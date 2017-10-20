@@ -82,6 +82,10 @@ public class AreaDBHelper extends SQLiteOpenHelper {
 
     public Integer deleteArea(Integer id) {
         SQLiteDatabase db = this.getWritableDatabase();
+
+        PositionsDBHelper pdb = new PositionsDBHelper(localContext);
+        pdb.deletePositionByAreaId(id);
+
         return db.delete(AREA_TABLE_NAME,
                 AREA_COLUMN_ID + " = ? ",
                 new String[]{Integer.toString(id)});
@@ -92,18 +96,33 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         db.execSQL("delete from "+ AREA_TABLE_NAME);
     }
 
-    public ArrayList<String> getAllAreas() {
-        ArrayList<String> array_list = new ArrayList<String>();
-
+    public ArrayList<AreaElement> getAllAreas() {
+        ArrayList<AreaElement> allAreas = new ArrayList<AreaElement>();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res = db.rawQuery("select * from " + AREA_TABLE_NAME, null);
-        res.moveToFirst();
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery("select * from " + AREA_TABLE_NAME, null);
+            if(cursor == null){
+                return allAreas;
+            }
+            if(cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                while (cursor.isAfterLast() == false) {
+                    AreaElement ae = new AreaElement();
+                    ae.setId(cursor.getInt(cursor.getColumnIndex(AREA_COLUMN_ID)));
+                    ae.setName(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_NAME)));
+                    ae.setDescription(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_DESCRIPTION)));
+                    allAreas.add(ae);
 
-        while (res.isAfterLast() == false) {
-            array_list.add(res.getString(res.getColumnIndex(AREA_COLUMN_NAME)));
-            res.moveToNext();
+                    cursor.moveToNext();
+                }
+            }
+        }finally {
+            if(cursor != null){
+                cursor.close();
+            }
         }
-        return array_list;
+        return allAreas;
     }
 
     public AreaElement getAreaByName(String name){

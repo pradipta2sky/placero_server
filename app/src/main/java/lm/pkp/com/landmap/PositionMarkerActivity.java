@@ -40,12 +40,16 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
         pdb = new PositionsDBHelper(getApplicationContext());
         adaptor = new PostionListAdaptor(getApplicationContext(), R.id.positionList, pList);
 
-        ae = adb.getAvailableArea();
-        if(ae.getName() == null){
-            String areaName = "AR_" + UUID.randomUUID().toString();
-            adb.insertArea(areaName, "", "", "");
-            ae = adb.getAvailableArea();
+        Bundle bundle = getIntent().getExtras();
+        String areaName = null;
+        if(bundle != null){
+            areaName = bundle.getString("area_name");
         }
+        if(areaName == null){
+            areaName = "AR_" + UUID.randomUUID().toString();
+            adb.insertArea(areaName, "No description.", "", "");
+        }
+        ae = adb.getAreaByName(areaName);
         pList.addAll(ae.getPositions());
         adaptor.notifyDataSetChanged();
 
@@ -64,7 +68,6 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
         bottomTB.inflateMenu(R.menu.marking_bottom_menu);
 
         TextView areaNameView = (TextView)findViewById(R.id.area_name_text);
-        String areaName = ae.getName();
         if(areaName.length() > 25){
             areaNameView.setText(areaName.substring(0,22).concat("..."));
         }else {
@@ -129,5 +132,11 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
         pList.add(insertedElem);
         adaptor.notifyDataSetChanged();
         findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent areaDashboardIntent = new Intent(PositionMarkerActivity.this, AreaDashboardActivity.class);
+        startActivity(areaDashboardIntent);
     }
 }

@@ -109,23 +109,29 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
                 + " AND "+POSITION_COLUMN_NAME+" = '"+pName+"'");
     }
 
+    public void deletePositionByAreaId(Integer areaId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM "+POSITION_TABLE_NAME+" WHERE "
+                + POSITION_COLUMN_AREA_ID +" = "+areaId);
+    }
+
     public void deleteAllPositions(){
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("delete from "+ POSITION_TABLE_NAME);
     }
 
     public ArrayList<String> getAllPositions() {
-        ArrayList<String> array_list = new ArrayList<String>();
+        ArrayList<String> positions = new ArrayList<String>();
 
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res = db.rawQuery("select * from " + POSITION_TABLE_NAME, null);
-        res.moveToFirst();
+        Cursor cursor = db.rawQuery("select * from " + POSITION_TABLE_NAME, null);
+        cursor.moveToFirst();
 
-        while (res.isAfterLast() == false) {
-            array_list.add(res.getString(res.getColumnIndex(POSITION_COLUMN_NAME)));
-            res.moveToNext();
+        while (cursor.isAfterLast() == false) {
+            positions.add(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_NAME)));
+            cursor.moveToNext();
         }
-        return array_list;
+        return positions;
     }
 
     public ArrayList<PositionElement> getAllPositionForArea(AreaElement ae) {

@@ -25,12 +25,16 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name=".PositionMarkerActivity"
-            android:label="@string/title_activity_position_marker">
+            android:name=".AreaDashboardActivity"
+            android:label="@string/title_activity_area_dashboard" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+        </activity>
+        <activity
+            android:name=".PositionMarkerActivity"
+            android:label="@string/title_activity_position_marker">
         </activity>
         <activity
             android:name=".AreaPlotterActivity"

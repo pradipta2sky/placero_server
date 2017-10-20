@@ -14,4 +14,6 @@
     <string name="edit_area_name">Edit Area</string>
     <string name="action_mark_location">Mark Location</string>
     <string name="title_activity_area_edit">Change Area Details</string>
+    <string name="new_area_create">Create Area</string>
+    <string name="title_activity_area_dashboard">IBhoomi</string>
 </resources>
