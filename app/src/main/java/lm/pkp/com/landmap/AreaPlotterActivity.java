@@ -9,9 +9,11 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -26,8 +28,11 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.maps.android.PolyUtil;
 import com.google.maps.android.SphericalUtil;
+import com.google.maps.android.ui.IconGenerator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -46,10 +51,11 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
     private Button infoButton;
     private OnInfoWindowElemTouchListener infoButtonListener;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         Bundle bundle = getIntent().getExtras();
         areaName = bundle.getString("area_name");
 
@@ -68,20 +74,11 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
         googleMap.setBuildingsEnabled(true);
 
         final MapWrapperLayout mapWrapperLayout = (MapWrapperLayout)findViewById(R.id.map_relative_layout);
-        // MapWrapperLayout initialization
-        // 39 - default marker height
-        // 20 - offset between the default InfoWindow bottom edge and it's content bottom edge
-
         mapWrapperLayout.init(googleMap, getPixelsFromDp(getApplicationContext(), 39 + 20));
-        // We want to reuse the info window for all the markers,
-        // so let's create only one class member instance
         this.infoWindow = (ViewGroup)getLayoutInflater().inflate(R.layout.info_window, null);
         this.infoTitle = (TextView)infoWindow.findViewById(R.id.title);
         this.infoSnippet = (TextView)infoWindow.findViewById(R.id.snippet);
         this.infoButton = (Button)infoWindow.findViewById(R.id.button);
-
-        // Setting custom OnTouchListener which deals with the pressed state
-        // so it shows up
         this.infoButtonListener = new OnInfoWindowElemTouchListener(infoButton,
                 getResources().getDrawable(R.drawable.round_but_green_sel), //btn_default_normal_holo_light
                 getResources().getDrawable(R.drawable.round_but_red_sel)) //btn_default_pressed_holo_light
@@ -105,7 +102,6 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
         };
         this.infoButton.setOnTouchListener(infoButtonListener);
 
-
         googleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
             @Override
             public View getInfoWindow(Marker marker) {
@@ -114,18 +110,19 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
 
             @Override
             public View getInfoContents(Marker marker) {
-                // Setting up the infoWindow with current's marker info
-                infoTitle.setText(marker.getTitle());
+                String markerTitle = marker.getTitle();
+                infoTitle.setText(markerTitle);
                 infoSnippet.setText(marker.getSnippet());
-                infoButtonListener.setMarker(marker);
-
-                // We must call this to set the current marker and infoWindow references
-                // to the MapWrapperLayout
+                if(markerTitle.indexOf("Area") != -1){
+                    infoButton.setVisibility(View.INVISIBLE);
+                }else {
+                    infoButton.setVisibility(View.VISIBLE);
+                    infoButtonListener.setMarker(marker);
+                }
                 mapWrapperLayout.setMarkerWithInfoWindow(marker, infoWindow);
                 return infoWindow;
             }
         });
-
        plotPolygonUsingPositions();
     }
 
@@ -150,41 +147,28 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
         final double lonAvg = lonTotal / positionElements.size();
 
         zoomCameraToPosition(latAvg, lonAvg);
+        drawPolygonForMarkers();
 
+        double polygonAreaSqMt = SphericalUtil.computeArea(polygon.getPoints());
+        double polygonAreaSqFt = polygonAreaSqMt * 10.7639;
+        polygonAreaSqFt = Math.round(polygonAreaSqFt);
+
+        IconGenerator iconFactory = new IconGenerator(this);
+        iconFactory.setStyle(IconGenerator.STYLE_WHITE);
+        MarkerOptions markerOptions = new MarkerOptions()
+                .position(new LatLng(latAvg,lonAvg))
+                .icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon("Area: " + polygonAreaSqFt
+                        + " square feet\nPos - Lat: " + latAvg + ", Long: " + lonAvg + "")))
+                .anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV());
+
+        Marker marker = googleMap.addMarker(markerOptions);
+        marker.setVisible(true);
+
+        adh.updateArea(ae.getId(), ae.getName(), ae.getDescription(), latAvg + "", lonAvg + "");
         googleMap.setOnPolygonClickListener(new GoogleMap.OnPolygonClickListener() {
-            @Override
             public void onPolygonClick(Polygon polygon) {
-
-                final TextView textView = new TextView(getApplicationContext());
-                textView.setText("Polygon Test");
-                textView.setTextSize(14);
-
-                final Paint paintText = textView.getPaint();
-
-                final Rect boundsText = new Rect();
-                paintText.getTextBounds("Polygon Test", 0, textView.length(), boundsText);
-                paintText.setTextAlign(Paint.Align.CENTER);
-
-                final Bitmap.Config conf = Bitmap.Config.ARGB_8888;
-                final Bitmap bmpText = Bitmap.createBitmap(boundsText.width() + 2
-                        * 5, boundsText.height() + 2 * 5, conf);
-
-                final Canvas canvasText = new Canvas(bmpText);
-                paintText.setColor(Color.BLACK);
-
-                canvasText.drawText("Polygon Test", canvasText.getWidth() / 2,
-                        canvasText.getHeight() - 5 - boundsText.bottom, paintText);
-
-                final MarkerOptions markerOptions = new MarkerOptions()
-                        .position(new LatLng(latAvg,lonAvg))
-                        .icon(BitmapDescriptorFactory.fromBitmap(bmpText))
-                        .anchor(0.5f, 1);
-
-                googleMap.addMarker(markerOptions);
             }
         });
-
-        drawPolygonForMarkers();
     }
 
     private void drawPolygonForMarkers() {
@@ -194,10 +178,6 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
         }
         polyOptions = polyOptions.strokeColor(Color.RED).fillColor(Color.CYAN).clickable(true).zIndex(1);
         polygon = googleMap.addPolygon(polyOptions);
-
-        //double polygonArea = PolygonUtil.getPolygonAreaSqFeet(polygon.getPoints());
-        double polygonArea = SphericalUtil.computeArea(polygon.getPoints());
-        Toast.makeText(getApplicationContext(), "Area : " + polygonArea, Toast.LENGTH_LONG).show();
     }
 
     public Marker drawMarkerUsingPosition(PositionElement pe) {
@@ -227,4 +207,5 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
         positionMarkerIntent.putExtra("area_name", ae.getName());
         startActivity(positionMarkerIntent);
     }
+
 }
