@@ -2,7 +2,11 @@ package lm.pkp.com.landmap;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
@@ -16,11 +20,14 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
+import com.google.maps.android.PolyUtil;
+import com.google.maps.android.SphericalUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +62,10 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
     @Override
     public void onMapReady(GoogleMap googleMap) {
         this.googleMap = googleMap;
+        googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        googleMap.setIndoorEnabled(true);
+        googleMap.setMyLocationEnabled(true);
+        googleMap.setBuildingsEnabled(true);
 
         final MapWrapperLayout mapWrapperLayout = (MapWrapperLayout)findViewById(R.id.map_relative_layout);
         // MapWrapperLayout initialization
@@ -123,6 +134,9 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
         ae = adh.getAreaByName(areaName);
         areaMarkers = new ArrayList<Marker>();
         List<PositionElement> positionElements = ae.getPositions();
+        if(positionElements.size() == 0){
+            return ;
+        }
         double latTotal = 0.0;
         double lonTotal = 0.0;
         for (int i = 0; i < positionElements.size(); i++) {
@@ -132,10 +146,44 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
             lonTotal += pe.getLon();
             areaMarkers.add(m);
         }
-        double latAvg = latTotal / positionElements.size();
-        double lonAvg = lonTotal / positionElements.size();
+        final double latAvg = latTotal / positionElements.size();
+        final double lonAvg = lonTotal / positionElements.size();
 
         zoomCameraToPosition(latAvg, lonAvg);
+
+        googleMap.setOnPolygonClickListener(new GoogleMap.OnPolygonClickListener() {
+            @Override
+            public void onPolygonClick(Polygon polygon) {
+
+                final TextView textView = new TextView(getApplicationContext());
+                textView.setText("Polygon Test");
+                textView.setTextSize(14);
+
+                final Paint paintText = textView.getPaint();
+
+                final Rect boundsText = new Rect();
+                paintText.getTextBounds("Polygon Test", 0, textView.length(), boundsText);
+                paintText.setTextAlign(Paint.Align.CENTER);
+
+                final Bitmap.Config conf = Bitmap.Config.ARGB_8888;
+                final Bitmap bmpText = Bitmap.createBitmap(boundsText.width() + 2
+                        * 5, boundsText.height() + 2 * 5, conf);
+
+                final Canvas canvasText = new Canvas(bmpText);
+                paintText.setColor(Color.BLACK);
+
+                canvasText.drawText("Polygon Test", canvasText.getWidth() / 2,
+                        canvasText.getHeight() - 5 - boundsText.bottom, paintText);
+
+                final MarkerOptions markerOptions = new MarkerOptions()
+                        .position(new LatLng(latAvg,lonAvg))
+                        .icon(BitmapDescriptorFactory.fromBitmap(bmpText))
+                        .anchor(0.5f, 1);
+
+                googleMap.addMarker(markerOptions);
+            }
+        });
+
         drawPolygonForMarkers();
     }
 
@@ -147,7 +195,8 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
         polyOptions = polyOptions.strokeColor(Color.RED).fillColor(Color.CYAN).clickable(true).zIndex(1);
         polygon = googleMap.addPolygon(polyOptions);
 
-        double polygonArea = PolygonUtil.getPolygonAreaSqFeet(polygon.getPoints());
+        //double polygonArea = PolygonUtil.getPolygonAreaSqFeet(polygon.getPoints());
+        double polygonArea = SphericalUtil.computeArea(polygon.getPoints());
         Toast.makeText(getApplicationContext(), "Area : " + polygonArea, Toast.LENGTH_LONG).show();
     }
 

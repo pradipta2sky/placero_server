@@ -42,14 +42,20 @@ public class AreaEditActivity extends AppCompatActivity{
 
                 EditText nameTextView = (EditText) findViewById(R.id.area_name_edit);
                 String nameText = nameTextView.getText().toString();
+                ae.setName(nameText);
 
                 EditText descTextView = (EditText) findViewById(R.id.area_desc_edit);
                 String descText = descTextView.getText().toString();
+                ae.setDescription(descText);
 
                 adb.updateArea(ae.getId(), nameText, descText, "0.0", "0.0");
                 areaNameView.setText(nameText);
 
                 findViewById(R.id.loadingPanel).setVisibility(View.INVISIBLE);
+
+                Intent positionMarkerIntent = new Intent(AreaEditActivity.this, PositionMarkerActivity.class);
+                positionMarkerIntent.putExtra("area_name", ae.getName());
+                startActivity(positionMarkerIntent);
 
             }
         });
