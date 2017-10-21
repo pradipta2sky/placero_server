@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.ActionMenuItemView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -98,7 +99,19 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
         markLocationItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
                 lp.getLocation();
+            }
+        });
+
+        ActionMenuItemView deleteAreaItem = (ActionMenuItemView)findViewById(R.id.action_delete_area);
+        deleteAreaItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+                adb.deleteArea(ae.getId());
+                Intent areaDashboardIntent = new Intent(PositionMarkerActivity.this, AreaDashboardActivity.class);
+                startActivity(areaDashboardIntent);
             }
         });
 

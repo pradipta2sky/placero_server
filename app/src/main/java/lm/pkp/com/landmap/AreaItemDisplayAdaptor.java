@@ -49,16 +49,6 @@ public class AreaItemDisplayAdaptor extends ArrayAdapter {
             desc = "No description.";
         }
         descText.setText(desc);
-
-        ImageView deleteButton = (ImageView) v.findViewById(R.id.del_row);
-        deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                items.remove(position);
-                adh.deleteArea(items.get(position).getId());
-                notifyDataSetChanged();
-            }
-        });
         return v;
     }
 }
