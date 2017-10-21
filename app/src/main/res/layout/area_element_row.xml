@@ -8,7 +8,7 @@
         android:id="@+id/area_default_image"
         android:layout_width="128px"
         android:layout_height="128px"
-        android:src="@drawable/area_flat"
+        android:src="@drawable/map_gen"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         />

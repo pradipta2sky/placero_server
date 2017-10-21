@@ -8,9 +8,10 @@
         android:id="@+id/position_default_img"
         android:layout_width="128px"
         android:layout_height="128px"
-        android:src="@drawable/green_map_marker_icon"
+        android:src="@drawable/marker_image"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
+        android:paddingRight="5dp"
         />
 
     <TextView
@@ -19,15 +20,18 @@
         android:layout_height="fill_parent"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
+        android:layout_toRightOf="@id/position_default_img"
         android:textSize="16sp"
+        android:textStyle="bold"
         android:textColor="#000000"/>
 
     <TextView
         android:id="@+id/pos_latlng"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
+        android:layout_toRightOf="@id/position_default_img"
+        android:layout_below="@id/pos_name"
         android:textSize="16sp"
         android:textColor="#000000"/>
 
