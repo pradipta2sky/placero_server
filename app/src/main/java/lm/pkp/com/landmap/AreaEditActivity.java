@@ -48,6 +48,9 @@ public class AreaEditActivity extends AppCompatActivity{
 
                 adb.updateArea(ae.getId(), nameText, descText, "0.0", "0.0");
                 areaNameView.setText(nameText);
+
+                findViewById(R.id.loadingPanel).setVisibility(View.INVISIBLE);
+
             }
         });
     }
@@ -63,5 +66,12 @@ public class AreaEditActivity extends AppCompatActivity{
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent positionMarkerIntent = new Intent(AreaEditActivity.this, PositionMarkerActivity.class);
+        positionMarkerIntent.putExtra("area_name", ae.getName());
+        startActivity(positionMarkerIntent);
     }
 }
