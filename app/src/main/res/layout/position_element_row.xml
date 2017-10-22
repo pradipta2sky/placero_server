@@ -6,12 +6,13 @@
 
     <ImageView
         android:id="@+id/position_default_img"
-        android:layout_width="128px"
-        android:layout_height="128px"
+        android:layout_width="96px"
+        android:layout_height="96px"
         android:src="@drawable/marker_image"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:paddingRight="5dp"
+        android:gravity="center_vertical"
         />
 
     <TextView
@@ -28,22 +29,24 @@
     <TextView
         android:id="@+id/pos_latlng"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_toRightOf="@id/position_default_img"
         android:layout_below="@id/pos_name"
         android:textSize="16sp"
-        android:textColor="#000000"/>
+        android:textColor="#000000"
+        android:width="0dip"/>
 
 
     <ImageView
         android:id="@+id/del_row"
-        android:layout_width="64px"
-        android:layout_height="64px"
+        android:layout_width="48px"
+        android:layout_height="48px"
         android:layout_marginRight="6dip"
         android:layout_marginTop="5dip"
         android:layout_alignParentRight="true"
         android:gravity="center_vertical"
-        android:src="@drawable/delete" />
+        android:src="@drawable/delete"
+        />
 
 </RelativeLayout>

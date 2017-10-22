@@ -69,8 +69,8 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
         bottomTB.inflateMenu(R.menu.marking_bottom_menu);
 
         TextView areaNameView = (TextView)findViewById(R.id.area_name_text);
-        if(areaName.length() > 25){
-            areaNameView.setText(areaName.substring(0,22).concat("..."));
+        if(areaName.length() > 20){
+            areaNameView.setText(areaName.substring(0,17).concat("..."));
         }else {
             areaNameView.setText(areaName);
         }

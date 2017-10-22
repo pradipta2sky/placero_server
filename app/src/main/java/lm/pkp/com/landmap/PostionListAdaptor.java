@@ -37,7 +37,7 @@ public class PostionListAdaptor extends ArrayAdapter<PositionElement> {
         TextView nameText = (TextView) v.findViewById(R.id.pos_name);
         nameText.setText(pe.getName());
         TextView latLongText = (TextView) v.findViewById(R.id.pos_latlng);
-        latLongText.setText("Lat: " + pe.getLat() + "," + "Long: " + pe.getLon());
+        latLongText.setText("Lat: " + pe.getLat() + "\n" + "Long: " + pe.getLon());
 
         ImageView deleteButton = (ImageView) v.findViewById(R.id.del_row);
         deleteButton.setOnClickListener(new View.OnClickListener() {

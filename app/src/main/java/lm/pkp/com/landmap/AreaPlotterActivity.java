@@ -34,6 +34,7 @@ import com.google.maps.android.PolyUtil;
 import com.google.maps.android.SphericalUtil;
 import com.google.maps.android.ui.IconGenerator;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -149,16 +150,19 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
         zoomCameraToPosition(latAvg, lonAvg);
         drawPolygonForMarkers();
 
+        DecimalFormat df = new DecimalFormat("###.##");
         double polygonAreaSqMt = SphericalUtil.computeArea(polygon.getPoints());
         double polygonAreaSqFt = polygonAreaSqMt * 10.7639;
-        polygonAreaSqFt = Math.round(polygonAreaSqFt);
+        double polygonAreaAcre = polygonAreaSqFt / 43560;
+        double polygonAreaDecimals = polygonAreaSqFt / 436;
 
         IconGenerator iconFactory = new IconGenerator(this);
         iconFactory.setStyle(IconGenerator.STYLE_WHITE);
         MarkerOptions markerOptions = new MarkerOptions()
                 .position(new LatLng(latAvg,lonAvg))
-                .icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon("Area: " + polygonAreaSqFt
-                        + " square feet\nPos - Lat: " + latAvg + ", Long: " + lonAvg + "")))
+                .icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon("Area: \nSq Ft - " + df.format(polygonAreaSqFt)
+                        + ", Acre - " + df.format(polygonAreaAcre) +", Decimals - "+ df.format(polygonAreaDecimals)
+                        +"\n\nPosition: \nLat: " + latAvg + ", Long: " + lonAvg + "")))
                 .anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV());
 
         Marker marker = googleMap.addMarker(markerOptions);
