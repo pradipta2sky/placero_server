@@ -1,4 +1,4 @@
-package lm.pkp.com.landmap;
+package lm.pkp.com.landmap.area;
 
 
 import android.content.ContentValues;
@@ -14,12 +14,13 @@ import android.location.Location;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
+import lm.pkp.com.landmap.sync.LandMapAsyncRestSync;
+import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.util.AndroidSystemUtil;
 

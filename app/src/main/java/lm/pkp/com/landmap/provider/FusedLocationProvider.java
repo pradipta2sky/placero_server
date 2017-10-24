@@ -1,4 +1,4 @@
-package lm.pkp.com.landmap;
+package lm.pkp.com.landmap.provider;
 
 import android.app.Activity;
 import android.content.Context;
@@ -7,6 +7,9 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+
+import lm.pkp.com.landmap.custom.LocationPositionReceiver;
+import lm.pkp.com.landmap.position.PositionElement;
 
 /**
  * Created by USER on 10/17/2017.

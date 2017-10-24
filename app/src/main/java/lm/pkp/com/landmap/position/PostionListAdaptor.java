@@ -1,4 +1,4 @@
-package lm.pkp.com.landmap;
+package lm.pkp.com.landmap.position;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,6 +9,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+
+import lm.pkp.com.landmap.R;
 
 /**
  * Created by USER on 10/16/2017.

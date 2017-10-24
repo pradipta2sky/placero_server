@@ -1,4 +1,4 @@
-package lm.pkp.com.landmap;
+package lm.pkp.com.landmap.position;
 
 
 import android.content.ContentValues;
@@ -11,10 +11,11 @@ import android.database.sqlite.SQLiteOpenHelper;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import lm.pkp.com.landmap.sync.LandMapAsyncRestSync;
+import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.util.AndroidSystemUtil;
 
 public class PositionsDBHelper extends SQLiteOpenHelper {

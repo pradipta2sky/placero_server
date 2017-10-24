@@ -1,7 +1,9 @@
-package lm.pkp.com.landmap;
+package lm.pkp.com.landmap.area;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import lm.pkp.com.landmap.position.PositionElement;
 
 /**
  * Created by USER on 10/16/2017.

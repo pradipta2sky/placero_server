@@ -1,4 +1,4 @@
-package lm.pkp.com.landmap;
+package lm.pkp.com.landmap.provider;
 
 /**
  * Created by USER on 10/16/2017.
@@ -14,6 +14,9 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
+
+import lm.pkp.com.landmap.custom.LocationPositionReceiver;
+import lm.pkp.com.landmap.position.PositionElement;
 
 public class GPSLocationProvider implements LocationListener {
 

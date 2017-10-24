@@ -2,20 +2,13 @@ package lm.pkp.com.landmap;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -28,15 +21,19 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
-import com.google.android.gms.maps.model.Polyline;
-import com.google.android.gms.maps.model.PolylineOptions;
-import com.google.maps.android.PolyUtil;
 import com.google.maps.android.SphericalUtil;
 import com.google.maps.android.ui.IconGenerator;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+
+import lm.pkp.com.landmap.area.AreaDBHelper;
+import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.custom.MapWrapperLayout;
+import lm.pkp.com.landmap.custom.OnInfoWindowElemTouchListener;
+import lm.pkp.com.landmap.position.PositionElement;
+import lm.pkp.com.landmap.position.PositionsDBHelper;
 
 public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyCallback {
 

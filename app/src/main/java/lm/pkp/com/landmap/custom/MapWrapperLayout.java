@@ -1,4 +1,4 @@
-package lm.pkp.com.landmap;
+package lm.pkp.com.landmap.custom;
 
 import android.content.Context;
 import android.graphics.Point;

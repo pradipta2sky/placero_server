@@ -8,17 +8,8 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
-import java.util.UUID;
-
-import lm.pkp.com.landmap.AreaDBHelper;
-import lm.pkp.com.landmap.AreaElement;
-import lm.pkp.com.landmap.LandMapAsyncRestSync;
-import lm.pkp.com.landmap.PositionsDBHelper;
-import lm.pkp.com.landmap.util.AndroidSystemUtil;
+import lm.pkp.com.landmap.area.AreaDBHelper;
+import lm.pkp.com.landmap.position.PositionsDBHelper;
 
 public class UserDBHelper extends SQLiteOpenHelper {
 

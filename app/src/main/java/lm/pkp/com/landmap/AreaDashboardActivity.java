@@ -11,9 +11,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
+
+import lm.pkp.com.landmap.area.AreaDBHelper;
+import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.area.AreaItemDisplayAdaptor;
 
 public class AreaDashboardActivity extends AppCompatActivity {
 

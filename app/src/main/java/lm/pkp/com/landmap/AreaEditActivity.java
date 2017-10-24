@@ -10,6 +10,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import lm.pkp.com.landmap.area.AreaDBHelper;
+import lm.pkp.com.landmap.area.AreaElement;
+
 public class AreaEditActivity extends AppCompatActivity{
 
     private AreaDBHelper adb = null;

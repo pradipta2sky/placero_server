@@ -1,4 +1,4 @@
-package lm.pkp.com.landmap;
+package lm.pkp.com.landmap.attic;
 
 import android.app.ProgressDialog;
 import android.os.Bundle;
@@ -14,6 +14,7 @@ import android.widget.Toast;
 
 import butterknife.ButterKnife;
 import butterknife.Bind;
+import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.google.signin.SignInActivity;
 
 public class LoginActivity extends AppCompatActivity {

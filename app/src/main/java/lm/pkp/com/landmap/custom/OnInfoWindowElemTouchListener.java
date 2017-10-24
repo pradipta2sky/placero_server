@@ -1,4 +1,4 @@
-package lm.pkp.com.landmap;
+package lm.pkp.com.landmap.custom;
 
 import android.graphics.drawable.Drawable;
 import android.os.Handler;

@@ -37,12 +37,12 @@
             android:label="@string/title_activity_area_edit" >
         </activity>
         <activity
-            android:name=".LoginActivity"
+            android:name=".attic.LoginActivity"
             android:label="@string/title_activity_login"
             android:windowSoftInputMode="stateHidden">
         </activity>
         <activity
-            android:name=".SignupActivity"
+            android:name=".attic.SignupActivity"
             android:label="@string/title_activity_signup"
             android:windowSoftInputMode="stateHidden">
         </activity>

@@ -1,15 +1,15 @@
-package lm.pkp.com.landmap;
+package lm.pkp.com.landmap.area;
 
-import android.app.Activity;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+
+import lm.pkp.com.landmap.R;
 
 /**
  * Created by USER on 10/20/2017.

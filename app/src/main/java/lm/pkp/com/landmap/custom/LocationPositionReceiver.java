@@ -1,4 +1,6 @@
-package lm.pkp.com.landmap;
+package lm.pkp.com.landmap.custom;
+
+import lm.pkp.com.landmap.position.PositionElement;
 
 /**
  * Created by USER on 10/17/2017.

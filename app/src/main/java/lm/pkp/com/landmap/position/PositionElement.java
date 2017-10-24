@@ -1,4 +1,4 @@
-package lm.pkp.com.landmap;
+package lm.pkp.com.landmap.position;
 
 /**
  * Created by USER on 10/16/2017.

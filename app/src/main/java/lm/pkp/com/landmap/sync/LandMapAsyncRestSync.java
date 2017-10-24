@@ -1,4 +1,4 @@
-package lm.pkp.com.landmap;
+package lm.pkp.com.landmap.sync;
 
 import android.os.AsyncTask;
 import android.util.Log;

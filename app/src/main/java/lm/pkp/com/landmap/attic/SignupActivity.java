@@ -1,4 +1,4 @@
-package lm.pkp.com.landmap;
+package lm.pkp.com.landmap.attic;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import butterknife.ButterKnife;
 import butterknife.Bind;
+import lm.pkp.com.landmap.R;
 
 public class SignupActivity extends AppCompatActivity {
     private static final String TAG = "SignupActivity";

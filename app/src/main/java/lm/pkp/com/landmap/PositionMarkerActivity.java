@@ -10,7 +10,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.ActionMenuItemView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -18,7 +17,15 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.UUID;
 
-public class PositionMarkerActivity extends AppCompatActivity implements LocationPositionReceiver{
+import lm.pkp.com.landmap.area.AreaDBHelper;
+import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.custom.LocationPositionReceiver;
+import lm.pkp.com.landmap.position.PositionElement;
+import lm.pkp.com.landmap.position.PositionsDBHelper;
+import lm.pkp.com.landmap.position.PostionListAdaptor;
+import lm.pkp.com.landmap.provider.GPSLocationProvider;
+
+public class PositionMarkerActivity extends AppCompatActivity implements LocationPositionReceiver {
 
     private ArrayList<PositionElement> pList = new ArrayList<PositionElement>();
     private PostionListAdaptor adaptor = null;
