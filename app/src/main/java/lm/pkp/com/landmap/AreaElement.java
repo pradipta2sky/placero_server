@@ -13,6 +13,7 @@ public class AreaElement {
     private String description;
     private double centerLat;
     private double centerLon;
+    private String unique_id;
     private List<PositionElement> positions = new ArrayList<PositionElement>();
 
     public Integer getId() {
@@ -61,5 +62,13 @@ public class AreaElement {
 
     public void setPositions(List<PositionElement> positions) {
         this.positions = positions;
+    }
+
+    public String getUnique_id() {
+        return unique_id;
+    }
+
+    public void setUnique_id(String unique_id) {
+        this.unique_id = unique_id;
     }
 }

@@ -8,13 +8,17 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 
 public class PositionsDBHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "landmap.db";
-
     public static final String POSITION_TABLE_NAME = "position_master";
+
     public static final String POSITION_COLUMN_ID = "id";
     public static final String POSITION_COLUMN_AREA_ID = "area_id";
     public static final String POSITION_COLUMN_NAME = "name";
@@ -22,6 +26,8 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
     public static final String POSITION_COLUMN_LAT = "lat";
     public static final String POSITION_COLUMN_LON = "lon";
     public static final String POSITION_COLUMN_TAGS = "tags";
+    private static final String POSITION_COLUMN_UNIQUE_AREA_ID = "uniqueAreaId";
+    private static final String POSITION_COLUMN_UNIQUE_ID = "uniqueId";
 
     public PositionsDBHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
@@ -37,6 +43,8 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
                         POSITION_COLUMN_DESCRIPTION + " text," +
                         POSITION_COLUMN_LAT + " text, " +
                         POSITION_COLUMN_LON + " text," +
+                        POSITION_COLUMN_UNIQUE_AREA_ID + " text," +
+                        POSITION_COLUMN_UNIQUE_ID + " text," +
                         POSITION_COLUMN_TAGS + " text)"
         );
     }
@@ -47,7 +55,8 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public PositionElement insertPosition(Integer areaId, String name, String desc, String lat, String lon, String tags) {
+    public PositionElement insertPosition(Integer areaId, String name, String desc, String lat, String lon, String tags
+            ,String uniqueAreadId , String uniqueId) {
         SQLiteDatabase db = this.getWritableDatabase();
         PositionElement pe = new PositionElement();
 
@@ -70,10 +79,69 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         contentValues.put(POSITION_COLUMN_TAGS, tags);
         pe.setTags(tags);
 
+        contentValues.put(POSITION_COLUMN_UNIQUE_AREA_ID,uniqueAreadId);
+        pe.setUniqueAreaId(uniqueAreadId);
+
+        contentValues.put(POSITION_COLUMN_UNIQUE_ID,uniqueId);
+        pe.setUniqueId(uniqueId);
+
         long id = db.insert(POSITION_TABLE_NAME, null, contentValues);
         pe.setId(id);
 
+        JSONObject postParams = preparePostParams("insert",null,areaId,lon,lat,desc,tags,name,null,uniqueAreadId,uniqueId);
+        new LandMapAsyncRestSync().execute(postParams);
         return pe;
+    }
+    private JSONObject preparePostParams(String queryType,String uniqueAreaId , String positionName) {
+        JSONObject postParams = preparePostParams(queryType,null,null,null,null,null,null,positionName,getDeviceId(),uniqueAreaId,null);
+        new LandMapAsyncRestSync().execute(postParams);
+        return  postParams;
+    }
+
+    private JSONObject preparePostParams(String queryType,String unique_id) {
+        JSONObject postParams = preparePostParams(queryType,null,null,null,null,null,null,null,getDeviceId(),null,unique_id);
+        new LandMapAsyncRestSync().execute(postParams);
+        return  postParams;
+    }
+
+    private JSONObject preparePostParams(String queryType , Integer id ,Integer areaId, String lon, String lat,
+                                         String desc, String tags, String name,String deviceID,String uniqueAreadId,String uniqueId) {
+        JSONObject postParams = new JSONObject();
+        try {
+            if(id!=null){
+                postParams.put("id",id);
+            }
+            if(deviceID==null){
+                deviceID = getDeviceId();
+            }
+            postParams.put("requestType", "PositionMaster");
+            postParams.put("queryType", queryType);
+            postParams.put("deviceID",deviceID);
+            postParams.put("area_id",areaId);
+            postParams.put("lon",lon);
+            postParams.put("lat",lat);
+            postParams.put("desc",desc);
+            postParams.put("tags",tags);
+            postParams.put("name",name);
+            postParams.put("uniqueAreaId",uniqueAreadId);
+            postParams.put("uniqueId",uniqueId);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return  postParams;
+    }
+
+    public String getDeviceId(){
+        String deviceID = null;
+        try {
+            Class<?> c = Class.forName("android.os.SystemProperties");
+            Method get = c.getMethod("get", String.class, String.class);
+            deviceID = (String) (get.invoke(c, "ro.serialno", "unknown"));
+            return deviceID;
+        }catch (Exception ignored){
+            ignored.printStackTrace();
+        }
+        return deviceID;
     }
 
     public int numberOfRows() {
@@ -82,8 +150,22 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         return numRows;
     }
 
-    public boolean updatePosition(Integer id, Integer areaId, String name, String desc, String lat, String lon, String tags) {
+    public Cursor getData(int id) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor res = db.rawQuery("select * from " + POSITION_TABLE_NAME + " where " + POSITION_COLUMN_ID + "=" + id + "", null);
+        return res;
+    }
+
+    public String getUniqueId(int id){
+        Cursor data = getData(id);
+        data.moveToFirst();
+        return data.getString(data.getColumnIndex(POSITION_COLUMN_UNIQUE_ID));
+    }
+
+    public boolean updatePosition(Integer id, Integer areaId, String name, String desc, String lat, String lon, String tags,
+                                  String uniqueAreadId) {
         SQLiteDatabase db = this.getWritableDatabase();
+        String uniqueId = getUniqueId(id);
         ContentValues contentValues = new ContentValues();
         contentValues.put(POSITION_COLUMN_AREA_ID, areaId);
         contentValues.put(POSITION_COLUMN_NAME, name);
@@ -92,27 +174,37 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         contentValues.put(POSITION_COLUMN_LON, lon);
         contentValues.put(POSITION_COLUMN_TAGS, tags);
         db.update(POSITION_TABLE_NAME, contentValues, POSITION_COLUMN_ID + " = ? ", new String[]{Integer.toString(id)});
+        JSONObject postParams = preparePostParams("update",id,areaId,name,lon,lat,desc,name,getDeviceId(),uniqueAreadId,uniqueId);
+        new LandMapAsyncRestSync().execute(postParams);
         return true;
     }
 
     public Integer deletePosition(Long id) {
         SQLiteDatabase db = this.getWritableDatabase();
-        return db.delete(POSITION_TABLE_NAME,
+        String uniqueId = getUniqueId(id.intValue());
+        int delete = db.delete(POSITION_TABLE_NAME,
                 POSITION_COLUMN_ID + " = ? ",
                 new String[]{id + ""});
+        JSONObject postParams = preparePostParams("delete",uniqueId);
+        new LandMapAsyncRestSync().execute(postParams);
+        return delete;
     }
 
-    public void deletePositionByName(String pName, Integer areaId) {
+    public void deletePositionByName(String pName, String uniqueAreaId) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM "+POSITION_TABLE_NAME+" WHERE "
-                + POSITION_COLUMN_AREA_ID +" = "+areaId
+                + POSITION_COLUMN_UNIQUE_AREA_ID +" = "+uniqueAreaId
                 + " AND "+POSITION_COLUMN_NAME+" = '"+pName+"'");
+        JSONObject postParams = preparePostParams("deleteByName",uniqueAreaId,pName);
+        new LandMapAsyncRestSync().execute(postParams);
     }
 
-    public void deletePositionByAreaId(Integer areaId) {
+    public void deletePositionByUniqueId(String uniqueAreaId) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM "+POSITION_TABLE_NAME+" WHERE "
-                + POSITION_COLUMN_AREA_ID +" = "+areaId);
+                + POSITION_COLUMN_UNIQUE_AREA_ID +" = '"+uniqueAreaId+"'");
+        JSONObject postParams = preparePostParams("deleteByUniqueAreaId", uniqueAreaId, null);
+        new LandMapAsyncRestSync().execute(postParams);
     }
 
     public void deleteAllPositions(){

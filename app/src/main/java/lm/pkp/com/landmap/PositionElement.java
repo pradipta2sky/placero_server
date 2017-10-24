@@ -13,6 +13,8 @@ public class PositionElement {
     private double lon;
     private String tags;
     private Integer viewPos;
+    private String uniqueAreaId;
+    private String uniqueId;
 
     public Integer getAreaId() {
         return areaId;
@@ -84,5 +86,21 @@ public class PositionElement {
         }else {
             return false;
         }
+    }
+
+    public String getUniqueAreaId() {
+        return uniqueAreaId;
+    }
+
+    public void setUniqueAreaId(String uniqueAreaId) {
+        this.uniqueAreaId = uniqueAreaId;
+    }
+
+    public String getUniqueId() {
+        return uniqueId;
+    }
+
+    public void setUniqueId(String uniqueId) {
+        this.uniqueId = uniqueId;
     }
 }
