@@ -49,6 +49,10 @@ public class AreaItemDisplayAdaptor extends ArrayAdapter {
             desc = "No description.";
         }
         descText.setText(desc);
+
+        TextView creatorText = (TextView) v.findViewById(R.id.area_creator_text);
+        creatorText.setText("Creator:" + ae.getCreatedBy());
+
         return v;
     }
 }

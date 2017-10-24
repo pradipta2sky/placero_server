@@ -1,5 +1,7 @@
 package lm.pkp.com.landmap.util;
 
+import android.net.Uri;
+
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
 import lm.pkp.com.landmap.user.UserElement;
@@ -15,7 +17,12 @@ public class UserMappingUtil {
         ue.setEmail(acct.getEmail());
         ue.setFamilyName(acct.getFamilyName());
         ue.setGivenName(acct.getGivenName());
-        ue.setPhotoUrl(acct.getPhotoUrl().toString());
+        Uri photoUri = acct.getPhotoUrl();
+        if(photoUri != null){
+            ue.setPhotoUrl(photoUri.toString());
+        }else {
+            ue.setPhotoUrl("");
+        }
         return ue;
     }
 }

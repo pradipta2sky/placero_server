@@ -11,10 +11,19 @@ public class AreaElement {
     private Integer id;
     private String name;
     private String description;
+    private String createdBy;
     private double centerLat;
     private double centerLon;
     private String unique_id;
     private List<PositionElement> positions = new ArrayList<PositionElement>();
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
 
     public Integer getId() {
         return id;

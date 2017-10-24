@@ -15,6 +15,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.util.AndroidSystemUtil;
 
 public class AreaDBHelper extends SQLiteOpenHelper {
@@ -26,6 +27,7 @@ public class AreaDBHelper extends SQLiteOpenHelper {
     public static final String AREA_COLUMN_ID = "id";
     public static final String AREA_COLUMN_NAME = "name";
     public static final String AREA_COLUMN_DESCRIPTION = "desc";
+    public static final String AREA_COLUMN_CREATED_BY = "created_by";
     public static final String AREA_COLUMN_CENTER_LAT = "center_lat";
     public static final String AREA_COLUMN_CENTER_LON = "center_lon";
     public static final String AREA_COLUMN_UNIQUE_ID = "unique_id";
@@ -42,6 +44,7 @@ public class AreaDBHelper extends SQLiteOpenHelper {
                         AREA_COLUMN_ID + " integer primary key, " +
                         AREA_COLUMN_NAME + " text," +
                         AREA_COLUMN_DESCRIPTION + " text," +
+                        AREA_COLUMN_CREATED_BY + " text," +
                         AREA_COLUMN_CENTER_LAT + " text, " +
                         AREA_COLUMN_CENTER_LON + " text, " +
                         AREA_COLUMN_UNIQUE_ID + " text )"
@@ -61,6 +64,7 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         contentValues.put(AREA_COLUMN_DESCRIPTION, desc);
         contentValues.put(AREA_COLUMN_CENTER_LAT, centerLat);
         contentValues.put(AREA_COLUMN_CENTER_LON, centerLon);
+        contentValues.put(AREA_COLUMN_CREATED_BY, UserContext.getInstance().getUserElement().getEmail());
         String uniqueId = UUID.randomUUID().toString();
         contentValues.put(AREA_COLUMN_UNIQUE_ID, uniqueId);
         db.insert(AREA_TABLE_NAME, null, contentValues);
@@ -149,11 +153,6 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         return delete;
     }
 
-    public void deleteAllAreas() {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("delete from " + AREA_TABLE_NAME);
-    }
-
     public ArrayList<AreaElement> getAllAreas() {
         ArrayList<AreaElement> allAreas = new ArrayList<AreaElement>();
         SQLiteDatabase db = this.getReadableDatabase();
@@ -170,6 +169,7 @@ public class AreaDBHelper extends SQLiteOpenHelper {
                     ae.setId(cursor.getInt(cursor.getColumnIndex(AREA_COLUMN_ID)));
                     ae.setName(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_NAME)));
                     ae.setDescription(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_DESCRIPTION)));
+                    ae.setCreatedBy(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_CREATED_BY)));
                     ae.setUniqueId(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_UNIQUE_ID)));
                     allAreas.add(ae);
 
@@ -198,32 +198,7 @@ public class AreaDBHelper extends SQLiteOpenHelper {
                 ae.setId(cursor.getInt(cursor.getColumnIndex(AREA_COLUMN_ID)));
                 ae.setName(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_NAME)));
                 ae.setDescription(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_DESCRIPTION)));
-                ae.setUniqueId(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_UNIQUE_ID)));
-
-                PositionsDBHelper pdb = new PositionsDBHelper(localContext);
-                ae.setPositions(pdb.getAllPositionForArea(ae));
-            }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-        return ae;
-    }
-
-    public AreaElement getAvailableArea() {
-        Cursor cursor = null;
-        AreaElement ae = new AreaElement();
-        try {
-            cursor = this.getReadableDatabase().rawQuery("SELECT * FROM " + AREA_TABLE_NAME, new String[]{});
-            if (cursor == null) {
-                return ae;
-            }
-            if (cursor.getCount() > 0) {
-                cursor.moveToFirst();
-                ae.setId(cursor.getInt(cursor.getColumnIndex(AREA_COLUMN_ID)));
-                ae.setName(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_NAME)));
-                ae.setDescription(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_DESCRIPTION)));
+                ae.setCreatedBy(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_CREATED_BY)));
                 ae.setUniqueId(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_UNIQUE_ID)));
 
                 PositionsDBHelper pdb = new PositionsDBHelper(localContext);
