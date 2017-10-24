@@ -41,7 +41,7 @@
                 android:id="@+id/area_display_list"
                 android:layout_gravity="top"
                 android:layout_marginTop="5dp"
-                android:divider="@color/common_plus_signin_btn_text_light_disabled"
+                android:divider="@color/aluminum"
                 android:dividerHeight="2dp"/>
         </LinearLayout>
     </ScrollView>

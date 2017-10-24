@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "508452433613",
+    "project_id": "firebase-ibhoomi"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:508452433613:android:9366d4c114b38f67",
+        "android_client_info": {
+          "package_name": "lm.pkp.com.landmap"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "508452433613-a96iq68m5gs6ri3ct7fds7rcmg40nh9a.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "508452433613-3efgq5j38urbhq0pmpebb8e2a5fhuf2t.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "lm.pkp.com.landmap",
+            "certificate_hash": "816586d115229c15ae03a3f4d58a73d574378f92"
+          }
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAGQItIMMsVu8kjvrU1KCR-zm1Xfdcxgnw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 1
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
