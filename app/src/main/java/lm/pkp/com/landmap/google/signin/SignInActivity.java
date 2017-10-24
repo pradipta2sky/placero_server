@@ -22,6 +22,10 @@ import com.google.android.gms.common.api.Status;
 
 import lm.pkp.com.landmap.AreaDashboardActivity;
 import lm.pkp.com.landmap.R;
+import lm.pkp.com.landmap.user.UserContext;
+import lm.pkp.com.landmap.user.UserDBHelper;
+import lm.pkp.com.landmap.user.UserElement;
+import lm.pkp.com.landmap.util.UserMappingUtil;
 
 /**
  * Activity to demonstrate basic retrieval of the Google user's ID, email address, and basic
@@ -129,12 +133,20 @@ public class SignInActivity extends AppCompatActivity implements
         if (result.isSuccess()) {
             // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
-            mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
-            updateUI(true);
+            //mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
+            //updateUI(true);
+
+            // Initialize user settings.
+            UserElement localUser = UserMappingUtil.convertGoogleAccountToLocalAccount(acct);
+            UserDBHelper udh = new UserDBHelper(getApplicationContext());
+            UserElement foundUser = udh.getUserByEmail(localUser.getEmail());
+            if(foundUser == null){
+                udh.insertUser(localUser);
+            }
+            UserContext.getInstance().setUserElement(localUser);
 
             Intent areaDashboardIntent = new Intent(SignInActivity.this, AreaDashboardActivity.class);
             startActivity(areaDashboardIntent);
-
         } else {
             // Signed out, show unauthenticated UI.
             updateUI(false);

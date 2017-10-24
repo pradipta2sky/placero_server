@@ -64,11 +64,11 @@ public class AreaElement {
         this.positions = positions;
     }
 
-    public String getUnique_id() {
+    public String getUniqueId() {
         return unique_id;
     }
 
-    public void setUnique_id(String unique_id) {
+    public void setUniqueId(String unique_id) {
         this.unique_id = unique_id;
     }
 }

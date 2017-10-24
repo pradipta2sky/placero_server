@@ -92,7 +92,7 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
             private void doRemovePositionByMarker(Marker marker) {
                 String positionName = marker.getTitle();
                 PositionsDBHelper pdh = new PositionsDBHelper(getApplicationContext());
-                pdh.deletePositionByName(positionName,ae.getUnique_id());
+                pdh.deletePositionByName(positionName,ae.getUniqueId());
                 for (int i = 0; i < areaMarkers.size(); i++) {
                     Marker m = areaMarkers.get(i);
                     m.remove();

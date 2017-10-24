@@ -141,7 +141,8 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
     @Override
     public void receivedLocationPostion(PositionElement pe) {
         pe.setName("Position_" + pList.size());
-        PositionElement insertedElem = pdb.insertPosition(ae.getId(), pe.getName(), pe.getDescription(), pe.getLat() + "", pe.getLon() + "", pe.getTags(),ae.getUnique_id(),"POS_"+adb.getDeviceId()+"_"+System.currentTimeMillis());
+        PositionElement insertedElem = pdb.insertPosition(ae.getId(), pe.getName(), pe.getDescription(),
+                pe.getLat() + "", pe.getLon() + "", pe.getTags(), ae.getUniqueId());
         pList.add(insertedElem);
         adaptor.notifyDataSetChanged();
         findViewById(R.id.loadingPanel).setVisibility(View.GONE);

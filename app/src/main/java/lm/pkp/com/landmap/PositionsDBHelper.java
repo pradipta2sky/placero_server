@@ -13,6 +13,9 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.UUID;
+
+import lm.pkp.com.landmap.util.AndroidSystemUtil;
 
 public class PositionsDBHelper extends SQLiteOpenHelper {
 
@@ -56,7 +59,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
     }
 
     public PositionElement insertPosition(Integer areaId, String name, String desc, String lat, String lon, String tags
-            ,String uniqueAreadId , String uniqueId) {
+            ,String uniqueAreadId) {
         SQLiteDatabase db = this.getWritableDatabase();
         PositionElement pe = new PositionElement();
 
@@ -79,9 +82,10 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         contentValues.put(POSITION_COLUMN_TAGS, tags);
         pe.setTags(tags);
 
-        contentValues.put(POSITION_COLUMN_UNIQUE_AREA_ID,uniqueAreadId);
+        contentValues.put(POSITION_COLUMN_UNIQUE_AREA_ID, uniqueAreadId);
         pe.setUniqueAreaId(uniqueAreadId);
 
+        String uniqueId = UUID.randomUUID().toString();
         contentValues.put(POSITION_COLUMN_UNIQUE_ID,uniqueId);
         pe.setUniqueId(uniqueId);
 
@@ -93,13 +97,13 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         return pe;
     }
     private JSONObject preparePostParams(String queryType,String uniqueAreaId , String positionName) {
-        JSONObject postParams = preparePostParams(queryType,null,null,null,null,null,null,positionName,getDeviceId(),uniqueAreaId,null);
+        JSONObject postParams = preparePostParams(queryType,null,null,null,null,null,null,positionName, AndroidSystemUtil.getDeviceId(),uniqueAreaId,null);
         new LandMapAsyncRestSync().execute(postParams);
         return  postParams;
     }
 
     private JSONObject preparePostParams(String queryType,String unique_id) {
-        JSONObject postParams = preparePostParams(queryType,null,null,null,null,null,null,null,getDeviceId(),null,unique_id);
+        JSONObject postParams = preparePostParams(queryType,null,null,null,null,null,null,null,AndroidSystemUtil.getDeviceId(),null,unique_id);
         new LandMapAsyncRestSync().execute(postParams);
         return  postParams;
     }
@@ -112,7 +116,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
                 postParams.put("id",id);
             }
             if(deviceID==null){
-                deviceID = getDeviceId();
+                deviceID = AndroidSystemUtil.getDeviceId();
             }
             postParams.put("requestType", "PositionMaster");
             postParams.put("queryType", queryType);
@@ -129,19 +133,6 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
             e.printStackTrace();
         }
         return  postParams;
-    }
-
-    public String getDeviceId(){
-        String deviceID = null;
-        try {
-            Class<?> c = Class.forName("android.os.SystemProperties");
-            Method get = c.getMethod("get", String.class, String.class);
-            deviceID = (String) (get.invoke(c, "ro.serialno", "unknown"));
-            return deviceID;
-        }catch (Exception ignored){
-            ignored.printStackTrace();
-        }
-        return deviceID;
     }
 
     public int numberOfRows() {
@@ -174,7 +165,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         contentValues.put(POSITION_COLUMN_LON, lon);
         contentValues.put(POSITION_COLUMN_TAGS, tags);
         db.update(POSITION_TABLE_NAME, contentValues, POSITION_COLUMN_ID + " = ? ", new String[]{Integer.toString(id)});
-        JSONObject postParams = preparePostParams("update",id,areaId,name,lon,lat,desc,name,getDeviceId(),uniqueAreadId,uniqueId);
+        JSONObject postParams = preparePostParams("update",id,areaId,name,lon,lat,desc,name,AndroidSystemUtil.getDeviceId(),uniqueAreadId,uniqueId);
         new LandMapAsyncRestSync().execute(postParams);
         return true;
     }

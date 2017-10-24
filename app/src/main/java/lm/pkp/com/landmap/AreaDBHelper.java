@@ -13,6 +13,9 @@ import org.json.JSONObject;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.UUID;
+
+import lm.pkp.com.landmap.util.AndroidSystemUtil;
 
 public class AreaDBHelper extends SQLiteOpenHelper {
 
@@ -41,9 +44,8 @@ public class AreaDBHelper extends SQLiteOpenHelper {
                         AREA_COLUMN_DESCRIPTION + " text," +
                         AREA_COLUMN_CENTER_LAT + " text, " +
                         AREA_COLUMN_CENTER_LON + " text, " +
-                        AREA_COLUMN_UNIQUE_ID  + " text )"
+                        AREA_COLUMN_UNIQUE_ID + " text )"
         );
-        new PositionsDBHelper(localContext).onCreate(db);
     }
 
     @Override
@@ -59,56 +61,45 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         contentValues.put(AREA_COLUMN_DESCRIPTION, desc);
         contentValues.put(AREA_COLUMN_CENTER_LAT, centerLat);
         contentValues.put(AREA_COLUMN_CENTER_LON, centerLon);
-        String unique_id = getDeviceId()+"_"+System.currentTimeMillis();
-        contentValues.put(AREA_COLUMN_UNIQUE_ID,unique_id);
+        String uniqueId = UUID.randomUUID().toString();
+        contentValues.put(AREA_COLUMN_UNIQUE_ID, uniqueId);
         db.insert(AREA_TABLE_NAME, null, contentValues);
-        JSONObject postParams = preparePostParams("insert",null,centerLon,centerLat,desc,name,null,unique_id);
+
+        JSONObject postParams = preparePostParams("insert", null, centerLon, centerLat, desc, name, null, uniqueId);
         new LandMapAsyncRestSync().execute(postParams);
+
         return true;
     }
 
-    private JSONObject preparePostParams(String queryType,String unique_id) {
+    private JSONObject preparePostParams(String queryType, String unique_id) {
         JSONObject postParams = new JSONObject();
-        postParams = preparePostParams(queryType,null,null,null,null,null,getDeviceId(),unique_id);
+        postParams = preparePostParams(queryType, null, null, null, null, null, AndroidSystemUtil.getDeviceId(), unique_id);
         new LandMapAsyncRestSync().execute(postParams);
-        return  postParams;
+        return postParams;
     }
 
-    private JSONObject preparePostParams(String queryType,Integer id,String centerlon, String centerlat, String desc, String name,
-                                         String deviceID,String unique_id) {
+    private JSONObject preparePostParams(String queryType, Integer id, String centerlon, String centerlat, String desc, String name,
+                                         String deviceID, String unique_id) {
         JSONObject postParams = new JSONObject();
         try {
-            if(id!=null) {
+            if (id != null) {
                 postParams.put("id", id);
             }
-            if(deviceID==null){
-                deviceID = getDeviceId();
+            if (deviceID == null) {
+                deviceID = AndroidSystemUtil.getDeviceId();
             }
             postParams.put("requestType", "AreaMaster");
             postParams.put("queryType", queryType);
-            postParams.put("deviceID",deviceID);
-            postParams.put("center_lon",centerlon);
-            postParams.put("center_lat",centerlat);
-            postParams.put("desc",desc);
-            postParams.put("name",name);
-            postParams.put("unique_id",unique_id);
+            postParams.put("deviceID", deviceID);
+            postParams.put("center_lon", centerlon);
+            postParams.put("center_lat", centerlat);
+            postParams.put("desc", desc);
+            postParams.put("name", name);
+            postParams.put("unique_id", unique_id);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return  postParams;
-    }
-
-    public String getDeviceId(){
-        String deviceID = null;
-        try {
-            Class<?> c = Class.forName("android.os.SystemProperties");
-            Method get = c.getMethod("get", String.class, String.class);
-            deviceID = (String) (get.invoke(c, "ro.serialno", "unknown"));
-            return deviceID;
-        }catch (Exception ignored){
-            ignored.printStackTrace();
-        }
-        return deviceID;
+        return postParams;
     }
 
     public Cursor getData(int id) {
@@ -125,15 +116,17 @@ public class AreaDBHelper extends SQLiteOpenHelper {
 
     public boolean updateArea(Integer id, String name, String desc, String centerLat, String centerLon) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String unique_id = getUniqueId(db,id);
+        String unique_id = getUniqueId(db, id);
         ContentValues contentValues = new ContentValues();
         contentValues.put(AREA_COLUMN_NAME, name);
         contentValues.put(AREA_COLUMN_DESCRIPTION, desc);
         contentValues.put(AREA_COLUMN_CENTER_LAT, centerLat);
         contentValues.put(AREA_COLUMN_CENTER_LON, centerLon);
         db.update(AREA_TABLE_NAME, contentValues, AREA_COLUMN_ID + " = ? ", new String[]{Integer.toString(id)});
-        JSONObject postParams = preparePostParams("update", id, centerLon, centerLat, desc, name,null,unique_id);
+
+        JSONObject postParams = preparePostParams("update", id, centerLon, centerLat, desc, name, null, unique_id);
         new LandMapAsyncRestSync().execute(postParams);
+
         return true;
     }
 
@@ -156,9 +149,9 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         return delete;
     }
 
-    public void deleteAllAreas(){
+    public void deleteAllAreas() {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("delete from "+ AREA_TABLE_NAME);
+        db.execSQL("delete from " + AREA_TABLE_NAME);
     }
 
     public ArrayList<AreaElement> getAllAreas() {
@@ -167,77 +160,77 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         Cursor cursor = null;
         try {
             cursor = db.rawQuery("select * from " + AREA_TABLE_NAME, null);
-            if(cursor == null){
+            if (cursor == null) {
                 return allAreas;
             }
-            if(cursor.getCount() > 0) {
+            if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 while (cursor.isAfterLast() == false) {
                     AreaElement ae = new AreaElement();
                     ae.setId(cursor.getInt(cursor.getColumnIndex(AREA_COLUMN_ID)));
                     ae.setName(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_NAME)));
                     ae.setDescription(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_DESCRIPTION)));
-                    ae.setUnique_id(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_UNIQUE_ID)));
+                    ae.setUniqueId(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_UNIQUE_ID)));
                     allAreas.add(ae);
 
                     cursor.moveToNext();
                 }
             }
-        }finally {
-            if(cursor != null){
+        } finally {
+            if (cursor != null) {
                 cursor.close();
             }
         }
         return allAreas;
     }
 
-    public AreaElement getAreaByName(String name){
+    public AreaElement getAreaByName(String name) {
         Cursor cursor = null;
         AreaElement ae = new AreaElement();
         try {
-            cursor = this.getReadableDatabase().rawQuery("SELECT * FROM "+AREA_TABLE_NAME+" WHERE "+AREA_COLUMN_NAME+"=?",
-                    new String[] {name});
-            if(cursor == null){
+            cursor = this.getReadableDatabase().rawQuery("SELECT * FROM " + AREA_TABLE_NAME + " WHERE " + AREA_COLUMN_NAME + "=?",
+                    new String[]{name});
+            if (cursor == null) {
                 return ae;
             }
-            if(cursor.getCount() > 0) {
+            if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 ae.setId(cursor.getInt(cursor.getColumnIndex(AREA_COLUMN_ID)));
                 ae.setName(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_NAME)));
                 ae.setDescription(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_DESCRIPTION)));
-                ae.setUnique_id(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_UNIQUE_ID)));
+                ae.setUniqueId(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_UNIQUE_ID)));
 
                 PositionsDBHelper pdb = new PositionsDBHelper(localContext);
                 ae.setPositions(pdb.getAllPositionForArea(ae));
             }
-        }finally {
-            if(cursor != null){
+        } finally {
+            if (cursor != null) {
                 cursor.close();
             }
         }
         return ae;
     }
 
-    public AreaElement getAvailableArea(){
+    public AreaElement getAvailableArea() {
         Cursor cursor = null;
         AreaElement ae = new AreaElement();
         try {
-            cursor = this.getReadableDatabase().rawQuery("SELECT * FROM "+AREA_TABLE_NAME, new String[]{});
-            if(cursor == null){
+            cursor = this.getReadableDatabase().rawQuery("SELECT * FROM " + AREA_TABLE_NAME, new String[]{});
+            if (cursor == null) {
                 return ae;
             }
-            if(cursor.getCount() > 0) {
+            if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 ae.setId(cursor.getInt(cursor.getColumnIndex(AREA_COLUMN_ID)));
                 ae.setName(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_NAME)));
                 ae.setDescription(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_DESCRIPTION)));
-                ae.setUnique_id(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_UNIQUE_ID)));
+                ae.setUniqueId(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_UNIQUE_ID)));
 
                 PositionsDBHelper pdb = new PositionsDBHelper(localContext);
                 ae.setPositions(pdb.getAllPositionForArea(ae));
             }
-        }finally {
-            if(cursor != null){
+        } finally {
+            if (cursor != null) {
                 cursor.close();
             }
         }
