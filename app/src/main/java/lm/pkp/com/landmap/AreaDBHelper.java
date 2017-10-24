@@ -7,12 +7,17 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import java.util.UUID;
 
 import lm.pkp.com.landmap.user.UserContext;
@@ -31,6 +36,7 @@ public class AreaDBHelper extends SQLiteOpenHelper {
     public static final String AREA_COLUMN_CENTER_LAT = "center_lat";
     public static final String AREA_COLUMN_CENTER_LON = "center_lon";
     public static final String AREA_COLUMN_UNIQUE_ID = "unique_id";
+    public static final String AREA_COLUMN_TAGS = "tags";
 
     public AreaDBHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
@@ -47,7 +53,8 @@ public class AreaDBHelper extends SQLiteOpenHelper {
                         AREA_COLUMN_CREATED_BY + " text," +
                         AREA_COLUMN_CENTER_LAT + " text, " +
                         AREA_COLUMN_CENTER_LON + " text, " +
-                        AREA_COLUMN_UNIQUE_ID + " text )"
+                        AREA_COLUMN_UNIQUE_ID + " text, " +
+                        AREA_COLUMN_TAGS + " text )"
         );
     }
 
@@ -65,8 +72,11 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         contentValues.put(AREA_COLUMN_CENTER_LAT, centerLat);
         contentValues.put(AREA_COLUMN_CENTER_LON, centerLon);
         contentValues.put(AREA_COLUMN_CREATED_BY, UserContext.getInstance().getUserElement().getEmail());
+
         String uniqueId = UUID.randomUUID().toString();
         contentValues.put(AREA_COLUMN_UNIQUE_ID, uniqueId);
+        contentValues.put(AREA_COLUMN_TAGS, "");
+
         db.insert(AREA_TABLE_NAME, null, contentValues);
 
         JSONObject postParams = preparePostParams("insert", null, centerLon, centerLat, desc, name, null, uniqueId);
@@ -82,8 +92,8 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         return postParams;
     }
 
-    private JSONObject preparePostParams(String queryType, Integer id, String centerlon, String centerlat, String desc, String name,
-                                         String deviceID, String unique_id) {
+    private JSONObject preparePostParams(String queryType, Integer id, String centerlon, String centerlat,
+                                         String desc, String name, String deviceID, String unique_id) {
         JSONObject postParams = new JSONObject();
         try {
             if (id != null) {
@@ -118,17 +128,39 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         return numRows;
     }
 
-    public boolean updateArea(Integer id, String name, String desc, String centerLat, String centerLon) {
+    public boolean updateArea(AreaElement ae) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String unique_id = getUniqueId(db, id);
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(AREA_COLUMN_NAME, name);
-        contentValues.put(AREA_COLUMN_DESCRIPTION, desc);
-        contentValues.put(AREA_COLUMN_CENTER_LAT, centerLat);
-        contentValues.put(AREA_COLUMN_CENTER_LON, centerLon);
-        db.update(AREA_TABLE_NAME, contentValues, AREA_COLUMN_ID + " = ? ", new String[]{Integer.toString(id)});
+        String unique_id = getUniqueId(db, ae.getId());
 
-        JSONObject postParams = preparePostParams("update", id, centerLon, centerLat, desc, name, null, unique_id);
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(AREA_COLUMN_NAME, ae.getName());
+        contentValues.put(AREA_COLUMN_DESCRIPTION, ae.getDescription());
+        contentValues.put(AREA_COLUMN_CENTER_LAT, ae.getCenterLat());
+        contentValues.put(AREA_COLUMN_CENTER_LON, ae.getCenterLon());
+        try{
+            Location areaLocation = new Location("");
+            areaLocation.setLatitude(ae.getCenterLat());
+            areaLocation.setLongitude(ae.getCenterLon());
+
+            StringBuffer buf = new StringBuffer();
+            Geocoder geocoder = new Geocoder(localContext,Locale.ENGLISH);
+            List<Address> addresses = geocoder.getFromLocation(areaLocation.getLatitude(), areaLocation.getLongitude(), 1);
+            String cityName = addresses.get(0).getAddressLine(0);
+            buf.append("city:" + cityName + ",");
+            String stateName = addresses.get(0).getAddressLine(1);
+            buf.append("state:" + stateName + ",");
+            String countryName = addresses.get(0).getAddressLine(2);
+            buf.append("country:" + countryName);
+
+            contentValues.put(AREA_COLUMN_TAGS, buf.toString());
+        }catch (Exception e){
+            // Do nothing if fails.
+        }
+
+        db.update(AREA_TABLE_NAME, contentValues, AREA_COLUMN_ID + " = ? ", new String[]{Integer.toString(ae.getId())});
+
+        JSONObject postParams = preparePostParams("update", ae.getId(), ae.getCenterLon() + "",
+                ae.getCenterLat() + "", ae.getDescription(), ae.getName(), null, unique_id);
         new LandMapAsyncRestSync().execute(postParams);
 
         return true;
@@ -171,8 +203,9 @@ public class AreaDBHelper extends SQLiteOpenHelper {
                     ae.setDescription(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_DESCRIPTION)));
                     ae.setCreatedBy(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_CREATED_BY)));
                     ae.setUniqueId(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_UNIQUE_ID)));
-                    allAreas.add(ae);
+                    ae.setTags(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_TAGS)));
 
+                    allAreas.add(ae);
                     cursor.moveToNext();
                 }
             }
@@ -200,6 +233,7 @@ public class AreaDBHelper extends SQLiteOpenHelper {
                 ae.setDescription(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_DESCRIPTION)));
                 ae.setCreatedBy(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_CREATED_BY)));
                 ae.setUniqueId(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_UNIQUE_ID)));
+                ae.setTags(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_TAGS)));
 
                 PositionsDBHelper pdb = new PositionsDBHelper(localContext);
                 ae.setPositions(pdb.getAllPositionForArea(ae));

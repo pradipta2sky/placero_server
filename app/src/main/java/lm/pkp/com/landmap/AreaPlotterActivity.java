@@ -168,7 +168,10 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
         Marker marker = googleMap.addMarker(markerOptions);
         marker.setVisible(true);
 
-        adh.updateArea(ae.getId(), ae.getName(), ae.getDescription(), latAvg + "", lonAvg + "");
+        ae.setCenterLon(latAvg);
+        ae.setCenterLon(lonAvg);
+        adh.updateArea(ae);
+
         googleMap.setOnPolygonClickListener(new GoogleMap.OnPolygonClickListener() {
             public void onPolygonClick(Polygon polygon) {
             }

@@ -15,7 +15,16 @@ public class AreaElement {
     private double centerLat;
     private double centerLon;
     private String unique_id;
+    private String tags;
     private List<PositionElement> positions = new ArrayList<PositionElement>();
+
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
+    }
 
     public String getCreatedBy() {
         return createdBy;

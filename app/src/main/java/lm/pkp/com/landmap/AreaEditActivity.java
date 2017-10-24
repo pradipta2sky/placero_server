@@ -48,7 +48,10 @@ public class AreaEditActivity extends AppCompatActivity{
                 String descText = descTextView.getText().toString();
                 ae.setDescription(descText);
 
-                adb.updateArea(ae.getId(), nameText, descText, "0.0", "0.0");
+                ae.setCenterLat(0.0);
+                ae.setCenterLon(0.0);
+
+                adb.updateArea(ae);
                 areaNameView.setText(nameText);
 
                 findViewById(R.id.loadingPanel).setVisibility(View.INVISIBLE);

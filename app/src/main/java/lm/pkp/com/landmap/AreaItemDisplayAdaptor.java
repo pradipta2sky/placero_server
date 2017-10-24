@@ -51,8 +51,16 @@ public class AreaItemDisplayAdaptor extends ArrayAdapter {
         descText.setText(desc);
 
         TextView creatorText = (TextView) v.findViewById(R.id.area_creator_text);
-        creatorText.setText("Creator:" + ae.getCreatedBy());
+        creatorText.setText(ae.getCreatedBy());
 
+        TextView tagsText = (TextView) v.findViewById(R.id.area_tags_text);
+        String areaTags = ae.getTags();
+        if(areaTags != null && !areaTags.trim().equalsIgnoreCase("")){
+            tagsText.setText(ae.getTags());
+            tagsText.setVisibility(View.VISIBLE);
+        }else {
+            tagsText.setVisibility(View.INVISIBLE);
+        }
         return v;
     }
 }
