@@ -8,8 +8,13 @@ import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import lm.pkp.com.landmap.area.AreaDBHelper;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
+import lm.pkp.com.landmap.sync.LandMapAsyncRestSync;
+import lm.pkp.com.landmap.util.AndroidSystemUtil;
 
 public class UserDBHelper extends SQLiteOpenHelper {
 
@@ -61,22 +66,21 @@ public class UserDBHelper extends SQLiteOpenHelper {
         contentValues.put(USER_COLUMN_AUTH_SYS_ID, user.getAuthSystemId());
         db.insert(USER_TABLE_NAME, null, contentValues);
 
-        //JSONObject postParams = preparePostParams("insert", null, centerLon, centerLat, desc, name, null, uniqueId);
-        //new LandMapAsyncRestSync().execute(postParams);
+        JSONObject postParams = preparePostParams("insert", contentValues, null ,null);
+        new LandMapAsyncRestSync().execute(postParams);
 
         return true;
     }
 
-    /*
-    private JSONObject preparePostParams(String queryType, String unique_id) {
+
+    /*private JSONObject preparePostParams(String queryType, String unique_id) {
         JSONObject postParams = new JSONObject();
         postParams = preparePostParams(queryType, null, null, null, null, null, AndroidSystemUtil.getDeviceId(), unique_id);
         new LandMapAsyncRestSync().execute(postParams);
         return postParams;
-    }
+    }*/
 
-    private JSONObject preparePostParams(String queryType, Integer id, String centerlon, String centerlat, String desc, String name,
-                                         String deviceID, String unique_id) {
+    private JSONObject preparePostParams(String queryType, ContentValues contentValues,String id ,String deviceID) {
         JSONObject postParams = new JSONObject();
         try {
             if (id != null) {
@@ -85,20 +89,20 @@ public class UserDBHelper extends SQLiteOpenHelper {
             if (deviceID == null) {
                 deviceID = AndroidSystemUtil.getDeviceId();
             }
-            postParams.put("requestType", "AreaMaster");
+            postParams.put("requestType", "UserMaster");
             postParams.put("queryType", queryType);
             postParams.put("deviceID", deviceID);
-            postParams.put("center_lon", centerlon);
-            postParams.put("center_lat", centerlat);
-            postParams.put("desc", desc);
-            postParams.put("name", name);
-            postParams.put("unique_id", unique_id);
+            postParams.put(USER_COLUMN_DISPLAY_NAME, contentValues.get(USER_COLUMN_DISPLAY_NAME));
+            postParams.put(USER_COLUMN_FAMILY_NAME, contentValues.get(USER_COLUMN_FAMILY_NAME));
+            postParams.put(USER_COLUMN_GIVEN_NAME,contentValues.get(USER_COLUMN_GIVEN_NAME));
+            postParams.put(USER_COLUMN_AUTH_SYS_ID, contentValues.get(USER_COLUMN_AUTH_SYS_ID));
+            postParams.put(USER_COLUMN_EMAIL, contentValues.get(USER_COLUMN_EMAIL));
+            postParams.put(USER_COLUMN_PHOTO_URL,contentValues.get(USER_COLUMN_PHOTO_URL));
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return postParams;
     }
-    */
 
     public Cursor getData(String email) {
         SQLiteDatabase db = this.getReadableDatabase();
