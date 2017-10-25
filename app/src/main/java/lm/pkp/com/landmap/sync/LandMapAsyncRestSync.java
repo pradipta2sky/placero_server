@@ -27,7 +27,7 @@ public class LandMapAsyncRestSync extends AsyncTask<JSONObject, Void, String> {
 
     protected String doInBackground(JSONObject... postDataParams) {
         try {
-            String urlString = "http://35.202.7.223/";
+            String urlString = "http://35.202.7.223/lm/";
             JSONObject postDataParam = postDataParams[0];
             String queryType = postDataParam.getString("queryType");
             String requestType = postDataParam.getString("requestType");
@@ -52,24 +52,19 @@ public class LandMapAsyncRestSync extends AsyncTask<JSONObject, Void, String> {
             os.close();
 
             int responseCode = conn.getResponseCode();
-
             if (responseCode == HttpsURLConnection.HTTP_OK) {
-
                 BufferedReader in = new BufferedReader(new
                         InputStreamReader(
                         conn.getInputStream()));
 
                 StringBuffer sb = new StringBuffer("");
                 String line = "";
-
                 while ((line = in.readLine()) != null) {
                     sb.append(line);
                     break;
                 }
-
                 in.close();
                 return sb.toString();
-
             } else {
                 return new String("false : " + responseCode);
             }

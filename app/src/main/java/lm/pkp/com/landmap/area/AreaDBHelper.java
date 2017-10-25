@@ -146,13 +146,16 @@ public class AreaDBHelper extends SQLiteOpenHelper {
             StringBuffer buf = new StringBuffer();
             Geocoder geocoder = new Geocoder(localContext,Locale.ENGLISH);
             List<Address> addresses = geocoder.getFromLocation(areaLocation.getLatitude(), areaLocation.getLongitude(), 1);
-            String cityName = addresses.get(0).getAddressLine(0);
-            buf.append("city:" + cityName + ",");
-            String stateName = addresses.get(0).getAddressLine(1);
-            buf.append("state:" + stateName + ",");
-            String countryName = addresses.get(0).getAddressLine(2);
-            buf.append("country:" + countryName);
-
+            for (int i = 0; i < addresses.size(); i++) {
+                Address address = addresses.get(i);
+                int maxLine = address.getMaxAddressLineIndex();
+                for (int j = 0; j <= maxLine; j++) {
+                    buf.append(address.getAddressLine(j));
+                    if(j != maxLine){
+                        buf.append(",");
+                    }
+                }
+            }
             contentValues.put(AREA_COLUMN_TAGS, buf.toString());
         }catch (Exception e){
             // Do nothing if fails.
