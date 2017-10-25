@@ -37,17 +37,21 @@ public class AreaEditActivity extends AppCompatActivity{
         final TextView areaNameView = (TextView)findViewById(R.id.area_name_fixed);
         areaNameView.setText(ae.getName());
 
+        final EditText nameTextView = (EditText) findViewById(R.id.area_name_edit);
+        nameTextView.setText(ae.getName());
+
+        final EditText descTextView = (EditText) findViewById(R.id.area_desc_edit);
+        descTextView.setText(ae.getDescription());
+
         Button saveButton = (Button)findViewById(R.id.area_edit_save_btn);
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
 
-                EditText nameTextView = (EditText) findViewById(R.id.area_name_edit);
                 String nameText = nameTextView.getText().toString();
                 ae.setName(nameText);
 
-                EditText descTextView = (EditText) findViewById(R.id.area_desc_edit);
                 String descText = descTextView.getText().toString();
                 ae.setDescription(descText);
 
@@ -59,7 +63,6 @@ public class AreaEditActivity extends AppCompatActivity{
                 Intent positionMarkerIntent = new Intent(AreaEditActivity.this, PositionMarkerActivity.class);
                 positionMarkerIntent.putExtra("area_name", ae.getName());
                 startActivity(positionMarkerIntent);
-
             }
         });
     }
