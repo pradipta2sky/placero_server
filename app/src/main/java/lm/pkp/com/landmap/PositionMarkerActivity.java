@@ -122,6 +122,15 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
             }
         });
 
+        ActionMenuItemView shareAreaItem = (ActionMenuItemView)findViewById(R.id.action_share_area);
+        shareAreaItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent areaShareIntent = new Intent(PositionMarkerActivity.this, AreaShareActivity.class);
+                areaShareIntent.putExtra("area_name", ae.getName());
+                startActivity(areaShareIntent);
+            }
+        });
     }
 
     private boolean approachLocationPermissions() {

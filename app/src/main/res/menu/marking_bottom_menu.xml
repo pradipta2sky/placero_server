@@ -14,4 +14,10 @@
         android:background="?android:attr/selectableItemBackground"
         app:showAsAction="always"/>
 
+    <item android:id="@+id/action_share_area"
+        android:title="@string/action_share_area"
+        android:icon="@drawable/share_icon"
+        android:background="?android:attr/selectableItemBackground"
+        app:showAsAction="always"/>
+
 </menu>

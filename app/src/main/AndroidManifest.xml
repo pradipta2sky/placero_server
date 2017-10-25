@@ -77,8 +77,8 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".google.signin.SignInActivityWithDrive"
-            android:label="@string/title_activity_google_signin_drive"
+            android:name=".AreaShareActivity"
+            android:label="@string/label_share_area"
             android:windowSoftInputMode="stateHidden">
         </activity>
     </application>
