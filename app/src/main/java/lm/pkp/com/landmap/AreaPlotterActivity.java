@@ -125,7 +125,7 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
     }
 
     private void plotPolygonUsingPositions() {
-        AreaDBHelper adh = new AreaDBHelper(getApplicationContext());
+        final AreaDBHelper adh = new AreaDBHelper(getApplicationContext());
         ae = adh.getAreaByName(areaName);
         areaMarkers = new ArrayList<Marker>();
         List<PositionElement> positionElements = ae.getPositions();
@@ -165,9 +165,14 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
         Marker marker = googleMap.addMarker(markerOptions);
         marker.setVisible(true);
 
-        ae.setCenterLon(latAvg);
+        ae.setCenterLat(latAvg);
         ae.setCenterLon(lonAvg);
-        adh.updateArea(ae);
+
+        new Thread(new Runnable() {
+            public void run() {
+                adh.updateArea(ae);
+            }
+        }).start();
 
         googleMap.setOnPolygonClickListener(new GoogleMap.OnPolygonClickListener() {
             public void onPolygonClick(Polygon polygon) {

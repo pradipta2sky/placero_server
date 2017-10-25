@@ -51,9 +51,6 @@ public class AreaEditActivity extends AppCompatActivity{
                 String descText = descTextView.getText().toString();
                 ae.setDescription(descText);
 
-                ae.setCenterLat(0.0);
-                ae.setCenterLon(0.0);
-
                 adb.updateArea(ae);
                 areaNameView.setText(nameText);
 
