@@ -55,7 +55,7 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
         }
         if(areaName == null){
             areaName = "AR_" + UUID.randomUUID().toString();
-            adb.insertArea(areaName, "No description.", "", "");
+            adb.insertArea(areaName, "No description.");
         }
         ae = adb.getAreaByName(areaName);
         pList.addAll(ae.getPositions());

@@ -72,25 +72,6 @@ public class UserDBHelper extends SQLiteOpenHelper {
         return true;
     }
 
-    public boolean searchUser(String displayName) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(USER_COLUMN_DISPLAY_NAME, user.getDisplayName());
-        db.insert(USER_TABLE_NAME, null, contentValues);
-
-        JSONObject postParams = preparePostParams("search", contentValues, null ,null);
-        new LandMapAsyncRestSync().execute(postParams);
-
-        return true;
-    }
-
-    /*private JSONObject preparePostParams(String queryType, String unique_id) {
-        JSONObject postParams = new JSONObject();
-        postParams = preparePostParams(queryType, null, null, null, null, null, AndroidSystemUtil.getDeviceId(), unique_id);
-        new LandMapAsyncRestSync().execute(postParams);
-        return postParams;
-    }*/
-
     private JSONObject preparePostParams(String queryType, ContentValues contentValues,String id ,String deviceID) {
         JSONObject postParams = new JSONObject();
         try {

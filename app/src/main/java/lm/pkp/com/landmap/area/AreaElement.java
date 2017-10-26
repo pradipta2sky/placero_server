@@ -14,11 +14,32 @@ public class AreaElement {
     private String name;
     private String description;
     private String createdBy;
-    private double centerLat;
-    private double centerLon;
+    private String ownershipType;
+
+    private double centerLat = 0.0;
+    private double centerLon = 0.0;
+    private double measureSqFt = 0.0;
+
     private String unique_id;
     private String tags;
+
     private List<PositionElement> positions = new ArrayList<PositionElement>();
+
+    public String getOwnershipType() {
+        return ownershipType;
+    }
+
+    public void setOwnershipType(String ownershipType) {
+        this.ownershipType = ownershipType;
+    }
+
+    public double getMeasureSqFt() {
+        return measureSqFt;
+    }
+
+    public void setMeasureSqFt(double measureSqFt) {
+        this.measureSqFt = measureSqFt;
+    }
 
     public String getTags() {
         return tags;

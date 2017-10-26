@@ -34,8 +34,10 @@ public class AreaDBHelper extends SQLiteOpenHelper {
     public static final String AREA_COLUMN_NAME = "name";
     public static final String AREA_COLUMN_DESCRIPTION = "desc";
     public static final String AREA_COLUMN_CREATED_BY = "created_by";
+    public static final String AREA_COLUMN_OWNERSHIP_TYPE = "ownership_type";
     public static final String AREA_COLUMN_CENTER_LAT = "center_lat";
     public static final String AREA_COLUMN_CENTER_LON = "center_lon";
+    public static final String AREA_COLUMN_MEASURE_SQ_FT = "measure_sq_ft";
     public static final String AREA_COLUMN_UNIQUE_ID = "unique_id";
     public static final String AREA_COLUMN_TAGS = "tags";
 
@@ -52,8 +54,10 @@ public class AreaDBHelper extends SQLiteOpenHelper {
                         AREA_COLUMN_NAME + " text," +
                         AREA_COLUMN_DESCRIPTION + " text," +
                         AREA_COLUMN_CREATED_BY + " text," +
+                        AREA_COLUMN_OWNERSHIP_TYPE + " text," +
                         AREA_COLUMN_CENTER_LAT + " text, " +
                         AREA_COLUMN_CENTER_LON + " text, " +
+                        AREA_COLUMN_MEASURE_SQ_FT + " text, " +
                         AREA_COLUMN_UNIQUE_ID + " text, " +
                         AREA_COLUMN_TAGS + " text )"
         );
@@ -65,52 +69,62 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean insertArea(String name, String desc, String centerLat, String centerLon) {
+    public boolean insertArea(String name, String desc) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues contentValues = new ContentValues();
         contentValues.put(AREA_COLUMN_NAME, name);
         contentValues.put(AREA_COLUMN_DESCRIPTION, desc);
-        contentValues.put(AREA_COLUMN_CENTER_LAT, centerLat);
-        contentValues.put(AREA_COLUMN_CENTER_LON, centerLon);
+        String createdBy = UserContext.getInstance().getUserElement().getEmail();
         contentValues.put(AREA_COLUMN_CREATED_BY, UserContext.getInstance().getUserElement().getEmail());
+        contentValues.put(AREA_COLUMN_OWNERSHIP_TYPE, "self");
 
         String uniqueId = UUID.randomUUID().toString();
         contentValues.put(AREA_COLUMN_UNIQUE_ID, uniqueId);
         contentValues.put(AREA_COLUMN_TAGS, "");
+        contentValues.put(AREA_COLUMN_CENTER_LAT, "0.0");
+        contentValues.put(AREA_COLUMN_CENTER_LON, "0.0");
+        contentValues.put(AREA_COLUMN_MEASURE_SQ_FT, "0");
 
         db.insert(AREA_TABLE_NAME, null, contentValues);
 
-        JSONObject postParams = preparePostParams("insert", null, centerLon, centerLat, desc, name, null, uniqueId);
+        JSONObject postParams = preparePostParams("insert", null, "0.0", "0.0", desc, name,
+                AndroidSystemUtil.getDeviceId(), uniqueId, "self", "0", createdBy);
         new LandMapAsyncRestSync().execute(postParams);
 
         return true;
     }
 
-    private JSONObject preparePostParams(String queryType, String unique_id) {
+    private JSONObject preparePostParams(String queryType, String uniqueId) {
         JSONObject postParams = new JSONObject();
-        postParams = preparePostParams(queryType, null, null, null, null, null, AndroidSystemUtil.getDeviceId(), unique_id);
+        postParams = preparePostParams(queryType, null, null, null, null, null, null, uniqueId, null, null, null);
         new LandMapAsyncRestSync().execute(postParams);
         return postParams;
     }
 
-    private JSONObject preparePostParams(String queryType, Integer id, String centerlon, String centerlat,
-                                         String desc, String name, String deviceID, String unique_id) {
+    private JSONObject preparePostParams(String queryType, Integer id, String cln, String clt,
+                                         String desc, String name, String did, String uid, String owt,
+                                         String mSqFt, String cBy) {
         JSONObject postParams = new JSONObject();
         try {
             if (id != null) {
                 postParams.put("id", id);
             }
-            if (deviceID == null) {
-                deviceID = AndroidSystemUtil.getDeviceId();
+            if (did == null) {
+                did = AndroidSystemUtil.getDeviceId();
             }
+
             postParams.put("requestType", "AreaMaster");
             postParams.put("queryType", queryType);
-            postParams.put("deviceID", deviceID);
-            postParams.put("center_lon", centerlon);
-            postParams.put("center_lat", centerlat);
+            postParams.put("deviceID", did);
+            postParams.put("center_lon", cln);
+            postParams.put("center_lat", clt);
             postParams.put("desc", desc);
             postParams.put("name", name);
-            postParams.put("unique_id", unique_id);
+            postParams.put("created_by", cBy);
+            postParams.put("unique_id", uid);
+            postParams.put("own_type", owt);
+            postParams.put("msqft", mSqFt);
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -123,12 +137,6 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         return res;
     }
 
-    public int numberOfRows() {
-        SQLiteDatabase db = this.getReadableDatabase();
-        int numRows = (int) DatabaseUtils.queryNumEntries(db, AREA_TABLE_NAME);
-        return numRows;
-    }
-
     public boolean updateArea(AreaElement ae) {
         SQLiteDatabase db = this.getWritableDatabase();
         String unique_id = getUniqueId(db, ae.getId());
@@ -138,6 +146,8 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         contentValues.put(AREA_COLUMN_DESCRIPTION, ae.getDescription());
         contentValues.put(AREA_COLUMN_CENTER_LAT, ae.getCenterLat());
         contentValues.put(AREA_COLUMN_CENTER_LON, ae.getCenterLon());
+        contentValues.put(AREA_COLUMN_OWNERSHIP_TYPE, ae.getOwnershipType());
+        contentValues.put(AREA_COLUMN_MEASURE_SQ_FT, ae.getMeasureSqFt() + "");
         try{
             Location areaLocation = new Location("");
             areaLocation.setLatitude(ae.getCenterLat());
@@ -164,7 +174,9 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         db.update(AREA_TABLE_NAME, contentValues, AREA_COLUMN_ID + " = ? ", new String[]{Integer.toString(ae.getId())});
 
         JSONObject postParams = preparePostParams("update", ae.getId(), ae.getCenterLon() + "",
-                ae.getCenterLat() + "", ae.getDescription(), ae.getName(), null, unique_id);
+                ae.getCenterLat() + "", ae.getDescription(), ae.getName(), null, unique_id,
+                ae.getOwnershipType(),ae.getMeasureSqFt() + "", ae.getCreatedBy());
+
         new LandMapAsyncRestSync().execute(postParams);
 
         return true;
@@ -173,7 +185,9 @@ public class AreaDBHelper extends SQLiteOpenHelper {
     private String getUniqueId(SQLiteDatabase db, Integer id) {
         Cursor data = getData(id);
         data.moveToFirst();
-        return data.getString(data.getColumnIndex(AREA_COLUMN_UNIQUE_ID));
+        String uid = data.getString(data.getColumnIndex(AREA_COLUMN_UNIQUE_ID));
+        data.close();
+        return uid;
     }
 
     public Integer deleteArea(Integer id) {
@@ -206,8 +220,12 @@ public class AreaDBHelper extends SQLiteOpenHelper {
                     ae.setName(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_NAME)));
                     ae.setDescription(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_DESCRIPTION)));
                     ae.setCreatedBy(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_CREATED_BY)));
+                    ae.setOwnershipType(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_OWNERSHIP_TYPE)));
                     ae.setUniqueId(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_UNIQUE_ID)));
                     ae.setTags(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_TAGS)));
+                    ae.setCenterLon(new Double(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_CENTER_LON))));
+                    ae.setCenterLat(new Double(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_CENTER_LAT))));
+                    ae.setMeasureSqFt(new Double(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_MEASURE_SQ_FT))));
 
                     allAreas.add(ae);
                     cursor.moveToNext();

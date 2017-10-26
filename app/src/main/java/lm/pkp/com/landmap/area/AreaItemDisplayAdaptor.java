@@ -10,6 +10,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import lm.pkp.com.landmap.R;
+import lm.pkp.com.landmap.user.UserContext;
+import lm.pkp.com.landmap.user.UserDBHelper;
 
 /**
  * Created by USER on 10/20/2017.
@@ -18,12 +20,14 @@ public class AreaItemDisplayAdaptor extends ArrayAdapter {
     private ArrayList<AreaElement> items;
     private Context context;
     private AreaDBHelper adh = null;
+    private UserDBHelper udh = null;
 
     public AreaItemDisplayAdaptor(Context context, int textViewResourceId, ArrayList<AreaElement> items) {
         super(context, textViewResourceId, items);
         this.context = context;
         this.items = items;
         adh = new AreaDBHelper(context);
+        udh = new UserDBHelper(context);
     }
 
     @Override
@@ -51,7 +55,7 @@ public class AreaItemDisplayAdaptor extends ArrayAdapter {
         descText.setText(desc);
 
         TextView creatorText = (TextView) v.findViewById(R.id.area_creator_text);
-        creatorText.setText(ae.getCreatedBy());
+        creatorText.setText(udh.getUserByEmail(ae.getCreatedBy()).getDisplayName());
 
         TextView tagsText = (TextView) v.findViewById(R.id.area_tags_text);
         String areaTags = ae.getTags();
