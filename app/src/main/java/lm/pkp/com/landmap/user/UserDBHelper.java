@@ -72,6 +72,17 @@ public class UserDBHelper extends SQLiteOpenHelper {
         return true;
     }
 
+    public boolean searchUser(String displayName) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(USER_COLUMN_DISPLAY_NAME, user.getDisplayName());
+        db.insert(USER_TABLE_NAME, null, contentValues);
+
+        JSONObject postParams = preparePostParams("search", contentValues, null ,null);
+        new LandMapAsyncRestSync().execute(postParams);
+
+        return true;
+    }
 
     /*private JSONObject preparePostParams(String queryType, String unique_id) {
         JSONObject postParams = new JSONObject();
@@ -89,16 +100,20 @@ public class UserDBHelper extends SQLiteOpenHelper {
             if (deviceID == null) {
                 deviceID = AndroidSystemUtil.getDeviceId();
             }
-            postParams.put("requestType", "UserMaster");
             postParams.put("queryType", queryType);
             postParams.put("deviceID", deviceID);
+            postParams.put("requestType", "UserMaster");
             postParams.put(USER_COLUMN_DISPLAY_NAME, contentValues.get(USER_COLUMN_DISPLAY_NAME));
-            postParams.put(USER_COLUMN_FAMILY_NAME, contentValues.get(USER_COLUMN_FAMILY_NAME));
-            postParams.put(USER_COLUMN_GIVEN_NAME,contentValues.get(USER_COLUMN_GIVEN_NAME));
-            postParams.put(USER_COLUMN_AUTH_SYS_ID, contentValues.get(USER_COLUMN_AUTH_SYS_ID));
-            postParams.put(USER_COLUMN_EMAIL, contentValues.get(USER_COLUMN_EMAIL));
-            postParams.put(USER_COLUMN_PHOTO_URL,contentValues.get(USER_COLUMN_PHOTO_URL));
-        } catch (JSONException e) {
+            if(queryType=="search"){
+                postParams.put("requestType", "UserSearch");
+            }else {
+                postParams.put(USER_COLUMN_FAMILY_NAME, contentValues.get(USER_COLUMN_FAMILY_NAME));
+                postParams.put(USER_COLUMN_GIVEN_NAME, contentValues.get(USER_COLUMN_GIVEN_NAME));
+                postParams.put(USER_COLUMN_AUTH_SYS_ID, contentValues.get(USER_COLUMN_AUTH_SYS_ID));
+                postParams.put(USER_COLUMN_EMAIL, contentValues.get(USER_COLUMN_EMAIL));
+                postParams.put(USER_COLUMN_PHOTO_URL, contentValues.get(USER_COLUMN_PHOTO_URL));
+            }
+            } catch (JSONException e) {
             e.printStackTrace();
         }
         return postParams;
