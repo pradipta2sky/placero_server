@@ -116,7 +116,7 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
             @Override
             public void onClick(View v) {
                 findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
-                adb.deleteArea(ae.getId());
+                adb.deleteArea(ae);
                 Intent areaDashboardIntent = new Intent(PositionMarkerActivity.this, AreaDashboardActivity.class);
                 startActivity(areaDashboardIntent);
             }
@@ -157,7 +157,7 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
     @Override
     public void receivedLocationPostion(PositionElement pe) {
         pe.setName("Position_" + pList.size());
-        PositionElement insertedElem = pdb.insertPosition(ae.getId(), pe.getName(), pe.getDescription(),
+        PositionElement insertedElem = pdb.insertPosition( pe.getName(), pe.getDescription(),
                 pe.getLat() + "", pe.getLon() + "", pe.getTags(), ae.getUniqueId());
         pList.add(insertedElem);
         adaptor.notifyDataSetChanged();

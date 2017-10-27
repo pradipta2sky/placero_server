@@ -46,7 +46,7 @@ public class PostionListAdaptor extends ArrayAdapter<PositionElement> {
             @Override
             public void onClick(View v) {
                 items.remove(position);
-                pdh.deletePosition(pe.getId());
+                pdh.deletePosition(pe);
                 notifyDataSetChanged();
             }
         });

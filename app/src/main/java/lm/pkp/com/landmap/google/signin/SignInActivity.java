@@ -22,6 +22,7 @@ import com.google.android.gms.common.api.Status;
 
 import lm.pkp.com.landmap.AreaDashboardActivity;
 import lm.pkp.com.landmap.R;
+import lm.pkp.com.landmap.SplashActivity;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.user.UserDBHelper;
 import lm.pkp.com.landmap.user.UserElement;
@@ -145,7 +146,7 @@ public class SignInActivity extends AppCompatActivity implements
             }
             UserContext.getInstance().setUserElement(localUser);
 
-            Intent areaDashboardIntent = new Intent(SignInActivity.this, AreaDashboardActivity.class);
+            Intent areaDashboardIntent = new Intent(SignInActivity.this, SplashActivity.class);
             startActivity(areaDashboardIntent);
         } else {
             // Signed out, show unauthenticated UI.

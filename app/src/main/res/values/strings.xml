@@ -74,4 +74,5 @@
     <string name="title_activity_google_signin_drive">Signin With Google Drive</string>
     <string name="action_share_area">Share Area</string>
     <string name="label_share_area">Share Area</string>
+    <string name="label_pre_load_splash">Pre load splash</string>
 </resources>

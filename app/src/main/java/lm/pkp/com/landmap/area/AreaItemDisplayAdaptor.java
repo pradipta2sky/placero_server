@@ -55,7 +55,7 @@ public class AreaItemDisplayAdaptor extends ArrayAdapter {
         descText.setText(desc);
 
         TextView creatorText = (TextView) v.findViewById(R.id.area_creator_text);
-        creatorText.setText(udh.getUserByEmail(ae.getCreatedBy()).getDisplayName());
+        creatorText.setText(ae.getCurrentOwner());
 
         TextView tagsText = (TextView) v.findViewById(R.id.area_tags_text);
         String areaTags = ae.getTags();

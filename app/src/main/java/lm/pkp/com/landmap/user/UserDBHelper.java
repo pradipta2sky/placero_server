@@ -20,6 +20,7 @@ public class UserDBHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "landmap.db";
     private Context localContext = null;
+    private final LandMapAsyncRestSync syncher = new LandMapAsyncRestSync();
 
     public static final String USER_TABLE_NAME = "user_master";
     public static final String USER_COLUMN_DISPLAY_NAME = "display_name";
@@ -57,6 +58,7 @@ public class UserDBHelper extends SQLiteOpenHelper {
 
     public boolean insertUser(UserElement user) {
         SQLiteDatabase db = this.getWritableDatabase();
+
         ContentValues contentValues = new ContentValues();
         contentValues.put(USER_COLUMN_DISPLAY_NAME, user.getDisplayName());
         contentValues.put(USER_COLUMN_EMAIL, user.getEmail());
@@ -67,8 +69,9 @@ public class UserDBHelper extends SQLiteOpenHelper {
         db.insert(USER_TABLE_NAME, null, contentValues);
 
         JSONObject postParams = preparePostParams("insert", contentValues, null ,null);
-        new LandMapAsyncRestSync().execute(postParams);
+        syncher.execute(postParams);
 
+        db.close();
         return true;
     }
 
@@ -98,18 +101,6 @@ public class UserDBHelper extends SQLiteOpenHelper {
             e.printStackTrace();
         }
         return postParams;
-    }
-
-    public Cursor getData(String email) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res = db.rawQuery("select * from " + USER_TABLE_NAME + " where " + USER_COLUMN_EMAIL + "='" + email + "'", null);
-        return res;
-    }
-
-    public int numberOfRows() {
-        SQLiteDatabase db = this.getReadableDatabase();
-        int numRows = (int) DatabaseUtils.queryNumEntries(db, USER_TABLE_NAME);
-        return numRows;
     }
 
     public UserElement getUserByEmail(String email) {

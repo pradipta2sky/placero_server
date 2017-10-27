@@ -11,15 +11,23 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
+
+import org.json.JSONObject;
+
+import java.util.List;
+import java.util.UUID;
 
 import lm.pkp.com.landmap.area.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.position.PositionElement;
+import lm.pkp.com.landmap.position.PositionsDBHelper;
+import lm.pkp.com.landmap.user.UserInfoSearchAsyncTask;
 
 public class AreaShareActivity extends AppCompatActivity{
 
-    private AreaDBHelper adb = null;
+    private AreaDBHelper adh = null;
+    private PositionsDBHelper pdh = null;
     private AreaElement ae = null;
 
     @Override
@@ -35,23 +43,32 @@ public class AreaShareActivity extends AppCompatActivity{
         ab.setDisplayHomeAsUpEnabled(true);
         ab.show();
 
-        adb = new AreaDBHelper(getApplicationContext());
-        final AreaElement ae = adb.getAreaByName(areaName);
+        adh = new AreaDBHelper(getApplicationContext());
+        pdh = new PositionsDBHelper(getApplicationContext());
+        final AreaElement ae = adh.getAreaByName(areaName);
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_dropdown_item_1line, COUNTRIES);
-        AutoCompleteTextView userNameTextView = (AutoCompleteTextView)
-                findViewById(R.id.user_search_text);
-        userNameTextView.setAdapter(adapter);
+        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
+                android.R.layout.simple_dropdown_item_1line, new String[]{});
+        final AutoCompleteTextView userIdView = (AutoCompleteTextView) findViewById(R.id.user_search_text);
+        userIdView.setAdapter(adapter);
 
-        userNameTextView.addTextChangedListener(new TextWatcher() {
+        userIdView.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
+
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // TODO Call the API and change the adaptor here.
+                UserInfoSearchAsyncTask searcherTask = new UserInfoSearchAsyncTask(adapter);
+                JSONObject searchParams = new JSONObject();
+                try {
+                    searchParams.put("us", s.toString());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                searcherTask.execute(searchParams);
             }
+
             @Override
             public void afterTextChanged(Editable s) {
             }
@@ -70,9 +87,18 @@ public class AreaShareActivity extends AppCompatActivity{
             public void onClick(View v) {
                 findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
 
-                // TODO get the user selections
-                // TODO Associate the users with the Area.
-                adb.updateArea(ae);
+                AreaElement copiedArea = ae.copy();
+                copiedArea.setCurrentOwner(userIdView.getText().toString());
+                copiedArea.setUniqueId(UUID.randomUUID().toString());
+                adh.insertAreaToServer(copiedArea);
+
+                List<PositionElement> positions = copiedArea.getPositions();
+                for (int i = 0; i < positions.size(); i++) {
+                    PositionElement pe = positions.get(i);
+                    pe.setUniqueId(UUID.randomUUID().toString());
+                    pe.setUniqueAreaId(copiedArea.getUniqueId());
+                    pdh.insertPositionToServer(pe);
+                }
                 findViewById(R.id.loadingPanel).setVisibility(View.INVISIBLE);
 
                 Intent positionMarkerIntent = new Intent(AreaShareActivity.this, PositionMarkerActivity.class);
@@ -103,7 +129,4 @@ public class AreaShareActivity extends AppCompatActivity{
         startActivity(positionMarkerIntent);
     }
 
-    private static final String[] COUNTRIES = new String[] {
-            "Belgium", "France", "Italy", "Germany", "Spain"
-    };
 }

@@ -4,7 +4,6 @@ package lm.pkp.com.landmap.area;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.location.Address;
@@ -28,12 +27,13 @@ public class AreaDBHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "landmap.db";
     private Context localContext = null;
+    private final LandMapAsyncRestSync syncher = new LandMapAsyncRestSync();
 
     public static final String AREA_TABLE_NAME = "area_master";
-    public static final String AREA_COLUMN_ID = "id";
     public static final String AREA_COLUMN_NAME = "name";
     public static final String AREA_COLUMN_DESCRIPTION = "desc";
     public static final String AREA_COLUMN_CREATED_BY = "created_by";
+    public static final String AREA_COLUMN_CURRENT_OWNER = "current_owner";
     public static final String AREA_COLUMN_OWNERSHIP_TYPE = "ownership_type";
     public static final String AREA_COLUMN_CENTER_LAT = "center_lat";
     public static final String AREA_COLUMN_CENTER_LON = "center_lon";
@@ -50,10 +50,10 @@ public class AreaDBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(
                 "create table " + AREA_TABLE_NAME + "(" +
-                        AREA_COLUMN_ID + " integer primary key, " +
                         AREA_COLUMN_NAME + " text," +
                         AREA_COLUMN_DESCRIPTION + " text," +
                         AREA_COLUMN_CREATED_BY + " text," +
+                        AREA_COLUMN_CURRENT_OWNER + " text," +
                         AREA_COLUMN_OWNERSHIP_TYPE + " text," +
                         AREA_COLUMN_CENTER_LAT + " text, " +
                         AREA_COLUMN_CENTER_LON + " text, " +
@@ -71,12 +71,14 @@ public class AreaDBHelper extends SQLiteOpenHelper {
 
     public boolean insertArea(String name, String desc) {
         SQLiteDatabase db = this.getWritableDatabase();
+
         ContentValues contentValues = new ContentValues();
         contentValues.put(AREA_COLUMN_NAME, name);
         contentValues.put(AREA_COLUMN_DESCRIPTION, desc);
         String createdBy = UserContext.getInstance().getUserElement().getEmail();
-        contentValues.put(AREA_COLUMN_CREATED_BY, UserContext.getInstance().getUserElement().getEmail());
+        contentValues.put(AREA_COLUMN_CREATED_BY, createdBy);
         contentValues.put(AREA_COLUMN_OWNERSHIP_TYPE, "self");
+        contentValues.put(AREA_COLUMN_CURRENT_OWNER, createdBy);
 
         String uniqueId = UUID.randomUUID().toString();
         contentValues.put(AREA_COLUMN_UNIQUE_ID, uniqueId);
@@ -87,61 +89,46 @@ public class AreaDBHelper extends SQLiteOpenHelper {
 
         db.insert(AREA_TABLE_NAME, null, contentValues);
 
-        JSONObject postParams = preparePostParams("insert", null, "0.0", "0.0", desc, name,
-                AndroidSystemUtil.getDeviceId(), uniqueId, "self", "0", createdBy);
-        new LandMapAsyncRestSync().execute(postParams);
+        JSONObject postParams = preparePostParams("insert", uniqueId, "0.0", "0.0", desc, name,
+                AndroidSystemUtil.getDeviceId(),"self", "0", createdBy, createdBy);
+        syncher.execute(postParams);
 
+        db.close();
         return true;
     }
 
-    private JSONObject preparePostParams(String queryType, String uniqueId) {
-        JSONObject postParams = new JSONObject();
-        postParams = preparePostParams(queryType, null, null, null, null, null, null, uniqueId, null, null, null);
-        new LandMapAsyncRestSync().execute(postParams);
-        return postParams;
+    public void insertAreaToServer(AreaElement ae){
+        JSONObject postParams = preparePostParams("insert",ae.getUniqueId(), ae.getCenterLon() + "",
+                ae.getCenterLat() + "", ae.getDescription(), ae.getName(), AndroidSystemUtil.getDeviceId(),
+                ae.getOwnershipType(), ae.getMeasureSqFt() + "", ae.getCreatedBy(), ae.getCurrentOwner());
+
+        syncher.execute(postParams);
     }
 
-    private JSONObject preparePostParams(String queryType, Integer id, String cln, String clt,
-                                         String desc, String name, String did, String uid, String owt,
-                                         String mSqFt, String cBy) {
-        JSONObject postParams = new JSONObject();
-        try {
-            if (id != null) {
-                postParams.put("id", id);
-            }
-            if (did == null) {
-                did = AndroidSystemUtil.getDeviceId();
-            }
+    public AreaElement insertAreaFromServer(AreaElement ae) {
+        SQLiteDatabase db = this.getWritableDatabase();
 
-            postParams.put("requestType", "AreaMaster");
-            postParams.put("queryType", queryType);
-            postParams.put("deviceID", did);
-            postParams.put("center_lon", cln);
-            postParams.put("center_lat", clt);
-            postParams.put("desc", desc);
-            postParams.put("name", name);
-            postParams.put("created_by", cBy);
-            postParams.put("unique_id", uid);
-            postParams.put("own_type", owt);
-            postParams.put("msqft", mSqFt);
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(AREA_COLUMN_UNIQUE_ID, ae.getUniqueId());
+        contentValues.put(AREA_COLUMN_NAME, ae.getName());
+        contentValues.put(AREA_COLUMN_DESCRIPTION, ae.getDescription());
+        contentValues.put(AREA_COLUMN_CREATED_BY, ae.getCreatedBy());
+        contentValues.put(AREA_COLUMN_OWNERSHIP_TYPE, ae.getOwnershipType());
+        contentValues.put(AREA_COLUMN_TAGS, ae.getTags());
+        contentValues.put(AREA_COLUMN_CENTER_LAT, ae.getCenterLat() + "");
+        contentValues.put(AREA_COLUMN_CENTER_LON, ae.getCenterLon() + "");
+        contentValues.put(AREA_COLUMN_MEASURE_SQ_FT, ae.getMeasureSqFt() + "");
 
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return postParams;
-    }
-
-    public Cursor getData(int id) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor res = db.rawQuery("select * from " + AREA_TABLE_NAME + " where " + AREA_COLUMN_ID + "=" + id + "", null);
-        return res;
+        db.insert(AREA_TABLE_NAME, null, contentValues);
+        db.close();
+        return ae;
     }
 
     public boolean updateArea(AreaElement ae) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String unique_id = getUniqueId(db, ae.getId());
 
         ContentValues contentValues = new ContentValues();
+        contentValues.put(AREA_COLUMN_UNIQUE_ID, ae.getUniqueId());
         contentValues.put(AREA_COLUMN_NAME, ae.getName());
         contentValues.put(AREA_COLUMN_DESCRIPTION, ae.getDescription());
         contentValues.put(AREA_COLUMN_CENTER_LAT, ae.getCenterLat());
@@ -171,35 +158,29 @@ public class AreaDBHelper extends SQLiteOpenHelper {
             // Do nothing if fails.
         }
 
-        db.update(AREA_TABLE_NAME, contentValues, AREA_COLUMN_ID + " = ? ", new String[]{Integer.toString(ae.getId())});
+        db.update(AREA_TABLE_NAME, contentValues, AREA_COLUMN_UNIQUE_ID + " = ? ", new String[]{ae.getUniqueId()});
 
-        JSONObject postParams = preparePostParams("update", ae.getId(), ae.getCenterLon() + "",
-                ae.getCenterLat() + "", ae.getDescription(), ae.getName(), null, unique_id,
-                ae.getOwnershipType(),ae.getMeasureSqFt() + "", ae.getCreatedBy());
+        JSONObject postParams = preparePostParams("update", ae.getUniqueId(), ae.getCenterLon() + "",
+                ae.getCenterLat() + "", ae.getDescription(), ae.getName(), AndroidSystemUtil.getDeviceId(),
+                ae.getOwnershipType(), ae.getMeasureSqFt() + "", ae.getCreatedBy(), ae.getCurrentOwner());
 
-        new LandMapAsyncRestSync().execute(postParams);
-
+        syncher.execute(postParams);
+        db.close();
         return true;
     }
 
-    private String getUniqueId(SQLiteDatabase db, Integer id) {
-        Cursor data = getData(id);
-        data.moveToFirst();
-        String uid = data.getString(data.getColumnIndex(AREA_COLUMN_UNIQUE_ID));
-        data.close();
-        return uid;
-    }
-
-    public Integer deleteArea(Integer id) {
+    public Integer deleteArea(AreaElement ae) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String uniqueId = getUniqueId(db, id);
+
         PositionsDBHelper pdb = new PositionsDBHelper(localContext);
-        pdb.deletePositionByUniqueId(uniqueId);
+        pdb.deletePositionByUniqueId(ae.getUniqueId());
         int delete = db.delete(AREA_TABLE_NAME,
-                AREA_COLUMN_ID + " = ? ",
-                new String[]{Integer.toString(id)});
-        JSONObject postParams = preparePostParams("delete", uniqueId);
-        new LandMapAsyncRestSync().execute(postParams);
+                AREA_COLUMN_UNIQUE_ID + " = ? ",
+                new String[]{ae.getUniqueId()});
+        JSONObject postParams = preparePostParams("delete", ae.getUniqueId());
+        syncher.execute(postParams);
+
+        db.close();
         return delete;
     }
 
@@ -216,7 +197,6 @@ public class AreaDBHelper extends SQLiteOpenHelper {
                 cursor.moveToFirst();
                 while (cursor.isAfterLast() == false) {
                     AreaElement ae = new AreaElement();
-                    ae.setId(cursor.getInt(cursor.getColumnIndex(AREA_COLUMN_ID)));
                     ae.setName(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_NAME)));
                     ae.setDescription(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_DESCRIPTION)));
                     ae.setCreatedBy(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_CREATED_BY)));
@@ -250,7 +230,6 @@ public class AreaDBHelper extends SQLiteOpenHelper {
             }
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
-                ae.setId(cursor.getInt(cursor.getColumnIndex(AREA_COLUMN_ID)));
                 ae.setName(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_NAME)));
                 ae.setDescription(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_DESCRIPTION)));
                 ae.setCreatedBy(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_CREATED_BY)));
@@ -266,6 +245,46 @@ public class AreaDBHelper extends SQLiteOpenHelper {
             }
         }
         return ae;
+    }
+
+    private JSONObject preparePostParams(String queryType, String uniqueId) {
+        JSONObject postParams = new JSONObject();
+        postParams = preparePostParams(queryType, uniqueId, null, null, null, null, null, null, null, null, null);
+        new LandMapAsyncRestSync().execute(postParams);
+        return postParams;
+    }
+
+    private JSONObject preparePostParams(String queryType,String uid, String cln, String clt, String desc, String name,
+                                         String did, String owt, String mSqFt, String cBy, String cown) {
+        JSONObject postParams = new JSONObject();
+        try {
+            if (did == null) {
+                did = AndroidSystemUtil.getDeviceId();
+            }
+
+            postParams.put("requestType", "AreaMaster");
+            postParams.put("queryType", queryType);
+            postParams.put("deviceID", did);
+            postParams.put("center_lon", cln);
+            postParams.put("center_lat", clt);
+            postParams.put("desc", desc);
+            postParams.put("name", name);
+            postParams.put("created_by", cBy);
+            postParams.put("unique_id", uid);
+            postParams.put("own_type", owt);
+            postParams.put("msqft", mSqFt);
+            postParams.put("cown", cown);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return postParams;
+    }
+
+    public void deleteAreasLocally() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete(AREA_TABLE_NAME, "1", null);
+        db.close();
     }
 
 }

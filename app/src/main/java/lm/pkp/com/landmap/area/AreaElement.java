@@ -1,5 +1,8 @@
 package lm.pkp.com.landmap.area;
 
+import org.apache.commons.lang3.SerializationUtils;
+
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,25 +11,33 @@ import lm.pkp.com.landmap.position.PositionElement;
 /**
  * Created by USER on 10/16/2017.
  */
-public class AreaElement {
+public class AreaElement implements Serializable{
 
-    private Integer id;
     private String name;
     private String description;
     private String createdBy;
     private String ownershipType;
+    private String currentOwner;
 
     private double centerLat = 0.0;
     private double centerLon = 0.0;
     private double measureSqFt = 0.0;
 
-    private String unique_id;
+    private String uniqueId;
     private String tags;
 
     private List<PositionElement> positions = new ArrayList<PositionElement>();
 
     public String getOwnershipType() {
         return ownershipType;
+    }
+
+    public String getCurrentOwner() {
+        return currentOwner;
+    }
+
+    public void setCurrentOwner(String currentOwner) {
+        this.currentOwner = currentOwner;
     }
 
     public void setOwnershipType(String ownershipType) {
@@ -55,14 +66,6 @@ public class AreaElement {
 
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public String getName() {
@@ -106,10 +109,14 @@ public class AreaElement {
     }
 
     public String getUniqueId() {
-        return unique_id;
+        return uniqueId;
     }
 
-    public void setUniqueId(String unique_id) {
-        this.unique_id = unique_id;
+    public void setUniqueId(String uniqueId) {
+        this.uniqueId = uniqueId;
+    }
+
+    public AreaElement copy(){
+        return SerializationUtils.clone(this);
     }
 }

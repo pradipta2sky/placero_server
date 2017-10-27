@@ -1,12 +1,14 @@
 package lm.pkp.com.landmap.position;
 
+import org.apache.commons.lang3.SerializationUtils;
+
+import java.io.Serializable;
+
 /**
  * Created by USER on 10/16/2017.
  */
-public class PositionElement {
+public class PositionElement implements Serializable{
 
-    private Long id;
-    private Integer areaId;
     private String name;
     private String description;
     private double lat;
@@ -15,14 +17,6 @@ public class PositionElement {
     private Integer viewPos;
     private String uniqueAreaId;
     private String uniqueId;
-
-    public Integer getAreaId() {
-        return areaId;
-    }
-
-    public void setAreaId(Integer areaId) {
-        this.areaId = areaId;
-    }
 
     public String getName() {
         return name;
@@ -64,14 +58,6 @@ public class PositionElement {
         this.tags = tags;
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
     public Integer getViewPos() {
         return viewPos;
     }
@@ -102,5 +88,9 @@ public class PositionElement {
 
     public void setUniqueId(String uniqueId) {
         this.uniqueId = uniqueId;
+    }
+
+    public PositionElement copy(){
+        return SerializationUtils.clone(this);
     }
 }

@@ -81,6 +81,10 @@
             android:label="@string/label_share_area"
             android:windowSoftInputMode="stateHidden">
         </activity>
+        <activity
+            android:name=".SplashActivity"
+            android:label="@string/label_pre_load_splash">
+        </activity>
     </application>
 
 </manifest>
