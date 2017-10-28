@@ -27,9 +27,10 @@ public class AreaDashboardActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_area_dashboard);
+        getSupportActionBar().hide();
 
-        ActionBar ab = getSupportActionBar();
-        ab.hide();
+        Toolbar topTB = (Toolbar) findViewById(R.id.toolbar_top);
+        topTB.inflateMenu(R.menu.area_db_top_menu);
 
         adb = new AreaDBHelper(getApplicationContext());
         allAreas = adb.getAllAreas();
@@ -42,15 +43,16 @@ public class AreaDashboardActivity extends AppCompatActivity {
             areaListView.setVisibility(View.INVISIBLE);
             // TODO Display a text or image for no areaas
         }
-        Toolbar topTB = (Toolbar) findViewById(R.id.toolbar_top);
-        topTB.inflateMenu(R.menu.area_db_top_menu);
-
 
         ActionMenuItemView createAreaView = (ActionMenuItemView) findViewById(R.id.action_area_create);
         createAreaView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                AreaElement ae = adb.insertAreaLocally();
+                adb.insertAreaToServer(ae);
+
                 Intent intent = new Intent(AreaDashboardActivity.this, PositionMarkerActivity.class);
+                intent.putExtra("area_name", ae.getName());
                 startActivity(intent);
             }
         });
@@ -75,7 +77,6 @@ public class AreaDashboardActivity extends AppCompatActivity {
                 .setPositiveButton("yes", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-
                         Intent intent = new Intent(Intent.ACTION_MAIN);
                         intent.addCategory(Intent.CATEGORY_HOME);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

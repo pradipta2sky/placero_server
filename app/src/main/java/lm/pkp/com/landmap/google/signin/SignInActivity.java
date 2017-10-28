@@ -146,8 +146,8 @@ public class SignInActivity extends AppCompatActivity implements
             }
             UserContext.getInstance().setUserElement(localUser);
 
-            Intent areaDashboardIntent = new Intent(SignInActivity.this, SplashActivity.class);
-            startActivity(areaDashboardIntent);
+            Intent spashIntent = new Intent(SignInActivity.this, SplashActivity.class);
+            startActivity(spashIntent);
         } else {
             // Signed out, show unauthenticated UI.
             updateUI(false);

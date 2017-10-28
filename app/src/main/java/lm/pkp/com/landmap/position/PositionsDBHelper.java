@@ -22,7 +22,6 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "landmap.db";
     public static final String POSITION_TABLE_NAME = "position_master";
-    private final LandMapAsyncRestSync syncher = new LandMapAsyncRestSync();
 
     public static final String POSITION_COLUMN_NAME = "name";
     public static final String POSITION_COLUMN_DESCRIPTION = "desc";
@@ -56,39 +55,24 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public PositionElement insertPosition(String name, String desc, String lat, String lon, String tags,String uniqueAreadId) {
+    public PositionElement insertPositionLocally(PositionElement pe, AreaElement ae) {
         SQLiteDatabase db = this.getWritableDatabase();
-        PositionElement pe = new PositionElement();
 
         ContentValues contentValues = new ContentValues();
-
-        contentValues.put(POSITION_COLUMN_NAME, name);
-        pe.setName(name);
-
-        contentValues.put(POSITION_COLUMN_DESCRIPTION, desc);
-        pe.setDescription(desc);
-
-        contentValues.put(POSITION_COLUMN_LAT, lat);
-        pe.setLat(new Double(lat));
-
-        contentValues.put(POSITION_COLUMN_LON, lon);
-        pe.setLon(new Double(lon));
-
-        contentValues.put(POSITION_COLUMN_TAGS, tags);
-        pe.setTags(tags);
-
-        contentValues.put(POSITION_COLUMN_UNIQUE_AREA_ID, uniqueAreadId);
-        pe.setUniqueAreaId(uniqueAreadId);
-
         String uniqueId = UUID.randomUUID().toString();
-        contentValues.put(POSITION_COLUMN_UNIQUE_ID,uniqueId);
+        contentValues.put(POSITION_COLUMN_UNIQUE_ID, uniqueId);
         pe.setUniqueId(uniqueId);
 
-        db.insert(POSITION_TABLE_NAME, null, contentValues);
+        contentValues.put(POSITION_COLUMN_UNIQUE_AREA_ID, ae.getUniqueId());
+        pe.setUniqueAreaId(ae.getUniqueId());
 
-        JSONObject postParams = preparePostParams("insert",pe.getUniqueId(), pe.getUniqueAreaId(), pe.getName(), pe.getDescription(),
-                pe.getLon() + "", pe.getLat() + "",pe.getTags(),AndroidSystemUtil.getDeviceId());
-        syncher.execute(postParams);
+        contentValues.put(POSITION_COLUMN_NAME, pe.getName());
+        contentValues.put(POSITION_COLUMN_DESCRIPTION, pe.getDescription());
+        contentValues.put(POSITION_COLUMN_LAT, pe.getLat());
+        contentValues.put(POSITION_COLUMN_LON, pe.getLon());
+        contentValues.put(POSITION_COLUMN_TAGS, pe.getTags());
+
+        db.insert(POSITION_TABLE_NAME, null, contentValues);
         db.close();
         return pe;
     }
@@ -97,7 +81,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
-        contentValues.put(POSITION_COLUMN_UNIQUE_ID,pe.getUniqueId());
+        contentValues.put(POSITION_COLUMN_UNIQUE_ID, pe.getUniqueId());
         contentValues.put(POSITION_COLUMN_UNIQUE_AREA_ID, pe.getUniqueAreaId());
         contentValues.put(POSITION_COLUMN_NAME, pe.getName());
         contentValues.put(POSITION_COLUMN_DESCRIPTION, pe.getDescription());
@@ -111,19 +95,13 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
     }
 
     public void insertPositionToServer(PositionElement pe) {
-        JSONObject postParams = preparePostParams("insert", pe.getUniqueId(), pe.getUniqueAreaId(), pe.getName(), pe.getDescription(),
-                pe.getLon() + "", pe.getLat() + "", pe.getTags(), AndroidSystemUtil.getDeviceId());
-        syncher.execute(postParams);
+        new LandMapAsyncRestSync().execute(preparePostParams("insert", pe));
     }
 
     public Integer deletePosition(PositionElement pe) {
         SQLiteDatabase db = this.getWritableDatabase();
-        String uniqueId = pe.getUniqueId();
-        int delete = db.delete(POSITION_TABLE_NAME,
-                POSITION_COLUMN_UNIQUE_ID + " = ? ",
-                new String[]{uniqueId});
-        JSONObject postParams = preparePostParams("delete", uniqueId);
-        syncher.execute(postParams);
+        int delete = db.delete(POSITION_TABLE_NAME, POSITION_COLUMN_UNIQUE_ID + " = ? ", new String[]{pe.getUniqueId()});
+        new LandMapAsyncRestSync().execute(preparePostParams("delete", pe));
         db.close();
         return delete;
     }
@@ -133,8 +111,12 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         db.execSQL("DELETE FROM "+POSITION_TABLE_NAME+" WHERE "
                 + POSITION_COLUMN_UNIQUE_AREA_ID +" = "+uniqueAreaId
                 + " AND "+POSITION_COLUMN_NAME+" = '"+pName+"'");
-        JSONObject postParams = preparePostParams("deleteByName", uniqueAreaId, pName);
-        syncher.execute(postParams);
+
+        PositionElement pe = new PositionElement();
+        pe.setUniqueAreaId(uniqueAreaId);
+        pe.setName(pName);
+
+        new LandMapAsyncRestSync().execute(preparePostParams("deleteByName", pe));
         db.close();
     }
 
@@ -142,8 +124,11 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM " + POSITION_TABLE_NAME + " WHERE "
                 + POSITION_COLUMN_UNIQUE_AREA_ID + " = '" + uniqueAreaId + "'");
-        JSONObject postParams = preparePostParams("deleteByUniqueAreaId", uniqueAreaId, null);
-        syncher.execute(postParams);
+
+        PositionElement pe = new PositionElement();
+        pe.setUniqueAreaId(uniqueAreaId);
+
+        new LandMapAsyncRestSync().execute(preparePostParams("deleteByUniqueAreaId", pe));
         db.close();
     }
 
@@ -156,6 +141,9 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
             cursor.moveToFirst();
             while (cursor.isAfterLast() == false) {
                 PositionElement pe = new PositionElement();
+
+                pe.setUniqueId(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_UNIQUE_ID)));
+                pe.setUniqueAreaId(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_UNIQUE_AREA_ID)));
 
                 pe.setName(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_NAME)));
                 pe.setDescription(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_DESCRIPTION)));
@@ -176,35 +164,19 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         return pes;
     }
 
-    private JSONObject preparePostParams(String queryType,String uniqueAreaId , String positionName) {
-        JSONObject postParams = preparePostParams(queryType, null, uniqueAreaId, positionName, null, null, null, null,  AndroidSystemUtil.getDeviceId());
-        syncher.execute(postParams);
-        return postParams;
-    }
-
-    private JSONObject preparePostParams(String queryType,String uniqueId) {
-        JSONObject postParams = preparePostParams(queryType, uniqueId, null, null, null, null, null, null, AndroidSystemUtil.getDeviceId());
-        syncher.execute(postParams);
-        return postParams;
-    }
-
-    private JSONObject preparePostParams(String queryType, String uniqueId, String uniqueAreadId, String name, String desc,
-                                         String lon, String lat, String tags, String deviceID) {
+    private JSONObject preparePostParams(String queryType, PositionElement pe) {
         JSONObject postParams = new JSONObject();
         try {
-            if(deviceID==null){
-                deviceID = AndroidSystemUtil.getDeviceId();
-            }
             postParams.put("requestType", "PositionMaster");
             postParams.put("queryType", queryType);
-            postParams.put("deviceID",deviceID);
-            postParams.put("lon",lon);
-            postParams.put("lat",lat);
-            postParams.put("desc",desc);
-            postParams.put("tags",tags);
-            postParams.put("name",name);
-            postParams.put("uniqueAreaId",uniqueAreadId);
-            postParams.put("uniqueId",uniqueId);
+            postParams.put("deviceID",AndroidSystemUtil.getDeviceId());
+            postParams.put("lon",pe.getLon() + "");
+            postParams.put("lat",pe.getLat() + "");
+            postParams.put("desc",pe.getDescription());
+            postParams.put("tags",pe.getTags());
+            postParams.put("name",pe.getName());
+            postParams.put("uniqueAreaId",pe.getUniqueAreaId());
+            postParams.put("uniqueId",pe.getUniqueId());
         } catch (JSONException e) {
             e.printStackTrace();
         }

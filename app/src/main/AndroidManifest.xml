@@ -2,7 +2,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="lm.pkp.com.landmap" >
 
-    <uses-permission android:name="com.javapapers.currentlocationinmap.permission.MAPS_RECEIVE" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
@@ -21,6 +20,16 @@
             android:value="@string/google_maps_key" />
 
         <activity
+            android:name=".google.signin.SignInActivity"
+            android:label="@string/app_name"
+            android:windowSoftInputMode="stateHidden"
+            android:clearTaskOnLaunch="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
             android:name=".AreaDashboardActivity"
             android:label="@string/title_activity_area_dashboard" >
         </activity>
@@ -35,46 +44,6 @@
         <activity
             android:name=".AreaEditActivity"
             android:label="@string/title_activity_area_edit" >
-        </activity>
-        <activity
-            android:name=".attic.LoginActivity"
-            android:label="@string/title_activity_login"
-            android:windowSoftInputMode="stateHidden">
-        </activity>
-        <activity
-            android:name=".attic.SignupActivity"
-            android:label="@string/title_activity_signup"
-            android:windowSoftInputMode="stateHidden">
-        </activity>
-
-        <activity
-            android:name=".google.signin.ChooserActivity"
-            android:label="@string/title_activity_signup"
-            android:windowSoftInputMode="stateHidden">
-        </activity>
-        <activity
-            android:name=".google.signin.IdTokenActivity"
-            android:label="@string/title_activity_signup"
-            android:windowSoftInputMode="stateHidden">
-        </activity>
-        <activity
-            android:name=".google.signin.RestApiActivity"
-            android:label="@string/title_activity_signup"
-            android:windowSoftInputMode="stateHidden">
-        </activity>
-        <activity
-            android:name=".google.signin.ServerAuthCodeActivity"
-            android:label="@string/title_activity_signup"
-            android:windowSoftInputMode="stateHidden">
-        </activity>
-        <activity
-            android:name=".google.signin.SignInActivity"
-            android:label="@string/app_name"
-            android:windowSoftInputMode="stateHidden">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
         </activity>
         <activity
             android:name=".AreaShareActivity"

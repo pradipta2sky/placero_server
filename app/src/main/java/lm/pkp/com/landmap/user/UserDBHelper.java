@@ -20,7 +20,6 @@ public class UserDBHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "landmap.db";
     private Context localContext = null;
-    private final LandMapAsyncRestSync syncher = new LandMapAsyncRestSync();
 
     public static final String USER_TABLE_NAME = "user_master";
     public static final String USER_COLUMN_DISPLAY_NAME = "display_name";
@@ -69,7 +68,7 @@ public class UserDBHelper extends SQLiteOpenHelper {
         db.insert(USER_TABLE_NAME, null, contentValues);
 
         JSONObject postParams = preparePostParams("insert", contentValues, null ,null);
-        syncher.execute(postParams);
+        new LandMapAsyncRestSync().execute(postParams);
 
         db.close();
         return true;

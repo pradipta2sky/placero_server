@@ -15,7 +15,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
 import lm.pkp.com.landmap.area.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
@@ -23,21 +22,28 @@ import lm.pkp.com.landmap.custom.LocationPositionReceiver;
 import lm.pkp.com.landmap.position.PositionElement;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.position.PostionListAdaptor;
+import lm.pkp.com.landmap.provider.FusedLocationProvider;
 import lm.pkp.com.landmap.provider.GPSLocationProvider;
 
 public class PositionMarkerActivity extends AppCompatActivity implements LocationPositionReceiver {
 
-    private ArrayList<PositionElement> pList = new ArrayList<PositionElement>();
-    private PostionListAdaptor adaptor = null;
-    private GPSLocationProvider lp = null;
     private AreaDBHelper adb = null;
     private PositionsDBHelper pdb = null;
     private AreaElement ae = null;
+
+    private ArrayList<PositionElement> positionList = new ArrayList<PositionElement>();
+    private PostionListAdaptor adaptor = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_position_marker);
+        getSupportActionBar().hide();
+
+        Toolbar topTB = (Toolbar) findViewById(R.id.toolbar_top);
+        topTB.inflateMenu(R.menu.marking_top_menu);
+        Toolbar bottomTB = (Toolbar) findViewById(R.id.toolbar_bottom);
+        bottomTB.inflateMenu(R.menu.marking_bottom_menu);
 
         if(!approachLocationPermissions()){
             Toast.makeText(getApplicationContext(),"No permission for location access.", Toast.LENGTH_LONG);
@@ -46,34 +52,16 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
 
         adb = new AreaDBHelper(getApplicationContext());
         pdb = new PositionsDBHelper(getApplicationContext());
-        adaptor = new PostionListAdaptor(getApplicationContext(), R.id.positionList, pList);
 
-        Bundle bundle = getIntent().getExtras();
-        String areaName = null;
-        if(bundle != null){
-            areaName = bundle.getString("area_name");
-        }
-        if(areaName == null){
-            areaName = "AR_" + UUID.randomUUID().toString();
-            adb.insertArea(areaName, "No description.");
-        }
-        ae = adb.getAreaByName(areaName);
-        pList.addAll(ae.getPositions());
-        adaptor.notifyDataSetChanged();
-
-        //lp = new FusedLocationProvider(PositionMarkerActivity.this);
-        lp = new GPSLocationProvider(PositionMarkerActivity.this);
         ListView posList = (ListView) findViewById(R.id.positionList);
+        adaptor = new PostionListAdaptor(getApplicationContext(), R.id.positionList, positionList);
         posList.setAdapter(adaptor);
 
-        ActionBar ab = getSupportActionBar();
-        ab.hide();
-
-        Toolbar topTB = (Toolbar) findViewById(R.id.toolbar_top);
-        topTB.inflateMenu(R.menu.marking_top_menu);
-
-        Toolbar bottomTB = (Toolbar) findViewById(R.id.toolbar_bottom);
-        bottomTB.inflateMenu(R.menu.marking_bottom_menu);
+        Bundle bundle = getIntent().getExtras();
+        String areaName = bundle.getString("area_name");
+        ae = adb.getAreaByName(areaName);
+        positionList.addAll(ae.getPositions());
+        adaptor.notifyDataSetChanged();
 
         TextView areaNameView = (TextView)findViewById(R.id.area_name_text);
         if(areaName.length() > 20){
@@ -107,7 +95,7 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
             @Override
             public void onClick(View v) {
                 findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
-                lp.getLocation();
+                new GPSLocationProvider(PositionMarkerActivity.this).getLocation();
             }
         });
 
@@ -156,10 +144,11 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
 
     @Override
     public void receivedLocationPostion(PositionElement pe) {
-        pe.setName("Position_" + pList.size());
-        PositionElement insertedElem = pdb.insertPosition( pe.getName(), pe.getDescription(),
-                pe.getLat() + "", pe.getLon() + "", pe.getTags(), ae.getUniqueId());
-        pList.add(insertedElem);
+        pe.setName("Position_" + positionList.size());
+        pe = pdb.insertPositionLocally(pe, ae);
+        pdb.insertPositionToServer(pe);
+
+        positionList.add(pe);
         adaptor.notifyDataSetChanged();
         findViewById(R.id.loadingPanel).setVisibility(View.GONE);
     }

@@ -49,8 +49,6 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
     private Button infoButton;
     private OnInfoWindowElemTouchListener infoButtonListener;
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

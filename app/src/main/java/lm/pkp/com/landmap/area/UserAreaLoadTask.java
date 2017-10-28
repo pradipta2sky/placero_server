@@ -79,15 +79,18 @@ public class UserAreaLoadTask extends AsyncTask<JSONObject, Void, String>{
 
             for (int i = 0; i < responseArr.length(); i++) {
                 JSONObject responseObj = (JSONObject) responseArr.get(i);
+
                 AreaElement ae = new AreaElement();
-                ae.setName((String) responseObj.get("name"));
-                ae.setCreatedBy((String) responseObj.get("created_by"));
-                ae.setDescription((String) responseObj.get("description"));
+                ae.setName(responseObj.getString("name"));
+                ae.setCreatedBy(responseObj.getString("created_by"));
+                ae.setDescription(responseObj.getString("description"));
                 ae.setCenterLat(new Double((String) responseObj.get("center_lat")));
                 ae.setCenterLon(new Double((String) responseObj.get("center_lon")));
-                ae.setUniqueId((String) responseObj.get("unique_id"));
+                ae.setUniqueId(responseObj.getString("unique_id"));
                 ae.setMeasureSqFt(new Double((String) responseObj.get("measure_sqft")));
                 ae.setOwnershipType("self");
+                ae.setCurrentOwner(responseObj.getString("curr_own"));
+                ae.setTags(responseObj.getString("tags"));
                 adh.insertAreaFromServer(ae);
 
                 JSONObject searchObj = new JSONObject();
