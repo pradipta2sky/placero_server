@@ -206,12 +206,13 @@ public class AreaDBHelper extends SQLiteOpenHelper {
 
         PositionsDBHelper pdb = new PositionsDBHelper(localContext);
         pdb.deletePositionByUniqueId(ae.getUniqueId());
+
         int delete = db.delete(AREA_TABLE_NAME,
                 AREA_COLUMN_UNIQUE_ID + " = ? ",
                 new String[]{ae.getUniqueId()});
 
-        JSONObject postParams = preparePostParams("delete", ae);
-        new LandMapAsyncRestSync().execute(postParams);
+        JSONObject areaPostParams = preparePostParams("delete", ae);
+        new LandMapAsyncRestSync().execute(areaPostParams);
 
         db.close();
         return delete;
