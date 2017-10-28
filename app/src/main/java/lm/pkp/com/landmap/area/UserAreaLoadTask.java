@@ -10,6 +10,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.net.URLEncoder;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -39,7 +40,7 @@ public class UserAreaLoadTask extends AsyncTask<JSONObject, Void, String>{
             String urlString = "http://35.202.7.223/lm/AreaSearch.php?us=";
             JSONObject postDataParam = postDataParams[0];
             String searchKey = postDataParam.getString("us");
-            URL url = new URL(urlString+searchKey);
+            URL url = new URL(urlString + URLEncoder.encode(searchKey, "utf-8"));
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(15000);
@@ -75,8 +76,6 @@ public class UserAreaLoadTask extends AsyncTask<JSONObject, Void, String>{
         super.onPostExecute(s);
         try {
             JSONArray responseArr = new JSONArray(s);
-            AreaPositionsLoadTask apt = new AreaPositionsLoadTask(localContext);
-
             for (int i = 0; i < responseArr.length(); i++) {
                 JSONObject responseObj = (JSONObject) responseArr.get(i);
 
@@ -91,11 +90,12 @@ public class UserAreaLoadTask extends AsyncTask<JSONObject, Void, String>{
                 ae.setOwnershipType("self");
                 ae.setCurrentOwner(responseObj.getString("curr_own"));
                 ae.setTags(responseObj.getString("tags"));
+
                 adh.insertAreaFromServer(ae);
 
                 JSONObject searchObj = new JSONObject();
                 searchObj.put("aid", ae.getUniqueId());
-                apt.execute(searchObj);
+                new AreaPositionsLoadTask(localContext).execute(searchObj);
             }
         }catch (Exception e){
             e.printStackTrace();
