@@ -13,6 +13,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.TextView;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -20,15 +21,18 @@ import java.util.UUID;
 
 import lm.pkp.com.landmap.area.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.position.PositionElement;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
+import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.user.UserInfoSearchAsyncTask;
 
-public class AreaShareActivity extends AppCompatActivity{
+public class AreaShareActivity extends AppCompatActivity implements AsyncTaskCallback{
 
     private AreaDBHelper adh = null;
     private PositionsDBHelper pdh = null;
     private AreaElement ae = null;
+    private ArrayAdapter<String> adapter = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,10 +49,22 @@ public class AreaShareActivity extends AppCompatActivity{
 
         adh = new AreaDBHelper(getApplicationContext());
         pdh = new PositionsDBHelper(getApplicationContext());
+
         final AreaElement ae = adh.getAreaByName(areaName);
 
-        final ArrayAdapter<String> adapter = new ArrayAdapter<String>(this,
-                android.R.layout.simple_dropdown_item_1line, new String[]{});
+        final TextView areaNameView = (TextView)findViewById(R.id.area_name_text);
+        areaNameView.setText(ae.getName());
+
+        final TextView areaDescView = (TextView)findViewById(R.id.area_desc_text);
+        areaDescView.setText(ae.getDescription());
+
+        final TextView areaCreatorView = (TextView)findViewById(R.id.area_creator_text);
+        areaCreatorView.setText(ae.getCreatedBy());
+
+        final TextView areaTagsView = (TextView)findViewById(R.id.area_tags_text);
+        areaTagsView.setText(ae.getTags());
+
+        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, new String[]{});
         final AutoCompleteTextView userIdView = (AutoCompleteTextView) findViewById(R.id.user_search_text);
         userIdView.setAdapter(adapter);
 
@@ -59,13 +75,15 @@ public class AreaShareActivity extends AppCompatActivity{
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                UserInfoSearchAsyncTask searcherTask = new UserInfoSearchAsyncTask(adapter);
+                UserInfoSearchAsyncTask searcherTask = new UserInfoSearchAsyncTask();
                 JSONObject searchParams = new JSONObject();
                 try {
-                    searchParams.put("us", s.toString());
+                    searchParams.put("ss", s.toString());
+                    searchParams.put("sf", "name");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+                searcherTask.setCompletionCallback(AreaShareActivity.this);
                 searcherTask.execute(searchParams);
             }
 
@@ -73,13 +91,6 @@ public class AreaShareActivity extends AppCompatActivity{
             public void afterTextChanged(Editable s) {
             }
         });
-
-        TextView areaNameView = (TextView)findViewById(R.id.area_name_text);
-        if(areaName.length() > 25){
-            areaNameView.setText(areaName.substring(0,22).concat("..."));
-        }else {
-            areaNameView.setText(areaName);
-        }
 
         Button saveButton = (Button)findViewById(R.id.area_share_save_btn);
         saveButton.setOnClickListener(new View.OnClickListener() {
@@ -100,11 +111,7 @@ public class AreaShareActivity extends AppCompatActivity{
                     pdh.insertPositionToServer(pe);
                 }
                 findViewById(R.id.loadingPanel).setVisibility(View.INVISIBLE);
-
-                Intent positionMarkerIntent = new Intent(AreaShareActivity.this, PositionMarkerActivity.class);
-                positionMarkerIntent.putExtra("area_name", ae.getName());
-                startActivity(positionMarkerIntent);
-
+                finish();
             }
         });
     }
@@ -113,10 +120,8 @@ public class AreaShareActivity extends AppCompatActivity{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                Intent positionMarkerIntent = new Intent(AreaShareActivity.this, PositionMarkerActivity.class);
-                positionMarkerIntent.putExtra("area_name", ae.getName());
-                startActivity(positionMarkerIntent);
-                return true;
+                finish();
+                return false;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -124,9 +129,32 @@ public class AreaShareActivity extends AppCompatActivity{
 
     @Override
     public void onBackPressed() {
-        Intent positionMarkerIntent = new Intent(AreaShareActivity.this, PositionMarkerActivity.class);
-        positionMarkerIntent.putExtra("area_name", ae.getName());
-        startActivity(positionMarkerIntent);
+            finish();
     }
 
+    @Override
+    public void taskCompleted(Object result) {
+        try {
+            String userArray = result.toString();
+            String currUserEmail = UserContext.getInstance().getUserElement().getEmail();
+            adapter.clear();
+
+            if(userArray.trim().equalsIgnoreCase("[]")){
+                // do nothing.
+            }else {
+                JSONArray responseArr = new JSONArray(userArray);
+                for (int i = 0; i < responseArr.length(); i++) {
+                    JSONObject responseObj = (JSONObject) responseArr.get(i);
+                    String emailStr = responseObj.getString("email");
+                    String displayName = responseObj.getString("display_name");
+                    if(!currUserEmail.equalsIgnoreCase(emailStr)){
+                        adapter.add(emailStr);
+                    }
+                }
+                adapter.notifyDataSetChanged();
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 }

@@ -20,12 +20,17 @@ import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import lm.pkp.com.landmap.AreaDashboardActivity;
 import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.SplashActivity;
+import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.user.UserDBHelper;
 import lm.pkp.com.landmap.user.UserElement;
+import lm.pkp.com.landmap.user.UserInfoSearchAsyncTask;
 import lm.pkp.com.landmap.util.UserMappingUtil;
 
 /**
@@ -34,7 +39,7 @@ import lm.pkp.com.landmap.util.UserMappingUtil;
  */
 public class SignInActivity extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener,
-        View.OnClickListener {
+        View.OnClickListener, AsyncTaskCallback {
 
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
@@ -42,6 +47,7 @@ public class SignInActivity extends AppCompatActivity implements
     private GoogleApiClient mGoogleApiClient;
     private TextView mStatusTextView;
     private ProgressDialog mProgressDialog;
+    private UserElement signedUser = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,22 +138,18 @@ public class SignInActivity extends AppCompatActivity implements
     private void handleSignInResult(GoogleSignInResult result) {
         Log.d(TAG, "handleSignInResult:" + result.isSuccess());
         if (result.isSuccess()) {
-            // Signed in successfully, show authenticated UI.
             GoogleSignInAccount acct = result.getSignInAccount();
-            //mStatusTextView.setText(getString(R.string.signed_in_fmt, acct.getDisplayName()));
-            //updateUI(true);
-
-            // Initialize user settings.
-            UserElement localUser = UserMappingUtil.convertGoogleAccountToLocalAccount(acct);
-            UserDBHelper udh = new UserDBHelper(getApplicationContext());
-            UserElement foundUser = udh.getUserByEmail(localUser.getEmail());
-            if(foundUser == null){
-                udh.insertUser(localUser);
+            signedUser = UserMappingUtil.convertGoogleAccountToLocalAccount(acct);
+            UserInfoSearchAsyncTask searchUserTask = new UserInfoSearchAsyncTask();
+            JSONObject params = new JSONObject();
+            try {
+                params.put("ss", acct.getEmail());
+                params.put("sf", "email");
+                searchUserTask.execute(params);
+            }catch (Exception e){
+                e.printStackTrace();
             }
-            UserContext.getInstance().setUserElement(localUser);
-
-            Intent spashIntent = new Intent(SignInActivity.this, SplashActivity.class);
-            startActivity(spashIntent);
+            searchUserTask.setCompletionCallback(this);
         } else {
             // Signed out, show unauthenticated UI.
             updateUI(false);
@@ -246,5 +248,36 @@ public class SignInActivity extends AppCompatActivity implements
                 revokeAccess();
                 break;
         }
+    }
+
+    @Override
+    public void taskCompleted(Object result) {
+        try {
+            String userDetails = result.toString();
+            UserDBHelper udh = new UserDBHelper(getApplicationContext());
+            if(userDetails.trim().equalsIgnoreCase("[]")){
+                // User not available on server
+                udh.insertUser(signedUser);
+                UserContext.getInstance().setUserElement(signedUser);
+            }else {
+                JSONArray userArr = new JSONArray(userDetails);
+                JSONObject userObject = (JSONObject) userArr.get(0);
+
+                UserElement ue = new UserElement();
+                ue.setEmail(userObject.getString("email"));
+                ue.setDisplayName(userObject.getString("display_name"));
+
+                UserElement localUser = udh.getUserByEmail(ue.getEmail());
+                if(localUser == null){
+                    udh.insertUser(ue);
+                }
+                UserContext.getInstance().setUserElement(ue);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+
+        Intent spashIntent = new Intent(SignInActivity.this, SplashActivity.class);
+        startActivity(spashIntent);
     }
 }

@@ -3,16 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="16dp"
+    android:weightSum="1">
 
-    <TextView
+    <include layout="@layout/area_element_row"
+        android:layout_height="wrap_content"
         android:layout_width="wrap_content"
-        android:layout_height = "wrap_content"
-        android:id = "@+id/area_name_text"
-        android:textSize = "15dp"
-        android:layout_alignParentTop = "true"
-        android:layout_centerHorizontal = "true"
-        android:textStyle="bold"/>
+        android:layout_weight="0.14"
+        android:layout_marginTop="5dip" />
 
     <AutoCompleteTextView
         android:id="@+id/user_search_text"
@@ -44,6 +42,7 @@
         android:paddingLeft="70dp"
         android:paddingRight="70dp"
         android:text="Save"
+        android:layout_marginTop="20dp"
         android:textColor="#fff" />
 
 

@@ -101,7 +101,6 @@ public class UserAreaLoadTask extends AsyncTask<JSONObject, Void, String>{
             e.printStackTrace();
         }
         finalizeTaskCompletion();
-        System.out.println(s);
     }
 
     public void setCompletionCallback(AsyncTaskCallback callback) {
@@ -109,6 +108,6 @@ public class UserAreaLoadTask extends AsyncTask<JSONObject, Void, String>{
     }
 
     public void finalizeTaskCompletion(){
-        callback.taskCompleted();
+        callback.taskCompleted("");
     }
 }

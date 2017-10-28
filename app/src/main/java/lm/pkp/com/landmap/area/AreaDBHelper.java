@@ -180,6 +180,27 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         return true;
     }
 
+    public boolean updateAreaNonGeo(AreaElement ae) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(AREA_COLUMN_UNIQUE_ID, ae.getUniqueId());
+        contentValues.put(AREA_COLUMN_NAME, ae.getName());
+        contentValues.put(AREA_COLUMN_DESCRIPTION, ae.getDescription());
+        contentValues.put(AREA_COLUMN_CENTER_LAT, ae.getCenterLat());
+        contentValues.put(AREA_COLUMN_CENTER_LON, ae.getCenterLon());
+        contentValues.put(AREA_COLUMN_OWNERSHIP_TYPE, ae.getOwnershipType());
+        contentValues.put(AREA_COLUMN_MEASURE_SQ_FT, ae.getMeasureSqFt() + "");
+        contentValues.put(AREA_COLUMN_CURRENT_OWNER, ae.getCurrentOwner());
+        contentValues.put(AREA_COLUMN_CREATED_BY, ae.getCreatedBy());
+        contentValues.put(AREA_COLUMN_TAGS, ae.getTags());
+
+        db.update(AREA_TABLE_NAME, contentValues, AREA_COLUMN_UNIQUE_ID + " = ? ", new String[]{ae.getUniqueId()});
+        new LandMapAsyncRestSync().execute(preparePostParams("update", ae));
+        db.close();
+
+        return true;
+    }
     public Integer deleteArea(AreaElement ae) {
         SQLiteDatabase db = this.getWritableDatabase();
 

@@ -34,8 +34,17 @@ public class AreaEditActivity extends AppCompatActivity{
         adb = new AreaDBHelper(getApplicationContext());
         final AreaElement ae = adb.getAreaByName(areaName);
 
-        final TextView areaNameView = (TextView)findViewById(R.id.area_name_fixed);
+        final TextView areaNameView = (TextView)findViewById(R.id.area_name_text);
         areaNameView.setText(ae.getName());
+
+        final TextView areaDescView = (TextView)findViewById(R.id.area_desc_text);
+        areaDescView.setText(ae.getDescription());
+
+        final TextView areaCreatorView = (TextView)findViewById(R.id.area_creator_text);
+        areaCreatorView.setText(ae.getCreatedBy());
+
+        final TextView areaTagsView = (TextView)findViewById(R.id.area_tags_text);
+        areaTagsView.setText(ae.getTags());
 
         final EditText nameTextView = (EditText) findViewById(R.id.area_name_edit);
         nameTextView.setText(ae.getName());
@@ -55,9 +64,7 @@ public class AreaEditActivity extends AppCompatActivity{
                 String descText = descTextView.getText().toString();
                 ae.setDescription(descText);
 
-                adb.updateArea(ae);
-                areaNameView.setText(nameText);
-
+                adb.updateAreaNonGeo(ae);
                 findViewById(R.id.loadingPanel).setVisibility(View.INVISIBLE);
 
                 Intent positionMarkerIntent = new Intent(AreaEditActivity.this, PositionMarkerActivity.class);
@@ -71,10 +78,8 @@ public class AreaEditActivity extends AppCompatActivity{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                Intent positionMarkerIntent = new Intent(AreaEditActivity.this, PositionMarkerActivity.class);
-                positionMarkerIntent.putExtra("area_name", ae.getName());
-                startActivity(positionMarkerIntent);
-                return true;
+                finish();
+                return false;
             default:
                 return super.onOptionsItemSelected(item);
         }
@@ -82,8 +87,6 @@ public class AreaEditActivity extends AppCompatActivity{
 
     @Override
     public void onBackPressed() {
-        Intent positionMarkerIntent = new Intent(AreaEditActivity.this, PositionMarkerActivity.class);
-        positionMarkerIntent.putExtra("area_name", ae.getName());
-        startActivity(positionMarkerIntent);
+        finish();
     }
 }

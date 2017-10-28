@@ -1,8 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
-    android:layout_height="60dip"
+    android:layout_height="wrap_content"
     android:minHeight="50dip"
-    android:padding="10dip">
+    android:padding="5dip">
 
     <ImageView
         android:id="@+id/area_default_image"
@@ -16,7 +16,7 @@
     <TextView
         android:id="@+id/area_name_text"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
         android:layout_toRightOf="@+id/area_default_image"
@@ -28,19 +28,19 @@
     <TextView
         android:id="@+id/area_desc_text"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_toRightOf="@+id/area_default_image"
         android:layout_below="@+id/area_name_text"
         android:textSize="13sp"
         android:textColor="#000000"
         android:paddingLeft="10dp"
-        android:layout_marginBottom="4dp"/>
+        android:layout_marginBottom="2dp"/>
 
     <TextView
         android:id="@+id/area_creator_text"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_toRightOf="@+id/area_default_image"
         android:layout_below="@+id/area_desc_text"
@@ -52,13 +52,13 @@
     <TextView
         android:id="@+id/area_tags_text"
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
         android:layout_toRightOf="@+id/area_default_image"
         android:layout_below="@+id/area_creator_text"
         android:textSize="13sp"
         android:textColor="#000000"
         android:paddingLeft="10dp"
-        android:visibility="invisible"/>
+        />
 
 </RelativeLayout>

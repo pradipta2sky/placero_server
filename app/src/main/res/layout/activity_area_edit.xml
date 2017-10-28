@@ -3,24 +3,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="16dp">
+    android:padding="5dp"
+    android:weightSum="1">
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
+    <include layout="@layout/area_element_row"
         android:layout_height="wrap_content"
-        android:layout_marginTop="18dp"
-        android:layout_marginBottom="8dp"
-        >
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height = "wrap_content"
-            android:id = "@+id/area_name_fixed"
-            android:textSize = "15dp"
-            android:layout_alignParentTop = "true"
-            android:layout_centerHorizontal = "true"
-            android:textStyle="bold"/>
-    </android.support.design.widget.TextInputLayout>
-
+        android:layout_width="wrap_content"
+        android:layout_weight="0.10"
+        android:layout_marginTop="5dip" />
 
     <android.support.design.widget.TextInputLayout
         android:layout_width="match_parent"
@@ -53,12 +43,13 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center_horizontal"
-        android:background="@color/colorPrimaryDark"
+        android:background="@color/blue_grey_500"
         android:elevation="4dp"
         android:paddingLeft="70dp"
         android:paddingRight="70dp"
         android:text="Save"
-        android:textColor="#fff" />
+        android:textColor="#fff"
+        android:layout_marginTop="20dp"/>
 
     <RelativeLayout
         android:id="@+id/loadingPanel"

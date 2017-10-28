@@ -41,7 +41,7 @@ public class SplashActivity extends Activity implements AsyncTaskCallback{
     }
 
     @Override
-    public void taskCompleted() {
+    public void taskCompleted(Object result) {
         Intent areaDashboardIntent = new Intent(SplashActivity.this, AreaDashboardActivity.class);
         startActivity(areaDashboardIntent);
     }

@@ -19,6 +19,7 @@ import java.util.Iterator;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.user.UserContext;
 
 /**
@@ -27,21 +28,20 @@ import lm.pkp.com.landmap.user.UserContext;
 
 public class UserInfoSearchAsyncTask extends AsyncTask<JSONObject, Void, String>{
 
-    private ArrayAdapter<String> localAdaptor = null;
-
-    public UserInfoSearchAsyncTask(ArrayAdapter<String> adapter) {
-        this.localAdaptor = adapter;
-    }
+    private AsyncTaskCallback callback = null;
 
     protected void onPreExecute() {
     }
 
     protected String doInBackground(JSONObject... postDataParams) {
         try {
-            String urlString = "http://35.202.7.223/lm/UserSearch.php?us=";
+            String urlString = "http://35.202.7.223/lm/UserSearch.php?";
             JSONObject postDataParam = postDataParams[0];
-            String searchKey = postDataParam.getString("us");
-            URL url = new URL(urlString+searchKey);
+            String searchStr = postDataParam.getString("ss");
+            String sStrURL = "ss=" + searchStr;
+            String searchField = postDataParam.getString("sf");
+            String sfURL = "&sf=" + searchField;
+            URL url = new URL(urlString + sStrURL + sfURL);
 
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(15000);
@@ -75,21 +75,11 @@ public class UserInfoSearchAsyncTask extends AsyncTask<JSONObject, Void, String>
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
-        try {
-            localAdaptor.clear();
-            String currUserEmail = UserContext.getInstance().getUserElement().getEmail();
-            JSONArray responseArr = new JSONArray(s);
-            for (int i = 0; i < responseArr.length(); i++) {
-                JSONObject responseObj = (JSONObject) responseArr.get(i);
-                String emailStr = (String) responseObj.get("email");
-                if(!currUserEmail.equalsIgnoreCase(emailStr)){
-                    localAdaptor.add((String) responseObj.get("email"));
-                }
-            }
-            localAdaptor.notifyDataSetChanged();
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        System.out.println(s);
+        callback.taskCompleted(s);
     }
+
+    public void setCompletionCallback(AsyncTaskCallback callback) {
+        this.callback = callback;
+    }
+
 }
