@@ -1,12 +1,14 @@
 package lm.pkp.com.landmap.area;
 
 import android.content.Context;
+import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import lm.pkp.com.landmap.R;
@@ -55,16 +57,23 @@ public class AreaItemDisplayAdaptor extends ArrayAdapter {
         descText.setText(desc);
 
         TextView creatorText = (TextView) v.findViewById(R.id.area_creator_text);
-        creatorText.setText(ae.getCurrentOwner());
+        creatorText.setText(ae.getCreatedBy());
 
         TextView tagsText = (TextView) v.findViewById(R.id.area_tags_text);
         String areaTags = ae.getTags();
-        if(areaTags != null && !areaTags.trim().equalsIgnoreCase("")){
-            tagsText.setText(ae.getTags());
-            tagsText.setVisibility(View.VISIBLE);
-        }else {
-            tagsText.setVisibility(View.INVISIBLE);
-        }
+        String tagsContent = "<b>Address: </b>" + areaTags;
+        tagsText.setText(Html.fromHtml(tagsContent));
+
+        double areaMeasureSqFt = ae.getMeasureSqFt();
+        double areaMeasureAcre = areaMeasureSqFt / 43560;
+        double areaMeasureDecimals = areaMeasureSqFt / 436;
+        DecimalFormat df = new DecimalFormat("###.##");
+
+        TextView measureText = (TextView) v.findViewById(R.id.area_measure_text);
+        String content = "<b>Area: </b>" + df.format(areaMeasureSqFt) + " Sqft, " + df.format(areaMeasureAcre) +" Acre," +
+                df.format(areaMeasureDecimals) + " Decimals.";
+        measureText.setText(Html.fromHtml(content));
+
         return v;
     }
 }

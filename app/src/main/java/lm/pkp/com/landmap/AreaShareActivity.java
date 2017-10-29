@@ -16,6 +16,7 @@ import android.widget.TextView;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.UUID;
 
@@ -63,6 +64,16 @@ public class AreaShareActivity extends AppCompatActivity implements AsyncTaskCal
 
         final TextView areaTagsView = (TextView)findViewById(R.id.area_tags_text);
         areaTagsView.setText(ae.getTags());
+
+        double areaMeasureSqFt = ae.getMeasureSqFt();
+        double areaMeasureAcre = areaMeasureSqFt / 43560;
+        double areaMeasureDecimals = areaMeasureSqFt / 436;
+        DecimalFormat df = new DecimalFormat("###.##");
+
+        TextView measureText = (TextView) findViewById(R.id.area_measure_text);
+        String content = "Area: " + df.format(areaMeasureSqFt) + " Sqft, " + df.format(areaMeasureAcre) +" Acre," +
+                df.format(areaMeasureDecimals) + " Decimals.";
+        measureText.setText(content);
 
         adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, new String[]{});
         final AutoCompleteTextView userIdView = (AutoCompleteTextView) findViewById(R.id.user_search_text);

@@ -85,9 +85,9 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
             }
 
             private void doRemovePositionByMarker(Marker marker) {
-                String positionName = marker.getTitle();
+                String positionId = marker.getTitle();
                 PositionsDBHelper pdh = new PositionsDBHelper(getApplicationContext());
-                pdh.deletePositionByName(positionName,ae.getUniqueId());
+                pdh.deletePositionById(positionId,ae.getUniqueId());
                 for (int i = 0; i < areaMarkers.size(); i++) {
                     Marker m = areaMarkers.get(i);
                     m.remove();
@@ -145,14 +145,15 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
         zoomCameraToPosition(latAvg, lonAvg);
         drawPolygonForMarkers();
 
-        DecimalFormat df = new DecimalFormat("###.##");
+        //DecimalFormat df = new DecimalFormat("###.##");
         double polygonAreaSqMt = SphericalUtil.computeArea(polygon.getPoints());
         double polygonAreaSqFt = polygonAreaSqMt * 10.7639;
-        double polygonAreaAcre = polygonAreaSqFt / 43560;
-        double polygonAreaDecimals = polygonAreaSqFt / 436;
+        //double polygonAreaAcre = polygonAreaSqFt / 43560;
+        //double polygonAreaDecimals = polygonAreaSqFt / 436;
 
-        IconGenerator iconFactory = new IconGenerator(this);
-        iconFactory.setStyle(IconGenerator.STYLE_WHITE);
+        //IconGenerator iconFactory = new IconGenerator(this);
+        //iconFactory.setStyle(IconGenerator.STYLE_WHITE);
+        /*
         MarkerOptions markerOptions = new MarkerOptions()
                 .position(new LatLng(latAvg,lonAvg))
                 .icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon("Area: \nSq Ft - " + df.format(polygonAreaSqFt)
@@ -161,10 +162,11 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
                 .anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV());
 
         Marker marker = googleMap.addMarker(markerOptions);
-        marker.setVisible(true);
-
+        marker.setVisible(false);
+        */
         ae.setCenterLat(latAvg);
         ae.setCenterLon(lonAvg);
+        ae.setMeasureSqFt(polygonAreaSqFt);
 
         new Thread(new Runnable() {
             public void run() {
@@ -191,16 +193,16 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
         LatLng position = new LatLng(pe.getLat(), pe.getLon());
         Marker marker = googleMap.addMarker((new MarkerOptions().position(position)));
         marker.setSnippet("Position [" + pe.getLat() + "," + pe.getLon() + "]");
-        marker.setTitle(pe.getName());
+        marker.setTitle(pe.getUniqueId());
         marker.showInfoWindow();
         return marker;
     }
 
     private void zoomCameraToPosition(double latAvg, double lonAvg) {
         LatLng position = new LatLng(latAvg, lonAvg);
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(position, 21f);
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(position, 19f);
         googleMap.animateCamera(cameraUpdate);
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 21f));
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 19f));
     }
 
     public static int getPixelsFromDp(Context context, float dp) {

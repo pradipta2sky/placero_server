@@ -10,12 +10,11 @@
         android:background="?attr/colorPrimary"
         android:minHeight="?attr/actionBarSize"
         app:contentInsetStart="5dp">
-
         <TextView
             android:id="@+id/area_name_text"
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
+            android:gravity="top"
             android:paddingTop="2dp"
             android:paddingBottom="2dp"
             android:textColor="#ffffffff"
@@ -23,15 +22,6 @@
             android:textSize="22sp"/>
 
     </android.support.v7.widget.Toolbar>
-
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/toolbar_bottom"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:background="?attr/colorPrimary"
-        android:layout_alignParentBottom="true"
-        android:minHeight="?attr/actionBarSize"
-        android:layoutDirection="rtl"/>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -67,5 +57,14 @@
             android:layout_height="wrap_content"
             android:indeterminate="true" />
     </RelativeLayout>
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar_bottom"
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:background="?attr/colorPrimary"
+        android:layout_alignParentBottom="true"
+        android:minHeight="?attr/actionBarSize"
+        android:layoutDirection="rtl"/>
 
 </RelativeLayout>

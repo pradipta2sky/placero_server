@@ -205,7 +205,7 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         PositionsDBHelper pdb = new PositionsDBHelper(localContext);
-        pdb.deletePositionByUniqueId(ae.getUniqueId());
+        pdb.deletePositionByUniqueAreaId(ae.getUniqueId());
 
         int delete = db.delete(AREA_TABLE_NAME,
                 AREA_COLUMN_UNIQUE_ID + " = ? ",

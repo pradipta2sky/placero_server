@@ -10,6 +10,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
+
 import lm.pkp.com.landmap.area.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
 
@@ -51,6 +53,16 @@ public class AreaEditActivity extends AppCompatActivity{
 
         final EditText descTextView = (EditText) findViewById(R.id.area_desc_edit);
         descTextView.setText(ae.getDescription());
+
+        double areaMeasureSqFt = ae.getMeasureSqFt();
+        double areaMeasureAcre = areaMeasureSqFt / 43560;
+        double areaMeasureDecimals = areaMeasureSqFt / 436;
+        DecimalFormat df = new DecimalFormat("###.##");
+
+        TextView measureText = (TextView) findViewById(R.id.area_measure_text);
+        String content = "Area: " + df.format(areaMeasureSqFt) + " Sqft, " + df.format(areaMeasureAcre) +" Acre," +
+                df.format(areaMeasureDecimals) + " Decimals.";
+        measureText.setText(content);
 
         Button saveButton = (Button)findViewById(R.id.area_edit_save_btn);
         saveButton.setOnClickListener(new View.OnClickListener() {
