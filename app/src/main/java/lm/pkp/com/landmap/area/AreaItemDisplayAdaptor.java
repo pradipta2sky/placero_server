@@ -51,13 +51,11 @@ public class AreaItemDisplayAdaptor extends ArrayAdapter {
 
         TextView descText = (TextView) v.findViewById(R.id.area_desc_text);
         String desc = ae.getDescription();
-        if(desc.trim().equals("")){
-            desc = "No description.";
-        }
-        descText.setText(desc);
+        desc = "<b>Desc: </b>" + desc;
+        descText.setText(Html.fromHtml(desc));
 
         TextView creatorText = (TextView) v.findViewById(R.id.area_creator_text);
-        creatorText.setText(ae.getCreatedBy());
+        creatorText.setText(Html.fromHtml("<b>Creator: </b>" + ae.getCreatedBy()));
 
         TextView tagsText = (TextView) v.findViewById(R.id.area_tags_text);
         String areaTags = ae.getTags();
