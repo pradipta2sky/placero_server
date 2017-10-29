@@ -27,7 +27,8 @@ public class LandMapAsyncRestSync extends AsyncTask<JSONObject, Void, String> {
 
     protected String doInBackground(JSONObject... postDataParams) {
         try {
-            String urlString = "http://35.202.7.223/lm/";
+            //String urlString = "http://35.202.7.223/lm/";
+            String urlString = "http://35.198.225.14";
             JSONObject postDataParam = postDataParams[0];
             String requestType = postDataParam.getString("requestType");
             URL url = new URL(urlString + requestType + ".php");
