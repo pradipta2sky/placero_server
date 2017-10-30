@@ -96,8 +96,9 @@ public class UserDBHelper extends SQLiteOpenHelper {
     public UserElement getUserByEmail(String email) {
         Cursor cursor = null;
         UserElement ue = null;
+        SQLiteDatabase db =  this.getReadableDatabase();
         try {
-            cursor = this.getReadableDatabase().rawQuery("SELECT * FROM " + USER_TABLE_NAME + " WHERE " + USER_COLUMN_EMAIL + "=?",
+            cursor = db.rawQuery("SELECT * FROM " + USER_TABLE_NAME + " WHERE " + USER_COLUMN_EMAIL + "=?",
                     new String[]{email});
             if (cursor == null) {
                 return ue;
@@ -117,6 +118,7 @@ public class UserDBHelper extends SQLiteOpenHelper {
                 cursor.close();
             }
         }
+        db.close();
         return ue;
     }
 

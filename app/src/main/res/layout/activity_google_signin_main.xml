@@ -88,6 +88,16 @@
             android:layout_weight="1"
             android:background="@color/blue_grey_900">
 
+            <TextView
+                android:id="@+id/debug_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="My Text View"
+                android:textColor="@color/black"
+                android:textSize="16sp"
+                android:textStyle="italic"
+                android:visibility="invisible"/>
+
             <com.google.android.gms.common.SignInButton
                 android:id="@+id/sign_in_button"
                 android:layout_width="wrap_content"
@@ -123,5 +133,6 @@
             </LinearLayout>
 
         </RelativeLayout>
+
 
     </LinearLayout>

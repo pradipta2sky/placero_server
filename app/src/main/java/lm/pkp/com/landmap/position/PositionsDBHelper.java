@@ -160,6 +160,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
             }
             cursor.close();
         }
+        db.close();
         return pes;
     }
 

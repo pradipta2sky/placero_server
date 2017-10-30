@@ -251,14 +251,16 @@ public class AreaDBHelper extends SQLiteOpenHelper {
                 cursor.close();
             }
         }
+        db.close();
         return allAreas;
     }
 
     public AreaElement getAreaByName(String name) {
         Cursor cursor = null;
+        SQLiteDatabase db = this.getReadableDatabase();
         AreaElement ae = new AreaElement();
         try {
-            cursor = this.getReadableDatabase().rawQuery("SELECT * FROM " + AREA_TABLE_NAME + " WHERE " + AREA_COLUMN_NAME + "=?",
+            cursor = db.rawQuery("SELECT * FROM " + AREA_TABLE_NAME + " WHERE " + AREA_COLUMN_NAME + "=?",
                     new String[]{name});
             if (cursor == null) {
                 return ae;
@@ -285,6 +287,7 @@ public class AreaDBHelper extends SQLiteOpenHelper {
                 cursor.close();
             }
         }
+        db.close();
         return ae;
     }
 

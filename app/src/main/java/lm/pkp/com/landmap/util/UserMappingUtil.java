@@ -17,6 +17,7 @@ public class UserMappingUtil {
         ue.setEmail(acct.getEmail());
         ue.setFamilyName(acct.getFamilyName());
         ue.setGivenName(acct.getGivenName());
+        ue.setAuthSystemId(acct.getServerAuthCode());
         Uri photoUri = acct.getPhotoUrl();
         if(photoUri != null){
             ue.setPhotoUrl(photoUri.toString());
