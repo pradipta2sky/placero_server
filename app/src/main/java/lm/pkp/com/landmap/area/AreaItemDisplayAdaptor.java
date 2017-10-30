@@ -12,7 +12,6 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import lm.pkp.com.landmap.R;
-import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.user.UserDBHelper;
 
 /**

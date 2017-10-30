@@ -2,7 +2,6 @@
 <resources>
     <string name="app_name">LMS</string>
     <string name="title_activity_land_plotter">Land View</string>
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="action_plot">Plot Markers</string>
 

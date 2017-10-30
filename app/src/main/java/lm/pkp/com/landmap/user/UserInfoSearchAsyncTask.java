@@ -1,26 +1,17 @@
 package lm.pkp.com.landmap.user;
 
 import android.os.AsyncTask;
-import android.util.Log;
-import android.widget.ArrayAdapter;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
-import java.util.Iterator;
 
 import javax.net.ssl.HttpsURLConnection;
 
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
-import lm.pkp.com.landmap.user.UserContext;
 
 /**
  * Created by Rinky on 21-10-2017.

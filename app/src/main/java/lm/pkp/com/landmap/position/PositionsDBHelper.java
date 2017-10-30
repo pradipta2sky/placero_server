@@ -4,7 +4,6 @@ package lm.pkp.com.landmap.position;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -14,8 +13,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import lm.pkp.com.landmap.sync.LandMapAsyncRestSync;
 import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.sync.LMRRestAsyncTask;
 import lm.pkp.com.landmap.util.AndroidSystemUtil;
 
 public class PositionsDBHelper extends SQLiteOpenHelper {
@@ -95,13 +94,13 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
     }
 
     public void insertPositionToServer(PositionElement pe) {
-        new LandMapAsyncRestSync().execute(preparePostParams("insert", pe));
+        new LMRRestAsyncTask().execute(preparePostParams("insert", pe));
     }
 
     public Integer deletePosition(PositionElement pe) {
         SQLiteDatabase db = this.getWritableDatabase();
         int delete = db.delete(POSITION_TABLE_NAME, POSITION_COLUMN_UNIQUE_ID + " = ? ", new String[]{pe.getUniqueId()});
-        new LandMapAsyncRestSync().execute(preparePostParams("delete", pe));
+        new LMRRestAsyncTask().execute(preparePostParams("delete", pe));
         db.close();
         return delete;
     }
@@ -116,7 +115,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         pe.setUniqueAreaId(uniqueAreaId);
         pe.setUniqueId(uniqueId);
 
-        new LandMapAsyncRestSync().execute(preparePostParams("deleteById", pe));
+        new LMRRestAsyncTask().execute(preparePostParams("deleteById", pe));
         db.close();
     }
 
@@ -128,7 +127,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         PositionElement pe = new PositionElement();
         pe.setUniqueAreaId(uniqueAreaId);
 
-        new LandMapAsyncRestSync().execute(preparePostParams("deleteByUniqueAreaId", pe));
+        new LMRRestAsyncTask().execute(preparePostParams("deleteByUniqueAreaId", pe));
         db.close();
     }
 

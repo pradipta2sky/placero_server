@@ -20,10 +20,8 @@ import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
-import lm.pkp.com.landmap.AreaDashboardActivity;
 import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.SplashActivity;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
@@ -140,22 +138,49 @@ public class SignInActivity extends AppCompatActivity implements
         if (result.isSuccess()) {
             GoogleSignInAccount acct = result.getSignInAccount();
             signedUser = UserMappingUtil.convertGoogleAccountToLocalAccount(acct);
-            UserInfoSearchAsyncTask searchUserTask = new UserInfoSearchAsyncTask();
-            JSONObject params = new JSONObject();
-            try {
-                params.put("ss", acct.getEmail());
-                params.put("sf", "email");
-                searchUserTask.execute(params);
-            }catch (Exception e){
-                e.printStackTrace();
+
+            UserDBHelper udh = new UserDBHelper(getApplicationContext());
+            UserElement localUser = udh.getUserByEmail(signedUser.getEmail());
+            if(localUser == null){
+                udh.insertUserLocally(signedUser);
             }
-            searchUserTask.setCompletionCallback(this);
+            UserContext.getInstance().setUserElement(signedUser);
+            searchOnRemoteAndUpdate(signedUser);
+
+            Intent spashIntent = new Intent(SignInActivity.this, SplashActivity.class);
+            startActivity(spashIntent);
         } else {
             // Signed out, show unauthenticated UI.
             updateUI(false);
         }
     }
-    // [END handleSignInResult]
+
+    private void searchOnRemoteAndUpdate(UserElement ue) {
+        UserInfoSearchAsyncTask searchUserTask = new UserInfoSearchAsyncTask();
+        JSONObject params = new JSONObject();
+        try {
+            params.put("ss", ue.getEmail());
+            params.put("sf", "email");
+            searchUserTask.execute(params);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        searchUserTask.setCompletionCallback(this);
+    }
+
+    @Override
+    public void taskCompleted(Object result) {
+        try {
+            String userDetails = result.toString();
+            UserDBHelper udh = new UserDBHelper(getApplicationContext());
+            if(userDetails.trim().equalsIgnoreCase("[]")){
+                // User not available on server
+                udh.insertUserToServer(signedUser);
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
 
     // [START signIn]
     private void signIn() {
@@ -250,34 +275,4 @@ public class SignInActivity extends AppCompatActivity implements
         }
     }
 
-    @Override
-    public void taskCompleted(Object result) {
-        try {
-            String userDetails = result.toString();
-            UserDBHelper udh = new UserDBHelper(getApplicationContext());
-            if(userDetails.trim().equalsIgnoreCase("[]")){
-                // User not available on server
-                udh.insertUser(signedUser);
-                UserContext.getInstance().setUserElement(signedUser);
-            }else {
-                JSONArray userArr = new JSONArray(userDetails);
-                JSONObject userObject = (JSONObject) userArr.get(0);
-
-                UserElement ue = new UserElement();
-                ue.setEmail(userObject.getString("email"));
-                ue.setDisplayName(userObject.getString("display_name"));
-
-                UserElement localUser = udh.getUserByEmail(ue.getEmail());
-                if(localUser == null){
-                    udh.insertUser(ue);
-                }
-                UserContext.getInstance().setUserElement(ue);
-            }
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-
-        Intent spashIntent = new Intent(SignInActivity.this, SplashActivity.class);
-        startActivity(spashIntent);
-    }
 }

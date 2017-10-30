@@ -21,7 +21,7 @@ import javax.net.ssl.HttpsURLConnection;
  * Created by Rinky on 21-10-2017.
  */
 
-public class LandMapAsyncRestSync extends AsyncTask<JSONObject, Void, String> {
+public class LMRRestAsyncTask extends AsyncTask<JSONObject, Void, String> {
     protected void onPreExecute() {
     }
 

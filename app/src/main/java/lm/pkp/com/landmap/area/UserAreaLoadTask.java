@@ -14,7 +14,6 @@ import java.net.URLEncoder;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import lm.pkp.com.landmap.SplashActivity;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 
 /**

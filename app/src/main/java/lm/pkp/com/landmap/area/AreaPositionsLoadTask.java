@@ -13,8 +13,6 @@ import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import lm.pkp.com.landmap.area.AreaDBHelper;
-import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.position.PositionElement;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
 

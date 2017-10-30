@@ -3,10 +3,10 @@ package lm.pkp.com.landmap;
 /**
  * Created by USER on 10/27/2017.
  */
+
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 
 import org.json.JSONObject;
 

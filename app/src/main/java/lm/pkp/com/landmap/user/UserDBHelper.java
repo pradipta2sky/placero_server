@@ -4,7 +4,6 @@ package lm.pkp.com.landmap.user;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
@@ -13,7 +12,7 @@ import org.json.JSONObject;
 
 import lm.pkp.com.landmap.area.AreaDBHelper;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
-import lm.pkp.com.landmap.sync.LandMapAsyncRestSync;
+import lm.pkp.com.landmap.sync.LMRRestAsyncTask;
 import lm.pkp.com.landmap.util.AndroidSystemUtil;
 
 public class UserDBHelper extends SQLiteOpenHelper {
@@ -55,7 +54,7 @@ public class UserDBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public boolean insertUser(UserElement user) {
+    public void insertUserLocally(UserElement user) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
@@ -65,37 +64,29 @@ public class UserDBHelper extends SQLiteOpenHelper {
         contentValues.put(USER_COLUMN_GIVEN_NAME, user.getGivenName());
         contentValues.put(USER_COLUMN_PHOTO_URL, user.getPhotoUrl());
         contentValues.put(USER_COLUMN_AUTH_SYS_ID, user.getAuthSystemId());
+
         db.insert(USER_TABLE_NAME, null, contentValues);
-
-        JSONObject postParams = preparePostParams("insert", contentValues, null ,null);
-        new LandMapAsyncRestSync().execute(postParams);
-
         db.close();
-        return true;
     }
 
-    private JSONObject preparePostParams(String queryType, ContentValues contentValues,String id ,String deviceID) {
+    public void insertUserToServer(UserElement user){
+        JSONObject postParams = preparePostParams("insert", user);
+        new LMRRestAsyncTask().execute(postParams);
+    }
+
+    private JSONObject preparePostParams(String queryType, UserElement user) {
         JSONObject postParams = new JSONObject();
         try {
-            if (id != null) {
-                postParams.put("id", id);
-            }
-            if (deviceID == null) {
-                deviceID = AndroidSystemUtil.getDeviceId();
-            }
             postParams.put("queryType", queryType);
-            postParams.put("deviceID", deviceID);
+            postParams.put("deviceID", AndroidSystemUtil.getDeviceId());
             postParams.put("requestType", "UserMaster");
-            postParams.put(USER_COLUMN_DISPLAY_NAME, contentValues.get(USER_COLUMN_DISPLAY_NAME));
-            if(queryType=="search"){
-                postParams.put("requestType", "UserSearch");
-            }else {
-                postParams.put(USER_COLUMN_FAMILY_NAME, contentValues.get(USER_COLUMN_FAMILY_NAME));
-                postParams.put(USER_COLUMN_GIVEN_NAME, contentValues.get(USER_COLUMN_GIVEN_NAME));
-                postParams.put(USER_COLUMN_AUTH_SYS_ID, contentValues.get(USER_COLUMN_AUTH_SYS_ID));
-                postParams.put(USER_COLUMN_EMAIL, contentValues.get(USER_COLUMN_EMAIL));
-                postParams.put(USER_COLUMN_PHOTO_URL, contentValues.get(USER_COLUMN_PHOTO_URL));
-            }
+            postParams.put(USER_COLUMN_DISPLAY_NAME, user.getDisplayName());
+            postParams.put(USER_COLUMN_FAMILY_NAME, user.getFamilyName());
+            postParams.put(USER_COLUMN_GIVEN_NAME, user.getGivenName());
+            postParams.put(USER_COLUMN_AUTH_SYS_ID, user.getAuthSystemId());
+            postParams.put(USER_COLUMN_EMAIL, user.getEmail());
+            postParams.put(USER_COLUMN_PHOTO_URL, user.getPhotoUrl());
+
             } catch (JSONException e) {
             e.printStackTrace();
         }

@@ -5,15 +5,11 @@ package lm.pkp.com.landmap.provider;
  */
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.provider.Settings;
 
 import lm.pkp.com.landmap.custom.LocationPositionReceiver;
 import lm.pkp.com.landmap.position.PositionElement;
