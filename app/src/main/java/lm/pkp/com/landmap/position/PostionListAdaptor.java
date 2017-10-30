@@ -37,7 +37,12 @@ public class PostionListAdaptor extends ArrayAdapter<PositionElement> {
         }
         final PositionElement pe = items.get(position);
         TextView nameText = (TextView) v.findViewById(R.id.pos_name);
-        nameText.setText(pe.getName());
+        String pName = pe.getName();
+        if(pName.length() > 25){
+            pName = pName.substring(0,22).concat("...");
+        }
+        nameText.setText(pName);
+
         TextView latLongText = (TextView) v.findViewById(R.id.pos_latlng);
         latLongText.setText("Lat: " + pe.getLat() + "\n" + "Long: " + pe.getLon());
 

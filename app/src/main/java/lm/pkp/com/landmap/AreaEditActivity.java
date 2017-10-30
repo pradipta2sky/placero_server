@@ -26,7 +26,7 @@ public class AreaEditActivity extends AppCompatActivity{
         setContentView(R.layout.activity_area_edit);
 
         Bundle bundle = getIntent().getExtras();
-        final String areaName = bundle.getString("area_name");
+        final String areaUid = bundle.getString("area_uid");
 
         ActionBar ab = getSupportActionBar();
         ab.setHomeButtonEnabled(true);
@@ -34,7 +34,7 @@ public class AreaEditActivity extends AppCompatActivity{
         ab.show();
 
         adb = new AreaDBHelper(getApplicationContext());
-        final AreaElement ae = adb.getAreaByName(areaName);
+        final AreaElement ae = adb.getAreaByUid(areaUid);
 
         final TextView areaNameView = (TextView)findViewById(R.id.area_name_text);
         areaNameView.setText(ae.getName());
@@ -80,7 +80,7 @@ public class AreaEditActivity extends AppCompatActivity{
                 findViewById(R.id.loadingPanel).setVisibility(View.INVISIBLE);
 
                 Intent positionMarkerIntent = new Intent(AreaEditActivity.this, PositionMarkerActivity.class);
-                positionMarkerIntent.putExtra("area_name", ae.getName());
+                positionMarkerIntent.putExtra("area_uid", ae.getUniqueId());
                 startActivity(positionMarkerIntent);
             }
         });

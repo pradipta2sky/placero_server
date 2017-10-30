@@ -291,6 +291,42 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         return ae;
     }
 
+    public AreaElement getAreaByUid(String uid) {
+        Cursor cursor = null;
+        SQLiteDatabase db = this.getReadableDatabase();
+        AreaElement ae = new AreaElement();
+        try {
+            cursor = db.rawQuery("SELECT * FROM " + AREA_TABLE_NAME + " WHERE " + AREA_COLUMN_UNIQUE_ID + "=?",
+                    new String[]{uid});
+            if (cursor == null) {
+                return ae;
+            }
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+
+                ae.setUniqueId(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_UNIQUE_ID)));
+                ae.setName(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_NAME)));
+                ae.setDescription(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_DESCRIPTION)));
+                ae.setCreatedBy(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_CREATED_BY)));
+                ae.setCurrentOwner(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_CURRENT_OWNER)));
+                ae.setCenterLon(new Double(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_CENTER_LON))));
+                ae.setCenterLat(new Double(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_CENTER_LAT))));
+                ae.setMeasureSqFt(new Double(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_MEASURE_SQ_FT))));
+                ae.setOwnershipType(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_OWNERSHIP_TYPE)));
+                ae.setTags(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_TAGS)));
+
+                PositionsDBHelper pdb = new PositionsDBHelper(localContext);
+                ae.setPositions(pdb.getAllPositionForArea(ae));
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        db.close();
+        return ae;
+    }
+
     private JSONObject preparePostParams(String queryType, AreaElement ae) {
         JSONObject postParams = new JSONObject();
         try {

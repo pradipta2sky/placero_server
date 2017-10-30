@@ -51,7 +51,7 @@ public class AreaDashboardActivity extends AppCompatActivity {
                 adb.insertAreaToServer(ae);
 
                 Intent intent = new Intent(AreaDashboardActivity.this, PositionMarkerActivity.class);
-                intent.putExtra("area_name", ae.getName());
+                intent.putExtra("area_uid", ae.getUniqueId());
                 startActivity(intent);
             }
         });
@@ -63,7 +63,7 @@ public class AreaDashboardActivity extends AppCompatActivity {
                                     long arg3) {
                 AreaElement ae = (AreaElement) adapter.getItemAtPosition(position);
                 Intent intent = new Intent(AreaDashboardActivity.this, PositionMarkerActivity.class);
-                intent.putExtra("area_name", ae.getName());
+                intent.putExtra("area_uid", ae.getUniqueId());
                 startActivity(intent);
             }
         });

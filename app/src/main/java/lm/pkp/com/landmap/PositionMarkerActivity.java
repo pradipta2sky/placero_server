@@ -2,6 +2,7 @@ package lm.pkp.com.landmap;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -14,6 +15,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.UUID;
 
 import lm.pkp.com.landmap.area.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
@@ -56,16 +58,16 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
         posList.setAdapter(adaptor);
 
         Bundle bundle = getIntent().getExtras();
-        String areaName = bundle.getString("area_name");
-        ae = adb.getAreaByName(areaName);
+        String areaUid = bundle.getString("area_uid");
+        ae = adb.getAreaByUid(areaUid);
         positionList.addAll(ae.getPositions());
         adaptor.notifyDataSetChanged();
 
         TextView areaNameView = (TextView)findViewById(R.id.area_name_text);
-        if(areaName.length() > 25){
-            areaNameView.setText(areaName.substring(0,22).concat("..."));
+        if(areaUid.length() > 25){
+            areaNameView.setText(areaUid.substring(0,22).concat("..."));
         }else {
-            areaNameView.setText(areaName);
+            areaNameView.setText(areaUid);
         }
 
         ActionMenuItemView plotItem = (ActionMenuItemView)findViewById(R.id.action_plot_area);
@@ -73,7 +75,7 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(PositionMarkerActivity.this, AreaPlotterActivity.class);
-                intent.putExtra("area_name", ae.getName());
+                intent.putExtra("area_uid", ae.getUniqueId());
                 startActivity(intent);
             }
         });
@@ -83,7 +85,7 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
             @Override
             public void onClick(View v) {
                 Intent areaEditIntent = new Intent(PositionMarkerActivity.this, AreaEditActivity.class);
-                areaEditIntent.putExtra("area_name", ae.getName());
+                areaEditIntent.putExtra("area_uid", ae.getUniqueId());
                 startActivity(areaEditIntent);
             }
         });
@@ -113,8 +115,19 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
             @Override
             public void onClick(View v) {
                 Intent areaShareIntent = new Intent(PositionMarkerActivity.this, AreaShareActivity.class);
-                areaShareIntent.putExtra("area_name", ae.getName());
+                areaShareIntent.putExtra("area_uid", ae.getUniqueId());
                 startActivity(areaShareIntent);
+            }
+        });
+
+        ActionMenuItemView shareNavigateItem = (ActionMenuItemView)findViewById(R.id.action_navigate_area);
+        shareNavigateItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Uri gmmIntentUri = Uri.parse("google.navigation:q=" + ae.getCenterLat()+ "," + ae.getCenterLon());
+                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                mapIntent.setPackage("com.google.android.apps.maps");
+                startActivity(mapIntent);
             }
         });
     }
@@ -142,7 +155,7 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
 
     @Override
     public void receivedLocationPostion(PositionElement pe) {
-        pe.setName("Position_" + positionList.size());
+        pe.setName("P_" + UUID.randomUUID().toString());
         pe.setUniqueAreaId(ae.getUniqueId());
 
         pe = pdb.insertPositionLocally(pe);

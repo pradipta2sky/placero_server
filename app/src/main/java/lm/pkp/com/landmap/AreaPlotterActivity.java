@@ -42,7 +42,7 @@ import lm.pkp.com.landmap.position.PositionsDBHelper;
 public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap googleMap;
-    private String areaName = null;
+    private String areaUid = null;
     private AreaElement ae = null;
     private LinkedHashMap<Marker, PositionElement> areaMarkers = new LinkedHashMap<>();
     private Polygon polygon = null;
@@ -58,7 +58,7 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         Bundle bundle = getIntent().getExtras();
-        areaName = bundle.getString("area_name");
+        areaUid = bundle.getString("area_uid");
 
         setContentView(R.layout.activity_area_plotter);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -130,7 +130,7 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
 
     private void plotPolygonUsingPositions() {
         final AreaDBHelper adh = new AreaDBHelper(getApplicationContext());
-        ae = adh.getAreaByName(areaName);
+        ae = adh.getAreaByUid(areaUid);
         List<PositionElement> positionElements = ae.getPositions();
         int noOfPositions = positionElements.size();
 
@@ -177,8 +177,7 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
         MarkerOptions markerOptions = new MarkerOptions().position(new LatLng(latAvg, lonAvg));
         centerMarker = googleMap.addMarker(markerOptions);
         centerMarker.setVisible(true);
-        centerMarker.setTitle("Center Marker");
-        centerMarker.showInfoWindow();
+        centerMarker.setTitle("Center Marker, \nLat: " + latAvg + ",Long: " + lonAvg);
         BitmapDrawable bd = (BitmapDrawable)getResources().getDrawable(R.drawable.green_map_marker_icon);
         Bitmap b = bd.getBitmap();
         Bitmap smallIcon = b.createScaledBitmap(b, 128, 128, false);
@@ -243,7 +242,7 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
     @Override
     public void onBackPressed() {
         Intent positionMarkerIntent = new Intent(AreaPlotterActivity.this, PositionMarkerActivity.class);
-        positionMarkerIntent.putExtra("area_name", ae.getName());
+        positionMarkerIntent.putExtra("area_uid", ae.getUniqueId());
         startActivity(positionMarkerIntent);
     }
 

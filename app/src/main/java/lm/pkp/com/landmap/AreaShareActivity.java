@@ -40,7 +40,7 @@ public class AreaShareActivity extends AppCompatActivity implements AsyncTaskCal
         setContentView(R.layout.activity_area_share);
 
         Bundle bundle = getIntent().getExtras();
-        final String areaName = bundle.getString("area_name");
+        final String areaUid = bundle.getString("area_uid");
 
         ActionBar ab = getSupportActionBar();
         ab.setHomeButtonEnabled(true);
@@ -50,7 +50,7 @@ public class AreaShareActivity extends AppCompatActivity implements AsyncTaskCal
         adh = new AreaDBHelper(getApplicationContext());
         pdh = new PositionsDBHelper(getApplicationContext());
 
-        final AreaElement ae = adh.getAreaByName(areaName);
+        final AreaElement ae = adh.getAreaByUid(areaUid);
 
         final TextView areaNameView = (TextView)findViewById(R.id.area_name_text);
         areaNameView.setText(ae.getName());
