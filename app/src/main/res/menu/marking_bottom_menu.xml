@@ -1,6 +1,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <item android:id="@+id/action_share_area"
+        android:title="@string/action_share_area"
+        android:icon="@drawable/share_icon"
+        android:background="?android:attr/selectableItemBackground"
+        app:showAsAction="always"/>
+
+    <item android:id="@+id/action_navigate_area"
+        android:title="@string/action_navigate_area"
+        android:icon="@drawable/navigate_icon"
+        android:background="?android:attr/selectableItemBackground"
+        app:showAsAction="always"/>
+
     <item
         android:id="@+id/action_plot_area"
         android:icon="@drawable/maps_64dp"
@@ -14,10 +26,5 @@
         android:background="?android:attr/selectableItemBackground"
         app:showAsAction="always"/>
 
-    <item android:id="@+id/action_share_area"
-        android:title="@string/action_share_area"
-        android:icon="@drawable/share_icon"
-        android:background="?android:attr/selectableItemBackground"
-        app:showAsAction="always"/>
 
 </menu>

@@ -143,7 +143,9 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
     @Override
     public void receivedLocationPostion(PositionElement pe) {
         pe.setName("Position_" + positionList.size());
-        pe = pdb.insertPositionLocally(pe, ae);
+        pe.setUniqueAreaId(ae.getUniqueId());
+
+        pe = pdb.insertPositionLocally(pe);
         pdb.insertPositionToServer(pe);
 
         positionList.add(pe);

@@ -74,4 +74,5 @@
     <string name="action_share_area">Share Area</string>
     <string name="label_share_area">Share Area</string>
     <string name="label_pre_load_splash">Pre load splash</string>
+    <string name="action_navigate_area">Navigate</string>
 </resources>

@@ -2,9 +2,12 @@ package lm.pkp.com.landmap;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -15,6 +18,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -22,8 +27,10 @@ import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.maps.android.SphericalUtil;
 
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 import lm.pkp.com.landmap.area.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
@@ -37,8 +44,9 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
     private GoogleMap googleMap;
     private String areaName = null;
     private AreaElement ae = null;
-    private List<Marker> areaMarkers = null;
+    private LinkedHashMap<Marker, PositionElement> areaMarkers = new LinkedHashMap<>();
     private Polygon polygon = null;
+    private Marker centerMarker = null;
 
     private ViewGroup infoWindow;
     private TextView infoTitle;
@@ -66,6 +74,13 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
         googleMap.setMyLocationEnabled(true);
         googleMap.setBuildingsEnabled(true);
 
+        UiSettings settings = googleMap.getUiSettings();
+        settings.setMapToolbarEnabled(true);
+        settings.setAllGesturesEnabled(true);
+        settings.setCompassEnabled(true);
+        settings.setZoomControlsEnabled(true);
+        settings.setZoomGesturesEnabled(true);
+
         final MapWrapperLayout mapWrapperLayout = (MapWrapperLayout)findViewById(R.id.map_relative_layout);
         mapWrapperLayout.init(googleMap, getPixelsFromDp(getApplicationContext(), 39 + 20));
         this.infoWindow = (ViewGroup)getLayoutInflater().inflate(R.layout.info_window, null);
@@ -78,17 +93,10 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
         {
             @Override
             protected void onClickConfirmed(View v, Marker marker) {
-                doRemovePositionByMarker(marker);
-            }
-
-            private void doRemovePositionByMarker(Marker marker) {
-                String positionId = marker.getTitle();
                 PositionsDBHelper pdh = new PositionsDBHelper(getApplicationContext());
-                pdh.deletePositionById(positionId,ae.getUniqueId());
-                for (int i = 0; i < areaMarkers.size(); i++) {
-                    Marker m = areaMarkers.get(i);
-                    m.remove();
-                }
+                PositionElement markedPosition = areaMarkers.get(marker);
+                pdh.deletePosition(markedPosition);
+                areaMarkers.remove(markedPosition);
                 polygon.remove();
                 plotPolygonUsingPositions();
             }
@@ -106,8 +114,9 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
                 String markerTitle = marker.getTitle();
                 infoTitle.setText(markerTitle);
                 infoSnippet.setText(marker.getSnippet());
-                if(markerTitle.indexOf("Area") != -1){
+                if(markerTitle.indexOf("Center") != -1){
                     infoButton.setVisibility(View.INVISIBLE);
+                    return infoWindow;
                 }else {
                     infoButton.setVisibility(View.VISIBLE);
                     infoButtonListener.setMarker(marker);
@@ -122,76 +131,100 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
     private void plotPolygonUsingPositions() {
         final AreaDBHelper adh = new AreaDBHelper(getApplicationContext());
         ae = adh.getAreaByName(areaName);
-        areaMarkers = new ArrayList<Marker>();
         List<PositionElement> positionElements = ae.getPositions();
-        if(positionElements.size() == 0){
-            return ;
+        int noOfPositions = positionElements.size();
+
+        Set<Marker> markerSet = areaMarkers.keySet();
+        for (Marker m : markerSet) {
+            m.remove();
         }
+        areaMarkers = new LinkedHashMap<>();
+        if(centerMarker != null){
+            centerMarker.remove();
+        }
+
+        PolygonOptions polyOptions = new PolygonOptions();
+        polyOptions = polyOptions.strokeColor(Color.RED).fillColor(Color.DKGRAY);
+
         double latTotal = 0.0;
         double lonTotal = 0.0;
-        for (int i = 0; i < positionElements.size(); i++) {
+        for (int i = 0; i < noOfPositions; i++) {
             PositionElement pe = positionElements.get(i);
             Marker m = drawMarkerUsingPosition(pe);
             latTotal += pe.getLat();
             lonTotal += pe.getLon();
-            areaMarkers.add(m);
+            areaMarkers.put(m, pe);
+            polyOptions.add(m.getPosition());
         }
-        final double latAvg = latTotal / positionElements.size();
-        final double lonAvg = lonTotal / positionElements.size();
+        polygon = googleMap.addPolygon(polyOptions);
 
+        final double latAvg = latTotal / noOfPositions;
+        final double lonAvg = lonTotal / noOfPositions;
         zoomCameraToPosition(latAvg, lonAvg);
-        drawPolygonForMarkers();
 
-        //DecimalFormat df = new DecimalFormat("###.##");
         double polygonAreaSqMt = SphericalUtil.computeArea(polygon.getPoints());
         double polygonAreaSqFt = polygonAreaSqMt * 10.7639;
-        //double polygonAreaAcre = polygonAreaSqFt / 43560;
-        //double polygonAreaDecimals = polygonAreaSqFt / 436;
-
-        //IconGenerator iconFactory = new IconGenerator(this);
-        //iconFactory.setStyle(IconGenerator.STYLE_WHITE);
-        /*
-        MarkerOptions markerOptions = new MarkerOptions()
-                .position(new LatLng(latAvg,lonAvg))
-                .icon(BitmapDescriptorFactory.fromBitmap(iconFactory.makeIcon("Area: \nSq Ft - " + df.format(polygonAreaSqFt)
-                        + ", Acre - " + df.format(polygonAreaAcre) +", Decimals - "+ df.format(polygonAreaDecimals)
-                        +"\n\nPosition: \nLat: " + latAvg + ", Long: " + lonAvg + "")))
-                .anchor(iconFactory.getAnchorU(), iconFactory.getAnchorV());
-
-        Marker marker = googleMap.addMarker(markerOptions);
-        marker.setVisible(false);
-        */
         ae.setCenterLat(latAvg);
         ae.setCenterLon(lonAvg);
         ae.setMeasureSqFt(polygonAreaSqFt);
-
         new Thread(new Runnable() {
             public void run() {
                 adh.updateArea(ae);
             }
         }).start();
 
-        googleMap.setOnPolygonClickListener(new GoogleMap.OnPolygonClickListener() {
-            public void onPolygonClick(Polygon polygon) {
-            }
-        });
+
+        MarkerOptions markerOptions = new MarkerOptions().position(new LatLng(latAvg, lonAvg));
+        centerMarker = googleMap.addMarker(markerOptions);
+        centerMarker.setVisible(true);
+        centerMarker.setTitle("Center Marker");
+        centerMarker.showInfoWindow();
+        BitmapDrawable bd = (BitmapDrawable)getResources().getDrawable(R.drawable.green_map_marker_icon);
+        Bitmap b = bd.getBitmap();
+        Bitmap smallIcon = b.createScaledBitmap(b, 128, 128, false);
+        centerMarker.setIcon(BitmapDescriptorFactory.fromBitmap(smallIcon));
     }
 
-    private void drawPolygonForMarkers() {
-        PolygonOptions polyOptions = new PolygonOptions();
-        for (int i = 0; i < areaMarkers.size(); i++) {
-            polyOptions.add(areaMarkers.get(i).getPosition());
-        }
-        polyOptions = polyOptions.strokeColor(Color.RED).fillColor(Color.CYAN).clickable(true).zIndex(1);
-        polygon = googleMap.addPolygon(polyOptions);
-    }
-
-    public Marker drawMarkerUsingPosition(PositionElement pe) {
+    public Marker drawMarkerUsingPosition(final PositionElement pe) {
         LatLng position = new LatLng(pe.getLat(), pe.getLon());
         Marker marker = googleMap.addMarker((new MarkerOptions().position(position)));
-        marker.setSnippet("Position [" + pe.getLat() + "," + pe.getLon() + "]");
         marker.setTitle(pe.getUniqueId());
-        marker.showInfoWindow();
+        marker.setDraggable(true);
+        googleMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+            @Override
+            public void onMarkerDragStart(Marker marker) {
+            }
+
+            @SuppressWarnings("unchecked")
+            @Override
+            public void onMarkerDragEnd(Marker marker) {
+                Log.d("System out", "onMarkerDragEnd..." + marker.getPosition().latitude + "..."
+                        + marker.getPosition().longitude);
+                googleMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+
+                PositionElement newPositionElem = new PositionElement();
+                String pid = UUID.randomUUID().toString();
+                newPositionElem.setUniqueId(pid);
+                newPositionElem.setUniqueAreaId(ae.getUniqueId());
+                newPositionElem.setName("P_" + pid);
+                newPositionElem.setDescription("No Description");
+                newPositionElem.setTags("");
+                newPositionElem.setLat(marker.getPosition().latitude);
+                newPositionElem.setLon(marker.getPosition().longitude);
+
+                PositionsDBHelper pdh = new PositionsDBHelper(getApplicationContext());
+                pdh.insertPositionLocally(newPositionElem);
+                pdh.insertPositionToServer(newPositionElem);
+                pdh.deletePosition(areaMarkers.get(marker));
+
+                polygon.remove();
+                plotPolygonUsingPositions();
+            }
+
+            @Override
+            public void onMarkerDrag(Marker marker) {
+            }
+        });
         return marker;
     }
 

@@ -54,7 +54,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public PositionElement insertPositionLocally(PositionElement pe, AreaElement ae) {
+    public PositionElement insertPositionLocally(PositionElement pe) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
@@ -62,9 +62,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         contentValues.put(POSITION_COLUMN_UNIQUE_ID, uniqueId);
         pe.setUniqueId(uniqueId);
 
-        contentValues.put(POSITION_COLUMN_UNIQUE_AREA_ID, ae.getUniqueId());
-        pe.setUniqueAreaId(ae.getUniqueId());
-
+        contentValues.put(POSITION_COLUMN_UNIQUE_AREA_ID, pe.getUniqueAreaId());
         contentValues.put(POSITION_COLUMN_NAME, pe.getName());
         contentValues.put(POSITION_COLUMN_DESCRIPTION, pe.getDescription());
         contentValues.put(POSITION_COLUMN_LAT, pe.getLat());
