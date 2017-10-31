@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import lm.pkp.com.landmap.area.AreaDBHelper;
 import lm.pkp.com.landmap.area.UserAreaLoadTask;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
+import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.user.UserContext;
 
@@ -28,6 +29,9 @@ public class SplashActivity extends Activity implements AsyncTaskCallback{
 
         PositionsDBHelper pdh = new PositionsDBHelper(getApplicationContext());
         pdh.deletePositionsLocally();
+
+        DriveDBHelper ddh = new DriveDBHelper(getApplicationContext());
+        ddh.deleteDriveElementsLocally();
 
         UserAreaLoadTask loadTask = new UserAreaLoadTask(getApplicationContext());
         loadTask.setCompletionCallback(this);

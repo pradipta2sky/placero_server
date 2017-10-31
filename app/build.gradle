@@ -8,8 +8,8 @@ android {
         applicationId "lm.pkp.com.landmap"
         minSdkVersion 20
         targetSdkVersion 17
-        versionCode 5
-        versionName "1.4"
+        versionCode 6
+        versionName "1.5"
         multiDexEnabled true
     }
     buildTypes {
@@ -38,8 +38,8 @@ dependencies {
     compile('com.google.http-client:google-http-client-gson:1.22.0') {
         exclude module: 'httpclient'
     }
-    compile 'com.google.apis:google-api-services-people:v1-rev158-1.23.0'
     compile 'com.google.android.gms:play-services:9.8.0'
+    compile 'com.google.apis:google-api-services-people:v1-rev158-1.23.0'
     compile 'org.apache.commons:commons-lang3:3.6'
 }
 

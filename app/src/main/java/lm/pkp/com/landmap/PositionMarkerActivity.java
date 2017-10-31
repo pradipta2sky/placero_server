@@ -20,6 +20,7 @@ import java.util.UUID;
 import lm.pkp.com.landmap.area.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.custom.LocationPositionReceiver;
+import lm.pkp.com.landmap.google.drive.CreateFolderStructureActivity;
 import lm.pkp.com.landmap.position.PositionElement;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.position.PostionListAdaptor;
@@ -64,11 +65,7 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
         adaptor.notifyDataSetChanged();
 
         TextView areaNameView = (TextView)findViewById(R.id.area_name_text);
-        if(areaUid.length() > 25){
-            areaNameView.setText(areaUid.substring(0,22).concat("..."));
-        }else {
-            areaNameView.setText(areaUid);
-        }
+        areaNameView.setText(ae.getName());
 
         ActionMenuItemView plotItem = (ActionMenuItemView)findViewById(R.id.action_plot_area);
         plotItem.setOnClickListener(new View.OnClickListener() {
@@ -120,8 +117,8 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
             }
         });
 
-        ActionMenuItemView shareNavigateItem = (ActionMenuItemView)findViewById(R.id.action_navigate_area);
-        shareNavigateItem.setOnClickListener(new View.OnClickListener() {
+        ActionMenuItemView navigateItem = (ActionMenuItemView)findViewById(R.id.action_navigate_area);
+        navigateItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Uri gmmIntentUri = Uri.parse("google.navigation:q=" + ae.getCenterLat()+ "," + ae.getCenterLon());
@@ -130,6 +127,17 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
                 startActivity(mapIntent);
             }
         });
+
+        ActionMenuItemView driveItem = (ActionMenuItemView)findViewById(R.id.action_drive_area);
+        driveItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(PositionMarkerActivity.this, CreateFolderStructureActivity.class);
+                intent.putExtra("area_uid", ae.getUniqueId());
+                startActivity(intent);
+            }
+        });
+
     }
 
     private boolean approachLocationPermissions() {

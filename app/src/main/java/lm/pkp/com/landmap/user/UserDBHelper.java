@@ -11,6 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import lm.pkp.com.landmap.area.AreaDBHelper;
+import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.sync.LMRRestAsyncTask;
 import lm.pkp.com.landmap.util.AndroidSystemUtil;
@@ -46,6 +47,7 @@ public class UserDBHelper extends SQLiteOpenHelper {
         );
         new AreaDBHelper(localContext).onCreate(db);
         new PositionsDBHelper(localContext).onCreate(db);
+        new DriveDBHelper(localContext).onCreate(db);
     }
 
     @Override
