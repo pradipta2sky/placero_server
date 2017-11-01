@@ -17,11 +17,25 @@ import java.util.Iterator;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import lm.pkp.com.landmap.custom.AsyncTaskCallback;
+
 /**
  * Created by Rinky on 21-10-2017.
  */
 
-public class LMRRestAsyncTask extends AsyncTask<JSONObject, Void, String> {
+public class LMSRestAsyncTask extends AsyncTask<JSONObject, Void, String> {
+
+    private AsyncTaskCallback callback = null;
+
+    public LMSRestAsyncTask(){
+        super();
+    }
+
+    public LMSRestAsyncTask(AsyncTaskCallback asyncTaskCallback){
+        super();
+        this.callback = asyncTaskCallback;
+    }
+
     protected void onPreExecute() {
     }
 
@@ -92,4 +106,9 @@ public class LMRRestAsyncTask extends AsyncTask<JSONObject, Void, String> {
         return result.toString();
     }
 
+    @Override
+    protected void onPostExecute(String s) {
+        super.onPostExecute(s);
+        callback.taskCompleted(s);
+    }
 }

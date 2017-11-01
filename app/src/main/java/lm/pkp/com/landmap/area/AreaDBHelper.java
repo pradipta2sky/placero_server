@@ -19,7 +19,7 @@ import java.util.Locale;
 import java.util.UUID;
 
 import lm.pkp.com.landmap.position.PositionsDBHelper;
-import lm.pkp.com.landmap.sync.LMRRestAsyncTask;
+import lm.pkp.com.landmap.sync.LMSRestAsyncTask;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.util.AndroidSystemUtil;
 
@@ -113,7 +113,7 @@ public class AreaDBHelper extends SQLiteOpenHelper {
     }
 
     public void insertAreaToServer(AreaElement ae){
-        new LMRRestAsyncTask().execute(preparePostParams("insert",ae));
+        new LMSRestAsyncTask().execute(preparePostParams("insert",ae));
     }
 
     public AreaElement insertAreaFromServer(AreaElement ae) {
@@ -174,7 +174,7 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         }
 
         db.update(AREA_TABLE_NAME, contentValues, AREA_COLUMN_UNIQUE_ID + " = ? ", new String[]{ae.getUniqueId()});
-        new LMRRestAsyncTask().execute(preparePostParams("update", ae));
+        new LMSRestAsyncTask().execute(preparePostParams("update", ae));
         db.close();
 
         return true;
@@ -196,7 +196,7 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         contentValues.put(AREA_COLUMN_TAGS, ae.getTags());
 
         db.update(AREA_TABLE_NAME, contentValues, AREA_COLUMN_UNIQUE_ID + " = ? ", new String[]{ae.getUniqueId()});
-        new LMRRestAsyncTask().execute(preparePostParams("update", ae));
+        new LMSRestAsyncTask().execute(preparePostParams("update", ae));
         db.close();
 
         return true;
@@ -212,7 +212,7 @@ public class AreaDBHelper extends SQLiteOpenHelper {
                 new String[]{ae.getUniqueId()});
 
         JSONObject areaPostParams = preparePostParams("delete", ae);
-        new LMRRestAsyncTask().execute(areaPostParams);
+        new LMSRestAsyncTask().execute(areaPostParams);
 
         db.close();
         return delete;

@@ -34,7 +34,7 @@ public class AreaAddResourcesActivity extends AppCompatActivity{
         ab.show();
 
         adb = new AreaDBHelper(getApplicationContext());
-        final AreaElement ae = adb.getAreaByUid(areaUid);
+        ae = adb.getAreaByUid(areaUid);
 
         final TextView areaNameView = (TextView)findViewById(R.id.area_name_text);
         areaNameView.setText(ae.getName());

@@ -13,7 +13,7 @@ import org.json.JSONObject;
 import lm.pkp.com.landmap.area.AreaDBHelper;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
-import lm.pkp.com.landmap.sync.LMRRestAsyncTask;
+import lm.pkp.com.landmap.sync.LMSRestAsyncTask;
 import lm.pkp.com.landmap.util.AndroidSystemUtil;
 
 public class UserDBHelper extends SQLiteOpenHelper {
@@ -73,7 +73,7 @@ public class UserDBHelper extends SQLiteOpenHelper {
 
     public void insertUserToServer(UserElement user){
         JSONObject postParams = preparePostParams("insert", user);
-        new LMRRestAsyncTask().execute(postParams);
+        new LMSRestAsyncTask().execute(postParams);
     }
 
     private JSONObject preparePostParams(String queryType, UserElement user) {

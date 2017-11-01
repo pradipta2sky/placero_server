@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import lm.pkp.com.landmap.area.AreaElement;
-import lm.pkp.com.landmap.sync.LMRRestAsyncTask;
+import lm.pkp.com.landmap.sync.LMSRestAsyncTask;
 import lm.pkp.com.landmap.util.AndroidSystemUtil;
 
 public class PositionsDBHelper extends SQLiteOpenHelper {
@@ -92,13 +92,13 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
     }
 
     public void insertPositionToServer(PositionElement pe) {
-        new LMRRestAsyncTask().execute(preparePostParams("insert", pe));
+        new LMSRestAsyncTask().execute(preparePostParams("insert", pe));
     }
 
     public Integer deletePosition(PositionElement pe) {
         SQLiteDatabase db = this.getWritableDatabase();
         int delete = db.delete(POSITION_TABLE_NAME, POSITION_COLUMN_UNIQUE_ID + " = ? ", new String[]{pe.getUniqueId()});
-        new LMRRestAsyncTask().execute(preparePostParams("delete", pe));
+        new LMSRestAsyncTask().execute(preparePostParams("delete", pe));
         db.close();
         return delete;
     }
@@ -113,7 +113,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         pe.setUniqueAreaId(uniqueAreaId);
         pe.setUniqueId(uniqueId);
 
-        new LMRRestAsyncTask().execute(preparePostParams("deleteById", pe));
+        new LMSRestAsyncTask().execute(preparePostParams("deleteById", pe));
         db.close();
     }
 
@@ -125,7 +125,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         PositionElement pe = new PositionElement();
         pe.setUniqueAreaId(uniqueAreaId);
 
-        new LMRRestAsyncTask().execute(preparePostParams("deleteByUniqueAreaId", pe));
+        new LMSRestAsyncTask().execute(preparePostParams("deleteByUniqueAreaId", pe));
         db.close();
     }
 

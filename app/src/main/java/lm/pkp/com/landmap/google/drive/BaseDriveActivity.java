@@ -43,13 +43,11 @@ public abstract class BaseDriveActivity extends Activity implements
     protected UserElement ue = null;
 
     protected AreaDBHelper adh = null;
-    protected DriveDBHelper ddh = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         adh = new AreaDBHelper(getApplicationContext());
-        ddh = new DriveDBHelper(getApplicationContext());
 
         Bundle bundle = getIntent().getExtras();
         String areaUid = bundle.getString("area_uid");

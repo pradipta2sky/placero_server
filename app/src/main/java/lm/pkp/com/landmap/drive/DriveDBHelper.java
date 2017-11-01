@@ -11,15 +11,16 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
-import lm.pkp.com.landmap.sync.LMRRestAsyncTask;
+import lm.pkp.com.landmap.custom.AsyncTaskCallback;
+import lm.pkp.com.landmap.sync.LMSRestAsyncTask;
 import lm.pkp.com.landmap.util.AndroidSystemUtil;
 
 public class DriveDBHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "landmap.db";
     private Context localContext = null;
+    private AsyncTaskCallback callback = null;
 
     public static final String DRIVE_TABLE_NAME = "drive_master";
     public static final String DRIVE_COLUMN_UNIQUE_ID = "unique_id";
@@ -29,6 +30,12 @@ public class DriveDBHelper extends SQLiteOpenHelper {
     public static final String DRIVE_COLUMN_NAME = "name";
     public static final String DRIVE_COLUMN_TYPE = "type";
     public static final String DRIVE_COLUMN_SIZE = "size";
+
+    public DriveDBHelper(Context context, AsyncTaskCallback callback) {
+        super(context, DATABASE_NAME, null, 1);
+        localContext = context;
+        this.callback = callback;
+    }
 
     public DriveDBHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
@@ -72,7 +79,8 @@ public class DriveDBHelper extends SQLiteOpenHelper {
     }
 
     public void insertResourceToServer(DriveResource dr){
-        new LMRRestAsyncTask().execute(preparePostParams("insert", dr));
+        LMSRestAsyncTask task = new LMSRestAsyncTask(callback);
+        task.execute(preparePostParams("insert", dr));
     }
 
     public DriveResource insertResourceFromServer(DriveResource dr) {
@@ -105,23 +113,25 @@ public class DriveDBHelper extends SQLiteOpenHelper {
         contentValues.put(DRIVE_COLUMN_SIZE, dr.getSize());
 
         db.update(DRIVE_TABLE_NAME, contentValues, DRIVE_COLUMN_UNIQUE_ID + " = ? ", new String[]{dr.getUniqueId()});
-        new LMRRestAsyncTask().execute(preparePostParams("update", dr));
+        new LMSRestAsyncTask().execute(preparePostParams("update", dr));
         db.close();
 
         return true;
     }
 
-    public Integer deleteResource(DriveResource dr) {
+    public void deleteResource(DriveResource dr) {
+        if(dr == null){
+            return;
+        }
         SQLiteDatabase db = this.getWritableDatabase();
         int delete = db.delete(DRIVE_TABLE_NAME,
                 DRIVE_COLUMN_UNIQUE_ID + " = ? ",
                 new String[]{dr.getUniqueId()});
 
         JSONObject areaPostParams = preparePostParams("delete", dr);
-        new LMRRestAsyncTask().execute(areaPostParams);
+        new LMSRestAsyncTask().execute(areaPostParams);
 
         db.close();
-        return delete;
     }
 
     public ArrayList<DriveResource> getAllResources() {
@@ -201,8 +211,8 @@ public class DriveDBHelper extends SQLiteOpenHelper {
         Cursor cursor = null;
         try {
             cursor = db.rawQuery("select * from " + DRIVE_TABLE_NAME + " WHERE "
-                            + DRIVE_COLUMN_UNIQUE_ID + "=? AND " + DRIVE_COLUMN_TYPE + "=?",
-                    new String[]{uid,"folder"});
+                            + DRIVE_COLUMN_USER_ID + "=?",
+                    new String[]{uid});
             if (cursor == null) {
                 return allResources;
             }
@@ -236,8 +246,8 @@ public class DriveDBHelper extends SQLiteOpenHelper {
         JSONObject postParams = new JSONObject();
         try {
             postParams.put("requestType", "DriveMaster");
-            postParams.put("queryType", queryType);
-            postParams.put("deviceID", AndroidSystemUtil.getDeviceId());
+            postParams.put("query_type", queryType);
+            postParams.put("device_id", AndroidSystemUtil.getDeviceId());
             postParams.put(DRIVE_COLUMN_AREA_ID, dr.getAreaId());
             postParams.put(DRIVE_COLUMN_USER_ID, dr.getUserId());
             postParams.put(DRIVE_COLUMN_UNIQUE_ID, dr.getUniqueId());
@@ -257,4 +267,11 @@ public class DriveDBHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    public void setCompletionCallback(AsyncTaskCallback callback) {
+        this.callback = callback;
+    }
+
+    public void finalizeTaskCompletion(){
+        callback.taskCompleted("");
+    }
 }

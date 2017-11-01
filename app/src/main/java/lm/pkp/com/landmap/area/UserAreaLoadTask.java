@@ -93,8 +93,12 @@ public class UserAreaLoadTask extends AsyncTask<JSONObject, Void, String>{
                 adh.insertAreaFromServer(ae);
 
                 JSONObject searchObj = new JSONObject();
-                searchObj.put("aid", ae.getUniqueId());
+                searchObj.put("sf", "area_id");
+                searchObj.put("sf_alt", "unique_area_id");
+                searchObj.put("ss", ae.getUniqueId());
+
                 new AreaPositionsLoadTask(localContext).execute(searchObj);
+                new AreaDriveResourcesLoadTask(localContext).execute(searchObj);
             }
         }catch (Exception e){
             e.printStackTrace();
