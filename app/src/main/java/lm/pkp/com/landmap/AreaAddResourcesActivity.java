@@ -23,7 +23,7 @@ public class AreaAddResourcesActivity extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_area_edit);
+        setContentView(R.layout.activity_area_resource_main);
 
         Bundle bundle = getIntent().getExtras();
         final String areaUid = bundle.getString("area_uid");
@@ -48,12 +48,6 @@ public class AreaAddResourcesActivity extends AppCompatActivity{
         final TextView areaTagsView = (TextView)findViewById(R.id.area_tags_text);
         areaTagsView.setText(ae.getTags());
 
-        final EditText nameTextView = (EditText) findViewById(R.id.area_name_edit);
-        nameTextView.setText(ae.getName());
-
-        final EditText descTextView = (EditText) findViewById(R.id.area_desc_edit);
-        descTextView.setText(ae.getDescription());
-
         double areaMeasureSqFt = ae.getMeasureSqFt();
         double areaMeasureAcre = areaMeasureSqFt / 43560;
         double areaMeasureDecimals = areaMeasureSqFt / 436;
@@ -64,24 +58,12 @@ public class AreaAddResourcesActivity extends AppCompatActivity{
                 df.format(areaMeasureDecimals) + " Decimals.";
         measureText.setText(content);
 
-        Button saveButton = (Button)findViewById(R.id.area_edit_save_btn);
-        saveButton.setOnClickListener(new View.OnClickListener() {
+        Button takeSnapButton = (Button)findViewById(R.id.take_snap_button);
+        takeSnapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
-
-                String nameText = nameTextView.getText().toString();
-                ae.setName(nameText);
-
-                String descText = descTextView.getText().toString();
-                ae.setDescription(descText);
-
-                adb.updateAreaNonGeo(ae);
-                findViewById(R.id.loadingPanel).setVisibility(View.INVISIBLE);
-
-                Intent positionMarkerIntent = new Intent(AreaAddResourcesActivity.this, PositionMarkerActivity.class);
-                positionMarkerIntent.putExtra("area_uid", ae.getUniqueId());
-                startActivity(positionMarkerIntent);
+                Intent i = new Intent(AreaAddResourcesActivity.this, AreaCameraShootActivity.class);
+                startActivity(i);
             }
         });
     }

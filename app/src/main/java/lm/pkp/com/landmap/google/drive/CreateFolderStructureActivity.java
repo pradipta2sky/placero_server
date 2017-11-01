@@ -35,9 +35,6 @@ import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
 
-/**
- * An activity to illustrate how to create a new folder.
- */
 public class CreateFolderStructureActivity extends BaseDriveActivity {
 
     private final String IMAGE_FOLDER_NAME = "LMS_IMAGES";
