@@ -7,18 +7,25 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.ImageButton;
+import android.widget.ListView;
 
-import java.text.DecimalFormat;
+import java.util.ArrayList;
 
+import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaDBHelper;
+import lm.pkp.com.landmap.area.AreaDriveResourceAdaptor;
 import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.drive.DriveResource;
+import lm.pkp.com.landmap.util.AreaActivityUtil;
 
 public class AreaAddResourcesActivity extends AppCompatActivity{
 
     private AreaDBHelper adb = null;
     private AreaElement ae = null;
+
+    private AreaDriveResourceAdaptor adaptor = null;
+    private ArrayList<DriveResource> areaResources = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,34 +42,41 @@ public class AreaAddResourcesActivity extends AppCompatActivity{
 
         adb = new AreaDBHelper(getApplicationContext());
         ae = adb.getAreaByUid(areaUid);
+        AreaContext.getInstance().setAreaElement(ae);
+        AreaActivityUtil.populateAreaElement(ae, this);
 
-        final TextView areaNameView = (TextView)findViewById(R.id.area_name_text);
-        areaNameView.setText(ae.getName());
+        ListView resourceFileList = (ListView) findViewById(R.id.file_display_list);
+        adaptor = new AreaDriveResourceAdaptor(getApplicationContext(), R.id.file_display_list, areaResources);
+        resourceFileList.setAdapter(adaptor);
 
-        final TextView areaDescView = (TextView)findViewById(R.id.area_desc_text);
-        areaDescView.setText(ae.getDescription());
-
-        final TextView areaCreatorView = (TextView)findViewById(R.id.area_creator_text);
-        areaCreatorView.setText(ae.getCreatedBy());
-
-        final TextView areaTagsView = (TextView)findViewById(R.id.area_tags_text);
-        areaTagsView.setText(ae.getTags());
-
-        double areaMeasureSqFt = ae.getMeasureSqFt();
-        double areaMeasureAcre = areaMeasureSqFt / 43560;
-        double areaMeasureDecimals = areaMeasureSqFt / 436;
-        DecimalFormat df = new DecimalFormat("###.##");
-
-        TextView measureText = (TextView) findViewById(R.id.area_measure_text);
-        String content = "Area: " + df.format(areaMeasureSqFt) + " Sqft, " + df.format(areaMeasureAcre) +" Acre," +
-                df.format(areaMeasureDecimals) + " Decimals.";
-        measureText.setText(content);
+        ArrayList<DriveResource> driveResources = AreaContext.getInstance().getDriveResources();
+        areaResources.clear();
+        areaResources.addAll(driveResources);
+        adaptor.notifyDataSetChanged();
 
         Button takeSnapButton = (Button)findViewById(R.id.take_snap_button);
         takeSnapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                Intent i = new Intent(AreaAddResourcesActivity.this, AreaCameraSnapActivity.class);
+                startActivity(i);
+            }
+        });
+
+        Button captureVideoButton = (Button)findViewById(R.id.shoot_video_button);
+        captureVideoButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 Intent i = new Intent(AreaAddResourcesActivity.this, AreaCameraShootActivity.class);
+                startActivity(i);
+            }
+        });
+
+        Button chooseDocumentButton = (Button)findViewById(R.id.upload_document_button);
+        chooseDocumentButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(AreaAddResourcesActivity.this, FCMainActivity.class);
                 startActivity(i);
             }
         });
@@ -82,5 +96,8 @@ public class AreaAddResourcesActivity extends AppCompatActivity{
     @Override
     public void onBackPressed() {
         finish();
+        Intent i = new Intent(AreaAddResourcesActivity.this, PositionMarkerActivity.class);
+        i.putExtra("area_uid", ae.getUniqueId());
+        startActivity(i);
     }
 }

@@ -23,15 +23,14 @@ import lm.pkp.com.landmap.user.UserContext;
 /**
  * Created by USER on 11/1/2017.
  */
-public class AreaCameraShootActivity extends Activity {
+public class AreaCameraSnapActivity extends Activity {
 
     // LogCat tag
-    private static final String TAG = AreaCameraShootActivity.class.getSimpleName();
+    private static final String TAG = AreaCameraSnapActivity.class.getSimpleName();
 
 
     // Camera activity request codes
     private static final int CAMERA_CAPTURE_IMAGE_REQUEST_CODE = 100;
-    private static final int CAMERA_CAPTURE_VIDEO_REQUEST_CODE = 200;
 
     public static final int MEDIA_TYPE_IMAGE = 1;
     public static final int MEDIA_TYPE_VIDEO = 2;
@@ -42,85 +41,61 @@ public class AreaCameraShootActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_camera_shoot);
-        recordVideo();
-    }
-
-
-    /**
-     * Launching camera app to record video
-     */
-    private void recordVideo() {
-        Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-
-        fileUri = getOutputMediaFileUri(MEDIA_TYPE_VIDEO);
-
-        // set video quality
-        intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
-
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the image file
-        // name
-
-        // start the video capture Intent
-        startActivityForResult(intent, CAMERA_CAPTURE_VIDEO_REQUEST_CODE);
+        captureImage();
     }
 
     /**
-     * Here we store the file url as it will be null after returning from camera
-     * app
+     * Launching camera app to capture image
      */
+    private void captureImage() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
+        startActivityForResult(intent, CAMERA_CAPTURE_IMAGE_REQUEST_CODE);
+    }
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
-        // save file url in bundle as it will be null on screen orientation
-        // changes
         outState.putParcelable("file_uri", fileUri);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-
-        // get the file url
         fileUri = savedInstanceState.getParcelable("file_uri");
     }
 
-    /**
-     * Receiving activity result method will be called after closing the camera
-     * */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // if the result is capturing Image
-         if (requestCode == CAMERA_CAPTURE_VIDEO_REQUEST_CODE) {
+        if (requestCode == CAMERA_CAPTURE_IMAGE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
-                File videoFile = new File(fileUri.getPath());
+                File imageFile = new File(fileUri.getPath());
 
                 DriveResource dr = new DriveResource();
-                dr.setName(videoFile.getName());
+                dr.setName(imageFile.getName());
                 dr.setPath(fileUri.getPath());
                 dr.setType("file");
                 dr.setUserId(UserContext.getInstance().getUserElement().getEmail());
-                dr.setSize(videoFile.length() + "");
+                dr.setSize(imageFile.length() + "");
                 dr.setUniqueId(UUID.randomUUID().toString());
 
                 AreaContext.getInstance().addDriveResource(dr);
                 AreaElement ae = AreaContext.getInstance().getAreaElement();
-                Intent i = new Intent(AreaCameraShootActivity.this, AreaAddResourcesActivity.class);
+                Intent i = new Intent(AreaCameraSnapActivity.this, AreaAddResourcesActivity.class);
                 i.putExtra("area_uid", ae.getUniqueId());
                 startActivity(i);
             } else if (resultCode == RESULT_CANCELED) {
                 // Cancelled case
                 finish();
             } else {
-                // Failed case
+                // Error case
                 finish();
             }
         }
     }
 
-    /**
-     * Creating file uri to store image/video
-     */
     public Uri getOutputMediaFileUri(int type) {
         return Uri.fromFile(getOutputMediaFile(type));
     }

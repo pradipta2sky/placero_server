@@ -57,4 +57,10 @@
     <string name="btnRecordVideo">Record Video</string>
     <string name="or">(or)</string>
     <string name="btnUploadToServer">Upload to Server</string>
+    <string name="create_folder_structure">Create Drive Folders</string>
+    <string name="area_add_resources">Add Resources</string>
+    <string name="area_add_image">Add Image</string>
+    <string name="area_add_video">Add Video</string>
+    <string name="generic_upload_file">Drive Upload</string>
+    <string name="choose_document">Choose Document</string>
 </resources>

@@ -8,6 +8,7 @@ public class DriveResource {
     private String userId = "";
     private String uniqueId = "";
     private String name = "";
+    private String path = "";
     private String areaId = "";
     private String driveId = "";
     private String type = "";
@@ -35,6 +36,14 @@ public class DriveResource {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getPath() {
+        return path;
+    }
+
+    public void setPath(String path) {
+        this.path = path;
     }
 
     public String getAreaId() {

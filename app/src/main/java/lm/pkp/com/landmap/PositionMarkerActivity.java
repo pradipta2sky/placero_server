@@ -1,9 +1,14 @@
 package lm.pkp.com.landmap;
 
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -49,6 +54,10 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
         if(!approachLocationPermissions()){
             Toast.makeText(getApplicationContext(),"No permission for location access.", Toast.LENGTH_LONG);
             finish();
+        }
+
+        if(!isGPSEnabled()){
+            showLocationDialog();
         }
 
         adb = new AreaDBHelper(getApplicationContext());
@@ -140,6 +149,24 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
 
     }
 
+    private void showLocationDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("GPS Location disabled.")
+                .setMessage("Do you want to enable GPS ?")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        // Add some marker in the context saying that GPS is not enabled.
+                        Intent myIntent = new Intent( Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        startActivity(myIntent);
+                    }})
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        // Add some marker in the context saying that GPS is not enabled.
+                    }})
+                .show();
+    }
+
     private boolean approachLocationPermissions() {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED &&
@@ -178,5 +205,19 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
     public void onBackPressed() {
         Intent areaDashboardIntent = new Intent(PositionMarkerActivity.this, AreaDashboardActivity.class);
         startActivity(areaDashboardIntent);
+    }
+
+    private boolean isGPSEnabled(){
+        LocationManager locationManager = null;
+        boolean gps_enabled= false;
+
+        if(locationManager ==null)
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        try{
+            gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+        }catch(Exception ex){
+            //do nothing...
+        }
+        return gps_enabled;
     }
 }

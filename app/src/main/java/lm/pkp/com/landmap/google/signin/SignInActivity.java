@@ -52,7 +52,7 @@ public class SignInActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_google_signin_main);
 
-        ActionBar ab = getSupportActionBar();
+        ActionBar ab = this.getSupportActionBar();
         ab.hide();
 
         mStatusTextView = (TextView)findViewById(R.id.status);
