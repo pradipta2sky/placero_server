@@ -17,11 +17,14 @@ import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.area.AreaItemDisplayAdaptor;
+import lm.pkp.com.landmap.custom.AsyncTaskCallback;
+import lm.pkp.com.landmap.sync.LocalDataRefresher;
 
 public class AreaDashboardActivity extends AppCompatActivity {
 
     private AreaDBHelper adb = null;
     private ArrayList<AreaElement> allAreas = null;
+    private AreaItemDisplayAdaptor areaDisplayAdapter = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,13 +39,8 @@ public class AreaDashboardActivity extends AppCompatActivity {
         allAreas = adb.getAllAreas();
 
         ListView areaListView = (ListView) findViewById(R.id.area_display_list);
-        if (allAreas.size() > 0) {
-            AreaItemDisplayAdaptor areaDisplayAdapter = new AreaItemDisplayAdaptor(this, R.layout.area_element_row, allAreas);
-            areaListView.setAdapter(areaDisplayAdapter);
-        } else {
-            areaListView.setVisibility(View.INVISIBLE);
-            // TODO Display a text or image for no areaas
-        }
+        areaDisplayAdapter = new AreaItemDisplayAdaptor(this, R.layout.area_element_row, allAreas);
+        areaListView.setAdapter(areaDisplayAdapter);
 
         ActionMenuItemView createAreaView = (ActionMenuItemView) findViewById(R.id.action_area_create);
         createAreaView.setOnClickListener(new View.OnClickListener() {
@@ -57,13 +55,22 @@ public class AreaDashboardActivity extends AppCompatActivity {
             }
         });
 
+        ActionMenuItemView refreshAreaView = (ActionMenuItemView) findViewById(R.id.action_area_refresh);
+        refreshAreaView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
+                new LocalDataRefresher(getApplicationContext(), new DataReloadCallback()).refreshLocalData();
+            }
+        });
+
         areaListView.setDescendantFocusability(ListView.FOCUS_BLOCK_DESCENDANTS);
         areaListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapter, View v, int position,
                                     long arg3) {
                 AreaElement ae = (AreaElement) adapter.getItemAtPosition(position);
-                AreaContext.getInstance().setAreaElement(ae,getApplicationContext());
+                AreaContext.getInstance().setAreaElement(ae, getApplicationContext());
                 Intent intent = new Intent(AreaDashboardActivity.this, PositionMarkerActivity.class);
                 startActivity(intent);
             }
@@ -84,5 +91,16 @@ public class AreaDashboardActivity extends AppCompatActivity {
                         finish();
                     }
                 }).setNegativeButton("no", null).show();
+    }
+
+    private class DataReloadCallback implements AsyncTaskCallback {
+
+        @Override
+        public void taskCompleted(Object result) {
+            areaDisplayAdapter.clear();
+            areaDisplayAdapter.addAll(adb.getAllAreas());
+            areaDisplayAdapter.notifyDataSetChanged();
+            findViewById(R.id.splash_panel).setVisibility(View.INVISIBLE);
+        }
     }
 }

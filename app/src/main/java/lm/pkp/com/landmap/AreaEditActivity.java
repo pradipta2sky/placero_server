@@ -7,10 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
-
-import java.text.DecimalFormat;
 
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaDBHelper;
@@ -40,7 +37,7 @@ public class AreaEditActivity extends AppCompatActivity{
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+                findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
 
                 String nameText = ((TextView)findViewById(R.id.area_name_edit)).getText().toString();
                 ae.setName(nameText);
@@ -49,7 +46,7 @@ public class AreaEditActivity extends AppCompatActivity{
                 ae.setDescription(descText);
 
                 adb.updateAreaNonGeo(ae);
-                findViewById(R.id.loadingPanel).setVisibility(View.INVISIBLE);
+                findViewById(R.id.splash_panel).setVisibility(View.INVISIBLE);
 
                 Intent positionMarkerIntent = new Intent(AreaEditActivity.this, PositionMarkerActivity.class);
                 startActivity(positionMarkerIntent);

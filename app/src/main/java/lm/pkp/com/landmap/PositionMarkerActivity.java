@@ -94,7 +94,7 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
         markLocationItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+                findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
                 new GPSLocationProvider(PositionMarkerActivity.this).getLocation();
             }
         });
@@ -103,7 +103,7 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
         deleteAreaItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+                findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
                 new AreaDBHelper(getApplicationContext()).deleteArea(ae);
                 Intent areaDashboardIntent = new Intent(PositionMarkerActivity.this, AreaDashboardActivity.class);
                 startActivity(areaDashboardIntent);
@@ -190,7 +190,7 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
 
         positionList.add(pe);
         adaptor.notifyDataSetChanged();
-        findViewById(R.id.loadingPanel).setVisibility(View.GONE);
+        findViewById(R.id.splash_panel).setVisibility(View.GONE);
     }
 
     @Override

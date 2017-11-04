@@ -15,38 +15,25 @@ import lm.pkp.com.landmap.area.UserAreaLoadTask;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
+import lm.pkp.com.landmap.sync.LocalDataRefresher;
 import lm.pkp.com.landmap.user.UserContext;
 
-public class SplashActivity extends Activity implements AsyncTaskCallback{
+public class SplashActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
+        new LocalDataRefresher(getApplicationContext(), new DataReloadCallback()).refreshLocalData();
+    }
 
-        AreaDBHelper adh = new AreaDBHelper(getApplicationContext());
-        adh.deleteAreasLocally();
+    private class DataReloadCallback implements AsyncTaskCallback{
 
-        PositionsDBHelper pdh = new PositionsDBHelper(getApplicationContext());
-        pdh.deletePositionsLocally();
-
-        DriveDBHelper ddh = new DriveDBHelper(getApplicationContext());
-        ddh.deleteDriveElementsLocally();
-
-        UserAreaLoadTask loadTask = new UserAreaLoadTask(getApplicationContext());
-        loadTask.setCompletionCallback(this);
-        JSONObject queryObj = new JSONObject();
-        try {
-            queryObj.put("us", UserContext.getInstance().getUserElement().getEmail());
-            loadTask.execute(queryObj);
-        }catch (Exception e){
-            e.printStackTrace();
+        @Override
+        public void taskCompleted(Object result) {
+            Intent areaDashboardIntent = new Intent(SplashActivity.this, AreaDashboardActivity.class);
+            startActivity(areaDashboardIntent);
         }
     }
 
-    @Override
-    public void taskCompleted(Object result) {
-        Intent areaDashboardIntent = new Intent(SplashActivity.this, AreaDashboardActivity.class);
-        startActivity(areaDashboardIntent);
-    }
 }

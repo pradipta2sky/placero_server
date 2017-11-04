@@ -10,12 +10,10 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
-import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.text.DecimalFormat;
 import java.util.List;
 import java.util.UUID;
 
@@ -80,7 +78,7 @@ public class AreaShareActivity extends AppCompatActivity implements AsyncTaskCal
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
+                findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
 
                 AreaElement copiedArea = AreaContext.getInstance().getAreaElement().copy();
                 copiedArea.setCurrentOwner(userIdView.getText().toString());
@@ -94,7 +92,7 @@ public class AreaShareActivity extends AppCompatActivity implements AsyncTaskCal
                     pe.setUniqueAreaId(copiedArea.getUniqueId());
                     pdh.insertPositionToServer(pe);
                 }
-                findViewById(R.id.loadingPanel).setVisibility(View.INVISIBLE);
+                findViewById(R.id.splash_panel).setVisibility(View.INVISIBLE);
                 finish();
             }
         });
