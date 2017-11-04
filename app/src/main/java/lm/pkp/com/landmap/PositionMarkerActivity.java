@@ -22,6 +22,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.UUID;
 
+import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.custom.LocationPositionReceiver;
@@ -33,7 +34,6 @@ import lm.pkp.com.landmap.provider.GPSLocationProvider;
 
 public class PositionMarkerActivity extends AppCompatActivity implements LocationPositionReceiver {
 
-    private AreaDBHelper adb = null;
     private PositionsDBHelper pdb = null;
     private AreaElement ae = null;
 
@@ -60,17 +60,13 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
             showLocationDialog();
         }
 
-        adb = new AreaDBHelper(getApplicationContext());
         pdb = new PositionsDBHelper(getApplicationContext());
-
         ListView posList = (ListView) findViewById(R.id.positionList);
         adaptor = new PostionListAdaptor(getApplicationContext(), R.id.positionList, positionList);
         posList.setAdapter(adaptor);
 
-        Bundle bundle = getIntent().getExtras();
-        String areaUid = bundle.getString("area_uid");
-        ae = adb.getAreaByUid(areaUid);
-        positionList.addAll(ae.getPositions());
+        ae = AreaContext.getInstance().getAreaElement();
+        positionList.addAll(AreaContext.getInstance().getPositions());
         adaptor.notifyDataSetChanged();
 
         TextView areaNameView = (TextView)findViewById(R.id.area_name_text);
@@ -81,17 +77,15 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(PositionMarkerActivity.this, AreaPlotterActivity.class);
-                intent.putExtra("area_uid", ae.getUniqueId());
                 startActivity(intent);
             }
         });
 
-        ActionMenuItemView areaNameEditItem = (ActionMenuItemView)findViewById(R.id.action_area_name_edit);
+        ActionMenuItemView areaNameEditItem = (ActionMenuItemView)findViewById(R.id.action_area_edit);
         areaNameEditItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent areaEditIntent = new Intent(PositionMarkerActivity.this, AreaEditActivity.class);
-                areaEditIntent.putExtra("area_uid", ae.getUniqueId());
                 startActivity(areaEditIntent);
             }
         });
@@ -110,7 +104,7 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
             @Override
             public void onClick(View v) {
                 findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
-                adb.deleteArea(ae);
+                new AreaDBHelper(getApplicationContext()).deleteArea(ae);
                 Intent areaDashboardIntent = new Intent(PositionMarkerActivity.this, AreaDashboardActivity.class);
                 startActivity(areaDashboardIntent);
             }
@@ -121,7 +115,6 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
             @Override
             public void onClick(View v) {
                 Intent areaShareIntent = new Intent(PositionMarkerActivity.this, AreaShareActivity.class);
-                areaShareIntent.putExtra("area_uid", ae.getUniqueId());
                 startActivity(areaShareIntent);
             }
         });
@@ -142,7 +135,6 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(PositionMarkerActivity.this, CreateFolderStructureActivity.class);
-                intent.putExtra("area_uid", ae.getUniqueId());
                 startActivity(intent);
             }
         });
@@ -194,6 +186,7 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
         pe.setUniqueAreaId(ae.getUniqueId());
 
         pe = pdb.insertPositionLocally(pe);
+        AreaContext.getInstance().addPosition(pe);
         pdb.insertPositionToServer(pe);
 
         positionList.add(pe);

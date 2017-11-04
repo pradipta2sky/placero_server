@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -25,40 +24,35 @@ public class AreaAddResourcesActivity extends AppCompatActivity{
     private AreaElement ae = null;
 
     private AreaDriveResourceAdaptor adaptor = null;
-    private ArrayList<DriveResource> areaResources = new ArrayList<>();
+    private ArrayList<DriveResource> areaResourcesDisplayList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_area_resource_main);
 
-        Bundle bundle = getIntent().getExtras();
-        final String areaUid = bundle.getString("area_uid");
-
         ActionBar ab = getSupportActionBar();
         ab.setHomeButtonEnabled(true);
         ab.setDisplayHomeAsUpEnabled(true);
         ab.show();
 
-        adb = new AreaDBHelper(getApplicationContext());
-        ae = adb.getAreaByUid(areaUid);
-        AreaContext.getInstance().setAreaElement(ae);
-        AreaActivityUtil.populateAreaElement(ae, this);
+        ae = AreaContext.getInstance().getAreaElement();
+        AreaActivityUtil.populateAreaElement(this);
 
         ListView resourceFileList = (ListView) findViewById(R.id.file_display_list);
-        adaptor = new AreaDriveResourceAdaptor(getApplicationContext(), R.id.file_display_list, areaResources);
+        adaptor = new AreaDriveResourceAdaptor(getApplicationContext(), R.id.file_display_list, areaResourcesDisplayList);
         resourceFileList.setAdapter(adaptor);
 
-        ArrayList<DriveResource> driveResources = AreaContext.getInstance().getDriveResources();
-        areaResources.clear();
-        areaResources.addAll(driveResources);
+        ArrayList<DriveResource> driveResources = AreaContext.getInstance().getUploadedDriveResources();
+        areaResourcesDisplayList.clear();
+        areaResourcesDisplayList.addAll(driveResources);
         adaptor.notifyDataSetChanged();
 
         Button takeSnapButton = (Button)findViewById(R.id.take_snap_button);
         takeSnapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(AreaAddResourcesActivity.this, AreaCameraSnapActivity.class);
+                Intent i = new Intent(AreaAddResourcesActivity.this, AreaCameraPictureActivity.class);
                 startActivity(i);
             }
         });
@@ -67,16 +61,25 @@ public class AreaAddResourcesActivity extends AppCompatActivity{
         captureVideoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(AreaAddResourcesActivity.this, AreaCameraShootActivity.class);
+                Intent i = new Intent(AreaAddResourcesActivity.this, AreaCameraVideoActivity.class);
                 startActivity(i);
             }
         });
 
-        Button chooseDocumentButton = (Button)findViewById(R.id.upload_document_button);
+        Button chooseDocumentButton = (Button)findViewById(R.id.add_document_button);
         chooseDocumentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent i = new Intent(AreaAddResourcesActivity.this, FCMainActivity.class);
+                Intent i = new Intent(AreaAddResourcesActivity.this, AreaDocumentChooserActivity.class);
+                startActivity(i);
+            }
+        });
+
+        Button driveUploadButton = (Button)findViewById(R.id.upload_to_drive_button);
+        driveUploadButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(AreaAddResourcesActivity.this, UploadResourcesActivity.class);
                 startActivity(i);
             }
         });
@@ -97,7 +100,6 @@ public class AreaAddResourcesActivity extends AppCompatActivity{
     public void onBackPressed() {
         finish();
         Intent i = new Intent(AreaAddResourcesActivity.this, PositionMarkerActivity.class);
-        i.putExtra("area_uid", ae.getUniqueId());
         startActivity(i);
     }
 }

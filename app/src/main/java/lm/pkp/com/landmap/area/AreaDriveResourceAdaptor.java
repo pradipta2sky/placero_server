@@ -42,15 +42,6 @@ public class AreaDriveResourceAdaptor extends ArrayAdapter<DriveResource> {
         TextView filePathText = (TextView) v.findViewById(R.id.ar_file_path);
         filePathText.setText(dr.getPath());
 
-        ImageView deleteButton = (ImageView) v.findViewById(R.id.del_row);
-        deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                items.remove(position);
-                AreaContext.getInstance().removeDriveResource(dr);
-                notifyDataSetChanged();
-            }
-        });
         return v;
     }
 }

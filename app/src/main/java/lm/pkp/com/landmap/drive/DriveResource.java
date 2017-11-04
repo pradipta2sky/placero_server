@@ -5,14 +5,18 @@ package lm.pkp.com.landmap.drive;
  */
 public class DriveResource {
 
-    private String userId = "";
     private String uniqueId = "";
-    private String name = "";
-    private String path = "";
+    private String userId = "";
     private String areaId = "";
     private String driveId = "";
+    private String driveResourceId = "";
+    private String containerDriveId = "";
+    private String name = "";
+    private String path = "";
     private String type = "";
     private String size = "";
+    private String contentType = "";
+    private String mimeType = "";
 
     public String getUserId() {
         return userId;
@@ -62,6 +66,14 @@ public class DriveResource {
         this.driveId = driveId;
     }
 
+    public String getDriveResourceId() {
+        return driveResourceId;
+    }
+
+    public void setDriveResourceId(String driveResourceId) {
+        this.driveResourceId = driveResourceId;
+    }
+
     public String getType() {
         return type;
     }
@@ -77,4 +89,30 @@ public class DriveResource {
     public void setSize(String size) {
         this.size = size;
     }
+
+    public String getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
+    }
+
+    public String getContainerDriveId() {
+        return containerDriveId;
+    }
+
+    public void setContainerDriveId(String containerDriveId) {
+        this.containerDriveId = containerDriveId;
+    }
+
+    public String getMimeType() {
+        return mimeType;
+    }
+
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
+    }
+
+
 }

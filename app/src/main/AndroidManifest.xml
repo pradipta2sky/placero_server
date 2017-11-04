@@ -64,29 +64,28 @@
             android:label="@string/create_folder_structure">
         </activity>
         <activity
-            android:name=".AreaAddResourcesActivity"
-            android:label="@string/area_add_resources">
-        </activity>
-        <activity
-            android:name=".AreaCameraSnapActivity"
+            android:name=".AreaCameraPictureActivity"
             android:screenOrientation="portrait"
             android:label="@string/area_add_image">
         </activity>
         <activity
-            android:name=".AreaCameraShootActivity"
+            android:name=".AreaCameraVideoActivity"
             android:screenOrientation="portrait"
             android:label="@string/area_add_video">
         </activity>
         <activity
-            android:name=".FCMainActivity"
+            android:name=".AreaDocumentChooserActivity"
             android:screenOrientation="portrait"
             android:label="@string/choose_document"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
         <activity
-            android:name=".GenericFileUploadActivity"
-            android:screenOrientation="portrait"
-            android:label="@string/generic_upload_file">
+            android:name=".AreaAddResourcesActivity"
+            android:label="@string/area_add_resources">
+        </activity>
+        <activity
+            android:name=".UploadResourcesActivity"
+            android:label="@string/choose_document">
         </activity>
     </application>
 </manifest>

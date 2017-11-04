@@ -13,6 +13,7 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 
+import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.area.AreaItemDisplayAdaptor;
@@ -48,10 +49,10 @@ public class AreaDashboardActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 AreaElement ae = adb.insertAreaLocally();
+                AreaContext.getInstance().setAreaElement(ae, getApplicationContext());
                 adb.insertAreaToServer(ae);
 
                 Intent intent = new Intent(AreaDashboardActivity.this, PositionMarkerActivity.class);
-                intent.putExtra("area_uid", ae.getUniqueId());
                 startActivity(intent);
             }
         });
@@ -62,8 +63,8 @@ public class AreaDashboardActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapter, View v, int position,
                                     long arg3) {
                 AreaElement ae = (AreaElement) adapter.getItemAtPosition(position);
+                AreaContext.getInstance().setAreaElement(ae,getApplicationContext());
                 Intent intent = new Intent(AreaDashboardActivity.this, PositionMarkerActivity.class);
-                intent.putExtra("area_uid", ae.getUniqueId());
                 startActivity(intent);
             }
         });

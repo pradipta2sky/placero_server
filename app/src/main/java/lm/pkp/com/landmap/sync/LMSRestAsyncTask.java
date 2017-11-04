@@ -1,6 +1,7 @@
 package lm.pkp.com.landmap.sync;
 
 import android.os.AsyncTask;
+import android.system.ErrnoException;
 import android.util.Log;
 
 import org.json.JSONObject;
@@ -79,7 +80,8 @@ public class LMSRestAsyncTask extends AsyncTask<JSONObject, Void, String> {
                 return new String("false : " + responseCode);
             }
         } catch (Exception e) {
-            return new String("Exception: " + e.getMessage());
+            e.printStackTrace();
+            return e.getMessage();
         }
     }
 
@@ -109,6 +111,8 @@ public class LMSRestAsyncTask extends AsyncTask<JSONObject, Void, String> {
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
-        callback.taskCompleted(s);
+        if(callback != null){
+            callback.taskCompleted(s);
+        }
     }
 }

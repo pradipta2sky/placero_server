@@ -6,6 +6,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import lm.pkp.com.landmap.drive.DriveResource;
 import lm.pkp.com.landmap.position.PositionElement;
 
 /**
@@ -26,7 +27,9 @@ public class AreaElement implements Serializable{
     private String uniqueId;
     private String tags;
 
-    private List<PositionElement> positions = new ArrayList<PositionElement>();
+    private List<PositionElement> positions = new ArrayList<>();
+
+    private List<DriveResource> driveResources = new ArrayList<>();
 
     public String getOwnershipType() {
         return ownershipType;
@@ -118,5 +121,13 @@ public class AreaElement implements Serializable{
 
     public AreaElement copy(){
         return SerializationUtils.clone(this);
+    }
+
+    public List<DriveResource> getDriveResources() {
+        return driveResources;
+    }
+
+    public void setDriveResources(List<DriveResource> driveResources) {
+        this.driveResources = driveResources;
     }
 }

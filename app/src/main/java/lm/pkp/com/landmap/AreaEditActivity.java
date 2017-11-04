@@ -12,8 +12,10 @@ import android.widget.TextView;
 
 import java.text.DecimalFormat;
 
+import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.util.AreaActivityUtil;
 
 public class AreaEditActivity extends AppCompatActivity{
 
@@ -25,44 +27,14 @@ public class AreaEditActivity extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_area_edit);
 
-        Bundle bundle = getIntent().getExtras();
-        final String areaUid = bundle.getString("area_uid");
-
         ActionBar ab = getSupportActionBar();
         ab.setHomeButtonEnabled(true);
         ab.setDisplayHomeAsUpEnabled(true);
         ab.show();
 
         adb = new AreaDBHelper(getApplicationContext());
-        final AreaElement ae = adb.getAreaByUid(areaUid);
-
-        final TextView areaNameView = (TextView)findViewById(R.id.area_name_text);
-        areaNameView.setText(ae.getName());
-
-        final TextView areaDescView = (TextView)findViewById(R.id.area_desc_text);
-        areaDescView.setText(ae.getDescription());
-
-        final TextView areaCreatorView = (TextView)findViewById(R.id.area_creator_text);
-        areaCreatorView.setText(ae.getCreatedBy());
-
-        final TextView areaTagsView = (TextView)findViewById(R.id.area_tags_text);
-        areaTagsView.setText(ae.getTags());
-
-        final EditText nameTextView = (EditText) findViewById(R.id.area_name_edit);
-        nameTextView.setText(ae.getName());
-
-        final EditText descTextView = (EditText) findViewById(R.id.area_desc_edit);
-        descTextView.setText(ae.getDescription());
-
-        double areaMeasureSqFt = ae.getMeasureSqFt();
-        double areaMeasureAcre = areaMeasureSqFt / 43560;
-        double areaMeasureDecimals = areaMeasureSqFt / 436;
-        DecimalFormat df = new DecimalFormat("###.##");
-
-        TextView measureText = (TextView) findViewById(R.id.area_measure_text);
-        String content = "Area: " + df.format(areaMeasureSqFt) + " Sqft, " + df.format(areaMeasureAcre) +" Acre," +
-                df.format(areaMeasureDecimals) + " Decimals.";
-        measureText.setText(content);
+        ae = AreaContext.getInstance().getAreaElement();
+        AreaActivityUtil.populateAreaElement(this);
 
         Button saveButton = (Button)findViewById(R.id.area_edit_save_btn);
         saveButton.setOnClickListener(new View.OnClickListener() {
@@ -70,17 +42,16 @@ public class AreaEditActivity extends AppCompatActivity{
             public void onClick(View v) {
                 findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
 
-                String nameText = nameTextView.getText().toString();
+                String nameText = ((TextView)findViewById(R.id.area_name_edit)).getText().toString();
                 ae.setName(nameText);
 
-                String descText = descTextView.getText().toString();
+                String descText = ((TextView)findViewById(R.id.area_desc_edit)).getText().toString();
                 ae.setDescription(descText);
 
                 adb.updateAreaNonGeo(ae);
                 findViewById(R.id.loadingPanel).setVisibility(View.INVISIBLE);
 
                 Intent positionMarkerIntent = new Intent(AreaEditActivity.this, PositionMarkerActivity.class);
-                positionMarkerIntent.putExtra("area_uid", ae.getUniqueId());
                 startActivity(positionMarkerIntent);
             }
         });

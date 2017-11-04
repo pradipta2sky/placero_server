@@ -8,10 +8,9 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.lib.fe.DirectoryFragment;
 
-public class FCMainActivity extends AppCompatActivity {
+public class AreaDocumentChooserActivity extends AppCompatActivity {
 
     private Toolbar toolbar;
     private FragmentManager fragmentManager = null;
@@ -38,7 +37,6 @@ public class FCMainActivity extends AppCompatActivity {
 
             @Override
             public void startDocumentSelectActivity() {
-
             }
 
             @Override

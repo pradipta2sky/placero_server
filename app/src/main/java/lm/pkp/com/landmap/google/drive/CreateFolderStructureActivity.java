@@ -31,9 +31,11 @@ import java.util.LinkedHashMap;
 import java.util.UUID;
 
 import lm.pkp.com.landmap.AreaAddResourcesActivity;
+import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
+import lm.pkp.com.landmap.util.FileUtil;
 
 public class CreateFolderStructureActivity extends BaseDriveActivity {
 
@@ -63,6 +65,7 @@ public class CreateFolderStructureActivity extends BaseDriveActivity {
     private void fetchStatusAndAct() {
         DriveDBHelper ddh = new DriveDBHelper(getApplicationContext());
         ArrayList<DriveResource> allDriveFolders = ddh.getFolderResourcesByUid(ue.getEmail());
+
         for (DriveResource res : allDriveFolders) {
             String folderName = res.getName();
             if(folderName.equals(IMAGE_FOLDER_NAME)){
@@ -113,7 +116,6 @@ public class CreateFolderStructureActivity extends BaseDriveActivity {
         }
         if(creationComplete()){
             Intent i = new Intent(CreateFolderStructureActivity.this, AreaAddResourcesActivity.class);
-            i.putExtra("area_uid", ae.getUniqueId());
             startActivity(i);
         }
     }
@@ -140,6 +142,7 @@ public class CreateFolderStructureActivity extends BaseDriveActivity {
                 return;
             }
             DriveFolder folder = result.getDriveFolder();
+            System.out.println("Resource ID of folder [" + folderName + "] is [" + folder.getDriveId().getResourceId() + "]");
             folder.getMetadata(getGoogleApiClient()).setResultCallback(new GenericMetaDataCallback(folderName));
         }
     }
@@ -168,6 +171,12 @@ public class CreateFolderStructureActivity extends BaseDriveActivity {
             dr.setDriveId(metadata.getDriveId().toString());
             dr.setSize(metadata.getFileSize() + "");
             dr.setName(metadata.getTitle());
+            dr.setContainerDriveId("");
+            dr.setMimeType("application/vnd.google-apps.folder");
+            dr.setDriveResourceId(metadata.getDriveId().getResourceId());
+            dr.setContentType("any");
+
+            AreaContext.getInstance().getAreaElement().getDriveResources().add(dr);
 
             DriveDBHelper ddh = new DriveDBHelper(getApplicationContext(),new ServerUpdateCallback(folderName));
             ddh.insertResourceLocally(dr);
@@ -189,7 +198,6 @@ public class CreateFolderStructureActivity extends BaseDriveActivity {
             driveStatusMap.put(key, "true");
             if(creationComplete()){
                 Intent i = new Intent(CreateFolderStructureActivity.this, AreaAddResourcesActivity.class);
-                i.putExtra("area_uid", ae.getUniqueId());
                 startActivity(i);
             }
         }

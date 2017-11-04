@@ -38,7 +38,8 @@ public class AreaItemDisplayAdaptor extends ArrayAdapter {
             LayoutInflater vi = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             v = vi.inflate(R.layout.area_element_row, null);
         }
-        final AreaElement ae = items.get(position);
+
+        AreaElement ae = items.get(position);
 
         TextView areaNameView = (TextView) v.findViewById(R.id.area_name_text);
         String areaName = ae.getName();

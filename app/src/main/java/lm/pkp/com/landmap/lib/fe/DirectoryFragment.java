@@ -230,20 +230,21 @@ public class DirectoryFragment extends Fragment {
                             delegate.didSelectFiles(DirectoryFragment.this, files);
                         }
 
+                        AreaElement ae = AreaContext.getInstance().getAreaElement();
                         DriveResource dr = new DriveResource();
                         dr.setName(file.getName());
-                        dr.setPath(file.getPath());
+                        dr.setPath(file.getAbsolutePath());
                         dr.setType("file");
                         dr.setUserId(UserContext.getInstance().getUserElement().getEmail());
                         dr.setSize(file.length() + "");
                         dr.setUniqueId(UUID.randomUUID().toString());
+                        dr.setAreaId(ae.getUniqueId());
 
-                        AreaContext.getInstance().addDriveResource(dr);
-                        AreaElement ae = AreaContext.getInstance().getAreaElement();
-                        Intent intent = new Intent(getActivity(), AreaAddResourcesActivity.class);
-                        intent.putExtra("area_uid", ae.getUniqueId());
-                        startActivity(intent);
+                        AreaContext.getInstance().addNewDriveResource(dr);
+
                         getActivity().finish();
+                        Intent intent = new Intent(getActivity(), AreaAddResourcesActivity.class);
+                        startActivity(intent);
                     }
                 }
             });

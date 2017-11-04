@@ -32,6 +32,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.custom.MapWrapperLayout;
@@ -42,8 +43,6 @@ import lm.pkp.com.landmap.position.PositionsDBHelper;
 public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap googleMap;
-    private String areaUid = null;
-    private AreaElement ae = null;
     private LinkedHashMap<Marker, PositionElement> areaMarkers = new LinkedHashMap<>();
     private Polygon polygon = null;
     private Marker centerMarker = null;
@@ -57,8 +56,6 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Bundle bundle = getIntent().getExtras();
-        areaUid = bundle.getString("area_uid");
 
         setContentView(R.layout.activity_area_plotter);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
@@ -130,8 +127,7 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
 
     private void plotPolygonUsingPositions() {
         final AreaDBHelper adh = new AreaDBHelper(getApplicationContext());
-        ae = adh.getAreaByUid(areaUid);
-        List<PositionElement> positionElements = ae.getPositions();
+        List<PositionElement> positionElements = AreaContext.getInstance().getPositions();
         int noOfPositions = positionElements.size();
 
         Set<Marker> markerSet = areaMarkers.keySet();
@@ -164,6 +160,8 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
 
         double polygonAreaSqMt = SphericalUtil.computeArea(polygon.getPoints());
         double polygonAreaSqFt = polygonAreaSqMt * 10.7639;
+
+        final AreaElement ae = AreaContext.getInstance().getAreaElement();
         ae.setCenterLat(latAvg);
         ae.setCenterLon(lonAvg);
         ae.setMeasureSqFt(polygonAreaSqFt);
@@ -204,7 +202,7 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
                 PositionElement newPositionElem = new PositionElement();
                 String pid = UUID.randomUUID().toString();
                 newPositionElem.setUniqueId(pid);
-                newPositionElem.setUniqueAreaId(ae.getUniqueId());
+                newPositionElem.setUniqueAreaId(AreaContext.getInstance().getAreaElement().getUniqueId());
                 newPositionElem.setName("P_" + pid);
                 newPositionElem.setDescription("No Description");
                 newPositionElem.setTags("");
@@ -214,7 +212,10 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
                 PositionsDBHelper pdh = new PositionsDBHelper(getApplicationContext());
                 pdh.insertPositionLocally(newPositionElem);
                 pdh.insertPositionToServer(newPositionElem);
+                AreaContext.getInstance().addPosition(newPositionElem);
+
                 pdh.deletePosition(areaMarkers.get(marker));
+                AreaContext.getInstance().removePosition(areaMarkers.get(marker));
 
                 polygon.remove();
                 plotPolygonUsingPositions();
@@ -242,7 +243,6 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
     @Override
     public void onBackPressed() {
         Intent positionMarkerIntent = new Intent(AreaPlotterActivity.this, PositionMarkerActivity.class);
-        positionMarkerIntent.putExtra("area_uid", ae.getUniqueId());
         startActivity(positionMarkerIntent);
     }
 

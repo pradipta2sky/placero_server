@@ -19,6 +19,7 @@ import java.text.DecimalFormat;
 import java.util.List;
 import java.util.UUID;
 
+import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
@@ -26,12 +27,12 @@ import lm.pkp.com.landmap.position.PositionElement;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.user.UserInfoSearchAsyncTask;
+import lm.pkp.com.landmap.util.AreaActivityUtil;
 
 public class AreaShareActivity extends AppCompatActivity implements AsyncTaskCallback{
 
     private AreaDBHelper adh = null;
     private PositionsDBHelper pdh = null;
-    private AreaElement ae = null;
     private ArrayAdapter<String> adapter = null;
 
     @Override
@@ -39,42 +40,15 @@ public class AreaShareActivity extends AppCompatActivity implements AsyncTaskCal
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_area_share);
 
-        Bundle bundle = getIntent().getExtras();
-        final String areaUid = bundle.getString("area_uid");
-
         ActionBar ab = getSupportActionBar();
         ab.setHomeButtonEnabled(true);
         ab.setDisplayHomeAsUpEnabled(true);
         ab.show();
 
-        adh = new AreaDBHelper(getApplicationContext());
         pdh = new PositionsDBHelper(getApplicationContext());
+        AreaActivityUtil.populateAreaElement(this);
 
-        final AreaElement ae = adh.getAreaByUid(areaUid);
-
-        final TextView areaNameView = (TextView)findViewById(R.id.area_name_text);
-        areaNameView.setText(ae.getName());
-
-        final TextView areaDescView = (TextView)findViewById(R.id.area_desc_text);
-        areaDescView.setText(ae.getDescription());
-
-        final TextView areaCreatorView = (TextView)findViewById(R.id.area_creator_text);
-        areaCreatorView.setText(ae.getCreatedBy());
-
-        final TextView areaTagsView = (TextView)findViewById(R.id.area_tags_text);
-        areaTagsView.setText(ae.getTags());
-
-        double areaMeasureSqFt = ae.getMeasureSqFt();
-        double areaMeasureAcre = areaMeasureSqFt / 43560;
-        double areaMeasureDecimals = areaMeasureSqFt / 436;
-        DecimalFormat df = new DecimalFormat("###.##");
-
-        TextView measureText = (TextView) findViewById(R.id.area_measure_text);
-        String content = "Area: " + df.format(areaMeasureSqFt) + " Sqft, " + df.format(areaMeasureAcre) +" Acre," +
-                df.format(areaMeasureDecimals) + " Decimals.";
-        measureText.setText(content);
-
-        adapter = new ArrayAdapter<String>(this, android.R.layout.simple_dropdown_item_1line, new String[]{});
+        adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, new String[]{});
         final AutoCompleteTextView userIdView = (AutoCompleteTextView) findViewById(R.id.user_search_text);
         userIdView.setAdapter(adapter);
 
@@ -108,7 +82,7 @@ public class AreaShareActivity extends AppCompatActivity implements AsyncTaskCal
             public void onClick(View v) {
                 findViewById(R.id.loadingPanel).setVisibility(View.VISIBLE);
 
-                AreaElement copiedArea = ae.copy();
+                AreaElement copiedArea = AreaContext.getInstance().getAreaElement().copy();
                 copiedArea.setCurrentOwner(userIdView.getText().toString());
                 copiedArea.setUniqueId(UUID.randomUUID().toString());
                 adh.insertAreaToServer(copiedArea);

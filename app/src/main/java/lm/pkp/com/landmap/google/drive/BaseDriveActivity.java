@@ -12,6 +12,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.drive.Drive;
 
+import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
@@ -23,35 +24,17 @@ public abstract class BaseDriveActivity extends Activity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
 
-    /**
-     * DriveId of an existing folder to be used as a parent folder in
-     * folder operations samples.
-     */
-    public static final String EXISTING_FOLDER_ID = "0B2EEtIjPUdX6MERsWlYxN3J6RU0";
-
-    /**
-     * DriveId of an existing file to be used in file operation samples..
-     */
-    public static final String EXISTING_FILE_ID = "0ByfSjdPVs9MZTHBmMVdSeWxaNTg";
-
     private static final String TAG = "BaseDriveActivity";
     protected static final int REQUEST_CODE_RESOLUTION = 1;
-    protected static final int NEXT_AVAILABLE_REQUEST_CODE = 2;
     private GoogleApiClient mGoogleApiClient;
 
     protected AreaElement ae = null;
     protected UserElement ue = null;
 
-    protected AreaDBHelper adh = null;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        adh = new AreaDBHelper(getApplicationContext());
-
-        Bundle bundle = getIntent().getExtras();
-        String areaUid = bundle.getString("area_uid");
-        ae = adh.getAreaByUid(areaUid);
+        ae = AreaContext.getInstance().getAreaElement();
         ue = UserContext.getInstance().getUserElement();
     }
 
@@ -120,4 +103,18 @@ public abstract class BaseDriveActivity extends Activity implements
       return mGoogleApiClient;
     }
 
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
 }

@@ -16,7 +16,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
-        android:layout_weight="0.8"
+        android:layout_weight="0.9"
         android:orientation="vertical"
         android:gravity="center_vertical"
         android:paddingTop="1dp">
@@ -42,14 +42,5 @@
         android:lines="1" />
 
     </LinearLayout>
-
-    <ImageView
-        android:id="@+id/del_row"
-        android:layout_width="80px"
-        android:layout_height="80px"
-        android:gravity="center_vertical"
-        android:src="@drawable/delete"
-        android:layout_weight="0.1"
-        />
 
 </LinearLayout>
