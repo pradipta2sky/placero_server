@@ -17,7 +17,7 @@
         android:paddingLeft="10dp"
         android:textStyle="bold"
         android:layout_weight="1"
-        android:fontFamily="@string/abc_font_family_title_material" />
+        android:fontFamily="sans-serif-medium" />
 
     <TextView
         android:id="@+id/area_desc_text"

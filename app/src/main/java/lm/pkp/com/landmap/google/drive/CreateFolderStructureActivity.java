@@ -142,7 +142,6 @@ public class CreateFolderStructureActivity extends BaseDriveActivity {
                 return;
             }
             DriveFolder folder = result.getDriveFolder();
-            System.out.println("Resource ID of folder [" + folderName + "] is [" + folder.getDriveId().getResourceId() + "]");
             folder.getMetadata(getGoogleApiClient()).setResultCallback(new GenericMetaDataCallback(folderName));
         }
     }

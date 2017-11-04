@@ -14,6 +14,7 @@
 
 package lm.pkp.com.landmap;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.gms.common.api.ResultCallback;
@@ -38,6 +39,7 @@ import java.util.Stack;
 
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.custom.ApiClientAsyncTask;
+import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
 import lm.pkp.com.landmap.google.drive.BaseDriveActivity;
 import lm.pkp.com.landmap.util.FileUtil;
@@ -87,6 +89,8 @@ public class UploadResourcesActivity extends BaseDriveActivity {
             processResource(res);
         }else {
             finish();
+            Intent addResourcesIntent = new Intent(UploadResourcesActivity.this, AreaAddResourcesActivity.class);
+            startActivity(addResourcesIntent);
         }
     }
 
@@ -179,12 +183,20 @@ public class UploadResourcesActivity extends BaseDriveActivity {
                     return false;
                 }
                 DriveContents driveContents = driveContentsResult.getDriveContents();
+
                 OutputStream outputStream = driveContents.getOutputStream();
                 outputStream.write(FileUtils.readFileToByteArray(new File(localRes.getPath())));
+                outputStream.flush();
+                outputStream.close();
+
                 com.google.android.gms.common.api.Status status =
                         driveContents.commit(getGoogleApiClient(), null).await();
 
                 AreaContext.getInstance().removeUploadedDriveResource(localRes);
+
+                DriveDBHelper ddh = new DriveDBHelper(getApplicationContext());
+                ddh.insertResourceLocally(localRes);
+                ddh.insertResourceToServer(localRes);
 
                 return status.getStatus().isSuccess();
             } catch (IOException e) {
@@ -202,5 +214,6 @@ public class UploadResourcesActivity extends BaseDriveActivity {
             processResources();
         }
     }
+
 
 }

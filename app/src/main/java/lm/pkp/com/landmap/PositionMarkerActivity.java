@@ -138,7 +138,6 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
                 startActivity(intent);
             }
         });
-
     }
 
     private void showLocationDialog() {

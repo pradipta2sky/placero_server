@@ -9,6 +9,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
 
     <application
         android:allowBackup="true"
@@ -85,6 +86,10 @@
         </activity>
         <activity
             android:name=".UploadResourcesActivity"
+            android:label="@string/choose_document">
+        </activity>
+        <activity
+            android:name=".ShareDriveResourcesActivity"
             android:label="@string/choose_document">
         </activity>
     </application>

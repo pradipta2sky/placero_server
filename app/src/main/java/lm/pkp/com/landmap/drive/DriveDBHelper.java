@@ -238,7 +238,7 @@ public class DriveDBHelper extends SQLiteOpenHelper {
         Cursor cursor = null;
         try {
             cursor = db.rawQuery("select * from " + DRIVE_TABLE_NAME + " WHERE "
-                            + DRIVE_COLUMN_USER_ID + "=?",
+                            + DRIVE_COLUMN_USER_ID + "= ? AND " + DRIVE_COLUMN_TYPE + "= 'folder'",
                     new String[]{uid});
             if (cursor == null) {
                 return allResources;
