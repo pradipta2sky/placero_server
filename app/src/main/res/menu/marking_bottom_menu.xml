@@ -1,6 +1,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+    <item android:id="@+id/action_display_res"
+        android:title="@string/action_drive_area"
+        android:icon="@drawable/ic_launcher"
+        android:background="?android:attr/selectableItemBackground"
+        app:showAsAction="always"/>
+
     <item android:id="@+id/action_drive_area"
         android:title="@string/action_drive_area"
         android:icon="@drawable/drive_128"

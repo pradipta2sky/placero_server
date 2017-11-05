@@ -138,6 +138,16 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
                 startActivity(intent);
             }
         });
+
+        ActionMenuItemView displayResItem = (ActionMenuItemView)findViewById(R.id.action_display_res);
+        displayResItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(PositionMarkerActivity.this, AreaResourcesDisplayActivity.class);
+                startActivity(intent);
+            }
+        });
+
     }
 
     private void showLocationDialog() {

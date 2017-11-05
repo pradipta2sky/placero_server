@@ -22,7 +22,6 @@ public class AreaDocumentChooserActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_fc_main);
 
-
         toolbar = (Toolbar) findViewById(R.id.fc_toolbar);
         toolbar.setTitle("Directory");
         setSupportActionBar(toolbar);
