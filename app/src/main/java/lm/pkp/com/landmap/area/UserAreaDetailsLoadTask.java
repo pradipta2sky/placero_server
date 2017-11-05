@@ -1,0 +1,151 @@
+package lm.pkp.com.landmap.area;
+
+import android.content.Context;
+import android.os.AsyncTask;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.net.URLEncoder;
+
+import javax.net.ssl.HttpsURLConnection;
+
+import lm.pkp.com.landmap.custom.AsyncTaskCallback;
+import lm.pkp.com.landmap.drive.DriveDBHelper;
+import lm.pkp.com.landmap.drive.DriveResource;
+import lm.pkp.com.landmap.position.PositionElement;
+import lm.pkp.com.landmap.position.PositionsDBHelper;
+
+/**
+ * Created by Rinky on 21-10-2017.
+ */
+
+public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>{
+
+    private Context localContext = null;
+    private AreaDBHelper adh = null;
+    private PositionsDBHelper pdh = null;
+    private DriveDBHelper ddh = null;
+    private AsyncTaskCallback callback = null;
+
+    public UserAreaDetailsLoadTask(Context appContext) {
+        this.localContext = appContext;
+        adh = new AreaDBHelper(this.localContext);
+        pdh = new PositionsDBHelper(this.localContext);
+        ddh = new DriveDBHelper(this.localContext);
+    }
+
+    protected void onPreExecute() {
+    }
+
+    protected String doInBackground(JSONObject... postDataParams) {
+        try {
+            String urlString = "http://35.202.7.223/lm/AreaSearch.php?us=";
+            JSONObject postDataParam = postDataParams[0];
+            String searchKey = postDataParam.getString("us");
+            URL url = new URL(urlString + URLEncoder.encode(searchKey, "utf-8"));
+
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setReadTimeout(15000);
+            conn.setConnectTimeout(15000);
+            conn.setRequestMethod("GET");
+            conn.setDoInput(true);
+            conn.setDoOutput(true);
+
+            int responseCode = conn.getResponseCode();
+            if (responseCode == HttpsURLConnection.HTTP_OK) {
+                BufferedReader in = new BufferedReader(new
+                        InputStreamReader(
+                        conn.getInputStream()));
+
+                StringBuffer sb = new StringBuffer("");
+                String line = "";
+                while ((line = in.readLine()) != null) {
+                    sb.append(line);
+                    break;
+                }
+                in.close();
+                return sb.toString();
+            } else {
+                return new String("false : " + responseCode);
+            }
+        } catch (Exception e) {
+            return new String("Exception: " + e.getMessage());
+        }
+    }
+
+    @Override
+    protected void onPostExecute(String s) {
+        super.onPostExecute(s);
+        try {
+            JSONArray responseArr = new JSONArray(s);
+            for (int i = 0; i < responseArr.length(); i++) {
+                JSONObject responseObj = (JSONObject) responseArr.get(i);
+
+                JSONObject areaObj = (JSONObject)responseObj.get("area");
+
+                AreaElement ae = new AreaElement();
+                ae.setName(areaObj.getString("name"));
+                ae.setCreatedBy(areaObj.getString("created_by"));
+                ae.setDescription(areaObj.getString("description"));
+                ae.setCenterLat(new Double((String) areaObj.get("center_lat")));
+                ae.setCenterLon(new Double((String) areaObj.get("center_lon")));
+                ae.setUniqueId(areaObj.getString("unique_id"));
+                ae.setMeasureSqFt(new Double((String) areaObj.get("measure_sqft")));
+                ae.setOwnershipType("self");
+                ae.setCurrentOwner(areaObj.getString("curr_own"));
+                ae.setTags(areaObj.getString("tags"));
+
+                adh.insertAreaFromServer(ae);
+
+                JSONArray positionsArr = (JSONArray)responseObj.get("positions");
+                for (int p = 0; p < positionsArr.length(); p++) {
+                    JSONObject positionObj = (JSONObject) positionsArr.get(p);
+
+                    PositionElement pe = new PositionElement();
+                    pe.setUniqueId((String) positionObj.get("unique_id"));
+                    pe.setUniqueAreaId((String) positionObj.get("unique_area_id"));
+                    pe.setName((String) positionObj.get("name"));
+                    pe.setDescription((String) positionObj.get("description"));
+                    pe.setLat(new Double((String) positionObj.get("lat")));
+                    pe.setLon(new Double((String) positionObj.get("lon")));
+                    pe.setTags((String) positionObj.get("tags"));
+
+                    pdh.insertPositionFromServer(pe);
+                }
+
+                JSONArray driveArr = (JSONArray)responseObj.get("drs");
+                for (int d = 0; d < driveArr.length(); d++) {
+                    JSONObject driveObj = (JSONObject) driveArr.get(d);
+
+                    DriveResource dr = new DriveResource();
+                    dr.setUniqueId((String) driveObj.get("unique_id"));
+                    dr.setDriveId((String) driveObj.get("drive_id"));
+                    dr.setUserId((String) driveObj.get("user_id"));
+                    dr.setName((String) driveObj.get("name"));
+                    dr.setAreaId((String) driveObj.get("area_id"));
+                    dr.setType((String) driveObj.get("type"));
+                    dr.setSize((String) driveObj.get("size"));
+
+                    ddh.insertResourceFromServer(dr);
+                }
+
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        finalizeTaskCompletion();
+    }
+
+    public void setCompletionCallback(AsyncTaskCallback callback) {
+        this.callback = callback;
+    }
+
+    public void finalizeTaskCompletion(){
+        callback.taskCompleted("");
+    }
+}

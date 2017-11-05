@@ -8,15 +8,9 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
-import org.json.JSONObject;
-
-import lm.pkp.com.landmap.area.AreaDBHelper;
-import lm.pkp.com.landmap.area.UserAreaLoadTask;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
-import lm.pkp.com.landmap.drive.DriveDBHelper;
-import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.sync.LocalDataRefresher;
-import lm.pkp.com.landmap.user.UserContext;
+import lm.pkp.com.landmap.sync.LocalFolderStructureManager;
 
 public class SplashActivity extends Activity {
 
@@ -25,6 +19,7 @@ public class SplashActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
         new LocalDataRefresher(getApplicationContext(), new DataReloadCallback()).refreshLocalData();
+        LocalFolderStructureManager.create();
     }
 
     private class DataReloadCallback implements AsyncTaskCallback{

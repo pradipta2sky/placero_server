@@ -17,6 +17,7 @@ import java.util.UUID;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.drive.DriveResource;
+import lm.pkp.com.landmap.sync.LocalFolderStructureManager;
 import lm.pkp.com.landmap.user.UserContext;
 
 /**
@@ -101,20 +102,10 @@ public class AreaCameraPictureActivity extends Activity {
      * returning image / video
      */
     private static File getOutputMediaFile(int type) {
-        // External sdcard location
-        File mediaStorageDir = new File(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),"LMS_IMAGES");
-        // Create the storage directory if it does not exist
-        if (!mediaStorageDir.exists()) {
-            if (!mediaStorageDir.mkdirs()) {
-                Log.d(TAG, "Oops! Failed create " + "LMS_IMAGES" + " directory");
-                return null;
-            }
-        }
-
         // Create a media file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-        File mediaFile = new File(mediaStorageDir.getPath() + File.separator + "IMG_" + timeStamp + ".jpg");
+        File mediaFile = new File(LocalFolderStructureManager.getImageStorageDir().getPath()
+                + File.separator + "IMG_" + timeStamp + ".jpg");
         return mediaFile;
     }
 }

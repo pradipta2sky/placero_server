@@ -1,23 +1,24 @@
 /**
  * Copyright 2013 Google Inc. All Rights Reserved.
- *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * <p/>
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software distributed under the
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
+ * Unless required by applicable law or agreed to in writing, software distributed under the
  * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
  */
 
 package lm.pkp.com.landmap;
+
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveApi.DriveContentsResult;
 import com.google.android.gms.drive.DriveApi.DriveIdResult;
@@ -27,13 +28,13 @@ import com.google.android.gms.drive.DriveFolder;
 import com.google.android.gms.drive.DriveFolder.DriveFileResult;
 import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.MetadataChangeSet;
-
-import org.apache.commons.io.FileUtils;
+import com.google.android.gms.drive.events.ChangeEvent;
+import com.google.android.gms.drive.events.ChangeListener;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.lang.Override;
 import java.util.ArrayList;
 import java.util.Stack;
 
@@ -41,7 +42,6 @@ import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.custom.ApiClientAsyncTask;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
-import lm.pkp.com.landmap.google.drive.BaseDriveActivity;
 import lm.pkp.com.landmap.util.FileUtil;
 
 
@@ -60,17 +60,17 @@ public class UploadResourcesActivity extends BaseDriveActivity {
         // Preprocessing of the resources.
         AreaContext ac = AreaContext.getInstance();
         ArrayList<DriveResource> resources = ac.getUploadedDriveResources();
-        for(int i = 0; i < resources.size(); i++){
+        for (int i = 0; i < resources.size(); i++) {
             DriveResource dr = resources.get(i);
-            if(!dr.getType().equalsIgnoreCase("folder")){
+            if (!dr.getType().equalsIgnoreCase("folder")) {
                 File localFile = new File(dr.getPath());
-                if(FileUtil.isImageFile(localFile)){
+                if (FileUtil.isImageFile(localFile)) {
                     dr.setContentType("Image");
                     dr.setContainerDriveId(ac.getImagesRootDriveResource().getDriveId());
-                }else if(FileUtil.isVideoFile(localFile)){
+                } else if (FileUtil.isVideoFile(localFile)) {
                     dr.setContentType("Video");
                     dr.setContainerDriveId(ac.getVideosRootDriveResource().getDriveId());
-                }else {
+                } else {
                     dr.setContentType("Document");
                     dr.setContainerDriveId(ac.getDocumentRootDriveResource().getDriveId());
                 }
@@ -79,7 +79,6 @@ public class UploadResourcesActivity extends BaseDriveActivity {
             processStack.push(dr);
         }
 
-        // Process the resources now.
         processResources();
     }
 
@@ -87,7 +86,7 @@ public class UploadResourcesActivity extends BaseDriveActivity {
         if (!processStack.isEmpty()) {
             DriveResource res = processStack.pop();
             processResource(res);
-        }else {
+        } else {
             finish();
             Intent addResourcesIntent = new Intent(UploadResourcesActivity.this, AreaAddResourcesActivity.class);
             startActivity(addResourcesIntent);
@@ -95,122 +94,102 @@ public class UploadResourcesActivity extends BaseDriveActivity {
     }
 
     private void processResource(DriveResource res) {
-        DriveId folderId = DriveId.decodeFromString(res.getContainerDriveId());
-        Drive.DriveApi.fetchDriveId(getGoogleApiClient(), folderId.getResourceId())
-                .setResultCallback(new ContainerIdCallback(res));
+        new FileProcessingTask(res).execute();
     }
 
-    private class ContainerIdCallback implements ResultCallback<DriveIdResult>{
+    private class FileProcessingTask extends AsyncTask {
 
-        private DriveResource localRes = null;
+        private DriveResource resource = null;
 
-        public ContainerIdCallback(DriveResource res){
-            localRes = res;
+        public FileProcessingTask(DriveResource dr) {
+            resource = dr;
         }
 
         @Override
-        public void onResult(DriveIdResult result) {
-            if (!result.getStatus().isSuccess()) {
-                showMessage("Cannot find DriveId. Are you authorized to view this file?");
-                return;
-            }
-            Drive.DriveApi.newDriveContents(getGoogleApiClient())
-                    .setResultCallback(new ContainerContentsCallback(localRes));
-        }
-    }
+        protected Object doInBackground(Object[] params) {
 
-    private class ContainerContentsCallback implements ResultCallback<DriveContentsResult>{
+            DriveId folderId = DriveId.decodeFromString(resource.getContainerDriveId());
+            DriveIdResult idResult = Drive.DriveApi.fetchDriveId(getGoogleApiClient(), folderId.getResourceId()).await();
+            DriveFolder folder = idResult.getDriveId().asDriveFolder();
 
-        private DriveResource localRes = null;
-
-        public ContainerContentsCallback(DriveResource res){
-            localRes = res;
-        }
-
-        @Override
-        public void onResult(DriveContentsResult result) {
-            if (!result.getStatus().isSuccess()) {
-                showMessage("Error while trying to create new file contents");
-                return;
-            }
-            DriveId folderDriveId = DriveId.decodeFromString(localRes.getContainerDriveId());
-            DriveFolder folder = folderDriveId.asDriveFolder();
+            DriveContentsResult contentsResult = Drive.DriveApi.newDriveContents(getGoogleApiClient()).await();
+            DriveContents contents = contentsResult.getDriveContents();
             MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
-                    .setTitle(localRes.getName())
-                    .setMimeType(localRes.getMimeType())
+                    .setTitle(resource.getName())
+                    .setMimeType(resource.getMimeType())
                     .build();
-            folder.createFile(getGoogleApiClient(), changeSet, result.getDriveContents())
-                    .setResultCallback(new FileCreationCallback(localRes));
+            DriveFileResult driveFileResult = folder.createFile(getGoogleApiClient(), changeSet, contents).await();
+
+            DriveFile createdFile = driveFileResult.getDriveFile();
+            createdFile.addChangeListener(getGoogleApiClient(), new FileMetaChangeListener(resource, createdFile));
+
+            return null;
         }
     }
 
+    private class FileMetaChangeListener implements ChangeListener {
 
-    private class FileCreationCallback implements ResultCallback<DriveFileResult>{
+        private DriveResource resource = null;
+        private DriveFile driveFile = null;
 
-        private DriveResource localRes = null;
-
-        public FileCreationCallback(DriveResource res){
-            localRes = res;
+        public FileMetaChangeListener(DriveResource res, DriveFile dFile) {
+            resource = res;
+            driveFile = dFile;
         }
 
         @Override
-        public void onResult(DriveFileResult result) {
-            if (!result.getStatus().isSuccess()) {
-                showMessage("Error while trying to create the file");
-                return;
+        public void onChange(ChangeEvent changeEvent) {
+            if (changeEvent.hasMetadataChanged()) {
+                DriveId driveId = changeEvent.getDriveId();
+                resource.setDriveId(driveId.toString());
+                resource.setDriveResourceId(driveId.getResourceId());
+
+                DriveDBHelper ddh = new DriveDBHelper(getApplicationContext());
+                ddh.insertResourceLocally(resource);
+                ddh.insertResourceToServer(resource);
+
+                driveFile.removeChangeListener(getGoogleApiClient(), this);
+                new CopyContentsAsyncTask(getApplicationContext(), resource).execute(driveFile);
             }
-            DriveFile resFile = result.getDriveFile();
-            localRes.setDriveId(resFile.getDriveId().toString());
-            new EditContentsAsyncTask(getApplicationContext(), localRes).execute(resFile);
         }
     }
 
-    public class EditContentsAsyncTask extends ApiClientAsyncTask<DriveFile, Void, Boolean> {
+    public class CopyContentsAsyncTask extends ApiClientAsyncTask<DriveFile, Void, Boolean> {
         private DriveResource localRes = null;
 
-        public EditContentsAsyncTask(Context context, DriveResource res) {
+        public CopyContentsAsyncTask(Context context, DriveResource res) {
             super(context);
             localRes = res;
         }
 
         @Override
         protected Boolean doInBackgroundConnected(DriveFile... args) {
-            DriveFile file = args[0];
-            try {
-                DriveContentsResult driveContentsResult = file.open(
-                        getGoogleApiClient(), DriveFile.MODE_WRITE_ONLY, null).await();
-                if (!driveContentsResult.getStatus().isSuccess()) {
-                    return false;
-                }
-                DriveContents driveContents = driveContentsResult.getDriveContents();
-
-                OutputStream outputStream = driveContents.getOutputStream();
-                outputStream.write(FileUtils.readFileToByteArray(new File(localRes.getPath())));
-                outputStream.flush();
-                outputStream.close();
-
-                com.google.android.gms.common.api.Status status =
-                        driveContents.commit(getGoogleApiClient(), null).await();
-
-                AreaContext.getInstance().removeUploadedDriveResource(localRes);
-
-                DriveDBHelper ddh = new DriveDBHelper(getApplicationContext());
-                ddh.insertResourceLocally(localRes);
-                ddh.insertResourceToServer(localRes);
-
-                return status.getStatus().isSuccess();
-            } catch (IOException e) {
-                e.printStackTrace();
+            final DriveFile file = args[0];
+            DriveContentsResult driveContentsResult = file.open(
+                    getGoogleApiClient(), DriveFile.MODE_WRITE_ONLY, null).await();
+            if (!driveContentsResult.getStatus().isSuccess()) {
+                return false;
             }
+
+            DriveContents driveContents = driveContentsResult.getDriveContents();
+            OutputStream outputStream = driveContents.getOutputStream();
+            try {
+                FileInputStream fileInputStream = new FileInputStream(new File(localRes.getPath()));
+                byte[] buffer = new byte[1024 * 50]; //10 KB
+                int bytesRead;
+                while ((bytesRead = fileInputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            }
+            driveContents.commit(getGoogleApiClient(), null).await();
             return false;
         }
 
         @Override
         protected void onPostExecute(Boolean result) {
-            if (!result) {
-                showMessage("Error while editing contents");
-                return;
-            }
+            AreaContext.getInstance().removeUploadedDriveResource(localRes);
             processResources();
         }
     }

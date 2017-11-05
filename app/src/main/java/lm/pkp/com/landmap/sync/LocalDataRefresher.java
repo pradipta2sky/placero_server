@@ -1,14 +1,11 @@
 package lm.pkp.com.landmap.sync;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.Intent;
 
 import org.json.JSONObject;
 
-import lm.pkp.com.landmap.AreaDashboardActivity;
 import lm.pkp.com.landmap.area.AreaDBHelper;
-import lm.pkp.com.landmap.area.UserAreaLoadTask;
+import lm.pkp.com.landmap.area.UserAreaDetailsLoadTask;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
@@ -38,7 +35,7 @@ public class LocalDataRefresher implements AsyncTaskCallback {
         DriveDBHelper ddh = new DriveDBHelper(ctxt);
         ddh.deleteDriveElementsLocally();
 
-        UserAreaLoadTask loadTask = new UserAreaLoadTask(ctxt);
+        UserAreaDetailsLoadTask loadTask = new UserAreaDetailsLoadTask(ctxt);
         loadTask.setCompletionCallback(this);
 
         try {

@@ -61,7 +61,7 @@
             android:label="@string/label_pre_load_splash">
         </activity>
         <activity
-            android:name=".google.drive.CreateFolderStructureActivity"
+            android:name=".CreateFolderStructureActivity"
             android:label="@string/create_folder_structure">
         </activity>
         <activity
@@ -87,6 +87,10 @@
         <activity
             android:name=".UploadResourcesActivity"
             android:label="@string/choose_document">
+        </activity>
+        <activity
+            android:name=".DownloadResourcesActivity"
+            android:label="@string/area_resources">
         </activity>
         <activity
             android:name=".ShareDriveResourcesActivity"

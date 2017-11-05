@@ -1,10 +1,11 @@
-package lm.pkp.com.landmap.google.drive;
+package lm.pkp.com.landmap;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.content.IntentSender.SendIntentException;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -13,11 +14,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.drive.Drive;
 
 import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
-import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.user.UserContext;
-import lm.pkp.com.landmap.user.UserDBHelper;
 import lm.pkp.com.landmap.user.UserElement;
 
 public abstract class BaseDriveActivity extends Activity implements
@@ -30,12 +28,15 @@ public abstract class BaseDriveActivity extends Activity implements
 
     protected AreaElement ae = null;
     protected UserElement ue = null;
+    protected TextView statusText = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         ae = AreaContext.getInstance().getAreaElement();
         ue = UserContext.getInstance().getUserElement();
+        setContentView(R.layout.activity_file_upload);
+        statusText = (TextView)findViewById(R.id.status_text);
     }
 
     @Override
@@ -96,7 +97,7 @@ public abstract class BaseDriveActivity extends Activity implements
     }
 
     public void showMessage(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+        statusText.setText(message);
     }
 
     public GoogleApiClient getGoogleApiClient() {

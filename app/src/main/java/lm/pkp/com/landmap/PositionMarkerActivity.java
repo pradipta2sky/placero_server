@@ -26,7 +26,6 @@ import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.custom.LocationPositionReceiver;
-import lm.pkp.com.landmap.google.drive.CreateFolderStructureActivity;
 import lm.pkp.com.landmap.position.PositionElement;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.position.PostionListAdaptor;
@@ -143,7 +142,7 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
         displayResItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(PositionMarkerActivity.this, AreaResourcesDisplayActivity.class);
+                Intent intent = new Intent(PositionMarkerActivity.this, DownloadResourcesActivity.class);
                 startActivity(intent);
             }
         });

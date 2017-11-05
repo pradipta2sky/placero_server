@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package lm.pkp.com.landmap.google.drive;
+package lm.pkp.com.landmap;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -30,12 +30,10 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.UUID;
 
-import lm.pkp.com.landmap.AreaAddResourcesActivity;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
-import lm.pkp.com.landmap.util.FileUtil;
 
 public class CreateFolderStructureActivity extends BaseDriveActivity {
 
