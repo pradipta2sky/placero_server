@@ -15,204 +15,188 @@
 package lm.pkp.com.landmap;
 
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.drive.Drive;
+import com.google.android.gms.drive.DriveApi;
 import com.google.android.gms.drive.DriveFolder;
 import com.google.android.gms.drive.DriveFolder.DriveFolderResult;
 import com.google.android.gms.drive.DriveId;
-import com.google.android.gms.drive.Metadata;
 import com.google.android.gms.drive.MetadataChangeSet;
-import com.google.android.gms.drive.DriveResource.MetadataResult;
+import com.google.android.gms.drive.events.ChangeEvent;
+import com.google.android.gms.drive.events.ChangeListener;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.Stack;
 import java.util.UUID;
 
 import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.custom.AsyncTaskCallback;
+import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
+import lm.pkp.com.landmap.user.UserContext;
+import lm.pkp.com.landmap.user.UserElement;
 
 public class CreateFolderStructureActivity extends BaseDriveActivity {
-
-    private final String IMAGE_FOLDER_NAME = "LMS_IMAGES";
-    private final String VIDEO_FOLDER_NAME = "LMS_VIDEOS";
-    private final String DOCUMENT_FOLDER_NAME = "LMS_DOCS";
-
-    private LinkedHashMap<String, String> resStatusMap = new LinkedHashMap<>();
-    private LinkedHashMap<String, String> driveStatusMap = new LinkedHashMap<>();
-    private LinkedHashMap<String, DriveResource> resourceMap = new LinkedHashMap<>();
 
     @Override
     public void onConnected(Bundle connectionHint) {
         super.onConnected(connectionHint);
-
-        resStatusMap.put(IMAGE_FOLDER_NAME, "false");
-        resStatusMap.put(VIDEO_FOLDER_NAME, "false");
-        resStatusMap.put(DOCUMENT_FOLDER_NAME, "false");
-
-        driveStatusMap.put(IMAGE_FOLDER_NAME, "false");
-        driveStatusMap.put(VIDEO_FOLDER_NAME, "false");
-        driveStatusMap.put(DOCUMENT_FOLDER_NAME, "false");
-
-        fetchStatusAndAct();
+        new FileProcessingTask().execute();
     }
 
-    private void fetchStatusAndAct() {
-        DriveDBHelper ddh = new DriveDBHelper(getApplicationContext());
-        ArrayList<DriveResource> allDriveFolders = ddh.getFolderResourcesByUid(ue.getEmail());
+    private class FileProcessingTask extends AsyncTask {
 
-        for (DriveResource res : allDriveFolders) {
-            String folderName = res.getName();
-            if(folderName.equals(IMAGE_FOLDER_NAME)){
-                resStatusMap.put(IMAGE_FOLDER_NAME, "true");
-                resourceMap.put(IMAGE_FOLDER_NAME, res);
-                DriveId folderId = DriveId.decodeFromString(res.getDriveId());
-                DriveFolder folder = Drive.DriveApi.getFolder(getGoogleApiClient(), folderId);
-                if(folder != null){
-                    driveStatusMap.put(IMAGE_FOLDER_NAME, "true");
-                }
-            }else if(folderName.equals(VIDEO_FOLDER_NAME)){
-                resStatusMap.put(VIDEO_FOLDER_NAME, "true");
-                resourceMap.put(VIDEO_FOLDER_NAME, res);
-                DriveId folderId = DriveId.decodeFromString(res.getDriveId());
-                DriveFolder folder = Drive.DriveApi.getFolder(getGoogleApiClient(), folderId);
-                if(folder != null){
-                    driveStatusMap.put(VIDEO_FOLDER_NAME, "true");
-                }
-            }else if(folderName.equals(DOCUMENT_FOLDER_NAME)){
-                resStatusMap.put(DOCUMENT_FOLDER_NAME, "true");
-                resourceMap.put(DOCUMENT_FOLDER_NAME, res);
-                DriveId folderId = DriveId.decodeFromString(res.getDriveId());
-                DriveFolder folder = Drive.DriveApi.getFolder(getGoogleApiClient(), folderId);
-                if(folder != null){
-                    driveStatusMap.put(DOCUMENT_FOLDER_NAME, "true");
-                }
-            }
-        }
-        actOnStatusObtained();
-    }
+        private final String IMAGE_FOLDER_NAME = "LMS_IMAGES";
+        private final String VIDEO_FOLDER_NAME = "LMS_VIDEOS";
+        private final String DOCUMENT_FOLDER_NAME = "LMS_DOCS";
 
-    private void actOnStatusObtained() {
-        DriveDBHelper ddh = new DriveDBHelper(getApplicationContext());
-        for (String key : resStatusMap.keySet()) {
-            String resStatusStr = resStatusMap.get(key);
-            Boolean resStatus = new Boolean(resStatusStr);
-            if(!resStatus){
-                createFolder(key);
-            }else {
-                String driveStatusStr = driveStatusMap.get(key);
-                Boolean driveStatus = new Boolean(driveStatusStr);
-                if(!driveStatus){
-                    // The drive resource got deleted somehow.
-                    ddh.deleteResource(resourceMap.get(key));
-                    createFolder(key);
-                }
-            }
-        }
-        if(creationComplete()){
-            Intent i = new Intent(CreateFolderStructureActivity.this, AreaAddResourcesActivity.class);
-            startActivity(i);
-        }
-    }
+        private LinkedHashMap<String, DriveResource> resourceMap = new LinkedHashMap<>();
+        private Stack<DriveResource> processStack = new Stack<>();
 
-    private void createFolder(String folderName) {
-        MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
-                .setTitle(folderName).build();
-        Drive.DriveApi.getRootFolder(getGoogleApiClient()).createFolder(
-                getGoogleApiClient(), changeSet).setResultCallback(new GenericResultCallback(folderName));
-    }
-
-    private class GenericResultCallback implements ResultCallback<DriveFolderResult>{
-
-        private String folderName = null;
-
-        public GenericResultCallback(String folderName){
-            this.folderName = folderName;
+        @Override
+        protected Object doInBackground(Object[] params) {
+            fetchStatusAndAct();
+            return null;
         }
 
         @Override
-        public void onResult(DriveFolderResult result) {
-            if (!result.getStatus().isSuccess()) {
-                showMessage("Problem while trying to create a folder");
-                return;
-            }
-            DriveFolder folder = result.getDriveFolder();
-            folder.getMetadata(getGoogleApiClient()).setResultCallback(new GenericMetaDataCallback(folderName));
-        }
-    }
-
-    private class GenericMetaDataCallback implements ResultCallback<MetadataResult>{
-
-        private String folderName = null;
-
-        public GenericMetaDataCallback(String folderName){
-            this.folderName = folderName;
+        protected void onPostExecute(Object o) {
+            super.onPostExecute(o);
         }
 
-        @Override
-        public void onResult(MetadataResult result) {
-            if (!result.getStatus().isSuccess()) {
-                showMessage("Problem while trying to fetch metadata");
-                return;
+
+        private void fetchStatusAndAct() {
+            DriveDBHelper ddh = new DriveDBHelper(getApplicationContext());
+            AreaElement areaElement = AreaContext.getInstance().getAreaElement();
+            ArrayList<DriveResource> areaFolders = ddh.getDriveResourcesByAreaId(areaElement.getUniqueId(), "folder");
+            // First check if there are DB entries.
+            for (DriveResource res : areaFolders) {
+                String folderName = res.getName();
+                if (folderName.equals(IMAGE_FOLDER_NAME)) {
+                    findFolderAndAct(res);
+                    resourceMap.put(IMAGE_FOLDER_NAME, res);
+                } else if (folderName.equals(VIDEO_FOLDER_NAME)) {
+                    findFolderAndAct(res);
+                    resourceMap.put(VIDEO_FOLDER_NAME, res);
+                } else if (folderName.equals(DOCUMENT_FOLDER_NAME)) {
+                    findFolderAndAct(res);
+                    resourceMap.put(DOCUMENT_FOLDER_NAME, res);
+                }
             }
-            Metadata metadata = result.getMetadata();
-            // Insert in database here.
+            // Now check if any DB entry is missing.
+            if (resourceMap.get(IMAGE_FOLDER_NAME) == null) {
+                // Create Image folder
+                generateMetaAndCreate(IMAGE_FOLDER_NAME);
+            }
+            if (resourceMap.get(VIDEO_FOLDER_NAME) == null) {
+                // Create Video folder
+                generateMetaAndCreate(VIDEO_FOLDER_NAME);
+            }
+            if (resourceMap.get(DOCUMENT_FOLDER_NAME) == null) {
+                // Create Docs folder
+                generateMetaAndCreate(DOCUMENT_FOLDER_NAME);
+            }
+
+            // Start processing.
+            process();
+        }
+
+        public void process() {
+            if (processStack.isEmpty()) {
+                Intent i = new Intent(CreateFolderStructureActivity.this, AreaAddResourcesActivity.class);
+                startActivity(i);
+            } else {
+                DriveResource res = processStack.pop();
+                MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
+                        .setTitle(res.getName())
+                        .setMimeType(res.getMimeType())
+                        .build();
+                Drive.DriveApi.getRootFolder(getGoogleApiClient())
+                        .createFolder(getGoogleApiClient(), changeSet).setResultCallback(new CreateFolderCallback(res));
+            }
+        }
+
+        private class CreateFolderCallback implements ResultCallback<DriveFolderResult> {
+
+            private DriveResource resource = null;
+
+            public CreateFolderCallback(DriveResource resource) {
+                this.resource = resource;
+            }
+
+            @Override
+            public void onResult(DriveFolderResult folderResult) {
+                DriveFolder driveFolder = folderResult.getDriveFolder();
+                driveFolder.addChangeListener(getGoogleApiClient(), new FolderMetaChangeListener(resource));
+                MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
+                        .setStarred(true)
+                        .build();
+                driveFolder.updateMetadata(getGoogleApiClient(), changeSet);
+            }
+        }
+
+        private void findFolderAndAct(DriveResource res) {
+            DriveApi.DriveIdResult idResult = Drive.DriveApi.fetchDriveId(getGoogleApiClient(),
+                    res.getDriveResourceId()).await();
+            if (!idResult.getStatus().isSuccess()) {
+                createNewFolder(res);
+            }
+        }
+
+        private void generateMetaAndCreate(String folderName) {
+            AreaElement ae = AreaContext.getInstance().getAreaElement();
+            UserElement ue = UserContext.getInstance().getUserElement();
+
             DriveResource dr = new DriveResource();
             dr.setUniqueId(UUID.randomUUID().toString());
             dr.setAreaId(ae.getUniqueId());
             dr.setType("folder");
             dr.setUserId(ue.getEmail());
-            dr.setDriveId(metadata.getDriveId().toString());
-            dr.setSize(metadata.getFileSize() + "");
-            dr.setName(metadata.getTitle());
+            dr.setName(folderName);
             dr.setContainerDriveId("");
             dr.setMimeType("application/vnd.google-apps.folder");
-            dr.setDriveResourceId(metadata.getDriveId().getResourceId());
             dr.setContentType("any");
+            dr.setSize("0");
 
-            AreaContext.getInstance().getAreaElement().getDriveResources().add(dr);
-
-            DriveDBHelper ddh = new DriveDBHelper(getApplicationContext(),new ServerUpdateCallback(folderName));
-            ddh.insertResourceLocally(dr);
-            ddh.insertResourceToServer(dr);
-        }
-    }
-
-    private class ServerUpdateCallback implements AsyncTaskCallback{
-
-        private String key = null;
-
-        public ServerUpdateCallback(String key){
-            this.key = key;
+            createNewFolder(dr);
         }
 
-        @Override
-        public void taskCompleted(Object result) {
-            resStatusMap.put(key, "true");
-            driveStatusMap.put(key, "true");
-            if(creationComplete()){
-                Intent i = new Intent(CreateFolderStructureActivity.this, AreaAddResourcesActivity.class);
-                startActivity(i);
+        private void createNewFolder(DriveResource res) {
+            processStack.push(res);
+        }
+
+        private class FolderMetaChangeListener implements ChangeListener {
+
+            private DriveResource resource = null;
+
+            public FolderMetaChangeListener(DriveResource res) {
+                resource = res;
+            }
+
+            @Override
+            public void onChange(ChangeEvent changeEvent) {
+                DriveFolder eventFolder = changeEvent.getDriveId().asDriveFolder();
+                DriveId driveId = eventFolder.getDriveId();
+                String resourceId = driveId.getResourceId();
+                if(resourceId != null){
+                    eventFolder.removeChangeListener(getGoogleApiClient(), this);
+                    DriveDBHelper ddh = new DriveDBHelper(getApplicationContext());
+
+                    resource.setDriveResourceId(resourceId);
+                    resource.setDriveId(driveId.toString());
+
+                    ddh.insertResourceLocally(resource);
+                    ddh.insertResourceToServer(resource);
+
+                    process();
+                }
             }
         }
+
     }
 
-    private boolean creationComplete() {
-        boolean isComplete = true;
-        for (String key : resStatusMap.keySet()) {
-            String resStatusStr = resStatusMap.get(key);
-            Boolean resStatus = new Boolean(resStatusStr);
-
-            String driveStatusStr = driveStatusMap.get(key);
-            Boolean driveStatus = new Boolean(driveStatusStr);
-
-            if(!resStatus && !driveStatus){
-                isComplete = false;
-            }
-        }
-        return isComplete;
-    }
 }

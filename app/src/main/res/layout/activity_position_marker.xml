@@ -23,27 +23,15 @@
 
     </android.support.v7.widget.Toolbar>
 
-    <ScrollView
+    <ListView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:id="@+id/positionList"
+        android:layout_gravity="top"
+        android:layout_marginTop="5dp"
         android:layout_below="@+id/toolbar_top"
-        android:layout_above="@+id/toolbar_bottom"
-        android:id="@+id/positionListScroller"
-        android:fillViewport="true">
-        <LinearLayout
-            android:orientation="vertical"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <ListView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/positionList"
-                android:layout_gravity="top"
-                android:layout_marginTop="5dp"
-                android:divider="@color/aluminum"
-                android:dividerHeight="2dp"/>
-        </LinearLayout>
-    </ScrollView>
+        android:divider="@color/aluminum"
+        android:dividerHeight="2dp"/>
 
     <RelativeLayout
         android:id="@+id/splash_panel"

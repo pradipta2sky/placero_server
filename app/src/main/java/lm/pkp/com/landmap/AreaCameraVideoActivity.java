@@ -8,6 +8,8 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 
+import com.iceteck.silicompressorr.SiliCompressor;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -19,6 +21,7 @@ import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.drive.DriveResource;
 import lm.pkp.com.landmap.sync.LocalFolderStructureManager;
 import lm.pkp.com.landmap.user.UserContext;
+import lm.pkp.com.landmap.util.FileUtil;
 
 /**
  * Created by USER on 11/1/2017.
@@ -50,8 +53,7 @@ public class AreaCameraVideoActivity extends Activity {
         fileUri = getOutputMediaFileUri(MEDIA_TYPE_VIDEO);
 
         // set video quality
-        intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 1);
-
+        intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 0);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the image file
         // name
 
@@ -82,14 +84,15 @@ public class AreaCameraVideoActivity extends Activity {
 
     /**
      * Receiving activity result method will be called after closing the camera
-     * */
+     */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // if the result is capturing Image
-         if (requestCode == CAMERA_CAPTURE_VIDEO_REQUEST_CODE) {
+        if (requestCode == CAMERA_CAPTURE_VIDEO_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 File videoFile = new File(fileUri.getPath());
-                AreaElement ae = AreaContext.getInstance().getAreaElement();
+                final AreaContext areaContext = AreaContext.getInstance();
+                AreaElement ae = areaContext.getAreaElement();
 
                 DriveResource dr = new DriveResource();
                 dr.setName(videoFile.getName());
@@ -99,6 +102,10 @@ public class AreaCameraVideoActivity extends Activity {
                 dr.setSize(videoFile.length() + "");
                 dr.setUniqueId(UUID.randomUUID().toString());
                 dr.setAreaId(ae.getUniqueId());
+                dr.setMimeType(FileUtil.getMimeType(videoFile));
+                dr.setContentType("Video");
+                String containerDriveId = areaContext.getImagesRootDriveResource().getDriveId();
+                dr.setContainerDriveId(containerDriveId);
 
                 AreaContext.getInstance().addNewDriveResource(dr);
 
@@ -125,8 +132,8 @@ public class AreaCameraVideoActivity extends Activity {
      * returning image / video
      */
     private static File getOutputMediaFile(int type) {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss",Locale.getDefault()).format(new Date());
-        File  mediaFile = new File(LocalFolderStructureManager.getVideoStorageDir().getPath()
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        File mediaFile = new File(LocalFolderStructureManager.getVideoStorageDir().getPath()
                 + File.separator + "VID_" + timeStamp + ".mp4");
         return mediaFile;
     }

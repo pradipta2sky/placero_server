@@ -142,7 +142,7 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
         displayResItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(PositionMarkerActivity.this, DownloadResourcesActivity.class);
+                Intent intent = new Intent(PositionMarkerActivity.this, AreaResourcesDisplayActivity.class);
                 startActivity(intent);
             }
         });

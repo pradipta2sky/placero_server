@@ -92,9 +92,9 @@ public class LocalFolderStructureManager {
     }
 
     public static File getLocalFolderByMimeType(String mimeType) {
-        if(FileUtil.isImageFile(mimeType)){
+        if(mimeType != null && mimeType.startsWith("image")){
             return imageStorageDir;
-        }else if(FileUtil.isVideoFile(mimeType)){
+        }else if(mimeType != null && mimeType.startsWith("video")){
             return videoStorageDir;
         }else {
             return docsStorageDir;

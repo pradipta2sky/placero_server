@@ -273,6 +273,47 @@ public class DriveDBHelper extends SQLiteOpenHelper {
         return allResources;
     }
 
+    public ArrayList<DriveResource> getDriveResourcesByAreaId(String aid, String type) {
+        ArrayList<DriveResource> allResources = new ArrayList<DriveResource>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery("select * from " + DRIVE_TABLE_NAME + " WHERE "
+                            + DRIVE_COLUMN_AREA_ID + "=? and " + DRIVE_COLUMN_TYPE + "='" + type + "'",
+                    new String[]{aid});
+            if (cursor == null) {
+                return allResources;
+            }
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                while (cursor.isAfterLast() == false) {
+                    DriveResource dr = new DriveResource();
+
+                    dr.setUniqueId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_UNIQUE_ID)));
+                    dr.setAreaId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_AREA_ID)));
+                    dr.setDriveId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_DRIVE_ID)));
+                    dr.setUserId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_USER_ID)));
+                    dr.setContainerDriveId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CONTAINER_DRIVE_ID)));
+                    dr.setDriveResourceId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_RESOURCE_ID)));
+                    dr.setName(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_NAME)));
+                    dr.setType(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_TYPE)));
+                    dr.setContentType(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CONTENT_TYPE)));
+                    dr.setMimeType(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_MIME_TYPE)));
+                    dr.setSize(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_SIZE)));
+
+                    allResources.add(dr);
+                    cursor.moveToNext();
+                }
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        db.close();
+        return allResources;
+    }
+
     public ArrayList<DriveResource> getDriveResourcesByAreaId(String aid) {
         ArrayList<DriveResource> allResources = new ArrayList<DriveResource>();
         SQLiteDatabase db = this.getReadableDatabase();

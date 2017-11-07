@@ -6,17 +6,11 @@ import android.content.IntentSender.SendIntentException;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.drive.Drive;
-
-import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.AreaElement;
-import lm.pkp.com.landmap.user.UserContext;
-import lm.pkp.com.landmap.user.UserElement;
 
 public abstract class BaseDriveActivity extends Activity implements
         GoogleApiClient.ConnectionCallbacks,
@@ -26,17 +20,12 @@ public abstract class BaseDriveActivity extends Activity implements
     protected static final int REQUEST_CODE_RESOLUTION = 1;
     private GoogleApiClient mGoogleApiClient;
 
-    protected AreaElement ae = null;
-    protected UserElement ue = null;
     protected TextView statusText = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ae = AreaContext.getInstance().getAreaElement();
-        ue = UserContext.getInstance().getUserElement();
-        setContentView(R.layout.activity_file_upload);
-        statusText = (TextView)findViewById(R.id.status_text);
+        setContentView(R.layout.activity_generic_wait);
     }
 
     @Override

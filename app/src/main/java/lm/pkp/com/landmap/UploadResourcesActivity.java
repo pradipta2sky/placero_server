@@ -31,6 +31,8 @@ import com.google.android.gms.drive.MetadataChangeSet;
 import com.google.android.gms.drive.events.ChangeEvent;
 import com.google.android.gms.drive.events.ChangeListener;
 
+import org.apache.commons.io.IOUtils;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -63,20 +65,8 @@ public class UploadResourcesActivity extends BaseDriveActivity {
         for (int i = 0; i < resources.size(); i++) {
             DriveResource dr = resources.get(i);
             if (!dr.getType().equalsIgnoreCase("folder")) {
-                File localFile = new File(dr.getPath());
-                if (FileUtil.isImageFile(localFile)) {
-                    dr.setContentType("Image");
-                    dr.setContainerDriveId(ac.getImagesRootDriveResource().getDriveId());
-                } else if (FileUtil.isVideoFile(localFile)) {
-                    dr.setContentType("Video");
-                    dr.setContainerDriveId(ac.getVideosRootDriveResource().getDriveId());
-                } else {
-                    dr.setContentType("Document");
-                    dr.setContainerDriveId(ac.getDocumentRootDriveResource().getDriveId());
-                }
-                dr.setMimeType(FileUtil.getMimeType(localFile));
+                processStack.push(dr);
             }
-            processStack.push(dr);
         }
 
         processResources();
@@ -174,12 +164,10 @@ public class UploadResourcesActivity extends BaseDriveActivity {
             DriveContents driveContents = driveContentsResult.getDriveContents();
             OutputStream outputStream = driveContents.getOutputStream();
             try {
-                FileInputStream fileInputStream = new FileInputStream(new File(localRes.getPath()));
-                byte[] buffer = new byte[1024 * 50]; //10 KB
-                int bytesRead;
-                while ((bytesRead = fileInputStream.read(buffer)) != -1) {
-                    outputStream.write(buffer, 0, bytesRead);
-                }
+                File inputFile = new File(localRes.getPath());
+                FileInputStream fileInputStream = new FileInputStream(inputFile);
+                IOUtils.copyLarge(fileInputStream, outputStream);
+                IOUtils.closeQuietly(fileInputStream);
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
@@ -190,6 +178,7 @@ public class UploadResourcesActivity extends BaseDriveActivity {
         @Override
         protected void onPostExecute(Boolean result) {
             AreaContext.getInstance().removeUploadedDriveResource(localRes);
+            AreaContext.getInstance().getAreaElement().getDriveResources().add(localRes);
             processResources();
         }
     }

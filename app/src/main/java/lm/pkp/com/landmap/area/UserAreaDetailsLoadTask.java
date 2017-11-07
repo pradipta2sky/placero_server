@@ -123,13 +123,17 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
                     JSONObject driveObj = (JSONObject) driveArr.get(d);
 
                     DriveResource dr = new DriveResource();
-                    dr.setUniqueId((String) driveObj.get("unique_id"));
-                    dr.setDriveId((String) driveObj.get("drive_id"));
-                    dr.setUserId((String) driveObj.get("user_id"));
-                    dr.setName((String) driveObj.get("name"));
-                    dr.setAreaId((String) driveObj.get("area_id"));
-                    dr.setType((String) driveObj.get("type"));
-                    dr.setSize((String) driveObj.get("size"));
+                    dr.setUniqueId(driveObj.getString("unique_id"));
+                    dr.setAreaId(driveObj.getString("area_id"));
+                    dr.setDriveId(driveObj.getString("drive_id"));
+                    dr.setUserId(driveObj.getString("user_id"));
+                    dr.setContainerDriveId(driveObj.getString("container_id"));
+                    dr.setDriveResourceId(driveObj.getString("resource_id"));
+                    dr.setName(driveObj.getString("name"));
+                    dr.setType(driveObj.getString("type"));
+                    dr.setSize(driveObj.getString("size"));
+                    dr.setMimeType(driveObj.getString("mime_type"));
+                    dr.setContentType(driveObj.getString("content_type"));
 
                     ddh.insertResourceFromServer(dr);
                 }
