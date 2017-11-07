@@ -8,26 +8,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import lm.pkp.com.landmap.R;
-import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.AreaElement;
-import lm.pkp.com.landmap.drive.DriveResource;
-import lm.pkp.com.landmap.sync.LocalFolderStructureManager;
 
 /**
  * Created by USER on 11/4/2017.
  */
-public class ImageDisplayFragment extends Fragment {
-
-    private GridView gridView;
+public class AreaVideoDisplayFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_picture_display, container, false);
+        return inflater.inflate(R.layout.fragment_video_display, container, false);
     }
 
     @Override
@@ -38,8 +28,8 @@ public class ImageDisplayFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        gridView = (GridView) getView().findViewById(R.id.gridView);
-        gridView.setAdapter(new AreaPictureDisplayAdaptor(this.getContext()));
+        GridView gridView = (GridView) getView().findViewById(R.id.gridView);
+        gridView.setAdapter(new AreaVideoDisplayAdaptor(this.getContext()));
         gridView.setOnScrollListener(new SampleScrollListener(this.getContext()));
     }
 
@@ -47,5 +37,7 @@ public class ImageDisplayFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
     }
+
+
 
 }

@@ -26,7 +26,7 @@ import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.area.res.disp.DocumentChooserAdaptor;
-import lm.pkp.com.landmap.area.res.disp.FileDisplayItem;
+import lm.pkp.com.landmap.area.res.disp.FileDisplayElement;
 import lm.pkp.com.landmap.custom.PermittedFileArrayList;
 import lm.pkp.com.landmap.drive.DriveResource;
 import lm.pkp.com.landmap.user.UserContext;
@@ -37,7 +37,7 @@ public class FileSearcherFragment extends Fragment {
     private View fragmentView;
     private ListView listView;
     private DocumentChooserAdaptor listAdapter;
-    private PermittedFileArrayList<FileDisplayItem> items = new PermittedFileArrayList<FileDisplayItem>();
+    private PermittedFileArrayList<FileDisplayElement> items = new PermittedFileArrayList<FileDisplayElement>();
 
 
     @Override
@@ -56,7 +56,7 @@ public class FileSearcherFragment extends Fragment {
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view,int i, long l) {
-                    FileDisplayItem item = items.get(i);
+                    FileDisplayElement item = items.get(i);
                     File file = new File(item.getPath());
                     if (!file.canRead()) {
                         showErrorBox("Error: File cannot be read. Probably corrupt / locked.");
@@ -91,7 +91,7 @@ public class FileSearcherFragment extends Fragment {
                 }
             });
 
-            PermittedFileArrayList<FileDisplayItem> files = new PermittedFileArrayList<>();
+            PermittedFileArrayList<FileDisplayElement> files = new PermittedFileArrayList<>();
             files.addAll(findFiles(getContext(), "external", "application/pdf"));
             files.addAll(findFiles(getContext(), "internal", "application/pdf"));
 
@@ -106,8 +106,8 @@ public class FileSearcherFragment extends Fragment {
         return fragmentView;
     }
 
-    private PermittedFileArrayList<FileDisplayItem> findFiles(Context context, String location, String mimeType) {
-        PermittedFileArrayList<FileDisplayItem> searchedFiles = new PermittedFileArrayList<>();
+    private PermittedFileArrayList<FileDisplayElement> findFiles(Context context, String location, String mimeType) {
+        PermittedFileArrayList<FileDisplayElement> searchedFiles = new PermittedFileArrayList<>();
         ContentResolver cr = context.getContentResolver();
         Uri uri = Files.getContentUri(location);
 
@@ -126,7 +126,7 @@ public class FileSearcherFragment extends Fragment {
                 String fileLastModifed = cursor.getString(cursor.getColumnIndex(FileColumns.DATE_MODIFIED));
                 String fileCreated = cursor.getString(cursor.getColumnIndex(FileColumns.DATE_ADDED));
 
-                FileDisplayItem fileDisplayItem = new FileDisplayItem();
+                FileDisplayElement fileDisplayItem = new FileDisplayElement();
                 fileDisplayItem.setIcon(R.drawable.pdf_icon);
                 fileDisplayItem.setName(fileTitle);
                 fileDisplayItem.setDesc(createDescriptionText(fileSize, fileLastModifed));

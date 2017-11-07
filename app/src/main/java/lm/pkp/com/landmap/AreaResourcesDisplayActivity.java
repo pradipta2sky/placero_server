@@ -9,9 +9,9 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import lm.pkp.com.landmap.area.res.disp.DocumentDisplayFragment;
-import lm.pkp.com.landmap.area.res.disp.ImageDisplayFragment;
-import lm.pkp.com.landmap.area.res.disp.VideoDisplayFragment;
+import lm.pkp.com.landmap.area.res.disp.AreaDocumentDisplayFragment;
+import lm.pkp.com.landmap.area.res.disp.AreaPictureDisplayFragment;
+import lm.pkp.com.landmap.area.res.disp.AreaVideoDisplayFragment;
 
 /**
  * Created by USER on 11/4/2017.
@@ -49,11 +49,11 @@ public class AreaResourcesDisplayActivity extends AppCompatActivity {
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return new ImageDisplayFragment();
+                    return new AreaPictureDisplayFragment();
                 case 1:
-                    return new VideoDisplayFragment();
+                    return new AreaVideoDisplayFragment();
                 case 2:
-                    return new DocumentDisplayFragment();
+                    return new AreaDocumentDisplayFragment();
                 default:
                     return null;
             }

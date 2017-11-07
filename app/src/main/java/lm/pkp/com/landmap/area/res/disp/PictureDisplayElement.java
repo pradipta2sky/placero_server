@@ -3,7 +3,7 @@ package lm.pkp.com.landmap.area.res.disp;
 /**
  * Created by USER on 11/6/2017.
  */
-public class ImageDisplayElement {
+public class PictureDisplayElement {
 
     private String name = "";
     private String absPath = "";

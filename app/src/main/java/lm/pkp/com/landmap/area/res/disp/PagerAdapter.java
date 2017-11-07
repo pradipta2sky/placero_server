@@ -2,7 +2,6 @@ package lm.pkp.com.landmap.area.res.disp;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 /**
@@ -21,13 +20,13 @@ public class PagerAdapter extends FragmentStatePagerAdapter {
 
         switch (position) {
             case 0:
-                ImageDisplayFragment idf = new ImageDisplayFragment();
+                AreaPictureDisplayFragment idf = new AreaPictureDisplayFragment();
                 return idf;
             case 1:
-                VideoDisplayFragment vdf = new VideoDisplayFragment();
+                AreaVideoDisplayFragment vdf = new AreaVideoDisplayFragment();
                 return vdf;
             case 2:
-                DocumentDisplayFragment ddf = new DocumentDisplayFragment();
+                AreaDocumentDisplayFragment ddf = new AreaDocumentDisplayFragment();
                 return ddf;
             default:
                 return null;

@@ -98,7 +98,7 @@ public class TextDetailDocumentsCell extends FrameLayout {
         super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec((int) (density * 64), MeasureSpec.EXACTLY));
     }
 
-    public void setTextAndValueAndTypeAndThumb(String text, String value, int resId) {
+    public void setValues(String text, String value, int resId) {
         textView.setText(text);
         valueTextView.setText(value);
         imageView.setImageDrawable(getResources().getDrawable(resId));

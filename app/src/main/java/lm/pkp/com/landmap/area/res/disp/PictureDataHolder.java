@@ -17,8 +17,8 @@ final class PictureDataHolder {
 
     public static final PictureDataHolder INSTANCE = new PictureDataHolder();
 
-    public ArrayList<ImageDisplayElement> getData() {
-        final ArrayList<ImageDisplayElement> imageItems = new ArrayList<>();
+    public ArrayList<PictureDisplayElement> getData() {
+        final ArrayList<PictureDisplayElement> imageItems = new ArrayList<>();
         final AreaElement areaElement = AreaContext.getInstance().getAreaElement();
         List<DriveResource> driveResources = areaElement.getDriveResources();
         String imgRootPath = LocalFolderStructureManager.getImageStorageDir().getAbsolutePath()
@@ -27,7 +27,7 @@ final class PictureDataHolder {
             final DriveResource resource = driveResources.get(i);
             if(resource.getType().equals("file")){
                 if(resource.getContentType().equals("Image")){
-                    final ImageDisplayElement imageDisplayElement = new ImageDisplayElement();
+                    final PictureDisplayElement imageDisplayElement = new PictureDisplayElement();
                     imageDisplayElement.setName(resource.getName());
                     imageDisplayElement.setAbsPath(imgRootPath + resource.getName());
                     imageItems.add(imageDisplayElement);

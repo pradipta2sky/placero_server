@@ -4,8 +4,6 @@ import android.content.Context;
 import android.view.View;
 import android.view.ViewGroup;
 
-import java.util.List;
-
 import lm.pkp.com.landmap.custom.PermittedFileArrayList;
 import lm.pkp.com.landmap.lib.fe.BaseFragmentAdapter;
 import lm.pkp.com.landmap.lib.fe.TextDetailDocumentsCell;
@@ -16,9 +14,9 @@ import lm.pkp.com.landmap.lib.fe.TextDetailDocumentsCell;
 public class DocumentChooserAdaptor extends BaseFragmentAdapter {
 
     private Context mContext;
-    private PermittedFileArrayList<FileDisplayItem> items;
+    private PermittedFileArrayList<FileDisplayElement> items;
 
-    public DocumentChooserAdaptor(Context context, PermittedFileArrayList<FileDisplayItem> chosenItems) {
+    public DocumentChooserAdaptor(Context context, PermittedFileArrayList<FileDisplayElement> chosenItems) {
         this.mContext = context;
         this.items = chosenItems;
     }
@@ -55,9 +53,8 @@ public class DocumentChooserAdaptor extends BaseFragmentAdapter {
         if (convertView == null) {
             convertView = new TextDetailDocumentsCell(mContext);
         }
-        FileDisplayItem item = items.get(position);
-        ((TextDetailDocumentsCell) convertView)
-                .setTextAndValueAndTypeAndThumb(item.getName(), item.getDesc(), item.getIcon());
+        FileDisplayElement item = items.get(position);
+        ((TextDetailDocumentsCell) convertView).setValues(item.getName(), item.getDesc(), item.getIcon());
         return convertView;
     }
 }

@@ -1,9 +1,11 @@
 package lm.pkp.com.landmap.area.res.disp;
 
+import lm.pkp.com.landmap.area.model.FileItemMarker;
+
 /**
  * Created by USER on 11/7/2017.
  */
-public class FileDisplayItem implements FileListItem {
+public class FileDisplayElement implements FileItemMarker {
 
     private int icon;
     private String name;

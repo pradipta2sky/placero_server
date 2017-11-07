@@ -1,21 +1,11 @@
 package lm.pkp.com.landmap.area.res.disp;
 
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
-import android.transition.Fade;
-import android.util.DisplayMetrics;
-import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
-import android.widget.RelativeLayout;
 
 import com.squareup.picasso.Picasso;
 
@@ -33,7 +23,7 @@ final class AreaPictureDisplayAdaptor extends BaseAdapter {
 
     AreaPictureDisplayAdaptor(Context context) {
         this.context = context;
-        final ArrayList<ImageDisplayElement> dataSet = PictureDataHolder.INSTANCE.getData();
+        final ArrayList<PictureDisplayElement> dataSet = PictureDataHolder.INSTANCE.getData();
         for (int i = 0; i < dataSet.size(); i++) {
             urls.add(dataSet.get(i).getAbsPath());
         }
