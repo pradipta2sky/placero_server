@@ -1,4 +1,4 @@
-package lm.pkp.com.landmap.area;
+package lm.pkp.com.landmap.area.res.disp;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -17,12 +17,12 @@ import lm.pkp.com.landmap.drive.DriveResource;
 /**
  * Created by USER on 10/16/2017.
  */
-public class AreaDriveResourceAdaptor extends ArrayAdapter<DriveResource> {
+public class AreaAddResourceAdaptor extends ArrayAdapter<DriveResource> {
 
     private ArrayList<DriveResource> items;
     private Context context;
 
-    public AreaDriveResourceAdaptor(Context context, int textViewResourceId, ArrayList<DriveResource> items) {
+    public AreaAddResourceAdaptor(Context context, int textViewResourceId, ArrayList<DriveResource> items) {
         super(context, textViewResourceId, items);
         this.context = context;
         this.items = items;

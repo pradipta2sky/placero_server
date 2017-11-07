@@ -22,11 +22,9 @@ public class TextDetailDocumentsCell extends FrameLayout {
 
     private TextView textView;
     private TextView valueTextView;
-    private TextView typeTextView;
     private ImageView imageView;
-    private CheckBox checkBox;
-
     private float density = 1;
+    private TextView typeTextView;
 
     public TextDetailDocumentsCell(Context context) {
         super(context);
@@ -93,52 +91,17 @@ public class TextDetailDocumentsCell extends FrameLayout {
         layoutParams.rightMargin = (int)(density * 0);
         layoutParams.gravity = Gravity.LEFT | Gravity.CENTER_VERTICAL;
         imageView.setLayoutParams(layoutParams);
-
-        checkBox = new CheckBox(context);
-        checkBox.setVisibility(GONE);
-        addView(checkBox);
-        layoutParams = (LayoutParams) checkBox.getLayoutParams();
-        layoutParams.width = (int)(density * 22);
-        layoutParams.height = (int)(density * 22);
-        layoutParams.topMargin = (int)(density * 34);
-        layoutParams.leftMargin = (int)(density * 38) ;
-        layoutParams.rightMargin = 0;
-        layoutParams.gravity = Gravity.LEFT;
-        checkBox.setLayoutParams(layoutParams);
     }
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
-        super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec((int)(density * 64), MeasureSpec.EXACTLY));
+        super.onMeasure(widthMeasureSpec, MeasureSpec.makeMeasureSpec((int) (density * 64), MeasureSpec.EXACTLY));
     }
 
-    public void setTextAndValueAndTypeAndThumb(String text, String value, String type, String thumb, int resId) {
+    public void setTextAndValueAndTypeAndThumb(String text, String value, int resId) {
         textView.setText(text);
         valueTextView.setText(value);
-        if (type != null) {
-            typeTextView.setVisibility(VISIBLE);
-            typeTextView.setText(type);
-        } else {
-            typeTextView.setVisibility(GONE);
-        }
-        if (thumb != null || resId != 0) {
-            if (thumb != null) {
-//                imageView.setImage(thumb, "40_40", null);
-            } else  {
-                imageView.setImageResource(resId);
-            }
-            imageView.setVisibility(VISIBLE);
-        } else {
-            imageView.setVisibility(GONE);
-        }
+        imageView.setImageDrawable(getResources().getDrawable(resId));
     }
-
-    public void setChecked(boolean checked, boolean animated) {
-        if (checkBox.getVisibility() != VISIBLE) {
-            checkBox.setVisibility(VISIBLE);
-        }
-        checkBox.setChecked(checked);
-    }
-
 
 }

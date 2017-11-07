@@ -33,14 +33,14 @@ import java.util.Set;
 import java.util.UUID;
 
 import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.AreaDBHelper;
+import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.custom.MapWrapperLayout;
 import lm.pkp.com.landmap.custom.OnInfoWindowElemTouchListener;
 import lm.pkp.com.landmap.position.PositionElement;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
 
-public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyCallback {
+public class AreaMapPlotterActivity extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap googleMap;
     private LinkedHashMap<Marker, PositionElement> areaMarkers = new LinkedHashMap<>();
@@ -242,7 +242,7 @@ public class AreaPlotterActivity extends FragmentActivity implements OnMapReadyC
 
     @Override
     public void onBackPressed() {
-        Intent positionMarkerIntent = new Intent(AreaPlotterActivity.this, PositionMarkerActivity.class);
+        Intent positionMarkerIntent = new Intent(AreaMapPlotterActivity.this, PositionMarkerActivity.class);
         startActivity(positionMarkerIntent);
     }
 

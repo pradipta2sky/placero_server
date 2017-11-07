@@ -10,7 +10,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.AreaDBHelper;
+import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.util.AreaActivityUtil;
 

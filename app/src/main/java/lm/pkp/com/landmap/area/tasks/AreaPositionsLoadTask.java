@@ -1,4 +1,4 @@
-package lm.pkp.com.landmap.area;
+package lm.pkp.com.landmap.area.tasks;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -13,21 +13,21 @@ import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import lm.pkp.com.landmap.drive.DriveDBHelper;
-import lm.pkp.com.landmap.drive.DriveResource;
+import lm.pkp.com.landmap.position.PositionElement;
+import lm.pkp.com.landmap.position.PositionsDBHelper;
 
 /**
  * Created by Rinky on 21-10-2017.
  */
 
-public class AreaDriveResourcesLoadTask extends AsyncTask<JSONObject, Void, String>{
+public class AreaPositionsLoadTask extends AsyncTask<JSONObject, Void, String>{
 
     private Context localContext = null;
-    private DriveDBHelper ddh = null;
+    private PositionsDBHelper pdh = null;
 
-    public AreaDriveResourcesLoadTask(Context appContext) {
+    public AreaPositionsLoadTask(Context appContext) {
         this.localContext = appContext;
-        ddh = new DriveDBHelper(this.localContext);
+        pdh = new PositionsDBHelper(this.localContext);
     }
 
     protected void onPreExecute() {
@@ -35,11 +35,11 @@ public class AreaDriveResourcesLoadTask extends AsyncTask<JSONObject, Void, Stri
 
     protected String doInBackground(JSONObject... postDataParams) {
         try {
-            String urlString = "http://35.202.7.223/lm/DriveSearch.php";
+            String urlString = "http://35.202.7.223/lm/PositionsSearch.php";
 
             JSONObject postDataParam = postDataParams[0];
-            String searchField = postDataParam.getString("sf");
-            String sfURL = "?sf=" + searchField;
+            String searchField = postDataParam.getString("sf_alt");
+            String sfURL = "?sf_alt=" + searchField;
             String searchStr = postDataParam.getString("ss");
             String ssURL = "&ss=" + searchStr;
 
@@ -79,16 +79,16 @@ public class AreaDriveResourcesLoadTask extends AsyncTask<JSONObject, Void, Stri
             for (int i = 0; i < responseArr.length(); i++) {
                 JSONObject responseObj = (JSONObject) responseArr.get(i);
 
-                DriveResource dr = new DriveResource();
-                dr.setUniqueId((String) responseObj.get("unique_id"));
-                dr.setDriveId((String) responseObj.get("drive_id"));
-                dr.setUserId((String) responseObj.get("user_id"));
-                dr.setName((String) responseObj.get("name"));
-                dr.setAreaId((String) responseObj.get("area_id"));
-                dr.setType((String) responseObj.get("type"));
-                dr.setSize((String) responseObj.get("size"));
+                PositionElement pe = new PositionElement();
+                pe.setUniqueId((String) responseObj.get("unique_id"));
+                pe.setUniqueAreaId((String) responseObj.get("unique_area_id"));
+                pe.setName((String) responseObj.get("name"));
+                pe.setDescription((String) responseObj.get("description"));
+                pe.setLat(new Double((String) responseObj.get("lat")));
+                pe.setLon(new Double((String) responseObj.get("lon")));
+                pe.setTags((String) responseObj.get("tags"));
 
-                ddh.insertResourceFromServer(dr);
+                pdh.insertPositionFromServer(pe);
             }
         }catch (Exception e){
             e.printStackTrace();

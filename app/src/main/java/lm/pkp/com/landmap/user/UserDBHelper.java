@@ -10,7 +10,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import lm.pkp.com.landmap.area.AreaDBHelper;
+import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.sync.LMSRestAsyncTask;

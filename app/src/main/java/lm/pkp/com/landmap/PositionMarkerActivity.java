@@ -23,7 +23,7 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.AreaDBHelper;
+import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.custom.LocationPositionReceiver;
 import lm.pkp.com.landmap.position.PositionElement;
@@ -75,7 +75,7 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
         plotItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(PositionMarkerActivity.this, AreaPlotterActivity.class);
+                Intent intent = new Intent(PositionMarkerActivity.this, AreaMapPlotterActivity.class);
                 startActivity(intent);
             }
         });

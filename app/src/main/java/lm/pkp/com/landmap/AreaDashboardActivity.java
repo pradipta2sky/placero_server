@@ -14,9 +14,9 @@ import android.widget.ListView;
 import java.util.ArrayList;
 
 import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.AreaDBHelper;
+import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
-import lm.pkp.com.landmap.area.AreaItemDisplayAdaptor;
+import lm.pkp.com.landmap.area.res.disp.AreaItemAdaptor;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.sync.LocalDataRefresher;
 
@@ -24,7 +24,7 @@ public class AreaDashboardActivity extends AppCompatActivity {
 
     private AreaDBHelper adb = null;
     private ArrayList<AreaElement> allAreas = null;
-    private AreaItemDisplayAdaptor areaDisplayAdapter = null;
+    private AreaItemAdaptor areaDisplayAdapter = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +39,7 @@ public class AreaDashboardActivity extends AppCompatActivity {
         allAreas = adb.getAllAreas();
 
         ListView areaListView = (ListView) findViewById(R.id.area_display_list);
-        areaDisplayAdapter = new AreaItemDisplayAdaptor(this, R.layout.area_element_row, allAreas);
+        areaDisplayAdapter = new AreaItemAdaptor(this, R.layout.area_element_row, allAreas);
         areaListView.setAdapter(areaDisplayAdapter);
 
         ActionMenuItemView createAreaView = (ActionMenuItemView) findViewById(R.id.action_area_create);

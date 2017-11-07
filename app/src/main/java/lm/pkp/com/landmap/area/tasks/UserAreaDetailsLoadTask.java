@@ -1,4 +1,4 @@
-package lm.pkp.com.landmap.area;
+package lm.pkp.com.landmap.area.tasks;
 
 import android.content.Context;
 import android.os.AsyncTask;
@@ -14,6 +14,8 @@ import java.net.URLEncoder;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import lm.pkp.com.landmap.area.db.AreaDBHelper;
+import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;

@@ -1,4 +1,4 @@
-package lm.pkp.com.landmap.area;
+package lm.pkp.com.landmap.area.db;
 
 
 import android.content.ContentValues;
@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
+import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.sync.LMSRestAsyncTask;
 import lm.pkp.com.landmap.user.UserContext;

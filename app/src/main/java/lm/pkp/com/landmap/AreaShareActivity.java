@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.UUID;
 
 import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.AreaDBHelper;
+import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.position.PositionElement;

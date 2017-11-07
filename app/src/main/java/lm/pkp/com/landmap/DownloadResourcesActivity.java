@@ -14,23 +14,17 @@
 
 package lm.pkp.com.landmap;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 
-import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveApi.DriveContentsResult;
 import com.google.android.gms.drive.DriveApi.DriveIdResult;
 import com.google.android.gms.drive.DriveContents;
 import com.google.android.gms.drive.DriveFile;
-import com.google.android.gms.drive.DriveId;
-
-import org.apache.commons.io.IOUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,13 +34,11 @@ import java.util.List;
 import java.util.Stack;
 
 import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.AreaDBHelper;
+import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
-import lm.pkp.com.landmap.custom.ApiClientAsyncTask;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
 import lm.pkp.com.landmap.sync.LocalFolderStructureManager;
-import lm.pkp.com.landmap.util.FileUtil;
 
 
 /**

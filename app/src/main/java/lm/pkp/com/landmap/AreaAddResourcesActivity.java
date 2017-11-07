@@ -12,13 +12,13 @@ import android.widget.ListView;
 import java.util.ArrayList;
 
 import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.AreaDriveResourceAdaptor;
+import lm.pkp.com.landmap.area.res.disp.AreaAddResourceAdaptor;
 import lm.pkp.com.landmap.drive.DriveResource;
 import lm.pkp.com.landmap.util.AreaActivityUtil;
 
 public class AreaAddResourcesActivity extends AppCompatActivity{
 
-    private AreaDriveResourceAdaptor adaptor = null;
+    private AreaAddResourceAdaptor adaptor = null;
     private ArrayList<DriveResource> areaResourcesDisplayList = new ArrayList<>();
 
     @Override
@@ -34,7 +34,7 @@ public class AreaAddResourcesActivity extends AppCompatActivity{
         AreaActivityUtil.populateAreaElement(this);
 
         ListView resourceFileList = (ListView) findViewById(R.id.file_display_list);
-        adaptor = new AreaDriveResourceAdaptor(getApplicationContext(), R.id.file_display_list, areaResourcesDisplayList);
+        adaptor = new AreaAddResourceAdaptor(getApplicationContext(), R.id.file_display_list, areaResourcesDisplayList);
         resourceFileList.setAdapter(adaptor);
 
         ArrayList<DriveResource> driveResources = AreaContext.getInstance().getUploadedDriveResources();

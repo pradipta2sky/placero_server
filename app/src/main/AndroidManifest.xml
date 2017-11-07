@@ -45,7 +45,7 @@
             android:label="@string/title_activity_position_marker">
         </activity>
         <activity
-            android:name=".AreaPlotterActivity"
+            android:name=".AreaMapPlotterActivity"
             android:label="@string/title_activity_land_plotter" >
         </activity>
         <activity

@@ -1,4 +1,4 @@
-package lm.pkp.com.landmap.area;
+package lm.pkp.com.landmap.area.res.disp;
 
 import android.content.Context;
 import android.text.Html;
@@ -12,18 +12,20 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import lm.pkp.com.landmap.R;
+import lm.pkp.com.landmap.area.db.AreaDBHelper;
+import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.user.UserDBHelper;
 
 /**
  * Created by USER on 10/20/2017.
  */
-public class AreaItemDisplayAdaptor extends ArrayAdapter {
+public class AreaItemAdaptor extends ArrayAdapter {
     private ArrayList<AreaElement> items;
     private Context context;
     private AreaDBHelper adh = null;
     private UserDBHelper udh = null;
 
-    public AreaItemDisplayAdaptor(Context context, int textViewResourceId, ArrayList<AreaElement> items) {
+    public AreaItemAdaptor(Context context, int textViewResourceId, ArrayList<AreaElement> items) {
         super(context, textViewResourceId, items);
         this.context = context;
         this.items = items;

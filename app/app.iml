@@ -189,7 +189,7 @@
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.google.firebase/firebase-storage/11.4.2/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.google.maps.android/android-maps-utils/0.5/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.iceteck.silicompressorr/silicompressor/2.1/jars" />
-      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/id.zelory/compressor/2.1.0/jars" />
+      <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/com.tom_roush/pdfbox-android/1.8.9.1/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/exploded-aar/pub.devrel/easypermissions/0.3.0/jars" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/incremental" />
       <excludeFolder url="file://$MODULE_DIR$/build/intermediates/jacoco" />
@@ -208,7 +208,6 @@
     </content>
     <orderEntry type="jdk" jdkName="Android API 23 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" exported="" name="compressor-2.1.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-ads-license-11.4.2" level="project" />
     <orderEntry type="library" exported="" name="play-services-ads-lite-11.4.2" level="project" />
     <orderEntry type="library" exported="" name="firebase-dynamic-links-license-11.4.2" level="project" />
@@ -250,11 +249,13 @@
     <orderEntry type="library" exported="" name="play-services-wallet-license-11.4.2" level="project" />
     <orderEntry type="library" exported="" name="play-services-awareness-11.4.2" level="project" />
     <orderEntry type="library" exported="" name="support-core-utils-25.2.0" level="project" />
+    <orderEntry type="library" exported="" name="pkix-1.51.0.0" level="project" />
     <orderEntry type="library" exported="" name="silicompressor-2.1" level="project" />
     <orderEntry type="library" exported="" name="recyclerview-v7-23.2.1" level="project" />
     <orderEntry type="library" exported="" name="firebase-common-11.4.2" level="project" />
     <orderEntry type="library" exported="" name="firebase-storage-license-11.4.2" level="project" />
     <orderEntry type="library" exported="" name="play-services-plus-11.4.2" level="project" />
+    <orderEntry type="library" exported="" name="core-1.51.0.0" level="project" />
     <orderEntry type="library" exported="" name="appcompat-v7-23.2.1" level="project" />
     <orderEntry type="library" exported="" name="play-services-panorama-11.4.2" level="project" />
     <orderEntry type="library" exported="" name="firebase-database-11.4.2" level="project" />
@@ -266,6 +267,7 @@
     <orderEntry type="library" exported="" name="play-services-analytics-11.4.2" level="project" />
     <orderEntry type="library" exported="" name="support-media-compat-25.2.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-vision-common-11.4.2" level="project" />
+    <orderEntry type="library" exported="" name="pdfbox-android-1.8.9.1" level="project" />
     <orderEntry type="library" exported="" name="play-services-gcm-license-11.4.2" level="project" />
     <orderEntry type="library" exported="" name="firebase-iid-license-11.4.2" level="project" />
     <orderEntry type="library" exported="" name="firebase-config-license-11.4.2" level="project" />
@@ -302,7 +304,6 @@
     <orderEntry type="library" exported="" name="firebase-database-connection-11.4.2" level="project" />
     <orderEntry type="library" exported="" name="play-services-drive-license-11.4.2" level="project" />
     <orderEntry type="library" exported="" name="play-services-base-license-11.4.2" level="project" />
-    <orderEntry type="library" exported="" name="rxjava-2.1.0" level="project" />
     <orderEntry type="library" exported="" name="firebase-appindexing-11.4.2" level="project" />
     <orderEntry type="library" exported="" name="play-services-location-11.4.2" level="project" />
     <orderEntry type="library" exported="" name="play-services-cast-framework-license-11.4.2" level="project" />
@@ -332,6 +333,7 @@
     <orderEntry type="library" exported="" name="google-api-client-1.23.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-vision-common-license-11.4.2" level="project" />
     <orderEntry type="library" exported="" name="play-services-gcm-11.4.2" level="project" />
+    <orderEntry type="library" exported="" name="prov-1.51.0.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-maps-license-11.4.2" level="project" />
     <orderEntry type="library" exported="" name="play-services-plus-license-11.4.2" level="project" />
     <orderEntry type="library" exported="" name="play-services-fitness-11.4.2" level="project" />
@@ -344,7 +346,6 @@
     <orderEntry type="library" exported="" name="firebase-analytics-11.4.2" level="project" />
     <orderEntry type="library" exported="" name="play-services-instantapps-11.4.2" level="project" />
     <orderEntry type="library" exported="" name="play-services-instantapps-license-11.4.2" level="project" />
-    <orderEntry type="library" exported="" name="reactive-streams-1.0.0" level="project" />
     <orderEntry type="library" exported="" name="play-services-nearby-11.4.2" level="project" />
     <orderEntry type="library" exported="" name="play-services-appinvite-11.4.2" level="project" />
   </component>

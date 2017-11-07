@@ -16,7 +16,6 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.UUID;
 
-import id.zelory.compressor.Compressor;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.drive.DriveResource;
