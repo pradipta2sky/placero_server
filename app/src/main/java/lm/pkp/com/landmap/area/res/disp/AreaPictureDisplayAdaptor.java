@@ -11,7 +11,6 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
 
 import lm.pkp.com.landmap.R;
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
@@ -19,14 +18,10 @@ import static android.widget.ImageView.ScaleType.CENTER_CROP;
 final class AreaPictureDisplayAdaptor extends BaseAdapter {
 
     private final Context context;
-    private final List<String> urls = new ArrayList<>();
+    final ArrayList<PictureDisplayElement> dataSet = PictureDataHolder.INSTANCE.getData();
 
     AreaPictureDisplayAdaptor(Context context) {
         this.context = context;
-        final ArrayList<PictureDisplayElement> dataSet = PictureDataHolder.INSTANCE.getData();
-        for (int i = 0; i < dataSet.size(); i++) {
-            urls.add(dataSet.get(i).getAbsPath());
-        }
     }
 
     @Override
@@ -35,6 +30,8 @@ final class AreaPictureDisplayAdaptor extends BaseAdapter {
         if (view == null) {
             view = new SquaredImageView(context);
             view.setScaleType(CENTER_CROP);
+        }else {
+            return view;
         }
 
         // Get the image URL for the current position.
@@ -42,11 +39,13 @@ final class AreaPictureDisplayAdaptor extends BaseAdapter {
 
         // Trigger the download of the URL asynchronously into the image view.
         final String fileUrl = "file://"+ url;
-        Picasso.with(context) //
-                .load(fileUrl) //
+
+        final Picasso picassoElem = Picasso.with(context);//
+        picassoElem.setIndicatorsEnabled(true);
+        picassoElem.load(fileUrl) //
                 .placeholder(R.drawable.placeholder) //
                 .error(R.drawable.error) //
-                .fit() //
+                .resize(300,300)
                 .tag(context) //
                 .into(view);
 
@@ -66,12 +65,12 @@ final class AreaPictureDisplayAdaptor extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return urls.size();
+        return dataSet.size();
     }
 
     @Override
     public String getItem(int position) {
-        return urls.get(position);
+        return dataSet.get(position).getAbsPath();
     }
 
     @Override

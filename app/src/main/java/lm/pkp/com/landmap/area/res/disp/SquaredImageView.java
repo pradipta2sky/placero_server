@@ -2,6 +2,11 @@ package lm.pkp.com.landmap.area.res.disp;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.ColorFilter;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.widget.ImageView;
 
@@ -25,12 +30,22 @@ public class SquaredImageView extends ImageView {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         setMeasuredDimension(getMeasuredWidth(), getMeasuredWidth());
+        setAdjustViewBounds(false);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        setPadding(5, 5, 5, 5);
+        setPadding(10, 10, 10, 10);
     }
 
+    @Override
+    protected void dispatchDraw(Canvas canvas) {
+        super.dispatchDraw(canvas);
+    }
+
+    @Override
+    public void setAdjustViewBounds(boolean adjustViewBounds) {
+        super.setAdjustViewBounds(adjustViewBounds);
+    }
 }

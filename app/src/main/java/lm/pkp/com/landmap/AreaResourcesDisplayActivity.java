@@ -12,6 +12,7 @@ import android.support.v7.widget.Toolbar;
 import lm.pkp.com.landmap.area.res.disp.AreaDocumentDisplayFragment;
 import lm.pkp.com.landmap.area.res.disp.AreaPictureDisplayFragment;
 import lm.pkp.com.landmap.area.res.disp.AreaVideoDisplayFragment;
+import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 
 /**
  * Created by USER on 11/4/2017.
@@ -21,6 +22,8 @@ public class AreaResourcesDisplayActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        new GenericActivityExceptionHandler(this);
+
         setContentView(R.layout.activity_area_res_display);
 
         // Setup Toolbar

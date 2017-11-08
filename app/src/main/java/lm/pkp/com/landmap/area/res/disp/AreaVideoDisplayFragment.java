@@ -30,7 +30,6 @@ public class AreaVideoDisplayFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         GridView gridView = (GridView) getView().findViewById(R.id.gridView);
         gridView.setAdapter(new AreaVideoDisplayAdaptor(this.getContext()));
-        gridView.setOnScrollListener(new SampleScrollListener(this.getContext()));
     }
 
     @Override

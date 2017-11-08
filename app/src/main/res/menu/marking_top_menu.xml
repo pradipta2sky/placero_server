@@ -3,13 +3,13 @@
 
     <item android:id="@+id/action_area_edit"
         android:title="@string/edit_area_name"
-        android:icon="@drawable/edit_icon"
+        android:icon="@drawable/content"
         android:background="?android:attr/selectableItemBackground"
         app:showAsAction="always"/>
 
     <item android:id="@+id/action_delete_area"
         android:title="@string/delete_area"
-        android:icon="@drawable/delete_icon"
+        android:icon="@drawable/garbage"
         android:background="?android:attr/selectableItemBackground"
         app:showAsAction="always"/>
 

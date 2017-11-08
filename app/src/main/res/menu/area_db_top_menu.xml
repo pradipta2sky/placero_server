@@ -9,7 +9,7 @@
 
     <item android:id="@+id/action_area_create"
         android:title="@string/new_area_create"
-        android:icon="@drawable/plus_icon_blue"
+        android:icon="@drawable/plus"
         android:background="?android:attr/selectableItemBackground"
         app:showAsAction="always"/>
 

@@ -28,18 +28,13 @@ import static android.widget.ImageView.ScaleType.CENTER_CROP;
 final class AreaDocumentDisplayAdaptor extends BaseAdapter {
 
     private final Context context;
-    private final List<String> urls = new ArrayList<>();
-    private final List<DocumentDisplayElement> docElems = new ArrayList<>();
+    private final List<DocumentDisplayElement> docElems = DocumentDataHolder.INSTANCE.getData();
 
     private final String tempRoot = LocalFolderStructureManager.getTempStorageDir().getAbsolutePath();
     private final String thumbsDirPath = tempRoot + File.separatorChar + "thumb" + File.separatorChar;
 
-    AreaDocumentDisplayAdaptor(Context context) {
+    public AreaDocumentDisplayAdaptor(Context context) {
         this.context = context;
-        docElems.addAll( DocumentDataHolder.INSTANCE.getData());
-        for (int i = 0; i < docElems.size(); i++) {
-            urls.add(docElems.get(i).getAbsPath());
-        }
     }
 
     @Override
@@ -48,17 +43,22 @@ final class AreaDocumentDisplayAdaptor extends BaseAdapter {
         if (view == null) {
             view = new SquaredImageView(context);
             view.setScaleType(CENTER_CROP);
+        }else {
+            return view;
         }
 
         // Get the image URL for the current position.
         final String url = getItem(position);
         final DocumentDisplayElement currElem = docElems.get(position);
 
-        Picasso.with(context) //
-                .load(Uri.fromFile(getThumbFile(currElem))) //
+        final Picasso picassoElem = Picasso.with(context);//
+        picassoElem.setIndicatorsEnabled(true);
+        picassoElem.load(Uri.fromFile(getThumbFile(currElem))) //
                 .placeholder(R.drawable.placeholder) //
                 .error(R.drawable.error) //
-                .fit() //
+                .config(Bitmap.Config.RGB_565)
+                .centerCrop()
+                .resize(300, 300)
                 .tag(context) //
                 .into(view);
 
@@ -112,12 +112,12 @@ final class AreaDocumentDisplayAdaptor extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return urls.size();
+        return docElems.size();
     }
 
     @Override
     public String getItem(int position) {
-        return urls.get(position);
+        return docElems.get(position).getAbsPath();
     }
 
     @Override

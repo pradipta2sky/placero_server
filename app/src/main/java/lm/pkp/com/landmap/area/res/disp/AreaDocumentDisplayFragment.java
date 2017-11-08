@@ -32,6 +32,5 @@ public class AreaDocumentDisplayFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         GridView gridView = (GridView) getView().findViewById(R.id.gridView);
         gridView.setAdapter(new AreaDocumentDisplayAdaptor(this.getContext()));
-        gridView.setOnScrollListener(new SampleScrollListener(this.getContext()));
     }
 }

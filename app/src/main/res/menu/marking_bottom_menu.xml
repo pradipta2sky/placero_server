@@ -3,19 +3,19 @@
 
     <item android:id="@+id/action_display_res"
         android:title="@string/action_drive_area"
-        android:icon="@drawable/ic_launcher"
+        android:icon="@drawable/briefcase"
         android:background="?android:attr/selectableItemBackground"
         app:showAsAction="always"/>
 
     <item android:id="@+id/action_drive_area"
         android:title="@string/action_drive_area"
-        android:icon="@drawable/drive_128"
+        android:icon="@drawable/upload"
         android:background="?android:attr/selectableItemBackground"
         app:showAsAction="always"/>
 
     <item android:id="@+id/action_share_area"
         android:title="@string/action_share_area"
-        android:icon="@drawable/share_icon"
+        android:icon="@drawable/networking"
         android:background="?android:attr/selectableItemBackground"
         app:showAsAction="always"/>
 
