@@ -31,7 +31,7 @@ public class AreaAddResourcesActivity extends AppCompatActivity{
         ab.setDisplayHomeAsUpEnabled(true);
         ab.show();
 
-        AreaActivityUtil.populateAreaElement(this);
+        AreaActivityUtil.INSTANCE.populateAreaElement(this);
 
         ListView resourceFileList = (ListView) findViewById(R.id.file_display_list);
         adaptor = new AreaAddResourceAdaptor(getApplicationContext(), R.id.file_display_list, areaResourcesDisplayList);

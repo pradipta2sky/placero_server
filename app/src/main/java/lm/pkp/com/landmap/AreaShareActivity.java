@@ -44,7 +44,7 @@ public class AreaShareActivity extends AppCompatActivity implements AsyncTaskCal
         ab.show();
 
         pdh = new PositionsDBHelper(getApplicationContext());
-        AreaActivityUtil.populateAreaElement(this);
+        AreaActivityUtil.INSTANCE.populateAreaElement(this);
 
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, new String[]{});
         final AutoCompleteTextView userIdView = (AutoCompleteTextView) findViewById(R.id.user_search_text);

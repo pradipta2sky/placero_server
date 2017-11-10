@@ -15,6 +15,7 @@ import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.user.UserDBHelper;
+import lm.pkp.com.landmap.util.AreaActivityUtil;
 
 /**
  * Created by USER on 10/20/2017.
@@ -22,15 +23,11 @@ import lm.pkp.com.landmap.user.UserDBHelper;
 public class AreaItemAdaptor extends ArrayAdapter {
     private ArrayList<AreaElement> items;
     private Context context;
-    private AreaDBHelper adh = null;
-    private UserDBHelper udh = null;
 
     public AreaItemAdaptor(Context context, int textViewResourceId, ArrayList<AreaElement> items) {
         super(context, textViewResourceId, items);
         this.context = context;
         this.items = items;
-        adh = new AreaDBHelper(context);
-        udh = new UserDBHelper(context);
     }
 
     @Override
@@ -39,41 +36,12 @@ public class AreaItemAdaptor extends ArrayAdapter {
         if (v == null) {
             LayoutInflater vi = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             v = vi.inflate(R.layout.area_element_row, null);
+        }else {
+            return v;
         }
 
         AreaElement ae = items.get(position);
-
-        TextView areaNameView = (TextView) v.findViewById(R.id.area_name_text);
-        String areaName = ae.getName();
-        if(areaName.length() > 25){
-            areaNameView.setText(areaName.substring(0,22).concat("..."));
-        }else {
-            areaNameView.setText(areaName);
-        }
-
-        TextView descText = (TextView) v.findViewById(R.id.area_desc_text);
-        String desc = ae.getDescription();
-        desc = "<b>Desc: </b>" + desc;
-        descText.setText(Html.fromHtml(desc));
-
-        TextView creatorText = (TextView) v.findViewById(R.id.area_creator_text);
-        creatorText.setText(Html.fromHtml("<b>Creator: </b>" + ae.getCreatedBy()));
-
-        TextView tagsText = (TextView) v.findViewById(R.id.area_tags_text);
-        String areaTags = ae.getTags();
-        String tagsContent = "<b>Address: </b>" + areaTags;
-        tagsText.setText(Html.fromHtml(tagsContent));
-
-        double areaMeasureSqFt = ae.getMeasureSqFt();
-        double areaMeasureAcre = areaMeasureSqFt / 43560;
-        double areaMeasureDecimals = areaMeasureSqFt / 436;
-        DecimalFormat df = new DecimalFormat("###.##");
-
-        TextView measureText = (TextView) v.findViewById(R.id.area_measure_text);
-        String content = "<b>Area: </b>" + df.format(areaMeasureSqFt) + " Sqft, " + df.format(areaMeasureAcre) +" Acre," +
-                df.format(areaMeasureDecimals) + " Decimals.";
-        measureText.setText(Html.fromHtml(content));
-
+        AreaActivityUtil.INSTANCE.populateAreaElement(v, ae);
         return v;
     }
 }

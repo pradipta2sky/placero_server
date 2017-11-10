@@ -19,6 +19,9 @@ import java.util.Locale;
 import java.util.UUID;
 
 import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.drive.DriveDBHelper;
+import lm.pkp.com.landmap.drive.DriveResource;
+import lm.pkp.com.landmap.google.geo.CommonGeoHelper;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.sync.LMSRestAsyncTask;
 import lm.pkp.com.landmap.user.UserContext;
@@ -151,27 +154,13 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         contentValues.put(AREA_COLUMN_CURRENT_OWNER, ae.getCurrentOwner());
         contentValues.put(AREA_COLUMN_CREATED_BY, ae.getCreatedBy());
 
-        try{
-            Location areaLocation = new Location("");
-            areaLocation.setLatitude(ae.getCenterLat());
-            areaLocation.setLongitude(ae.getCenterLon());
-
-            StringBuffer buf = new StringBuffer();
-            Geocoder geocoder = new Geocoder(localContext,Locale.ENGLISH);
-            List<Address> addresses = geocoder.getFromLocation(areaLocation.getLatitude(), areaLocation.getLongitude(), 1);
-            for (int i = 0; i < addresses.size(); i++) {
-                Address address = addresses.get(i);
-                int maxLine = address.getMaxAddressLineIndex();
-                for (int j = 0; j <= maxLine; j++) {
-                    buf.append(address.getAddressLine(j));
-                    if(j != maxLine){
-                        buf.append(",");
-                    }
-                }
-            }
-            contentValues.put(AREA_COLUMN_TAGS, buf.toString());
-        }catch (Exception e){
-            // Do nothing if fails.
+        final String areaTags = ae.getTags();
+        if(areaTags != null && !areaTags.trim().equals("")){
+            contentValues.put(AREA_COLUMN_TAGS, ae.getTags());
+        }else {
+            String address
+                    = CommonGeoHelper.INSTANCE.getAddressByGeoLocation(localContext, ae.getCenterLat(), ae.getCenterLon());
+            contentValues.put(AREA_COLUMN_TAGS, address);
         }
 
         db.update(AREA_TABLE_NAME, contentValues, AREA_COLUMN_UNIQUE_ID + " = ? ", new String[]{ae.getUniqueId()});
@@ -222,6 +211,7 @@ public class AreaDBHelper extends SQLiteOpenHelper {
     public ArrayList<AreaElement> getAllAreas() {
         ArrayList<AreaElement> allAreas = new ArrayList<AreaElement>();
         SQLiteDatabase db = this.getReadableDatabase();
+        final DriveDBHelper ddh = new DriveDBHelper(localContext);
         Cursor cursor = null;
         try {
             cursor = db.rawQuery("select * from " + AREA_TABLE_NAME, null);
@@ -243,7 +233,9 @@ public class AreaDBHelper extends SQLiteOpenHelper {
                     ae.setMeasureSqFt(new Double(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_MEASURE_SQ_FT))));
                     ae.setCurrentOwner(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_CURRENT_OWNER)));
 
+                    ae.getDriveResources().addAll(ddh.getDriveResourcesByAreaId(ae.getUniqueId()));
                     allAreas.add(ae);
+
                     cursor.moveToNext();
                 }
             }

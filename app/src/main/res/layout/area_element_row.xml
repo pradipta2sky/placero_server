@@ -1,63 +1,91 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:padding="15dip"
-    android:layout_marginBottom="5dp"
-    android:layout_marginLeft="10dp"
-    android:layout_marginRight="10dp"
-    android:orientation="vertical"
-    android:background="@color/iron">
+    android:layout_margin="15dp"
+    android:orientation="horizontal"
+    android:elevation="5dp"
+    android:weightSum="1"
+    android:background="@drawable/rounded_corner"
+    android:baselineAligned="false"
+    android:minHeight="100dp"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp">
 
-    <TextView
-        android:id="@+id/area_name_text"
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:layout_weight="0.80"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="fill_parent"
+            android:layout_height="128px"
+            android:id="@+id/area_default_img"
+            android:src="@drawable/app_icon1"
+            android:layout_gravity="center_vertical"/>
+
+    </LinearLayout>
+
+
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textSize="17sp"
-        android:textColor="#000000"
-        android:paddingLeft="10dp"
-        android:textStyle="bold"
-        android:layout_weight="1"
-        android:fontFamily="sans-serif-medium" />
+        android:orientation="vertical"
+        android:layout_weight="0.20">
 
-    <TextView
-        android:id="@+id/area_desc_text"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:textSize="13sp"
-        android:textColor="#000000"
-        android:paddingLeft="10dp"
-        android:layout_marginBottom="2dp"
-        android:layout_weight="1"/>
+        <TextView
+            android:id="@+id/area_name_text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textSize="17sp"
+            android:textColor="#000000"
+            android:paddingLeft="10dp"
+            android:textStyle="bold"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif-medium"
+            />
 
-    <TextView
-        android:id="@+id/area_tags_text"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:textSize="13sp"
-        android:textColor="#000000"
-        android:paddingLeft="10dp"
-        android:layout_weight="1"
-        />
+        <TextView
+            android:id="@+id/area_desc_text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:textColor="#000000"
+            android:paddingLeft="10dp"
+            android:layout_marginBottom="2dp"
+            android:layout_weight="1"/>
 
-    <TextView
-        android:id="@+id/area_measure_text"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:textSize="13sp"
-        android:textColor="#000000"
-        android:paddingLeft="10dp"
-        android:layout_weight="1"
-        />
+        <TextView
+            android:id="@+id/area_tags_text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:textColor="#000000"
+            android:paddingLeft="10dp"
+            android:layout_weight="1"
+            />
 
+        <TextView
+            android:id="@+id/area_measure_text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:textColor="#000000"
+            android:paddingLeft="10dp"
+            android:layout_weight="1"
+            />
 
-    <TextView
-        android:id="@+id/area_creator_text"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:textSize="13sp"
-        android:textColor="#000000"
-        android:paddingLeft="10dp"
-        android:layout_marginBottom="2dp"
-        android:layout_weight="1"/>
+        <TextView
+            android:id="@+id/area_creator_text"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:textColor="#000000"
+            android:paddingLeft="10dp"
+            android:layout_marginBottom="2dp"
+            android:layout_weight="1"/>
+
+    </LinearLayout>
 
 </LinearLayout>
+

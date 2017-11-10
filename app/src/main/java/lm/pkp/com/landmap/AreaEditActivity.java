@@ -31,7 +31,7 @@ public class AreaEditActivity extends AppCompatActivity{
 
         adb = new AreaDBHelper(getApplicationContext());
         ae = AreaContext.getInstance().getAreaElement();
-        AreaActivityUtil.populateAreaElement(this);
+        AreaActivityUtil.INSTANCE.populateAreaElement(this);
 
         Button saveButton = (Button)findViewById(R.id.area_edit_save_btn);
         saveButton.setOnClickListener(new View.OnClickListener() {
