@@ -96,12 +96,16 @@ public class AreaShareActivity extends AppCompatActivity{
                         if (inflatedStub.getVisibility() == View.VISIBLE) {
                             inflatedStub.setVisibility(View.GONE);
                         } else {
-                            inflatedStub.setVisibility(View.VISIBLE);
+                            if(checkedId == R.id.share_restricted_radio){
+                                inflatedStub.setVisibility(View.VISIBLE);
+                            }
                         }
                     }
                 } else {
-                    stub.setLayoutResource(R.layout.area_share_restricted);
-                    stub.inflate();
+                    if(checkedId == R.id.share_restricted_radio){
+                        stub.setLayoutResource(R.layout.area_share_restricted);
+                        stub.inflate();
+                    }
                 }
             }
         });
@@ -117,6 +121,7 @@ public class AreaShareActivity extends AppCompatActivity{
                 // target user should be a valid email.
                 if(!GeneralUtil.isValidEmail(targetUser)){
                     Toast.makeText(getApplicationContext(), "Please enter a valid email", Toast.LENGTH_SHORT).show();
+                    findViewById(R.id.splash_panel).setVisibility(View.GONE);
                     return;
                 }
 
@@ -124,7 +129,8 @@ public class AreaShareActivity extends AppCompatActivity{
                 View radioButton = roleGroup.findViewById(radioButtonID);
                 int idx = roleGroup.indexOfChild(radioButton);
 
-                final PermissionsDBHelper pmh = new PermissionsDBHelper(getApplicationContext(), new DatabaseUpdateCallback());
+                final PermissionsDBHelper pmh = new PermissionsDBHelper(getApplicationContext(),
+                        new DatabaseUpdateCallback());
                 if(idx == 0){
                     // For view insert view_only permission.
                     pmh.insertPermissionsToServer(targetUser, "view_only");
@@ -134,10 +140,10 @@ public class AreaShareActivity extends AppCompatActivity{
                 }else if(idx == 2){
                     View inflatedStub = findViewById(R.id.share_details_stub_restricted);
                     // For restricted read all the values.
-                    ArrayList<View> focusableViews = inflatedStub.getFocusables(View.FOCUS_FORWARD);
+                    ArrayList<View> touchableViews = inflatedStub.getTouchables();
                     List<String> checkedFunctions = new ArrayList<String>();
-                    for (int i = 0; i < focusableViews.size(); i++) {
-                        View actualView = focusableViews.get(i);
+                    for (int i = 0; i < touchableViews.size(); i++) {
+                        View actualView = touchableViews.get(i);
                         if(actualView instanceof CheckBox) {
                             final CheckBox checkBox = (CheckBox) actualView;
                             if(checkBox.isChecked()){

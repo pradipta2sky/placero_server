@@ -82,10 +82,12 @@ public class PermissionsDBHelper extends SQLiteOpenHelper {
     private JSONObject preparePostParams(String queryType, String targetUser, String functionCodes) {
         JSONObject postParams = new JSONObject();
         final AreaElement areaElement = AreaContext.getInstance().getAreaElement();
+        final UserElement userElement = UserContext.getInstance().getUserElement();
         try {
             postParams.put("requestType", "ShareArea");
             postParams.put("query_type", queryType);
-            postParams.put("user_id", targetUser);
+            postParams.put("source_user", userElement.getEmail());
+            postParams.put("target_user", targetUser);
             postParams.put("area_id", areaElement.getUniqueId());
             postParams.put("function_codes",functionCodes);
         } catch (JSONException e) {
