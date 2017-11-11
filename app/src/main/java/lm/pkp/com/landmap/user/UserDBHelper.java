@@ -12,6 +12,7 @@ import org.json.JSONObject;
 
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
+import lm.pkp.com.landmap.permission.PermissionsDBHelper;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.sync.LMSRestAsyncTask;
 import lm.pkp.com.landmap.util.AndroidSystemUtil;
@@ -45,9 +46,11 @@ public class UserDBHelper extends SQLiteOpenHelper {
                         USER_COLUMN_PHOTO_URL + " text, " +
                         USER_COLUMN_AUTH_SYS_ID + " text )"
         );
+
         new AreaDBHelper(localContext).onCreate(db);
         new PositionsDBHelper(localContext).onCreate(db);
         new DriveDBHelper(localContext).onCreate(db);
+        new PermissionsDBHelper(localContext).onCreate(db);
     }
 
     @Override

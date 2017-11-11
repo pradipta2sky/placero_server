@@ -19,6 +19,8 @@ import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
+import lm.pkp.com.landmap.permission.PermissionElement;
+import lm.pkp.com.landmap.permission.PermissionsDBHelper;
 import lm.pkp.com.landmap.position.PositionElement;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
 
@@ -32,6 +34,8 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
     private AreaDBHelper adh = null;
     private PositionsDBHelper pdh = null;
     private DriveDBHelper ddh = null;
+    private PermissionsDBHelper pmh = null;
+
     private AsyncTaskCallback callback = null;
 
     public UserAreaDetailsLoadTask(Context appContext) {
@@ -39,6 +43,7 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
         adh = new AreaDBHelper(this.localContext);
         pdh = new PositionsDBHelper(this.localContext);
         ddh = new DriveDBHelper(this.localContext);
+        pmh = new PermissionsDBHelper(this.localContext);
     }
 
     protected void onPreExecute() {
@@ -139,6 +144,17 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
                     ddh.insertResourceFromServer(dr);
                 }
 
+                JSONArray permissionsArr = (JSONArray)responseObj.get("permissions");
+                for (int e = 0; e < permissionsArr.length(); e++) {
+                    JSONObject permissionObj = (JSONObject) permissionsArr.get(e);
+
+                    PermissionElement pe = new PermissionElement();
+                    pe.setUserId(permissionObj.getString("user_id"));
+                    pe.setAreaId(permissionObj.getString("area_id"));
+                    pe.setFunctionCode(permissionObj.getString("function_id"));
+
+                    pmh.insertPermission(pe);
+                }
             }
         }catch (Exception e){
             e.printStackTrace();

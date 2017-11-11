@@ -4,9 +4,12 @@ import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import lm.pkp.com.landmap.drive.DriveResource;
+import lm.pkp.com.landmap.permission.PermissionElement;
 import lm.pkp.com.landmap.position.PositionElement;
 
 /**
@@ -29,6 +32,8 @@ public class AreaElement implements Serializable{
     private List<PositionElement> positions = new ArrayList<>();
 
     private List<DriveResource> driveResources = new ArrayList<>();
+
+    private Map<String, PermissionElement> permissions = new HashMap<>();
 
     public double getMeasureSqFt() {
         return measureSqFt;
@@ -120,5 +125,9 @@ public class AreaElement implements Serializable{
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public Map<String, PermissionElement> getPermissions() {
+        return this.permissions;
     }
 }

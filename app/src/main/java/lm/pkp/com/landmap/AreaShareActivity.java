@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,12 +12,15 @@ import android.view.ViewStub;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -25,16 +29,17 @@ import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
+import lm.pkp.com.landmap.permission.PermissionsDBHelper;
 import lm.pkp.com.landmap.position.PositionElement;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.user.UserInfoSearchAsyncTask;
 import lm.pkp.com.landmap.util.AreaActivityUtil;
+import lm.pkp.com.landmap.util.GeneralUtil;
 
-public class AreaShareActivity extends AppCompatActivity implements AsyncTaskCallback{
+public class AreaShareActivity extends AppCompatActivity{
 
-    private AreaDBHelper adh = null;
-    private ArrayAdapter<String> adapter = null;
+    private ArrayAdapter<String> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +75,7 @@ public class AreaShareActivity extends AppCompatActivity implements AsyncTaskCal
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-                searcherTask.setCompletionCallback(AreaShareActivity.this);
+                searcherTask.setCompletionCallback(new UserInfoCallBack());
                 searcherTask.execute(searchParams);
             }
 
@@ -79,22 +84,22 @@ public class AreaShareActivity extends AppCompatActivity implements AsyncTaskCal
             }
         });
 
-        RadioGroup radioGroup = (RadioGroup) findViewById(R.id.area_share_role_group);
-        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        final RadioGroup roleGroup = (RadioGroup) findViewById(R.id.area_share_role_group);
+        roleGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 ViewStub stub = (ViewStub) findViewById(R.id.share_details_stub);
-                if(stub == null){
+                if (stub == null) {
                     // View stub is already inflated
                     View inflatedStub = findViewById(R.id.share_details_stub_restricted);
-                    if(inflatedStub != null){
-                        if(inflatedStub.getVisibility() == View.VISIBLE){
+                    if (inflatedStub != null) {
+                        if (inflatedStub.getVisibility() == View.VISIBLE) {
                             inflatedStub.setVisibility(View.GONE);
-                        }else {
+                        } else {
                             inflatedStub.setVisibility(View.VISIBLE);
                         }
                     }
-                }else {
+                } else {
                     stub.setLayoutResource(R.layout.area_share_restricted);
                     stub.inflate();
                 }
@@ -105,22 +110,44 @@ public class AreaShareActivity extends AppCompatActivity implements AsyncTaskCal
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // This will change. There will no longer be an area copy.
                 findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
 
-                AreaElement copiedArea = AreaContext.getInstance().getAreaElement().copy();
-                copiedArea.setCreatedBy(userIdView.getText().toString());
-                copiedArea.setUniqueId(UUID.randomUUID().toString());
-                adh.insertAreaToServer(copiedArea);
-
-                List<PositionElement> positions = copiedArea.getPositions();
-                for (int i = 0; i < positions.size(); i++) {
-                    PositionElement pe = positions.get(i);
-                    pe.setUniqueId(UUID.randomUUID().toString());
-                    pe.setUniqueAreaId(copiedArea.getUniqueId());
-                    pdh.insertPositionToServer(pe);
+                final AutoCompleteTextView userIdView = (AutoCompleteTextView) findViewById(R.id.user_search_text);
+                final String targetUser = userIdView.getText().toString();
+                // target user should be a valid email.
+                if(!GeneralUtil.isValidEmail(targetUser)){
+                    Toast.makeText(getApplicationContext(), "Please enter a valid email", Toast.LENGTH_SHORT).show();
+                    return;
                 }
-                finish();
+
+                int radioButtonID = roleGroup.getCheckedRadioButtonId();
+                View radioButton = roleGroup.findViewById(radioButtonID);
+                int idx = roleGroup.indexOfChild(radioButton);
+
+                final PermissionsDBHelper pmh = new PermissionsDBHelper(getApplicationContext(), new DatabaseUpdateCallback());
+                if(idx == 0){
+                    // For view insert view_only permission.
+                    pmh.insertPermissionsToServer(targetUser, "view_only");
+                }else if(idx == 1){
+                    // For Full control insert full_control permission.
+                    pmh.insertPermissionsToServer(targetUser, "full_control");
+                }else if(idx == 2){
+                    View inflatedStub = findViewById(R.id.share_details_stub_restricted);
+                    // For restricted read all the values.
+                    ArrayList<View> focusableViews = inflatedStub.getFocusables(View.FOCUS_FORWARD);
+                    List<String> checkedFunctions = new ArrayList<String>();
+                    for (int i = 0; i < focusableViews.size(); i++) {
+                        View actualView = focusableViews.get(i);
+                        if(actualView instanceof CheckBox) {
+                            final CheckBox checkBox = (CheckBox) actualView;
+                            if(checkBox.isChecked()){
+                                checkedFunctions.add(checkBox.getTag().toString());
+                            }
+                        }
+                    }
+                    String joinedFunctions = TextUtils.join(",", checkedFunctions);
+                    pmh.insertPermissionsToServer(targetUser,joinedFunctions);
+                }
             }
         });
     }
@@ -141,29 +168,40 @@ public class AreaShareActivity extends AppCompatActivity implements AsyncTaskCal
             finish();
     }
 
-    @Override
-    public void taskCompleted(Object result) {
-        try {
-            String userArray = result.toString();
-            String currUserEmail = UserContext.getInstance().getUserElement().getEmail();
-            adapter.clear();
+    private class UserInfoCallBack implements AsyncTaskCallback{
 
-            if(userArray.trim().equalsIgnoreCase("[]")){
-                // do nothing.
-            }else {
-                JSONArray responseArr = new JSONArray(userArray);
-                for (int i = 0; i < responseArr.length(); i++) {
-                    JSONObject responseObj = (JSONObject) responseArr.get(i);
-                    String emailStr = responseObj.getString("email");
-                    String displayName = responseObj.getString("display_name");
-                    if(!currUserEmail.equalsIgnoreCase(emailStr)){
-                        adapter.add(emailStr);
+        @Override
+        public void taskCompleted(Object result) {
+            try {
+                String userArray = result.toString();
+                String currUserEmail = UserContext.getInstance().getUserElement().getEmail();
+                adapter.clear();
+
+                if(!userArray.trim().equalsIgnoreCase("[]")){
+                    JSONArray responseArr = new JSONArray(userArray);
+                    for (int i = 0; i < responseArr.length(); i++) {
+                        JSONObject responseObj = (JSONObject) responseArr.get(i);
+                        String emailStr = responseObj.getString("email");
+                        if(!currUserEmail.equalsIgnoreCase(emailStr)){
+                            adapter.add(emailStr);
+                        }
                     }
+                    adapter.notifyDataSetChanged();
                 }
-                adapter.notifyDataSetChanged();
+            }catch (Exception e){
+                e.printStackTrace();
             }
-        }catch (Exception e){
-            e.printStackTrace();
         }
     }
+
+
+    private class DatabaseUpdateCallback implements AsyncTaskCallback{
+
+        @Override
+        public void taskCompleted(Object result) {
+            finish();
+        }
+    }
+
+
 }
