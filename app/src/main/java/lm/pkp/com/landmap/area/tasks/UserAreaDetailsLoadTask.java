@@ -43,7 +43,7 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
         adh = new AreaDBHelper(this.localContext);
         pdh = new PositionsDBHelper(this.localContext);
         ddh = new DriveDBHelper(this.localContext);
-        pmh = new PermissionsDBHelper(this.localContext);
+        pmh = new PermissionsDBHelper(this.localContext, null);
     }
 
     protected void onPreExecute() {
