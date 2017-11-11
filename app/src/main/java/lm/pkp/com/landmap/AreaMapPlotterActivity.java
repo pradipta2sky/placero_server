@@ -73,12 +73,14 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
         googleMap.setMyLocationEnabled(true);
         googleMap.setBuildingsEnabled(true);
 
+
         UiSettings settings = googleMap.getUiSettings();
         settings.setMapToolbarEnabled(true);
         settings.setAllGesturesEnabled(true);
         settings.setCompassEnabled(true);
         settings.setZoomControlsEnabled(true);
         settings.setZoomGesturesEnabled(true);
+
 
         final MapWrapperLayout mapWrapperLayout = (MapWrapperLayout)findViewById(R.id.map_relative_layout);
         mapWrapperLayout.init(googleMap, getPixelsFromDp(getApplicationContext(), 39 + 20));
@@ -178,10 +180,6 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
         centerMarker = googleMap.addMarker(markerOptions);
         centerMarker.setVisible(true);
         centerMarker.setTitle("Center Marker, \nLat: " + latAvg + ",Long: " + lonAvg);
-        BitmapDrawable bd = (BitmapDrawable)getResources().getDrawable(R.drawable.green_map_marker_icon);
-        Bitmap b = bd.getBitmap();
-        Bitmap smallIcon = b.createScaledBitmap(b, 128, 128, false);
-        centerMarker.setIcon(BitmapDescriptorFactory.fromBitmap(smallIcon));
     }
 
     public Marker drawMarkerUsingPosition(final PositionElement pe) {
@@ -244,6 +242,9 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
 
     @Override
     public void onBackPressed() {
+        googleMap.clear();
+        googleMap = null;
+
         Intent positionMarkerIntent = new Intent(AreaMapPlotterActivity.this, PositionMarkerActivity.class);
         startActivity(positionMarkerIntent);
     }

@@ -85,6 +85,7 @@ public class AreaActivityUtil {
                 picassoElem.load(resLocalPath) //
                         .tag(view.getContext()) //
                         .error(R.drawable.app_icon1)
+                        .resize(128, 128)
                         .into(areaImg, new com.squareup.picasso.Callback() {
                             @Override
                             public void onSuccess() {

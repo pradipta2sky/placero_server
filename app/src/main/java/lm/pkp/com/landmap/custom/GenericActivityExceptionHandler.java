@@ -25,7 +25,7 @@ public class GenericActivityExceptionHandler implements Thread.UncaughtException
 
     @Override
     public void uncaughtException(Thread thread, Throwable ex) {
-        StringBuffer content = new StringBuffer();
+        final StringBuffer content = new StringBuffer();
         content.append("\n\n Exception trace ! \n");
 
         System.out.println("\n\n Exception trace ! \n");
@@ -33,6 +33,7 @@ public class GenericActivityExceptionHandler implements Thread.UncaughtException
         for (int i = 0; i < exceptionTrace.length ; i++) {
             System.out.println(exceptionTrace[i]);
             content.append(exceptionTrace[i].toString());
+            content.append("\n");
         }
 
         content.append("\n\n Thread trace ! \n");
@@ -41,9 +42,15 @@ public class GenericActivityExceptionHandler implements Thread.UncaughtException
         for (int i = 0; i < threadStackTrace.length ; i++) {
             System.out.println(threadStackTrace[i]);
             content.append(threadStackTrace[i].toString());
+            content.append("\n");
         }
 
-        sendEmail(content.toString());
+        Runnable r = new Runnable() {
+            @Override
+            public void run() {
+                sendEmail(content.toString());
+            }
+        };
 
         if(ex instanceof  UserUnavailableException){
             // Check why the user went off. ?? Do something here.
