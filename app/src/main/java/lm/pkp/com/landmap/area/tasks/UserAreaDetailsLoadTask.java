@@ -94,13 +94,12 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
                 ae.setName(areaObj.getString("name"));
                 ae.setCreatedBy(areaObj.getString("created_by"));
                 ae.setDescription(areaObj.getString("description"));
-                ae.setCenterLat(new Double((String) areaObj.get("center_lat")));
-                ae.setCenterLon(new Double((String) areaObj.get("center_lon")));
+                ae.setCenterLat(areaObj.getDouble("center_lat"));
+                ae.setCenterLon(areaObj.getDouble("center_lon"));
                 ae.setUniqueId(areaObj.getString("unique_id"));
-                ae.setMeasureSqFt(new Double((String) areaObj.get("measure_sqft")));
-                ae.setOwnershipType("self");
-                ae.setCurrentOwner(areaObj.getString("curr_own"));
-                ae.setTags(areaObj.getString("tags"));
+                ae.setMeasureSqFt(areaObj.getDouble("measure_sqft"));
+                ae.setAddress(areaObj.getString("address"));
+                ae.setType(areaObj.getString("type"));
 
                 adh.insertAreaFromServer(ae);
 
@@ -113,8 +112,8 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
                     pe.setUniqueAreaId((String) positionObj.get("unique_area_id"));
                     pe.setName((String) positionObj.get("name"));
                     pe.setDescription((String) positionObj.get("description"));
-                    pe.setLat(new Double((String) positionObj.get("lat")));
-                    pe.setLon(new Double((String) positionObj.get("lon")));
+                    pe.setLat(positionObj.getDouble("lat"));
+                    pe.setLon(positionObj.getDouble("lon"));
                     pe.setTags((String) positionObj.get("tags"));
 
                     pdh.insertPositionFromServer(pe);

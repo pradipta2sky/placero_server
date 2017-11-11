@@ -36,17 +36,24 @@ public class AreaEditActivity extends AppCompatActivity{
         ae = AreaContext.getInstance().getAreaElement();
         AreaActivityUtil.INSTANCE.populateAreaElement(this);
 
+        final TextView nameText = (TextView)findViewById(R.id.area_name_edit);
+        nameText.setText(ae.getName());
+
+        final TextView descText = (TextView)findViewById(R.id.area_desc_edit);
+        descText.setText(ae.getDescription());
+
+        final TextView addressText = (TextView)findViewById(R.id.area_address_edit);
+        addressText.setText(ae.getAddress());
+
         Button saveButton = (Button)findViewById(R.id.area_edit_save_btn);
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
 
-                String nameText = ((TextView)findViewById(R.id.area_name_edit)).getText().toString();
-                ae.setName(nameText);
-
-                String descText = ((TextView)findViewById(R.id.area_desc_edit)).getText().toString();
-                ae.setDescription(descText);
+                ae.setName(nameText.getText().toString());
+                ae.setDescription(descText.getText().toString());
+                ae.setAddress(addressText.getText().toString());
 
                 adb.updateAreaNonGeo(ae);
                 findViewById(R.id.splash_panel).setVisibility(View.INVISIBLE);
@@ -55,6 +62,8 @@ public class AreaEditActivity extends AppCompatActivity{
                 startActivity(positionMarkerIntent);
             }
         });
+
+
     }
 
     @Override

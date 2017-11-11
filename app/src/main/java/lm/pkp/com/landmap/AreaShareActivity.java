@@ -7,9 +7,12 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewStub;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -31,7 +34,6 @@ import lm.pkp.com.landmap.util.AreaActivityUtil;
 public class AreaShareActivity extends AppCompatActivity implements AsyncTaskCallback{
 
     private AreaDBHelper adh = null;
-    private PositionsDBHelper pdh = null;
     private ArrayAdapter<String> adapter = null;
 
     @Override
@@ -46,7 +48,7 @@ public class AreaShareActivity extends AppCompatActivity implements AsyncTaskCal
         ab.setDisplayHomeAsUpEnabled(true);
         ab.show();
 
-        pdh = new PositionsDBHelper(getApplicationContext());
+        final PositionsDBHelper pdh = new PositionsDBHelper(getApplicationContext());
         AreaActivityUtil.INSTANCE.populateAreaElement(this);
 
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, new String[]{});
@@ -77,14 +79,37 @@ public class AreaShareActivity extends AppCompatActivity implements AsyncTaskCal
             }
         });
 
+        RadioGroup radioGroup = (RadioGroup) findViewById(R.id.area_share_role_group);
+        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                ViewStub stub = (ViewStub) findViewById(R.id.share_details_stub);
+                if(stub == null){
+                    // View stub is already inflated
+                    View inflatedStub = findViewById(R.id.share_details_stub_restricted);
+                    if(inflatedStub != null){
+                        if(inflatedStub.getVisibility() == View.VISIBLE){
+                            inflatedStub.setVisibility(View.GONE);
+                        }else {
+                            inflatedStub.setVisibility(View.VISIBLE);
+                        }
+                    }
+                }else {
+                    stub.setLayoutResource(R.layout.area_share_restricted);
+                    stub.inflate();
+                }
+            }
+        });
+
         Button saveButton = (Button)findViewById(R.id.area_share_save_btn);
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                // This will change. There will no longer be an area copy.
                 findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
 
                 AreaElement copiedArea = AreaContext.getInstance().getAreaElement().copy();
-                copiedArea.setCurrentOwner(userIdView.getText().toString());
+                copiedArea.setCreatedBy(userIdView.getText().toString());
                 copiedArea.setUniqueId(UUID.randomUUID().toString());
                 adh.insertAreaToServer(copiedArea);
 
@@ -95,7 +120,6 @@ public class AreaShareActivity extends AppCompatActivity implements AsyncTaskCal
                     pe.setUniqueAreaId(copiedArea.getUniqueId());
                     pdh.insertPositionToServer(pe);
                 }
-                findViewById(R.id.splash_panel).setVisibility(View.INVISIBLE);
                 finish();
             }
         });

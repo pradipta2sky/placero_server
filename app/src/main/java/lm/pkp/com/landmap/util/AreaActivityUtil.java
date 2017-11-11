@@ -55,7 +55,7 @@ public class AreaActivityUtil {
         creatorText.setText(Html.fromHtml("<b>Creator: </b>" + ae.getCreatedBy()));
 
         TextView tagsText = (TextView) view.findViewById(R.id.area_tags_text);
-        String areaTags = ae.getTags();
+        String areaTags = ae.getAddress();
         String tagsContent = "<b>Address: </b>" + areaTags;
         tagsText.setText(Html.fromHtml(tagsContent));
 

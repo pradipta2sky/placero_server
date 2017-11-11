@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:padding="5dp"
+    android:layout_margin="10dp"
     android:weightSum="1">
 
     <include layout="@layout/area_element_row"
@@ -12,31 +12,69 @@
         android:layout_weight="0.10"
         android:layout_marginTop="5dip" />
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
+    <LinearLayout
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="18dp"
-        android:layout_marginBottom="8dp">
-        <EditText android:id="@+id/area_name_edit"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:inputType="text"
-            android:hint="Name"
-            android:textSize="21sp"/>
-    </android.support.design.widget.TextInputLayout>
+        android:orientation="vertical"
+        android:layout_margin="25dp">
 
-    <android.support.design.widget.TextInputLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="18dp"
-        android:layout_marginBottom="8dp">
-        <EditText android:id="@+id/area_desc_edit"
+        <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:inputType="text"
-            android:hint="Description"
-            android:textSize="21sp"/>
-    </android.support.design.widget.TextInputLayout>
+            android:layout_marginTop="18dp"
+            android:layout_marginBottom="8dp">
+            <EditText android:id="@+id/area_name_edit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:hint="Name"
+                android:textSize="18sp"/>
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:layout_marginBottom="8dp">
+            <EditText android:id="@+id/area_desc_edit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:hint="Description"
+                android:textSize="18sp"/>
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:layout_marginBottom="8dp">
+            <EditText android:id="@+id/area_address_edit"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="text"
+                android:hint="Address"
+                android:textSize="18sp"/>
+        </android.support.design.widget.TextInputLayout>
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:weightSum="1"
+            android:layout_weight="0.4"
+            android:layout_marginTop="20dp">
+
+            <CheckBox
+                android:id="@+id/make_area_public"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Make place public !!. Anyone can find and view your place. Public places are view only no changes are possible."
+                android:checked="false" />
+
+        </LinearLayout>
+
+    </LinearLayout>
 
     <Button
         android:id="@+id/area_edit_save_btn"

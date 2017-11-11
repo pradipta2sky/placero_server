@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="5dp"
+    android:layout_marginTop="10dp"
+    android:weightSum="1">
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/rounded_corner"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:padding="5dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|top"
+            android:text="Attributes"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="17sp"
+            android:textColor="#000000"
+            android:paddingLeft="10dp"
+            android:textStyle="bold"/>
+        <CheckBox
+            android:id="@+id/attribute_change_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Change place name."
+            android:checked="false"
+            android:layout_marginTop="5dp"/>
+        <CheckBox
+            android:id="@+id/attribute_change_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Change place description."
+            android:checked="false"
+            android:layout_marginTop="5dp"/>
+        <CheckBox
+            android:id="@+id/attribute_change_address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Change place address"
+            android:checked="false"
+            android:layout_marginTop="5dp"/>
+        <CheckBox
+            android:id="@+id/attribute_make_public"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Make place public"
+            android:checked="false"
+            android:layout_marginTop="5dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/rounded_corner"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:padding="5dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|top"
+            android:text="Positioning"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="17sp"
+            android:textColor="#000000"
+            android:paddingLeft="10dp"
+            android:textStyle="bold"/>
+        <CheckBox
+            android:id="@+id/mark_position"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add positions to place. This will impact the plotting, area measurement, location and navigation."
+            android:checked="false"
+            android:layout_marginTop="10dp"/>
+        <CheckBox
+            android:id="@+id/remove_position"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Remove place position. This will impact the plotting, area measurement, location and navigation."
+            android:checked="false"
+            android:layout_marginTop="10dp"/>
+        <CheckBox
+            android:id="@+id/move_position"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Move position marker. This will impact the plotting, area measurement, location and navigation."
+            android:checked="false"
+            android:layout_marginTop="10dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/rounded_corner"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:padding="5dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|top"
+            android:text="Sharing"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="17sp"
+            android:textColor="#000000"
+            android:paddingLeft="10dp"
+            android:textStyle="bold"/>
+        <CheckBox
+            android:id="@+id/share_area_ro"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Share place in view only mode."
+            android:checked="false"
+            android:layout_marginTop="5dp"/>
+        <CheckBox
+            android:id="@+id/share_area_rw"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Share place with your permissions."
+            android:checked="false"
+            android:layout_marginTop="5dp"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/rounded_corner"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp"
+        android:padding="5dp">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left|top"
+            android:text="Resources"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="17sp"
+            android:textColor="#000000"
+            android:paddingLeft="10dp"
+            android:textStyle="bold"/>
+        <CheckBox
+            android:id="@+id/add_resources"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add resources to place. i.e. pictures, videos, documents."
+            android:checked="false"
+            android:layout_marginTop="10dp"/>
+        <CheckBox
+            android:id="@+id/remove_resources"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Remove place resources. i.e. pictures, videos, documents."
+            android:checked="false"
+            android:layout_marginTop="10dp"/>
+    </LinearLayout>
+
+</LinearLayout>

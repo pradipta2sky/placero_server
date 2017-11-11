@@ -17,35 +17,18 @@ public class AreaElement implements Serializable{
     private String name;
     private String description;
     private String createdBy;
-    private String ownershipType;
-    private String currentOwner;
+    private String type;
 
     private double centerLat = 0.0;
     private double centerLon = 0.0;
     private double measureSqFt = 0.0;
 
     private String uniqueId;
-    private String tags;
+    private String address;
 
     private List<PositionElement> positions = new ArrayList<>();
 
     private List<DriveResource> driveResources = new ArrayList<>();
-
-    public String getOwnershipType() {
-        return ownershipType;
-    }
-
-    public String getCurrentOwner() {
-        return currentOwner;
-    }
-
-    public void setCurrentOwner(String currentOwner) {
-        this.currentOwner = currentOwner;
-    }
-
-    public void setOwnershipType(String ownershipType) {
-        this.ownershipType = ownershipType;
-    }
 
     public double getMeasureSqFt() {
         return measureSqFt;
@@ -53,14 +36,6 @@ public class AreaElement implements Serializable{
 
     public void setMeasureSqFt(double measureSqFt) {
         this.measureSqFt = measureSqFt;
-    }
-
-    public String getTags() {
-        return tags;
-    }
-
-    public void setTags(String tags) {
-        this.tags = tags;
     }
 
     public String getCreatedBy() {
@@ -129,5 +104,21 @@ public class AreaElement implements Serializable{
 
     public void setDriveResources(List<DriveResource> driveResources) {
         this.driveResources = driveResources;
+    }
+
+    public String getType() {
+        return this.type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public String getAddress() {
+        return this.address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

@@ -1,166 +1,147 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:weightSum="1">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
 
-    <include layout="@layout/area_element_row"
-        android:layout_height="wrap_content"
-        android:layout_width="fill_parent" />
-
-    <LinearLayout
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:padding="20dp"
         android:orientation="vertical"
-        android:weightSum="5">
+        android:weightSum="1">
+
+        <include
+            layout="@layout/area_element_row"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" />
 
         <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="1"
-            android:layout_weight="0.3">
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="20dp"
+            android:weightSum="5">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:text="Email"
-                android:textStyle="bold"
-                android:textSize="18sp"
-                android:layout_weight="0.3"
-                />
-
-
-            <AutoCompleteTextView
-                android:id="@+id/user_search_text"
-                android:layout_width="wrap_content"
-                android:minWidth="100dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="0.6"
-                android:layout_gravity="top"/>
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="1"
-            android:layout_weight="0.1"
-            android:layout_marginTop="20dp">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="**Only Gmail and existing users can be shared"
-                android:id="@+id/textView"
-                android:layout_weight="0.3" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="1"
-            android:layout_weight="0.4"
-            android:layout_marginTop="20dp">
-
-            <CheckBox
-                android:id="@+id/share_area_resources"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Share resources i.e pictures, videos, documents"
-                android:checked="true" />
-
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="1"
-            android:layout_weight="0.4"
-            android:layout_marginTop="20dp">
-
-            <CheckBox
-                android:id="@+id/make_area_public"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Make are public i.e. Anyone can find and view your area. Public areas are read only."
-                android:checked="false" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="1"
-            android:layout_weight="0.4"
-            android:layout_gravity="bottom"
-            android:layout_marginTop="20dp">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="fill_parent"
-                android:text="Role"
-                android:textStyle="bold"
-                android:textSize="18sp"
-                android:layout_weight="0.3"
-                />
-
-            <RadioGroup
-                android:id="@+id/area_share_role"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.3"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:weightSum="1">
 
-                <RadioButton
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="0.3"
+                    android:text="Email"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <AutoCompleteTextView
+                    android:id="@+id/user_search_text"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="View Only"
-                    android:id="@+id/radioButton"
-                    android:checked="true"/>
+                    android:layout_gravity="top"
+                    android:layout_weight="0.6"
+                    android:minWidth="100dp" />
+            </LinearLayout>
 
-                <RadioButton
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_weight="0.1"
+                android:orientation="horizontal"
+                android:weightSum="1">
+
+                <TextView
+                    android:id="@+id/textView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Modify"
-                    android:id="@+id/radioButton2"
-                    android:layout_gravity="right" />
+                    android:layout_weight="0.3"
+                    android:text="**Only existing users can be shared"
+                    android:textAppearance="?android:attr/textAppearanceSmall" />
+            </LinearLayout>
 
-            </RadioGroup>
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom"
+                android:layout_marginTop="20dp"
+                android:layout_weight="0.4"
+                android:orientation="horizontal"
+                android:weightSum="1">
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="0.3"
+                    android:text="Role"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <RadioGroup
+                    android:id="@+id/area_share_role_group"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.3"
+                    android:orientation="horizontal">
+
+                    <RadioButton
+                        android:id="@+id/share_view_radio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="View" />
+
+                    <RadioButton
+                        android:id="@+id/share_full_radio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="Everything" />
+
+                    <RadioButton
+                        android:id="@+id/share_restricted_radio"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="right"
+                        android:text="Restricted" />
+                </RadioGroup>
+            </LinearLayout>
+
+            <ViewStub
+                android:id="@+id/share_details_stub"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:inflatedId="@+id/share_details_stub_restricted" />
 
         </LinearLayout>
 
         <Button
             android:id="@+id/area_share_save_btn"
             android:layout_width="fill_parent"
-            android:layout_height="10dp"
+            android:layout_height="0dp"
             android:layout_gravity="bottom|center_horizontal"
-            android:text="Save"
+            android:layout_marginTop="20dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_marginBottom="30dp"
             android:layout_weight="1"
-            android:layout_marginTop="20dp"/>
+            android:text="Save" />
+
+        <RelativeLayout
+            android:id="@+id/splash_panel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true" />
+        </RelativeLayout>
 
     </LinearLayout>
 
-
-    <RelativeLayout
-        android:id="@+id/splash_panel"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:visibility="gone">
-
-        <ProgressBar
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:indeterminate="true" />
-    </RelativeLayout>
-
-</LinearLayout>
+</ScrollView>
