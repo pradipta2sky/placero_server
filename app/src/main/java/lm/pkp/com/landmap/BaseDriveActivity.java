@@ -12,6 +12,8 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.drive.Drive;
 
+import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
+
 public abstract class BaseDriveActivity extends Activity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener {
@@ -25,6 +27,8 @@ public abstract class BaseDriveActivity extends Activity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        new GenericActivityExceptionHandler(this);
+
         setContentView(R.layout.activity_generic_wait);
     }
 

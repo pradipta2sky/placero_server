@@ -25,6 +25,7 @@ import java.util.UUID;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.custom.LocationPositionReceiver;
 import lm.pkp.com.landmap.position.PositionElement;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
@@ -42,6 +43,8 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        new GenericActivityExceptionHandler(this);
+
         setContentView(R.layout.activity_position_marker);
         getSupportActionBar().hide();
 

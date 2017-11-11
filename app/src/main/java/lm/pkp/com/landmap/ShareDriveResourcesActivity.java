@@ -38,6 +38,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import lm.pkp.com.landmap.area.AreaContext;
+import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.drive.DriveResource;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
@@ -59,6 +60,8 @@ public class ShareDriveResourcesActivity extends Activity implements EasyPermiss
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        new GenericActivityExceptionHandler(this);
+
         Bundle extras = getIntent().getExtras();
         if(extras != null){
             shareToUser = extras.getString("share_to_user");

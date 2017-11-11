@@ -21,6 +21,7 @@ import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
+import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.position.PositionElement;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.user.UserContext;
@@ -36,6 +37,8 @@ public class AreaShareActivity extends AppCompatActivity implements AsyncTaskCal
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        new GenericActivityExceptionHandler(this);
+
         setContentView(R.layout.activity_area_share);
 
         ActionBar ab = getSupportActionBar();

@@ -5,6 +5,7 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.lib.fe.FileSearcherFragment;
 
 public class AreaDocumentChooserActivity extends AppCompatActivity {
@@ -13,6 +14,8 @@ public class AreaDocumentChooserActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        new GenericActivityExceptionHandler(this);
+
         setContentView(R.layout.activity_area_doc_chooser);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.fc_toolbar);

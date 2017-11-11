@@ -66,6 +66,7 @@ dependencies {
         exclude group: 'com.android.support'
     }
     compile 'com.tom_roush:pdfbox-android:1.8.9.1'
+    compile 'javax.mail:mail:1.4.7'
 }
 
 apply plugin: 'com.google.gms.google-services'

@@ -35,6 +35,7 @@ import java.util.UUID;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.custom.MapWrapperLayout;
 import lm.pkp.com.landmap.custom.OnInfoWindowElemTouchListener;
 import lm.pkp.com.landmap.position.PositionElement;
@@ -56,6 +57,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        new GenericActivityExceptionHandler(this);
 
         setContentView(R.layout.activity_area_plotter);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()

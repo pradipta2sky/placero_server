@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
+import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.sync.LocalDataRefresher;
 import lm.pkp.com.landmap.sync.LocalFolderStructureManager;
 
@@ -17,7 +18,10 @@ public class SplashActivity extends Activity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        new GenericActivityExceptionHandler(this);
+
         setContentView(R.layout.activity_splash);
+
         new LocalDataRefresher(getApplicationContext(), new DataReloadCallback()).refreshLocalData();
         LocalFolderStructureManager.create();
     }

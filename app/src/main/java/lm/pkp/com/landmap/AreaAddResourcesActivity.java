@@ -13,6 +13,7 @@ import java.util.ArrayList;
 
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.res.disp.AreaAddResourceAdaptor;
+import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.drive.DriveResource;
 import lm.pkp.com.landmap.util.AreaActivityUtil;
 
@@ -24,6 +25,8 @@ public class AreaAddResourcesActivity extends AppCompatActivity{
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        new GenericActivityExceptionHandler(this);
+
         setContentView(R.layout.activity_area_resource_main);
 
         ActionBar ab = getSupportActionBar();
