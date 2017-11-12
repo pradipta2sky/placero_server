@@ -44,7 +44,7 @@
             android:label="@string/title_activity_area_dashboard" >
         </activity>
         <activity
-            android:name=".PositionMarkerActivity"
+            android:name=".AreaDetailsActivity"
             android:label="@string/title_activity_position_marker">
         </activity>
         <activity

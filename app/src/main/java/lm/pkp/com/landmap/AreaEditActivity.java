@@ -1,6 +1,7 @@
 package lm.pkp.com.landmap;
 
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -14,6 +15,7 @@ import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.util.AreaActivityUtil;
+import lm.pkp.com.landmap.util.ColorConstants;
 
 public class AreaEditActivity extends AppCompatActivity{
 
@@ -30,11 +32,14 @@ public class AreaEditActivity extends AppCompatActivity{
         ActionBar ab = getSupportActionBar();
         ab.setHomeButtonEnabled(true);
         ab.setDisplayHomeAsUpEnabled(true);
+        ab.setBackgroundDrawable(new ColorDrawable(ColorConstants.getToolBarColorForShare()));
         ab.show();
 
         adb = new AreaDBHelper(getApplicationContext());
         ae = AreaContext.getInstance().getAreaElement();
-        AreaActivityUtil.INSTANCE.populateAreaElement(this);
+
+        View includedView = findViewById(R.id.selected_area_include);
+        AreaActivityUtil.INSTANCE.populateAreaElement(includedView);
 
         final TextView nameText = (TextView)findViewById(R.id.area_name_edit);
         nameText.setText(ae.getName());
@@ -58,7 +63,7 @@ public class AreaEditActivity extends AppCompatActivity{
                 adb.updateAreaNonGeo(ae);
                 findViewById(R.id.splash_panel).setVisibility(View.INVISIBLE);
 
-                Intent positionMarkerIntent = new Intent(AreaEditActivity.this, PositionMarkerActivity.class);
+                Intent positionMarkerIntent = new Intent(AreaEditActivity.this, AreaDetailsActivity.class);
                 startActivity(positionMarkerIntent);
             }
         });

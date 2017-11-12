@@ -3,12 +3,14 @@ package lm.pkp.com.landmap;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.menu.ActionMenuItemView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.ImageView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -20,6 +22,7 @@ import lm.pkp.com.landmap.area.res.disp.AreaItemAdaptor;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.sync.LocalDataRefresher;
+import lm.pkp.com.landmap.util.ColorConstants;
 
 public class AreaDashboardActivity extends AppCompatActivity {
 
@@ -36,7 +39,8 @@ public class AreaDashboardActivity extends AppCompatActivity {
         getSupportActionBar().hide();
 
         Toolbar topTB = (Toolbar) findViewById(R.id.toolbar_top);
-        topTB.inflateMenu(R.menu.area_db_top_menu);
+        final ColorDrawable topDrawable = (ColorDrawable) topTB.getBackground().getCurrent();
+        topDrawable.setColor(ColorConstants.getDefaultToolBarColor());
 
         adb = new AreaDBHelper(getApplicationContext());
         allAreas = adb.getAllAreas();
@@ -45,7 +49,7 @@ public class AreaDashboardActivity extends AppCompatActivity {
         areaDisplayAdapter = new AreaItemAdaptor(this, R.layout.area_element_row, allAreas);
         areaListView.setAdapter(areaDisplayAdapter);
 
-        ActionMenuItemView createAreaView = (ActionMenuItemView) findViewById(R.id.action_area_create);
+        ImageView createAreaView = (ImageView) findViewById(R.id.action_area_create);
         createAreaView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -53,12 +57,12 @@ public class AreaDashboardActivity extends AppCompatActivity {
                 AreaContext.getInstance().setAreaElement(ae, getApplicationContext());
                 adb.insertAreaToServer(ae);
 
-                Intent intent = new Intent(AreaDashboardActivity.this, PositionMarkerActivity.class);
+                Intent intent = new Intent(AreaDashboardActivity.this, AreaDetailsActivity.class);
                 startActivity(intent);
             }
         });
 
-        ActionMenuItemView refreshAreaView = (ActionMenuItemView) findViewById(R.id.action_area_refresh);
+        ImageView refreshAreaView = (ImageView) findViewById(R.id.action_area_refresh);
         refreshAreaView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -74,7 +78,7 @@ public class AreaDashboardActivity extends AppCompatActivity {
                                     long arg3) {
                 AreaElement ae = (AreaElement) adapter.getItemAtPosition(position);
                 AreaContext.getInstance().setAreaElement(ae, getApplicationContext());
-                Intent intent = new Intent(AreaDashboardActivity.this, PositionMarkerActivity.class);
+                Intent intent = new Intent(AreaDashboardActivity.this, AreaDetailsActivity.class);
                 startActivity(intent);
             }
         });

@@ -100,7 +100,7 @@ public class AreaAddResourcesActivity extends AppCompatActivity{
     @Override
     public void onBackPressed() {
         finish();
-        Intent i = new Intent(AreaAddResourcesActivity.this, PositionMarkerActivity.class);
+        Intent i = new Intent(AreaAddResourcesActivity.this, AreaDetailsActivity.class);
         startActivity(i);
     }
 }

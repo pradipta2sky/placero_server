@@ -5,9 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.GradientDrawable;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -15,9 +13,9 @@ import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.view.menu.ActionMenuItemView;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,8 +24,8 @@ import java.util.ArrayList;
 import java.util.UUID;
 
 import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.custom.LocationPositionReceiver;
 import lm.pkp.com.landmap.permission.PermissionConstants;
@@ -38,7 +36,7 @@ import lm.pkp.com.landmap.position.PostionListAdaptor;
 import lm.pkp.com.landmap.provider.GPSLocationProvider;
 import lm.pkp.com.landmap.util.ColorConstants;
 
-public class PositionMarkerActivity extends AppCompatActivity implements LocationPositionReceiver {
+public class AreaDetailsActivity extends AppCompatActivity implements LocationPositionReceiver {
 
     private PositionsDBHelper pdb = null;
     private AreaElement ae = null;
@@ -52,16 +50,14 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
         new GenericActivityExceptionHandler(this);
         ae = AreaContext.getInstance().getAreaElement();
 
-        setContentView(R.layout.activity_position_marker);
+        setContentView(R.layout.activity_area_details);
         getSupportActionBar().hide();
 
         Toolbar topTB = (Toolbar) findViewById(R.id.toolbar_top);
-        topTB.inflateMenu(R.menu.marking_top_menu);
         final ColorDrawable topDrawable = (ColorDrawable) topTB.getBackground().getCurrent();
         topDrawable.setColor(ColorConstants.getToolBarColorForShare());
 
         Toolbar bottomTB = (Toolbar) findViewById(R.id.toolbar_bottom);
-        bottomTB.inflateMenu(R.menu.marking_bottom_menu);
         final ColorDrawable bottomDrawable = (ColorDrawable) bottomTB.getBackground().getCurrent();
         bottomDrawable.setColor(ColorConstants.getToolBarColorForShare());
 
@@ -85,56 +81,56 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
         TextView areaNameView = (TextView)findViewById(R.id.area_name_text);
         areaNameView.setText(ae.getName());
 
-        ActionMenuItemView plotItem = (ActionMenuItemView)findViewById(R.id.action_plot_area);
+        ImageView plotItem = (ImageView)findViewById(R.id.action_plot_area);
         plotItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(PositionMarkerActivity.this, AreaMapPlotterActivity.class);
+                Intent intent = new Intent(AreaDetailsActivity.this, AreaMapPlotterActivity.class);
                 startActivity(intent);
             }
         });
 
-        ActionMenuItemView areaEditItem = (ActionMenuItemView)findViewById(R.id.action_area_edit);
+        ImageView areaEditItem = (ImageView)findViewById(R.id.action_area_edit);
         areaEditItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent areaEditIntent = new Intent(PositionMarkerActivity.this, AreaEditActivity.class);
+                Intent areaEditIntent = new Intent(AreaDetailsActivity.this, AreaEditActivity.class);
                 startActivity(areaEditIntent);
             }
         });
 
-        ActionMenuItemView markLocationItem = (ActionMenuItemView)findViewById(R.id.action_mark_location);
+        ImageView markLocationItem = (ImageView)findViewById(R.id.action_mark_location);
         markLocationItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(PermissionManager.INSTANCE.hasAccess(PermissionConstants.MARK_POSITION)){
                     findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
-                    new GPSLocationProvider(PositionMarkerActivity.this).getLocation();
+                    new GPSLocationProvider(AreaDetailsActivity.this).getLocation();
                 }
             }
         });
 
-        ActionMenuItemView deleteAreaItem = (ActionMenuItemView)findViewById(R.id.action_delete_area);
+        ImageView deleteAreaItem = (ImageView)findViewById(R.id.action_delete_area);
         deleteAreaItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
                 new AreaDBHelper(getApplicationContext()).deleteArea(ae);
-                Intent areaDashboardIntent = new Intent(PositionMarkerActivity.this, AreaDashboardActivity.class);
+                Intent areaDashboardIntent = new Intent(AreaDetailsActivity.this, AreaDashboardActivity.class);
                 startActivity(areaDashboardIntent);
             }
         });
 
-        ActionMenuItemView shareAreaItem = (ActionMenuItemView)findViewById(R.id.action_share_area);
+        ImageView shareAreaItem = (ImageView)findViewById(R.id.action_share_area);
         shareAreaItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent areaShareIntent = new Intent(PositionMarkerActivity.this, AreaShareActivity.class);
+                Intent areaShareIntent = new Intent(AreaDetailsActivity.this, AreaShareActivity.class);
                 startActivity(areaShareIntent);
             }
         });
 
-        ActionMenuItemView navigateItem = (ActionMenuItemView)findViewById(R.id.action_navigate_area);
+        ImageView navigateItem = (ImageView)findViewById(R.id.action_navigate_area);
         navigateItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -145,24 +141,23 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
             }
         });
 
-        ActionMenuItemView driveItem = (ActionMenuItemView)findViewById(R.id.action_drive_area);
+        ImageView driveItem = (ImageView)findViewById(R.id.action_drive_area);
         driveItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(PositionMarkerActivity.this, CreateFolderStructureActivity.class);
+                Intent intent = new Intent(AreaDetailsActivity.this, CreateFolderStructureActivity.class);
                 startActivity(intent);
             }
         });
 
-        ActionMenuItemView displayResItem = (ActionMenuItemView)findViewById(R.id.action_display_res);
+        ImageView displayResItem = (ImageView)findViewById(R.id.action_display_res);
         displayResItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(PositionMarkerActivity.this, AreaResourcesDisplayActivity.class);
+                Intent intent = new Intent(AreaDetailsActivity.this, AreaResourcesDisplayActivity.class);
                 startActivity(intent);
             }
         });
-
     }
 
     private void showLocationDialog() {
@@ -220,7 +215,7 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
 
     @Override
     public void onBackPressed() {
-        Intent areaDashboardIntent = new Intent(PositionMarkerActivity.this, AreaDashboardActivity.class);
+        Intent areaDashboardIntent = new Intent(AreaDetailsActivity.this, AreaDashboardActivity.class);
         startActivity(areaDashboardIntent);
     }
 

@@ -59,10 +59,11 @@
 
     <ImageView
         android:id="@+id/del_row"
-        android:layout_width="96px"
-        android:layout_height="96px"
-        android:layout_marginTop="5dip"
-        android:gravity="right"
+        android:layout_width="48px"
+        android:layout_height="48px"
+        android:layout_marginTop="15dip"
+        android:layout_marginRight="10dp"
+        android:gravity="right|center_vertical"
         android:src="@drawable/delete"
         />
 

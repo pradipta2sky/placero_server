@@ -2,9 +2,7 @@ package lm.pkp.com.landmap;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
@@ -19,7 +17,6 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -245,7 +242,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
         googleMap.clear();
         googleMap = null;
 
-        Intent positionMarkerIntent = new Intent(AreaMapPlotterActivity.this, PositionMarkerActivity.class);
+        Intent positionMarkerIntent = new Intent(AreaMapPlotterActivity.this, AreaDetailsActivity.class);
         startActivity(positionMarkerIntent);
     }
 

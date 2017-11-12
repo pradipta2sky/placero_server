@@ -5,23 +5,15 @@
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar_top"
-        android:layout_width="match_parent"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:minHeight="65dp"
         android:background="?attr/colorPrimary"
-        android:minHeight="?attr/actionBarSize"
-        app:contentInsetStart="5dp">
+        app:contentInsetStart="5dp"
+        android:layout_weight="0.1">
 
-        <TextView
-            android:id="@+id/area_dashboard_text"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_vertical"
-            android:paddingBottom="2dp"
-            android:paddingTop="2dp"
-            android:text="Area Dashboard"
-            android:textColor="#ffffffff"
-            android:textSize="22sp"
-            android:textStyle="bold" />
+        <include layout="@layout/area_dashboard_toolbar" />
+
     </android.support.v7.widget.Toolbar>
 
     <ListView
