@@ -1,5 +1,6 @@
 package lm.pkp.com.landmap;
 
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -35,6 +36,7 @@ import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.user.UserInfoSearchAsyncTask;
 import lm.pkp.com.landmap.util.AreaActivityUtil;
+import lm.pkp.com.landmap.util.ColorConstants;
 import lm.pkp.com.landmap.util.GeneralUtil;
 
 public class AreaShareActivity extends AppCompatActivity{
@@ -51,10 +53,11 @@ public class AreaShareActivity extends AppCompatActivity{
         ActionBar ab = getSupportActionBar();
         ab.setHomeButtonEnabled(true);
         ab.setDisplayHomeAsUpEnabled(true);
+        ab.setBackgroundDrawable(new ColorDrawable(ColorConstants.getToolBarColorForShare()));
         ab.show();
 
-        final PositionsDBHelper pdh = new PositionsDBHelper(getApplicationContext());
-        AreaActivityUtil.INSTANCE.populateAreaElement(this);
+        View includedView = findViewById(R.id.selected_area_include);
+        AreaActivityUtil.INSTANCE.populateAreaElement(includedView);
 
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, new String[]{});
         final AutoCompleteTextView userIdView = (AutoCompleteTextView) findViewById(R.id.user_search_text);
@@ -78,7 +81,6 @@ public class AreaShareActivity extends AppCompatActivity{
                 searcherTask.setCompletionCallback(new UserInfoCallBack());
                 searcherTask.execute(searchParams);
             }
-
             @Override
             public void afterTextChanged(Editable s) {
             }

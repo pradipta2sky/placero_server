@@ -34,7 +34,10 @@ public class PostionListAdaptor extends ArrayAdapter<PositionElement> {
         if (v == null) {
             LayoutInflater vi = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             v = vi.inflate(R.layout.position_element_row, null);
+        }else {
+            return v;
         }
+
         final PositionElement pe = items.get(position);
         TextView nameText = (TextView) v.findViewById(R.id.pos_name);
         String pName = pe.getName();

@@ -13,6 +13,7 @@ import lm.pkp.com.landmap.area.res.disp.AreaDocumentDisplayFragment;
 import lm.pkp.com.landmap.area.res.disp.AreaPictureDisplayFragment;
 import lm.pkp.com.landmap.area.res.disp.AreaVideoDisplayFragment;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
+import lm.pkp.com.landmap.util.ColorConstants;
 
 /**
  * Created by USER on 11/4/2017.
@@ -29,6 +30,7 @@ public class AreaResourcesDisplayActivity extends AppCompatActivity {
         // Setup Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_ar_res_disp);
         setSupportActionBar(toolbar);
+        toolbar.setBackgroundColor(ColorConstants.getToolBarColorForShare());
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.area_tab_pager);
         // Assign created adapter to viewPager

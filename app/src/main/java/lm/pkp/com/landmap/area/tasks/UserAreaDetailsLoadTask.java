@@ -151,7 +151,7 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
                     PermissionElement pe = new PermissionElement();
                     pe.setUserId(permissionObj.getString("user_id"));
                     pe.setAreaId(permissionObj.getString("area_id"));
-                    pe.setFunctionCode(permissionObj.getString("function_id"));
+                    pe.setFunctionCode(permissionObj.getString("function_code"));
 
                     pmh.insertPermission(pe);
                 }

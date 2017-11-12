@@ -4,7 +4,7 @@
     android:layout_height="match_parent">
 
     <include
-        android:id="@+id/area_details_section"
+        android:id="@+id/selected_area_include"
         layout="@layout/area_element_row"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" />
@@ -13,10 +13,9 @@
         android:id="@+id/action_buttons_section"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/area_details_section"
+        android:layout_below="@+id/selected_area_include"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:background="@drawable/border_bottom_layout"
         android:orientation="horizontal"
         android:paddingBottom="20dp"
         android:layout_marginTop="10dp"

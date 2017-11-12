@@ -24,17 +24,15 @@
             android:textStyle="bold" />
     </android.support.v7.widget.Toolbar>
 
-
     <ListView
+        android:id="@+id/area_display_list"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/area_display_list"
+        android:layout_below="@+id/toolbar_top"
         android:layout_gravity="top"
         android:layout_margin="10dp"
-        android:layout_below="@+id/toolbar_top"
         android:divider="@android:color/transparent"
-        android:dividerHeight="10.0sp"
-        />
+        android:dividerHeight="10.0sp" />
 
     <RelativeLayout
         android:id="@+id/splash_panel"
@@ -50,3 +48,4 @@
     </RelativeLayout>
 
 </RelativeLayout>
+

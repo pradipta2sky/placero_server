@@ -1,6 +1,9 @@
 package lm.pkp.com.landmap.util;
 
 import android.app.Activity;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.text.Html;
 import android.view.View;
 import android.widget.ImageView;
@@ -28,6 +31,11 @@ public class AreaActivityUtil {
 
     private AreaActivityUtil(){
 
+    }
+
+    public void populateAreaElement(View view){
+        final AreaElement areaElement = AreaContext.getInstance().getAreaElement();
+        populateAreaElement(view, areaElement);
     }
 
     public void populateAreaElement(Activity activity){
@@ -68,6 +76,21 @@ public class AreaActivityUtil {
         String content = "<b>Area: </b>" + df.format(areaMeasureSqFt) + " Sqft, " + df.format(areaMeasureAcre) +" Acre," +
                 df.format(areaMeasureDecimals) + " Decimals.";
         measureText.setText(Html.fromHtml(content));
+
+        final Drawable drawable = view.getBackground().getCurrent();
+        if(drawable instanceof GradientDrawable){
+            if(ae.getType().equalsIgnoreCase("shared")){
+                ((GradientDrawable)drawable).setColor(ColorConstants.BUFF_YELLOW_AREA_DISPLAY);
+            }else {
+                ((GradientDrawable)drawable).setColor(ColorConstants.BUFF_BLUE_AREA_DISPLAY);
+            }
+        }else if(drawable instanceof ColorDrawable){
+            if(ae.getType().equalsIgnoreCase("shared")){
+                ((ColorDrawable)drawable).setColor(ColorConstants.BUFF_YELLOW_AREA_DISPLAY);
+            }else {
+                ((ColorDrawable)drawable).setColor(ColorConstants.BUFF_BLUE_AREA_DISPLAY);
+            }
+        }
 
         // Load the area image here.
         final List<DriveResource> driveResources = ae.getDriveResources();

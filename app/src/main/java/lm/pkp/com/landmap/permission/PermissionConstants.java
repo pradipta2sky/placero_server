@@ -7,6 +7,8 @@ public class PermissionConstants {
 
     public static final String FULL_CONTROL = "full_control";
 
+    public static final String VIEW_ONLY = "view_only";
+
     public static final String REMOVE_AREA = "remove_area";
 
     public static final String MARK_POSITION = "mark_position";

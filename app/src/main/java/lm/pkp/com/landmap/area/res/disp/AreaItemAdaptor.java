@@ -1,6 +1,8 @@
 package lm.pkp.com.landmap.area.res.disp;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -42,6 +44,7 @@ public class AreaItemAdaptor extends ArrayAdapter {
 
         AreaElement ae = items.get(position);
         AreaActivityUtil.INSTANCE.populateAreaElement(v, ae);
+
         return v;
     }
 }

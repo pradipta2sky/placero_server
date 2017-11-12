@@ -14,6 +14,14 @@ public class PermissionManager {
     }
 
     public boolean hasAccess(String functionCode){
+        if(functionCode.equalsIgnoreCase(PermissionConstants.FULL_CONTROL)){
+            return true;
+        }
+
+        if(functionCode.equalsIgnoreCase(PermissionConstants.VIEW_ONLY)){
+            return false;
+        }
+
         final AreaElement areaElement = AreaContext.getInstance().getAreaElement();
         final PermissionElement permission = areaElement.getPermissions().get(functionCode);
         if(permission != null){

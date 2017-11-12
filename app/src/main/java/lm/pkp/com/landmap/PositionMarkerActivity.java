@@ -5,6 +5,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.GradientDrawable;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -27,10 +30,13 @@ import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.custom.LocationPositionReceiver;
+import lm.pkp.com.landmap.permission.PermissionConstants;
+import lm.pkp.com.landmap.permission.PermissionManager;
 import lm.pkp.com.landmap.position.PositionElement;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.position.PostionListAdaptor;
 import lm.pkp.com.landmap.provider.GPSLocationProvider;
+import lm.pkp.com.landmap.util.ColorConstants;
 
 public class PositionMarkerActivity extends AppCompatActivity implements LocationPositionReceiver {
 
@@ -44,14 +50,20 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
+        ae = AreaContext.getInstance().getAreaElement();
 
         setContentView(R.layout.activity_position_marker);
         getSupportActionBar().hide();
 
         Toolbar topTB = (Toolbar) findViewById(R.id.toolbar_top);
         topTB.inflateMenu(R.menu.marking_top_menu);
+        final ColorDrawable topDrawable = (ColorDrawable) topTB.getBackground().getCurrent();
+        topDrawable.setColor(ColorConstants.getToolBarColorForShare());
+
         Toolbar bottomTB = (Toolbar) findViewById(R.id.toolbar_bottom);
         bottomTB.inflateMenu(R.menu.marking_bottom_menu);
+        final ColorDrawable bottomDrawable = (ColorDrawable) bottomTB.getBackground().getCurrent();
+        bottomDrawable.setColor(ColorConstants.getToolBarColorForShare());
 
         if(!approachLocationPermissions()){
             Toast.makeText(getApplicationContext(),"No permission for location access.", Toast.LENGTH_LONG);
@@ -67,7 +79,6 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
         adaptor = new PostionListAdaptor(getApplicationContext(), R.id.positionList, positionList);
         posList.setAdapter(adaptor);
 
-        ae = AreaContext.getInstance().getAreaElement();
         positionList.addAll(AreaContext.getInstance().getPositions());
         adaptor.notifyDataSetChanged();
 
@@ -83,8 +94,8 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
             }
         });
 
-        ActionMenuItemView areaNameEditItem = (ActionMenuItemView)findViewById(R.id.action_area_edit);
-        areaNameEditItem.setOnClickListener(new View.OnClickListener() {
+        ActionMenuItemView areaEditItem = (ActionMenuItemView)findViewById(R.id.action_area_edit);
+        areaEditItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent areaEditIntent = new Intent(PositionMarkerActivity.this, AreaEditActivity.class);
@@ -96,8 +107,10 @@ public class PositionMarkerActivity extends AppCompatActivity implements Locatio
         markLocationItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
-                new GPSLocationProvider(PositionMarkerActivity.this).getLocation();
+                if(PermissionManager.INSTANCE.hasAccess(PermissionConstants.MARK_POSITION)){
+                    findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
+                    new GPSLocationProvider(PositionMarkerActivity.this).getLocation();
+                }
             }
         });
 
