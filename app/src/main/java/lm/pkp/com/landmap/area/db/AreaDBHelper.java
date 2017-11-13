@@ -6,23 +6,18 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.location.Address;
-import android.location.Geocoder;
-import android.location.Location;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
 import java.util.UUID;
 
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
-import lm.pkp.com.landmap.drive.DriveResource;
 import lm.pkp.com.landmap.google.geo.CommonGeoHelper;
+import lm.pkp.com.landmap.permission.PermissionsDBHelper;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.sync.LMSRestAsyncTask;
 import lm.pkp.com.landmap.user.UserContext;
@@ -196,7 +191,7 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         db.delete(AREA_TABLE_NAME, AREA_COLUMN_UNIQUE_ID + " = ? ", new String[]{ae.getUniqueId()});
         db.close();
         PositionsDBHelper pdb = new PositionsDBHelper(localContext);
-        pdb.deletePositionByUniqueAreaId(ae.getUniqueId());
+        pdb.deletePositionByAreaId(ae.getUniqueId());
     }
 
     public void deleteAreaFromServer(AreaElement ae){
@@ -307,6 +302,26 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         db.delete(AREA_TABLE_NAME, "1", null);
         db.close();
+    }
+
+    public void deletePublicAreas() {
+        ArrayList<AreaElement> publicAreas = getAreas("public");
+
+        PositionsDBHelper pdh = new PositionsDBHelper(localContext);
+        DriveDBHelper ddh = new DriveDBHelper(localContext);
+        PermissionsDBHelper pmh = new PermissionsDBHelper(localContext);
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        for (int i = 0; i < publicAreas.size(); i++) {
+            final String areaId = publicAreas.get(i).getUniqueId();
+            db.delete(AREA_TABLE_NAME, AREA_COLUMN_UNIQUE_ID + "=? AND "
+                            + AREA_COLUMN_TYPE + "=?", new String[]{areaId, "public"});
+            pdh.deletePositionByAreaId(areaId);
+            ddh.deleteResourcesByAreaId(areaId);
+            pmh.deletePermissionsByAreaId(areaId);
+        }
+        db.close();
+
     }
 
 }

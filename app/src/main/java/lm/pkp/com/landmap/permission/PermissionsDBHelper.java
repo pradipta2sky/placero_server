@@ -3,28 +3,18 @@ package lm.pkp.com.landmap.permission;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-
-import com.google.api.services.drive.model.User;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.UUID;
-
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
-import lm.pkp.com.landmap.position.PositionElement;
 import lm.pkp.com.landmap.sync.LMSRestAsyncTask;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.user.UserElement;
-import lm.pkp.com.landmap.util.AndroidSystemUtil;
 
 public class PermissionsDBHelper extends SQLiteOpenHelper {
 
@@ -32,9 +22,9 @@ public class PermissionsDBHelper extends SQLiteOpenHelper {
     private AsyncTaskCallback callback = null;
 
     public static final String ACCESS_TABLE_NAME = "area_access";
-    public static final String ACCESS_AREA_ID = "area_id";
-    public static final String ACCESS_USER_ID = "user_id";
-    public static final String ACCESS_FUNCTION_CODE = "function_code";
+    public static final String ACCESS_COLUMN_AREA_ID = "area_id";
+    public static final String ACCESS_COLUMN_USER_ID = "user_id";
+    public static final String ACCESS_COLUMN_FUNCTION_CODE = "function_code";
 
     public PermissionsDBHelper(Context context, AsyncTaskCallback callback) {
         super(context, DATABASE_NAME, null, 1);
@@ -49,9 +39,9 @@ public class PermissionsDBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(
                 "create table " + ACCESS_TABLE_NAME + "(" +
-                        ACCESS_AREA_ID + " text," +
-                        ACCESS_USER_ID + " text, " +
-                        ACCESS_FUNCTION_CODE + " text)"
+                        ACCESS_COLUMN_AREA_ID + " text," +
+                        ACCESS_COLUMN_USER_ID + " text, " +
+                        ACCESS_COLUMN_FUNCTION_CODE + " text)"
         );
     }
 
@@ -65,9 +55,9 @@ public class PermissionsDBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
-        contentValues.put(ACCESS_AREA_ID, pe.getAreaId());
-        contentValues.put(ACCESS_FUNCTION_CODE, pe.getFunctionCode());
-        contentValues.put(ACCESS_USER_ID, pe.getUserId());
+        contentValues.put(ACCESS_COLUMN_AREA_ID, pe.getAreaId());
+        contentValues.put(ACCESS_COLUMN_FUNCTION_CODE, pe.getFunctionCode());
+        contentValues.put(ACCESS_COLUMN_USER_ID, pe.getUserId());
 
         db.insert(ACCESS_TABLE_NAME, null, contentValues);
         db.close();
@@ -96,6 +86,12 @@ public class PermissionsDBHelper extends SQLiteOpenHelper {
         return  postParams;
     }
 
+    public void deletePermissionsByAreaId(String areaId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM " + ACCESS_TABLE_NAME + " WHERE "
+                + ACCESS_COLUMN_AREA_ID + " = '" + areaId + "'");
+        db.close();
+    }
 
     public void setCompletionCallback(AsyncTaskCallback callback) {
         this.callback = callback;

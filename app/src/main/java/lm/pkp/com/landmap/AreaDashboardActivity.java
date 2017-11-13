@@ -40,10 +40,12 @@ public class AreaDashboardActivity extends AppCompatActivity {
         ViewPager viewPager = (ViewPager) findViewById(R.id.areas_display_tab_pager);
         // Assign created adapter to viewPager
         viewPager.setAdapter(new DisplayAreasPagerAdapter(getSupportFragmentManager()));
+        viewPager.setOffscreenPageLimit(1);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.areas_display_tab_layout);
         // This method setup all required method for TabLayout with Viewpager
         tabLayout.setupWithViewPager(viewPager);
+        tabLayout.setBackgroundColor(ColorProvider.getDefaultToolBarColor());
 
         ImageView createAreaView = (ImageView) findViewById(R.id.action_area_create);
         createAreaView.setOnClickListener(new View.OnClickListener() {

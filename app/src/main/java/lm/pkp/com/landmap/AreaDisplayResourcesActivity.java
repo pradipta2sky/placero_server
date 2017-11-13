@@ -42,6 +42,7 @@ public class AreaDisplayResourcesActivity extends AppCompatActivity {
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         // This method setup all required method for TabLayout with Viewpager
         tabLayout.setupWithViewPager(viewPager);
+        tabLayout.setBackgroundColor(ColorProvider.getAreaToolBarColor(areaElement));
     }
 
     public static class DisplayResourcesPagerAdapter extends FragmentPagerAdapter {

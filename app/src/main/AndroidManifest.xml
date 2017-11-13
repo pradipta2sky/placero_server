@@ -42,7 +42,8 @@
         <activity
             android:name=".AreaDashboardActivity"
             android:label="@string/title_activity_area_dashboard"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateHidden">
         </activity>
         <activity
             android:name=".AreaDetailsActivity"

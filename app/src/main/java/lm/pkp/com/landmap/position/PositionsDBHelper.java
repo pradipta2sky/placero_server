@@ -117,7 +117,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public void deletePositionByUniqueAreaId(String uniqueAreaId) {
+    public void deletePositionByAreaId(String uniqueAreaId) {
         SQLiteDatabase db = this.getWritableDatabase();
         db.execSQL("DELETE FROM " + POSITION_TABLE_NAME + " WHERE "
                 + POSITION_COLUMN_UNIQUE_AREA_ID + " = '" + uniqueAreaId + "'");

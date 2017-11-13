@@ -36,26 +36,18 @@ public class AreaDashboardSharedFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
     }
 
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        final ArrayList<AreaElement> areas = new AreaDBHelper(view.getContext()).getAreas("shared");
+        ArrayList<AreaElement> areas = new ArrayList<>();
         ListView areaListView = (ListView) view.findViewById(R.id.area_display_list);
         areaDisplayAdapter = new AreaItemAdaptor(getContext(), R.layout.area_element_row, areas);
+
         areaListView.setAdapter(areaDisplayAdapter);
-
-        ImageView refreshAreaView = (ImageView) getActivity().findViewById(R.id.action_area_refresh);
-        refreshAreaView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                view.findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
-                new LocalDataRefresher(getContext(), new DataReloadCallback()).refreshLocalData();
-            }
-        });
-
         areaListView.setDescendantFocusability(ListView.FOCUS_BLOCK_DESCENDANTS);
         areaListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -67,6 +59,36 @@ public class AreaDashboardSharedFragment extends Fragment {
                 startActivity(intent);
             }
         });
+
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean visible) {
+        super.setUserVisibleHint(visible);
+        if (visible  && isResumed()) {
+            System.out.println("Menu is visible and resumed");
+            loadFragment();
+        }
+    }
+
+    private void loadFragment() {
+        View view = getView();
+        view.findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
+
+        final AreaDBHelper adh = new AreaDBHelper(view.getContext());
+        areaDisplayAdapter.clear();
+        areaDisplayAdapter.addAll(adh.getAreas("shared"));
+        areaDisplayAdapter.notifyDataSetChanged();
+
+        ImageView refreshAreaView = (ImageView) getActivity().findViewById(R.id.action_area_refresh);
+        refreshAreaView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getView().findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
+                new LocalDataRefresher(getContext(), new DataReloadCallback()).refreshLocalData();
+            }
+        });
+        view.findViewById(R.id.splash_panel).setVisibility(View.GONE);
     }
 
     private class DataReloadCallback implements AsyncTaskCallback {
@@ -76,10 +98,11 @@ public class AreaDashboardSharedFragment extends Fragment {
             AreaDBHelper adh = new AreaDBHelper(getContext());
 
             areaDisplayAdapter.clear();
-            areaDisplayAdapter.addAll(adh.getAllAreas());
+            areaDisplayAdapter.addAll(adh.getAreas("shared"));
             areaDisplayAdapter.notifyDataSetChanged();
 
             getView().findViewById(R.id.splash_panel).setVisibility(View.INVISIBLE);
         }
     }
+
 }

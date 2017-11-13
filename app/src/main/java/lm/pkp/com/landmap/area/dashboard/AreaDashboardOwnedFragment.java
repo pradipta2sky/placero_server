@@ -3,10 +3,13 @@ package lm.pkp.com.landmap.area.dashboard;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 
@@ -45,17 +48,8 @@ public class AreaDashboardOwnedFragment extends Fragment {
         final ArrayList<AreaElement> areas = new AreaDBHelper(view.getContext()).getAreas("self");
         ListView areaListView = (ListView) view.findViewById(R.id.area_display_list);
         areaDisplayAdapter = new AreaItemAdaptor(getContext(), R.layout.area_element_row, areas);
+
         areaListView.setAdapter(areaDisplayAdapter);
-
-        ImageView refreshAreaView = (ImageView) getActivity().findViewById(R.id.action_area_refresh);
-        refreshAreaView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                view.findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
-                new LocalDataRefresher(getContext(), new DataReloadCallback()).refreshLocalData();
-            }
-        });
-
         areaListView.setDescendantFocusability(ListView.FOCUS_BLOCK_DESCENDANTS);
         areaListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -67,6 +61,20 @@ public class AreaDashboardOwnedFragment extends Fragment {
                 startActivity(intent);
             }
         });
+
+        EditText inputSearch = (EditText) getActivity().findViewById(R.id.searchEditText);
+        inputSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
+            }
+            @Override
+            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+            }
+            @Override
+            public void afterTextChanged(Editable editable) {
+                areaDisplayAdapter.getFilter().filter(editable.toString());
+            }
+        });
     }
 
     private class DataReloadCallback implements AsyncTaskCallback {
@@ -76,11 +84,34 @@ public class AreaDashboardOwnedFragment extends Fragment {
             AreaDBHelper adh = new AreaDBHelper(getContext());
 
             areaDisplayAdapter.clear();
-            areaDisplayAdapter.addAll(adh.getAllAreas());
+            areaDisplayAdapter.addAll(adh.getAreas("self"));
             areaDisplayAdapter.notifyDataSetChanged();
 
             getView().findViewById(R.id.splash_panel).setVisibility(View.INVISIBLE);
         }
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean visible) {
+        super.setUserVisibleHint(visible);
+        if (visible  && isResumed()) {
+            loadFragment();
+        }
+    }
+
+    private void loadFragment() {
+        View view = getView();
+        view.findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
+
+        ImageView refreshAreaView = (ImageView) getActivity().findViewById(R.id.action_area_refresh);
+        refreshAreaView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getView().findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
+                new LocalDataRefresher(getContext(), new DataReloadCallback()).refreshLocalData();
+            }
+        });
+        view.findViewById(R.id.splash_panel).setVisibility(View.GONE);
     }
 
 }

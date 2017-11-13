@@ -5,6 +5,7 @@ import android.content.Context;
 import org.json.JSONObject;
 
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
+import lm.pkp.com.landmap.area.tasks.PublicAreasLoadTask;
 import lm.pkp.com.landmap.area.tasks.UserAreaDetailsLoadTask;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
@@ -47,8 +48,25 @@ public class LocalDataRefresher implements AsyncTaskCallback {
         }
     }
 
+    public void refreshPublicAreas() {
+
+        AreaDBHelper adh = new AreaDBHelper(ctxt);
+        adh.deletePublicAreas();
+
+        PublicAreasLoadTask loadTask = new PublicAreasLoadTask(ctxt);
+        loadTask.setCompletionCallback(this);
+
+        try {
+            loadTask.execute();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
     @Override
     public void taskCompleted(Object result) {
         callback.taskCompleted(result);
     }
+
+
 }
