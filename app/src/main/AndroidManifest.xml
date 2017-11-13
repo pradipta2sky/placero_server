@@ -41,10 +41,6 @@
 
         <activity
             android:name=".AreaDashboardActivity"
-            android:label="@string/title_activity_area_dashboard" >
-        </activity>
-        <activity
-            android:name=".AreaDashboardTabbedActivity"
             android:label="@string/title_activity_area_dashboard"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>

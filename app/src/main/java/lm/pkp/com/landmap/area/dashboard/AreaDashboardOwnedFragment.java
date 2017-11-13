@@ -12,7 +12,6 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 
-import lm.pkp.com.landmap.AreaDashboardTabbedActivity;
 import lm.pkp.com.landmap.AreaDetailsActivity;
 import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.area.AreaContext;

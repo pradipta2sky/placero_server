@@ -31,7 +31,7 @@ public class SplashActivity extends Activity {
         @Override
         public void taskCompleted(Object result) {
             //Intent areaDashboardIntent = new Intent(SplashActivity.this, DownloadResourcesActivity.class);
-            Intent areaDashboardIntent = new Intent(SplashActivity.this, AreaDashboardTabbedActivity.class);
+            Intent areaDashboardIntent = new Intent(SplashActivity.this, AreaDashboardActivity.class);
             startActivity(areaDashboardIntent);
         }
     }

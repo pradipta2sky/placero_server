@@ -218,7 +218,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
 
     @Override
     public void onBackPressed() {
-        Intent areaDashboardIntent = new Intent(AreaDetailsActivity.this, AreaDashboardTabbedActivity.class);
+        Intent areaDashboardIntent = new Intent(AreaDetailsActivity.this, AreaDashboardActivity.class);
         startActivity(areaDashboardIntent);
     }
 
