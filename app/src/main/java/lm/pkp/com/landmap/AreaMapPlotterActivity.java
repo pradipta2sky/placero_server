@@ -166,9 +166,11 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
         ae.setCenterLat(latAvg);
         ae.setCenterLon(lonAvg);
         ae.setMeasureSqFt(polygonAreaSqFt);
+
         new Thread(new Runnable() {
             public void run() {
                 adh.updateArea(ae);
+                adh.updateAreaOnServer(ae);
             }
         }).start();
 

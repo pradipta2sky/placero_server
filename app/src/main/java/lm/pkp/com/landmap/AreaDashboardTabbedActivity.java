@@ -3,48 +3,51 @@ package lm.pkp.com.landmap;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.design.widget.TabLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
-import android.widget.AdapterView;
 import android.widget.ImageView;
-import android.widget.ListView;
 
 import java.util.ArrayList;
 
 import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.area.dashboard.AreaDashboardOwnedFragment;
+import lm.pkp.com.landmap.area.dashboard.AreaDashboardPublicFragment;
+import lm.pkp.com.landmap.area.dashboard.AreaDashboardSharedFragment;
+import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.res.disp.AreaItemAdaptor;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.sync.LocalDataRefresher;
 import lm.pkp.com.landmap.util.ColorProvider;
 
-public class AreaDashboardActivity extends AppCompatActivity {
-
-    private ArrayList<AreaElement> allAreas = null;
-    private AreaItemAdaptor areaDisplayAdapter = null;
+public class AreaDashboardTabbedActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        new GenericActivityExceptionHandler(this);
+        //new GenericActivityExceptionHandler(this);
 
-        setContentView(R.layout.activity_area_dashboard);
-        getSupportActionBar().hide();
+        setContentView(R.layout.activity_area_tabbed_dashboard);
+        // Setup Toolbar
+        Toolbar toolbar = (Toolbar) findViewById(R.id.areas_display_toolbar);
+        setSupportActionBar(toolbar);
+        toolbar.setBackgroundColor(ColorProvider.getDefaultToolBarColor());
 
-        Toolbar topTB = (Toolbar) findViewById(R.id.toolbar_top);
-        final ColorDrawable topDrawable = (ColorDrawable) topTB.getBackground().getCurrent();
-        topDrawable.setColor(ColorProvider.getDefaultToolBarColor());
+        ViewPager viewPager = (ViewPager) findViewById(R.id.areas_display_tab_pager);
+        // Assign created adapter to viewPager
+        viewPager.setAdapter(new DisplayAreasPagerAdapter(getSupportFragmentManager()));
 
-        allAreas = new AreaDBHelper(getApplicationContext()).getAllAreas();
-
-        ListView areaListView = (ListView) findViewById(R.id.area_display_list);
-        areaDisplayAdapter = new AreaItemAdaptor(this, R.layout.area_element_row, allAreas);
-        areaListView.setAdapter(areaDisplayAdapter);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.areas_display_tab_layout);
+        // This method setup all required method for TabLayout with Viewpager
+        tabLayout.setupWithViewPager(viewPager);
 
         ImageView createAreaView = (ImageView) findViewById(R.id.action_area_create);
         createAreaView.setOnClickListener(new View.OnClickListener() {
@@ -55,26 +58,50 @@ public class AreaDashboardActivity extends AppCompatActivity {
             }
         });
 
-        ImageView refreshAreaView = (ImageView) findViewById(R.id.action_area_refresh);
-        refreshAreaView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
-                new LocalDataRefresher(getApplicationContext(), new DataReloadCallback()).refreshLocalData();
-            }
-        });
+    }
 
-        areaListView.setDescendantFocusability(ListView.FOCUS_BLOCK_DESCENDANTS);
-        areaListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapter, View v, int position,
-                                    long arg3) {
-                AreaElement ae = (AreaElement) adapter.getItemAtPosition(position);
-                AreaContext.getInstance().setAreaElement(ae, getApplicationContext());
-                Intent intent = new Intent(AreaDashboardActivity.this, AreaDetailsActivity.class);
-                startActivity(intent);
+    public static class DisplayAreasPagerAdapter extends FragmentPagerAdapter {
+        // As we are implementing two tabs
+        private static final int NUM_ITEMS = 3;
+
+        public DisplayAreasPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        // For each tab different fragment is returned
+        public Fragment getItem(int position) {
+            switch (position) {
+                case 0:
+                    return new AreaDashboardOwnedFragment();
+                case 1:
+                    return new AreaDashboardSharedFragment();
+                case 2:
+                    return new AreaDashboardPublicFragment();
+                default:
+                    return null;
             }
-        });
+        }
+
+        @Override
+        public int getCount() {
+            return NUM_ITEMS;
+
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            switch (position) {
+                case 0:
+                    return "Owned";
+                case 1:
+                    return "Shared";
+                case 2:
+                    return "Public";
+                default:
+                    return null;
+            }
+        }
     }
 
     @Override
@@ -91,20 +118,6 @@ public class AreaDashboardActivity extends AppCompatActivity {
                         finish();
                     }
                 }).setNegativeButton("no", null).show();
-    }
-
-    private class DataReloadCallback implements AsyncTaskCallback {
-
-        @Override
-        public void taskCompleted(Object result) {
-            AreaDBHelper adh = new AreaDBHelper(getApplicationContext());
-
-            areaDisplayAdapter.clear();
-            areaDisplayAdapter.addAll(adh.getAllAreas());
-            areaDisplayAdapter.notifyDataSetChanged();
-
-            findViewById(R.id.splash_panel).setVisibility(View.INVISIBLE);
-        }
     }
 
     private class DataInsertCallback implements AsyncTaskCallback {
@@ -126,8 +139,9 @@ public class AreaDashboardActivity extends AppCompatActivity {
             findViewById(R.id.splash_panel).setVisibility(View.INVISIBLE);
             finish();
 
-            Intent intent = new Intent(AreaDashboardActivity.this, AreaDetailsActivity.class);
+            Intent intent = new Intent(getApplicationContext(), AreaDetailsActivity.class);
             startActivity(intent);
         }
     }
+
 }

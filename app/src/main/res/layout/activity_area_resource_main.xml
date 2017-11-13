@@ -29,6 +29,7 @@
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@color/blue_grey_500"
             android:layout_weight="1"
             android:text="Picture" />
 
@@ -37,6 +38,7 @@
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@color/blue_grey_500"
             android:layout_weight="1"
             android:text="Video" />
 
@@ -45,6 +47,7 @@
             style="?android:attr/buttonStyleSmall"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:background="@color/blue_grey_500"
             android:layout_weight="1"
             android:text="Document" />
     </LinearLayout>
@@ -57,13 +60,16 @@
         android:id="@+id/upload_section"
         android:gravity="center_vertical"
         android:paddingTop="10dp"
-        android:paddingBottom="20dp">
+        android:paddingBottom="10dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp">
 
         <Button
             android:id="@+id/upload_to_drive_button"
             style="?android:attr/buttonStyleSmall"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:background="@color/blue_grey_500"
             android:gravity="center"
             android:text="Upload"
             android:visibility="visible" />

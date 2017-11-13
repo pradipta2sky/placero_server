@@ -84,7 +84,7 @@ public class PermissionsDBHelper extends SQLiteOpenHelper {
         final AreaElement areaElement = AreaContext.getInstance().getAreaElement();
         final UserElement userElement = UserContext.getInstance().getUserElement();
         try {
-            postParams.put("requestType", "ShareArea");
+            postParams.put("requestType", "AreaShare");
             postParams.put("query_type", queryType);
             postParams.put("source_user", userElement.getEmail());
             postParams.put("target_user", targetUser);

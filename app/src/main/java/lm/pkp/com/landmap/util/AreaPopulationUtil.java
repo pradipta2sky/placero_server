@@ -25,23 +25,17 @@ import lm.pkp.com.landmap.sync.LocalFolderStructureManager;
 /**
  * Created by USER on 11/2/2017.
  */
-public class AreaActivityUtil {
+public class AreaPopulationUtil {
 
-    public static final AreaActivityUtil INSTANCE = new AreaActivityUtil();
+    public static final AreaPopulationUtil INSTANCE = new AreaPopulationUtil();
 
-    private AreaActivityUtil(){
+    private AreaPopulationUtil(){
 
     }
 
     public void populateAreaElement(View view){
         final AreaElement areaElement = AreaContext.getInstance().getAreaElement();
         populateAreaElement(view, areaElement);
-    }
-
-    public void populateAreaElement(Activity activity){
-        View rootView = activity.getWindow().getDecorView().getRootView();
-        final AreaElement areaElement = AreaContext.getInstance().getAreaElement();
-        populateAreaElement(rootView, areaElement);
     }
 
     public void populateAreaElement(View view, AreaElement ae){
@@ -56,7 +50,7 @@ public class AreaActivityUtil {
 
         TextView descText = (TextView) view.findViewById(R.id.area_desc_text);
         String desc = ae.getDescription();
-        desc = "<b>Desc: </b>" + desc;
+        desc = "<b>Description: </b>" + desc;
         descText.setText(Html.fromHtml(desc));
 
         TextView creatorText = (TextView) view.findViewById(R.id.area_creator_text);
@@ -79,17 +73,9 @@ public class AreaActivityUtil {
 
         final Drawable drawable = view.getBackground().getCurrent();
         if(drawable instanceof GradientDrawable){
-            if(ae.getType().equalsIgnoreCase("shared")){
-                ((GradientDrawable)drawable).setColor(ColorConstants.BUFF_YELLOW_AREA_DISPLAY);
-            }else {
-                ((GradientDrawable)drawable).setColor(ColorConstants.BUFF_BLUE_AREA_DISPLAY);
-            }
+            ((GradientDrawable)drawable).setColor(ColorProvider.getAreaDetailsColor(ae));
         }else if(drawable instanceof ColorDrawable){
-            if(ae.getType().equalsIgnoreCase("shared")){
-                ((ColorDrawable)drawable).setColor(ColorConstants.BUFF_YELLOW_AREA_DISPLAY);
-            }else {
-                ((ColorDrawable)drawable).setColor(ColorConstants.BUFF_BLUE_AREA_DISPLAY);
-            }
+            ((ColorDrawable)drawable).setColor(ColorProvider.getAreaDetailsColor(ae));
         }
 
         // Load the area image here.

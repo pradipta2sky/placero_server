@@ -122,10 +122,6 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         db.execSQL("DELETE FROM " + POSITION_TABLE_NAME + " WHERE "
                 + POSITION_COLUMN_UNIQUE_AREA_ID + " = '" + uniqueAreaId + "'");
 
-        PositionElement pe = new PositionElement();
-        pe.setUniqueAreaId(uniqueAreaId);
-
-        new LMSRestAsyncTask().execute(preparePostParams("deleteByUniqueAreaId", pe));
         db.close();
     }
 
@@ -133,7 +129,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         ArrayList<PositionElement> pes = new ArrayList<PositionElement>();
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("select * from " + POSITION_TABLE_NAME + " WHERE " + POSITION_COLUMN_UNIQUE_AREA_ID + "=?",
-                new String[]{ae.getUniqueId() + ""});
+                new String[]{ae.getUniqueId()});
         if(cursor != null){
             cursor.moveToFirst();
             while (cursor.isAfterLast() == false) {

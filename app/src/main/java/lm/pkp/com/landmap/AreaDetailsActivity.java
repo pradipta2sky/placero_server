@@ -26,6 +26,7 @@ import java.util.UUID;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
+import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.custom.LocationPositionReceiver;
 import lm.pkp.com.landmap.permission.PermissionConstants;
@@ -34,7 +35,7 @@ import lm.pkp.com.landmap.position.PositionElement;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.position.PostionListAdaptor;
 import lm.pkp.com.landmap.provider.GPSLocationProvider;
-import lm.pkp.com.landmap.util.ColorConstants;
+import lm.pkp.com.landmap.util.ColorProvider;
 
 public class AreaDetailsActivity extends AppCompatActivity implements LocationPositionReceiver {
 
@@ -48,18 +49,17 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
-        ae = AreaContext.getInstance().getAreaElement();
-
         setContentView(R.layout.activity_area_details);
         getSupportActionBar().hide();
 
+        ae = AreaContext.getInstance().getAreaElement();
         Toolbar topTB = (Toolbar) findViewById(R.id.toolbar_top);
         final ColorDrawable topDrawable = (ColorDrawable) topTB.getBackground().getCurrent();
-        topDrawable.setColor(ColorConstants.getToolBarColorForShare());
+        topDrawable.setColor(ColorProvider.getAreaToolBarColor(ae));
 
         Toolbar bottomTB = (Toolbar) findViewById(R.id.toolbar_bottom);
         final ColorDrawable bottomDrawable = (ColorDrawable) bottomTB.getBackground().getCurrent();
-        bottomDrawable.setColor(ColorConstants.getToolBarColorForShare());
+        bottomDrawable.setColor(ColorProvider.getAreaToolBarColor(ae));
 
         if(!approachLocationPermissions()){
             Toast.makeText(getApplicationContext(),"No permission for location access.", Toast.LENGTH_LONG);
@@ -71,15 +71,18 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         }
 
         pdb = new PositionsDBHelper(getApplicationContext());
-        ListView posList = (ListView) findViewById(R.id.positionList);
-        adaptor = new PostionListAdaptor(getApplicationContext(), R.id.positionList, positionList);
-        posList.setAdapter(adaptor);
-
+        ListView posListView = (ListView) findViewById(R.id.positionList);
         positionList.addAll(AreaContext.getInstance().getPositions());
+        adaptor = new PostionListAdaptor(getApplicationContext(), R.id.positionList, positionList);
+        posListView.setAdapter(adaptor);
         adaptor.notifyDataSetChanged();
 
         TextView areaNameView = (TextView)findViewById(R.id.area_name_text);
-        areaNameView.setText(ae.getName());
+        String areaName = ae.getName();
+        if(areaName.length() > 20){
+            areaName = areaName.substring(0,19).concat("...");
+        }
+        areaNameView.setText(areaName);
 
         ImageView plotItem = (ImageView)findViewById(R.id.action_plot_area);
         plotItem.setOnClickListener(new View.OnClickListener() {
@@ -115,9 +118,9 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
             @Override
             public void onClick(View v) {
                 findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
-                new AreaDBHelper(getApplicationContext()).deleteArea(ae);
-                Intent areaDashboardIntent = new Intent(AreaDetailsActivity.this, AreaDashboardActivity.class);
-                startActivity(areaDashboardIntent);
+                final AreaDBHelper adh = new AreaDBHelper(getApplicationContext(), new DeleteAreaCallback());
+                adh.deleteArea(ae);
+                adh.deleteAreaFromServer(ae);
             }
         });
 
@@ -154,7 +157,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         displayResItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(AreaDetailsActivity.this, AreaResourcesDisplayActivity.class);
+                Intent intent = new Intent(AreaDetailsActivity.this, AreaDisplayResourcesActivity.class);
                 startActivity(intent);
             }
         });
@@ -215,7 +218,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
 
     @Override
     public void onBackPressed() {
-        Intent areaDashboardIntent = new Intent(AreaDetailsActivity.this, AreaDashboardActivity.class);
+        Intent areaDashboardIntent = new Intent(AreaDetailsActivity.this, AreaDashboardTabbedActivity.class);
         startActivity(areaDashboardIntent);
     }
 
@@ -231,5 +234,15 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
             //do nothing...
         }
         return gps_enabled;
+    }
+
+    private class DeleteAreaCallback implements AsyncTaskCallback{
+
+        @Override
+        public void taskCompleted(Object result) {
+            finish();
+            Intent areaDashboardIntent = new Intent(AreaDetailsActivity.this, AreaDashboardActivity.class);
+            startActivity(areaDashboardIntent);
+        }
     }
 }

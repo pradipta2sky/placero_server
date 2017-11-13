@@ -1,23 +1,16 @@
 package lm.pkp.com.landmap.area.res.disp;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.GradientDrawable;
-import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.TextView;
 
-import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import lm.pkp.com.landmap.R;
-import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
-import lm.pkp.com.landmap.user.UserDBHelper;
-import lm.pkp.com.landmap.util.AreaActivityUtil;
+import lm.pkp.com.landmap.util.AreaPopulationUtil;
 
 /**
  * Created by USER on 10/20/2017.
@@ -41,10 +34,7 @@ public class AreaItemAdaptor extends ArrayAdapter {
         }else {
             return v;
         }
-
-        AreaElement ae = items.get(position);
-        AreaActivityUtil.INSTANCE.populateAreaElement(v, ae);
-
+        AreaPopulationUtil.INSTANCE.populateAreaElement(v, items.get(position));
         return v;
     }
 }

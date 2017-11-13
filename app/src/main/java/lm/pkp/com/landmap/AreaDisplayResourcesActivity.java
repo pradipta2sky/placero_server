@@ -9,16 +9,18 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
+import lm.pkp.com.landmap.area.AreaContext;
+import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.area.res.disp.AreaDocumentDisplayFragment;
 import lm.pkp.com.landmap.area.res.disp.AreaPictureDisplayFragment;
 import lm.pkp.com.landmap.area.res.disp.AreaVideoDisplayFragment;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
-import lm.pkp.com.landmap.util.ColorConstants;
+import lm.pkp.com.landmap.util.ColorProvider;
 
 /**
  * Created by USER on 11/4/2017.
  */
-public class AreaResourcesDisplayActivity extends AppCompatActivity {
+public class AreaDisplayResourcesActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,25 +29,26 @@ public class AreaResourcesDisplayActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_area_res_display);
 
+        final AreaElement areaElement = AreaContext.getInstance().getAreaElement();
         // Setup Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_ar_res_disp);
         setSupportActionBar(toolbar);
-        toolbar.setBackgroundColor(ColorConstants.getToolBarColorForShare());
+        toolbar.setBackgroundColor(ColorProvider.getAreaToolBarColor(areaElement));
 
         ViewPager viewPager = (ViewPager) findViewById(R.id.area_tab_pager);
         // Assign created adapter to viewPager
-        viewPager.setAdapter(new TabsExamplePagerAdapter(getSupportFragmentManager()));
+        viewPager.setAdapter(new DisplayResourcesPagerAdapter(getSupportFragmentManager()));
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
         // This method setup all required method for TabLayout with Viewpager
         tabLayout.setupWithViewPager(viewPager);
     }
 
-    public static class TabsExamplePagerAdapter extends FragmentPagerAdapter {
+    public static class DisplayResourcesPagerAdapter extends FragmentPagerAdapter {
         // As we are implementing two tabs
         private static final int NUM_ITEMS = 3;
 
-        public TabsExamplePagerAdapter(FragmentManager fm) {
+        public DisplayResourcesPagerAdapter(FragmentManager fm) {
             super(fm);
         }
 

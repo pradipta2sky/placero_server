@@ -44,6 +44,11 @@
             android:label="@string/title_activity_area_dashboard" >
         </activity>
         <activity
+            android:name=".AreaDashboardTabbedActivity"
+            android:label="@string/title_activity_area_dashboard"
+            android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
             android:name=".AreaDetailsActivity"
             android:label="@string/title_activity_position_marker">
         </activity>
@@ -101,7 +106,7 @@
             android:label="@string/choose_document">
         </activity>
         <activity
-            android:name=".AreaResourcesDisplayActivity"
+            android:name=".AreaDisplayResourcesActivity"
             android:label="@string/area_resources"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>

@@ -8,19 +8,20 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
-import lm.pkp.com.landmap.util.AreaActivityUtil;
-import lm.pkp.com.landmap.util.ColorConstants;
+import lm.pkp.com.landmap.permission.PermissionsDBHelper;
+import lm.pkp.com.landmap.util.AreaPopulationUtil;
+import lm.pkp.com.landmap.util.ColorProvider;
 
 public class AreaEditActivity extends AppCompatActivity{
-
-    private AreaDBHelper adb = null;
-    private AreaElement ae = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,20 +30,22 @@ public class AreaEditActivity extends AppCompatActivity{
 
         setContentView(R.layout.activity_area_edit);
 
+        final AreaElement ae = AreaContext.getInstance().getAreaElement();
         ActionBar ab = getSupportActionBar();
-        ab.setHomeButtonEnabled(true);
-        ab.setDisplayHomeAsUpEnabled(true);
-        ab.setBackgroundDrawable(new ColorDrawable(ColorConstants.getToolBarColorForShare()));
+        ab.setHomeButtonEnabled(false);
+        ab.setDisplayHomeAsUpEnabled(false);
+        ab.setBackgroundDrawable(new ColorDrawable(ColorProvider.getAreaToolBarColor(ae)));
         ab.show();
 
-        adb = new AreaDBHelper(getApplicationContext());
-        ae = AreaContext.getInstance().getAreaElement();
-
         View includedView = findViewById(R.id.selected_area_include);
-        AreaActivityUtil.INSTANCE.populateAreaElement(includedView);
+        AreaPopulationUtil.INSTANCE.populateAreaElement(includedView);
 
         final TextView nameText = (TextView)findViewById(R.id.area_name_edit);
-        nameText.setText(ae.getName());
+        String areaName = ae.getName();
+        if(areaName.length() > 20){
+            areaName = areaName.substring(0,19).concat("...");
+        }
+        nameText.setText(areaName);
 
         final TextView descText = (TextView)findViewById(R.id.area_desc_edit);
         descText.setText(ae.getDescription());
@@ -56,19 +59,21 @@ public class AreaEditActivity extends AppCompatActivity{
             public void onClick(View v) {
                 findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
 
-                ae.setName(nameText.getText().toString());
+                String areaName = nameText.getText().toString();
+                if(areaName.trim().equalsIgnoreCase("")){
+                    Toast.makeText(getApplicationContext(), "A name is required !!", Toast.LENGTH_LONG);
+                    findViewById(R.id.splash_panel).setVisibility(View.GONE);
+                    return;
+                }
+                ae.setName(areaName);
                 ae.setDescription(descText.getText().toString());
                 ae.setAddress(addressText.getText().toString());
 
-                adb.updateAreaNonGeo(ae);
-                findViewById(R.id.splash_panel).setVisibility(View.INVISIBLE);
-
-                Intent positionMarkerIntent = new Intent(AreaEditActivity.this, AreaDetailsActivity.class);
-                startActivity(positionMarkerIntent);
+                AreaDBHelper adh = new AreaDBHelper(getApplicationContext(), new UpdateAreaToServerCallback());
+                adh.updateAreaAttributes(ae);
+                adh.updateAreaOnServer(ae);
             }
         });
-
-
     }
 
     @Override
@@ -85,5 +90,34 @@ public class AreaEditActivity extends AppCompatActivity{
     @Override
     public void onBackPressed() {
         finish();
+    }
+
+    private class UpdateAreaToServerCallback implements AsyncTaskCallback{
+
+        @Override
+        public void taskCompleted(Object result) {
+            // Work on the make public option.
+            final CheckBox makePublicCheckBox = (CheckBox) findViewById(R.id.make_area_public);
+            if(makePublicCheckBox.isChecked()){
+                PermissionsDBHelper pdh = new PermissionsDBHelper(getApplicationContext(), new MakeAreaPublicCallback());
+                pdh.insertPermissionsToServer("any", "view_only");
+            }else {
+                findViewById(R.id.splash_panel).setVisibility(View.INVISIBLE);
+                finish();
+                Intent areaDetailsIntent = new Intent(AreaEditActivity.this, AreaDetailsActivity.class);
+                startActivity(areaDetailsIntent);
+            }
+        }
+    }
+
+    private class MakeAreaPublicCallback implements AsyncTaskCallback{
+
+        @Override
+        public void taskCompleted(Object result) {
+            findViewById(R.id.splash_panel).setVisibility(View.INVISIBLE);
+            finish();
+            Intent areaDetailsIntent = new Intent(AreaEditActivity.this, AreaDetailsActivity.class);
+            startActivity(areaDetailsIntent);
+        }
     }
 }

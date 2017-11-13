@@ -13,11 +13,12 @@ import android.widget.ListView;
 import java.util.ArrayList;
 
 import lm.pkp.com.landmap.area.AreaContext;
+import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.area.res.disp.AreaAddResourceAdaptor;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.drive.DriveResource;
-import lm.pkp.com.landmap.util.AreaActivityUtil;
-import lm.pkp.com.landmap.util.ColorConstants;
+import lm.pkp.com.landmap.util.AreaPopulationUtil;
+import lm.pkp.com.landmap.util.ColorProvider;
 
 public class AreaAddResourcesActivity extends AppCompatActivity{
 
@@ -34,11 +35,12 @@ public class AreaAddResourcesActivity extends AppCompatActivity{
         ActionBar ab = getSupportActionBar();
         ab.setHomeButtonEnabled(true);
         ab.setDisplayHomeAsUpEnabled(true);
-        ab.setBackgroundDrawable(new ColorDrawable(ColorConstants.getToolBarColorForShare()));
+        final AreaElement areaElement = AreaContext.getInstance().getAreaElement();
+        ab.setBackgroundDrawable(new ColorDrawable(ColorProvider.getAreaToolBarColor(areaElement)));
         ab.show();
 
         View includedView = findViewById(R.id.selected_area_include);
-        AreaActivityUtil.INSTANCE.populateAreaElement(includedView);
+        AreaPopulationUtil.INSTANCE.populateAreaElement(includedView);
 
         ListView resourceFileList = (ListView) findViewById(R.id.file_display_list);
         adaptor = new AreaAddResourceAdaptor(getApplicationContext(), R.id.file_display_list, areaResourcesDisplayList);

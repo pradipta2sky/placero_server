@@ -14,7 +14,6 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
@@ -23,20 +22,16 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.permission.PermissionsDBHelper;
-import lm.pkp.com.landmap.position.PositionElement;
-import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.user.UserInfoSearchAsyncTask;
-import lm.pkp.com.landmap.util.AreaActivityUtil;
-import lm.pkp.com.landmap.util.ColorConstants;
+import lm.pkp.com.landmap.util.AreaPopulationUtil;
+import lm.pkp.com.landmap.util.ColorProvider;
 import lm.pkp.com.landmap.util.GeneralUtil;
 
 public class AreaShareActivity extends AppCompatActivity{
@@ -50,14 +45,15 @@ public class AreaShareActivity extends AppCompatActivity{
 
         setContentView(R.layout.activity_area_share);
 
+        final AreaElement areaElement = AreaContext.getInstance().getAreaElement();
         ActionBar ab = getSupportActionBar();
         ab.setHomeButtonEnabled(true);
         ab.setDisplayHomeAsUpEnabled(true);
-        ab.setBackgroundDrawable(new ColorDrawable(ColorConstants.getToolBarColorForShare()));
+        ab.setBackgroundDrawable(new ColorDrawable(ColorProvider.getAreaToolBarColor(areaElement)));
         ab.show();
 
         View includedView = findViewById(R.id.selected_area_include);
-        AreaActivityUtil.INSTANCE.populateAreaElement(includedView);
+        AreaPopulationUtil.INSTANCE.populateAreaElement(includedView);
 
         adapter = new ArrayAdapter<>(this, android.R.layout.simple_dropdown_item_1line, new String[]{});
         final AutoCompleteTextView userIdView = (AutoCompleteTextView) findViewById(R.id.user_search_text);
