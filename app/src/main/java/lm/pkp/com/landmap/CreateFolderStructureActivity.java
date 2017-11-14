@@ -44,6 +44,12 @@ import lm.pkp.com.landmap.user.UserElement;
 public class CreateFolderStructureActivity extends BaseDriveActivity {
 
     @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_synchronize_folders);
+    }
+
+    @Override
     public void onConnected(Bundle connectionHint) {
         super.onConnected(connectionHint);
         new FileProcessingTask().execute();

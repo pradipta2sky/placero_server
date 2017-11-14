@@ -67,7 +67,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         }
 
         if (!isGPSEnabled()) {
-            showLocationDialog();
+            showEnableGPSDialog();
         }
 
         pdb = new PositionsDBHelper(getApplicationContext());
@@ -177,26 +177,6 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         });
     }
 
-    private void showLocationDialog() {
-        new AlertDialog.Builder(this)
-                .setTitle("GPS Location disabled.")
-                .setMessage("Do you want to enable GPS ?")
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        // Add some marker in the context saying that GPS is not enabled.
-                        Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                        startActivity(myIntent);
-                    }
-                })
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int whichButton) {
-                        // Add some marker in the context saying that GPS is not enabled.
-                    }
-                })
-                .show();
-    }
-
     private boolean askForLocationPermission() {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED &&
@@ -233,6 +213,18 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
     }
 
     @Override
+    public void locationFixTimedOut() {
+        findViewById(R.id.splash_panel).setVisibility(View.GONE);
+        showLocationFixFailureDialog();
+    }
+
+    @Override
+    public void providerDisabled() {
+        findViewById(R.id.splash_panel).setVisibility(View.GONE);
+        showEnableGPSDialog();
+    }
+
+    @Override
     public void onBackPressed() {
         Intent areaDashboardIntent = new Intent(AreaDetailsActivity.this, AreaDashboardActivity.class);
         startActivity(areaDashboardIntent);
@@ -253,7 +245,6 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
     }
 
     private class DeleteAreaCallback implements AsyncTaskCallback {
-
         @Override
         public void taskCompleted(Object result) {
             finish();
@@ -261,4 +252,42 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
             startActivity(areaDashboardIntent);
         }
     }
+
+    private void showEnableGPSDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("GPS Location disabled.")
+                .setMessage("Do you want to enable GPS ?")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        // Add some marker in the context saying that GPS is not enabled.
+                        Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        startActivity(myIntent);
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        // Add some marker in the context saying that GPS is not enabled.
+                    }
+                })
+                .show();
+    }
+
+    private void showLocationFixFailureDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Location Fix failed. Please stay outdoors !!")
+                .setMessage("Do you want to try again ?")
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
+                        new GPSLocationProvider(AreaDetailsActivity.this).getLocation();
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        // Add some marker in the context saying that GPS is not enabled.
+                    }
+                })
+                .show();
+    }
+
 }

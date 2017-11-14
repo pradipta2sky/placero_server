@@ -9,4 +9,7 @@ public interface LocationPositionReceiver {
 
     public void receivedLocationPostion(PositionElement pe);
 
+    public void locationFixTimedOut();
+
+    public void providerDisabled();
 }

@@ -5,29 +5,41 @@ package lm.pkp.com.landmap.provider;
  */
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.view.View;
 
+import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.custom.LocationPositionReceiver;
 import lm.pkp.com.landmap.position.PositionElement;
 
 public class GPSLocationProvider implements LocationListener {
 
-    private final Activity mContext;
-    private PositionElement pe = null;
+    private final Activity activity;
 
     public GPSLocationProvider(Activity context) {
-        this.mContext = context;
+        this.activity = context;
     }
 
     public void getLocation() {
         try {
-            pe = new PositionElement();
-            LocationManager locationManager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
+            final LocationManager locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
+            Looper looper = Looper.myLooper();
             locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER,this,null);
+            final Handler handler = new Handler(looper);
+            handler.postDelayed(new Runnable() {
+                public void run() {
+                    locationManager.removeUpdates(GPSLocationProvider.this);
+                    notifyFailureForLocationFix();
+                }
+            }, (1000 * 30)); // timeout after 30 secs
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -35,14 +47,15 @@ public class GPSLocationProvider implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
+        PositionElement pe = new PositionElement();
         pe.setLon(location.getLongitude());
         pe.setLat(location.getLatitude());
-        ((LocationPositionReceiver)mContext).receivedLocationPostion(pe);
+        ((LocationPositionReceiver) activity).receivedLocationPostion(pe);
     }
 
     @Override
     public void onProviderDisabled(String provider) {
-        // TODO Show an error to the user.
+        ((LocationPositionReceiver) activity).providerDisabled();
     }
 
     @Override
@@ -51,6 +64,10 @@ public class GPSLocationProvider implements LocationListener {
 
     @Override
     public void onStatusChanged(String provider, int status, Bundle extras) {
+    }
+
+    public void notifyFailureForLocationFix(){
+        ((LocationPositionReceiver) activity).locationFixTimedOut();
     }
 
 }
