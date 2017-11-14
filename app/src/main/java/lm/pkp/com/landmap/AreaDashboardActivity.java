@@ -12,6 +12,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 
 import lm.pkp.com.landmap.area.AreaContext;
@@ -40,7 +42,6 @@ public class AreaDashboardActivity extends AppCompatActivity {
         ViewPager viewPager = (ViewPager) findViewById(R.id.areas_display_tab_pager);
         // Assign created adapter to viewPager
         viewPager.setAdapter(new DisplayAreasPagerAdapter(getSupportFragmentManager()));
-        viewPager.setOffscreenPageLimit(1);
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.areas_display_tab_layout);
         // This method setup all required method for TabLayout with Viewpager

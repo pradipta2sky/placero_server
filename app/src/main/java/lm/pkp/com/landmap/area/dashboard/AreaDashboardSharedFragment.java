@@ -3,10 +3,15 @@ package lm.pkp.com.landmap.area.dashboard;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 
@@ -26,8 +31,6 @@ import lm.pkp.com.landmap.sync.LocalDataRefresher;
  */
 public class AreaDashboardSharedFragment extends Fragment {
 
-    private AreaItemAdaptor areaDisplayAdapter;
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_shared_areas, container, false);
@@ -42,12 +45,46 @@ public class AreaDashboardSharedFragment extends Fragment {
     @Override
     public void onViewCreated(final View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+    }
 
-        ArrayList<AreaElement> areas = new ArrayList<>();
+    @Override
+    public void setUserVisibleHint(boolean visible) {
+        super.setUserVisibleHint(visible);
+        if (visible && isResumed()) {
+            loadFragment();
+        }
+    }
+
+    private void loadFragment() {
+        View view = getView();
+        view.findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
+
+        ImageView refreshAreaView = (ImageView) getActivity().findViewById(R.id.action_area_refresh);
+        refreshAreaView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getView().findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
+                new LocalDataRefresher(getContext(), new DataReloadCallback()).refreshLocalData();
+            }
+        });
+
+        final EditText inputSearch = (EditText) getActivity().findViewById(R.id.dashboard_search_box);
+        inputSearch.addTextChangedListener(new UserInputWatcher());
+
+        final Button seachClearButton = (Button) getActivity().findViewById(R.id.dashboard_search_clear);
+        seachClearButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final EditText inputSearch = (EditText) getView().findViewById(R.id.dashboard_search_box);
+                inputSearch.setText("");
+            }
+        });
+
+        final AreaDBHelper adh = new AreaDBHelper(view.getContext());
         ListView areaListView = (ListView) view.findViewById(R.id.area_display_list);
-        areaDisplayAdapter = new AreaItemAdaptor(getContext(), R.layout.area_element_row, areas);
+        AreaItemAdaptor adaptor = new AreaItemAdaptor(getContext(), R.layout.area_element_row, adh.getAreas("shared"));
 
-        areaListView.setAdapter(areaDisplayAdapter);
+        areaListView.setAdapter(adaptor);
         areaListView.setDescendantFocusability(ListView.FOCUS_BLOCK_DESCENDANTS);
         areaListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -60,34 +97,6 @@ public class AreaDashboardSharedFragment extends Fragment {
             }
         });
 
-    }
-
-    @Override
-    public void setUserVisibleHint(boolean visible) {
-        super.setUserVisibleHint(visible);
-        if (visible  && isResumed()) {
-            System.out.println("Menu is visible and resumed");
-            loadFragment();
-        }
-    }
-
-    private void loadFragment() {
-        View view = getView();
-        view.findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
-
-        final AreaDBHelper adh = new AreaDBHelper(view.getContext());
-        areaDisplayAdapter.clear();
-        areaDisplayAdapter.addAll(adh.getAreas("shared"));
-        areaDisplayAdapter.notifyDataSetChanged();
-
-        ImageView refreshAreaView = (ImageView) getActivity().findViewById(R.id.action_area_refresh);
-        refreshAreaView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                getView().findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
-                new LocalDataRefresher(getContext(), new DataReloadCallback()).refreshLocalData();
-            }
-        });
         view.findViewById(R.id.splash_panel).setVisibility(View.GONE);
     }
 
@@ -95,14 +104,42 @@ public class AreaDashboardSharedFragment extends Fragment {
 
         @Override
         public void taskCompleted(Object result) {
-            AreaDBHelper adh = new AreaDBHelper(getContext());
+            final ArrayList<AreaElement> areas = new AreaDBHelper(getView().getContext()).getAreas("shared");
 
-            areaDisplayAdapter.clear();
-            areaDisplayAdapter.addAll(adh.getAreas("shared"));
-            areaDisplayAdapter.notifyDataSetChanged();
+            ListView areaListView = (ListView) getView().findViewById(R.id.area_display_list);
+            AreaItemAdaptor adaptor = new AreaItemAdaptor(getContext(), R.layout.area_element_row, areas);
+            areaListView.setAdapter(adaptor);
+
+            final EditText inputSearch = (EditText) getActivity().findViewById(R.id.dashboard_search_box);
+            String filterStr = inputSearch.getText().toString().trim();
+            if(!filterStr.equalsIgnoreCase("")){
+                adaptor.getFilter().filter(filterStr);
+            }
 
             getView().findViewById(R.id.splash_panel).setVisibility(View.INVISIBLE);
         }
+    }
+
+    private class UserInputWatcher implements TextWatcher {
+        @Override
+        public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            getView().findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
+
+            ListView areaListView = (ListView) getView().findViewById(R.id.area_display_list);
+            final ArrayAdapter<AreaElement> adapter = (ArrayAdapter<AreaElement>) areaListView.getAdapter();
+            adapter.getFilter().filter(editable.toString());
+
+            getView().findViewById(R.id.splash_panel).setVisibility(View.GONE);
+        }
+
     }
 
 }

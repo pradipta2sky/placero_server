@@ -70,9 +70,11 @@ public class AreaItemAdaptor extends ArrayAdapter implements Filterable{
                 List<AreaElement> results = new ArrayList<>();
                 for (int i = 0; i < fixedItems.size(); i++) {
                     final AreaElement areaElement = fixedItems.get(i);
-                    if(areaElement.getName().contains(constraint)
-                            || areaElement.getDescription().contains(constraint)
-                            || areaElement.getAddress().contains(constraint)){
+                    String areaName = areaElement.getName().toLowerCase();
+                    String description = areaElement.getDescription().toLowerCase();
+                    String address = areaElement.getAddress().toLowerCase();
+                    String cons = constraint.toString().toLowerCase();
+                    if(areaName.contains(cons) || description.contains(constraint) || address.contains(constraint)){
                         results.add(areaElement);
                     }
                 }

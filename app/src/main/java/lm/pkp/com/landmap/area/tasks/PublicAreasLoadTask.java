@@ -51,9 +51,15 @@ public class PublicAreasLoadTask extends AsyncTask<JSONObject, Void, String>{
 
     protected String doInBackground(JSONObject... postDataParams) {
         try {
-            String urlString = "http://35.202.7.223/lm/AreaPublic.php";
-            URL url = new URL(urlString);
-
+            String urlString = "http://35.202.7.223/lm/AreaPublicSearch.php";
+            URL url = null;
+            if(postDataParams.length > 0){
+                JSONObject postDataParam = postDataParams[0];
+                String searchKey = postDataParam.getString("sk");
+                url = new URL(urlString + "?sk=" + URLEncoder.encode(searchKey, "utf-8"));
+            }else {
+                url = new URL(urlString);
+            }
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(15000);
             conn.setConnectTimeout(15000);

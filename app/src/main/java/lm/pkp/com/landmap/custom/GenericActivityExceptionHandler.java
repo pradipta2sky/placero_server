@@ -45,17 +45,20 @@ public class GenericActivityExceptionHandler implements Thread.UncaughtException
             content.append("\n");
         }
 
+        /*
         Runnable r = new Runnable() {
             @Override
             public void run() {
                 sendEmail(content.toString());
             }
         };
+        */
 
         if(ex instanceof  UserUnavailableException){
             // Check why the user went off. ?? Do something here.
         }
 
+        /*
         Intent intent = new Intent(activity, SignInActivity.class);
         intent.putExtra("crash", true);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -69,6 +72,7 @@ public class GenericActivityExceptionHandler implements Thread.UncaughtException
         AlarmManager mgr = (AlarmManager) LandmapApplication.getInstance().getBaseContext()
                 .getSystemService(Context.ALARM_SERVICE);
         mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, pendingIntent);
+        */
 
         activity.finish();
         System.exit(2);

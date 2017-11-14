@@ -3,10 +3,14 @@ package lm.pkp.com.landmap.area.dashboard;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 
@@ -41,23 +45,6 @@ public class AreaDashboardPublicFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        ArrayList<AreaElement> areas = new ArrayList<>();
-        ListView areaListView = (ListView) view.findViewById(R.id.area_display_list);
-        areaDisplayAdapter = new AreaItemAdaptor(getContext(), R.layout.area_element_row, areas);
-
-        areaListView.setAdapter(areaDisplayAdapter);
-        areaListView.setDescendantFocusability(ListView.FOCUS_BLOCK_DESCENDANTS);
-        areaListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapter, View v, int position,
-                                    long arg3) {
-                AreaElement ae = (AreaElement) adapter.getItemAtPosition(position);
-                AreaContext.getInstance().setAreaElement(ae, getContext());
-                Intent intent = new Intent(getContext(), AreaDetailsActivity.class);
-                startActivity(intent);
-            }
-        });
     }
 
     @Override
@@ -71,29 +58,107 @@ public class AreaDashboardPublicFragment extends Fragment {
     private void loadFragment() {
         View view = getView();
         view.findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
-        new LocalDataRefresher(getContext(), new DataReloadCallback()).refreshPublicAreas();
+
+        final EditText inputSearch = (EditText) getActivity().findViewById(R.id.dashboard_search_box);
+        final String availableKey = inputSearch.getText().toString();
+        inputSearch.addTextChangedListener(new UserInputWatcher());
+
+        if(availableKey.trim().equalsIgnoreCase("")){
+            LocalDataRefresher dataRefresher = new LocalDataRefresher(getContext(), new DataReloadCallback());
+            dataRefresher.refreshPublicAreas();
+        }else {
+            LocalDataRefresher dataRefresher = new LocalDataRefresher(getContext(), new DataReloadCallback(availableKey.trim()));
+            dataRefresher.refreshPublicAreas(availableKey.trim());
+        }
 
         ImageView refreshAreaView = (ImageView) getActivity().findViewById(R.id.action_area_refresh);
         refreshAreaView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 getView().findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
-                new LocalDataRefresher(getContext(), new DataReloadCallback()).refreshPublicAreas();
+                final String key = inputSearch.getText().toString();
+                if (key.trim().equalsIgnoreCase("")) {
+                    LocalDataRefresher dataRefresher = new LocalDataRefresher(getContext(), new DataReloadCallback());
+                    dataRefresher.refreshPublicAreas();
+                } else {
+                    LocalDataRefresher dataRefresher = new LocalDataRefresher(getContext(), new DataReloadCallback(key.trim()));
+                    dataRefresher.refreshPublicAreas(key.trim());
+                }
             }
         });
+
+        final Button seachClearButton = (Button) getActivity().findViewById(R.id.dashboard_search_clear);
+        seachClearButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final EditText inputSearch = (EditText) getActivity().findViewById(R.id.dashboard_search_box);
+                inputSearch.setText("");
+            }
+        });
+
     }
 
     private class DataReloadCallback implements AsyncTaskCallback {
+
+        private String filterStr;
+
+        public DataReloadCallback(String searchKey) {
+            this.filterStr = searchKey;
+        }
+
+        public DataReloadCallback() {
+            this.filterStr = "";
+        }
 
         @Override
         public void taskCompleted(Object result) {
             AreaDBHelper adh = new AreaDBHelper(getContext());
 
-            areaDisplayAdapter.clear();
-            areaDisplayAdapter.addAll(adh.getAreas("public"));
-            areaDisplayAdapter.notifyDataSetChanged();
+            AreaItemAdaptor adaptor = new AreaItemAdaptor(getContext(), R.layout.area_element_row, adh.getAreas("public"));
+            adaptor.notifyDataSetChanged();
+            ListView areaListView = (ListView) getView().findViewById(R.id.area_display_list);
+            areaListView.setAdapter(adaptor);
+
+            if(!filterStr.equalsIgnoreCase("")){
+                adaptor.getFilter().filter(filterStr);
+            }
+
+            areaListView.setDescendantFocusability(ListView.FOCUS_BLOCK_DESCENDANTS);
+            areaListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapter, View v, int position,
+                                        long arg3) {
+                    AreaElement ae = (AreaElement) adapter.getItemAtPosition(position);
+                    AreaContext.getInstance().setAreaElement(ae, getContext());
+                    Intent intent = new Intent(getContext(), AreaDetailsActivity.class);
+                    startActivity(intent);
+                }
+            });
 
             getView().findViewById(R.id.splash_panel).setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private class UserInputWatcher implements TextWatcher {
+        @Override
+        public void onTextChanged(CharSequence cs, int arg1, int arg2, int arg3) {
+        }
+
+        @Override
+        public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+        }
+
+        @Override
+        public void afterTextChanged(Editable editable) {
+            getView().findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
+            String filterStr = editable.toString().trim();
+            if(!filterStr.equalsIgnoreCase("")){
+                LocalDataRefresher dataRefresher = new LocalDataRefresher(getContext(), new DataReloadCallback(filterStr));
+                dataRefresher.refreshPublicAreas(filterStr);
+            }else {
+                LocalDataRefresher dataRefresher = new LocalDataRefresher(getContext(), new DataReloadCallback());
+                dataRefresher.refreshPublicAreas();
+            }
         }
     }
 

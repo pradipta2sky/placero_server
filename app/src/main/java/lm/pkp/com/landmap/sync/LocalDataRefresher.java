@@ -49,18 +49,31 @@ public class LocalDataRefresher implements AsyncTaskCallback {
     }
 
     public void refreshPublicAreas() {
-
         AreaDBHelper adh = new AreaDBHelper(ctxt);
         adh.deletePublicAreas();
 
         PublicAreasLoadTask loadTask = new PublicAreasLoadTask(ctxt);
         loadTask.setCompletionCallback(this);
-
         try {
             loadTask.execute();
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public void refreshPublicAreas(String searchKey) {
+        AreaDBHelper adh = new AreaDBHelper(ctxt);
+        adh.deletePublicAreas();
+
+        PublicAreasLoadTask loadTask = new PublicAreasLoadTask(ctxt);
+        try {
+            JSONObject queryObj = new JSONObject();
+            queryObj.put("sk", searchKey);
+            loadTask.execute(queryObj);
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        loadTask.setCompletionCallback(this);
     }
 
     @Override
