@@ -54,7 +54,6 @@ public class DownloadResourcesActivity extends BaseDriveActivity {
 
         // Preprocessing of the resources.
         AreaDBHelper adh = new AreaDBHelper(getApplicationContext());
-        DriveDBHelper ddh = new DriveDBHelper(getApplicationContext());
 
         ArrayList<AreaElement> areas = adh.getAllAreas();
         AreaContext ac = AreaContext.getInstance();
@@ -79,7 +78,7 @@ public class DownloadResourcesActivity extends BaseDriveActivity {
             processResource(res);
         }else {
             finish();
-            Intent areaDashboardIntent = new Intent(DownloadResourcesActivity.this, AreaDashboardActivity.class);
+            Intent areaDashboardIntent = new Intent(getApplicationContext(), AreaDashboardActivity.class);
             startActivity(areaDashboardIntent);
         }
     }
@@ -128,12 +127,9 @@ public class DownloadResourcesActivity extends BaseDriveActivity {
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }
-
-                    driveStream.close();
                     localStream.flush();
                     localStream.close();
                 }
-
                 processResources();
                 return true;
             } catch (IOException e) {

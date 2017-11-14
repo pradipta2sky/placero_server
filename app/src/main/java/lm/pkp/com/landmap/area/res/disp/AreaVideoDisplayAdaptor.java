@@ -49,7 +49,6 @@ final class AreaVideoDisplayAdaptor extends BaseAdapter {
         final Picasso picassoElem = Picasso.with(context);//
         picassoElem.setIndicatorsEnabled(true);
         picassoElem.load(Uri.parse(thumbPath)) //
-                .placeholder(R.drawable.placeholder) //
                 .error(R.drawable.error) //
                 .config(Bitmap.Config.RGB_565)
                 .centerCrop()

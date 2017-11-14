@@ -43,7 +43,6 @@ final class AreaPictureDisplayAdaptor extends BaseAdapter {
         final Picasso picassoElem = Picasso.with(context);//
         picassoElem.setIndicatorsEnabled(true);
         picassoElem.load(fileUrl) //
-                .placeholder(R.drawable.placeholder) //
                 .error(R.drawable.error) //
                 .resize(300,300)
                 .tag(context) //

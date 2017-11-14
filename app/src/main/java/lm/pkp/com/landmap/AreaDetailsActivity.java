@@ -39,11 +39,11 @@ import lm.pkp.com.landmap.util.ColorProvider;
 
 public class AreaDetailsActivity extends AppCompatActivity implements LocationPositionReceiver {
 
-    private PositionsDBHelper pdb = null;
-    private AreaElement ae = null;
+    private PositionsDBHelper pdb;
+    private AreaElement ae;
 
     private ArrayList<PositionElement> positionList = new ArrayList<PositionElement>();
-    private PostionListAdaptor adaptor = null;
+    private PostionListAdaptor adaptor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,12 +61,12 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         final ColorDrawable bottomDrawable = (ColorDrawable) bottomTB.getBackground().getCurrent();
         bottomDrawable.setColor(ColorProvider.getAreaToolBarColor(ae));
 
-        if(!approachLocationPermissions()){
-            Toast.makeText(getApplicationContext(),"No permission for location access.", Toast.LENGTH_LONG);
+        if (!askForLocationPermission()) {
+            Toast.makeText(getApplicationContext(), "No permission for location access.", Toast.LENGTH_LONG);
             finish();
         }
 
-        if(!isGPSEnabled()){
+        if (!isGPSEnabled()) {
             showLocationDialog();
         }
 
@@ -77,23 +77,14 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         posListView.setAdapter(adaptor);
         adaptor.notifyDataSetChanged();
 
-        TextView areaNameView = (TextView)findViewById(R.id.area_name_text);
+        TextView areaNameView = (TextView) findViewById(R.id.area_name_text);
         String areaName = ae.getName();
-        if(areaName.length() > 20){
-            areaName = areaName.substring(0,19).concat("...");
+        if (areaName.length() > 20) {
+            areaName = areaName.substring(0, 19).concat("...");
         }
         areaNameView.setText(areaName);
 
-        ImageView plotItem = (ImageView)findViewById(R.id.action_plot_area);
-        plotItem.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(AreaDetailsActivity.this, AreaMapPlotterActivity.class);
-                startActivity(intent);
-            }
-        });
-
-        ImageView areaEditItem = (ImageView)findViewById(R.id.action_area_edit);
+        ImageView areaEditItem = (ImageView) findViewById(R.id.action_area_edit);
         areaEditItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -102,64 +93,81 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
             }
         });
 
-        ImageView markLocationItem = (ImageView)findViewById(R.id.action_mark_location);
-        markLocationItem.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if(PermissionManager.INSTANCE.hasAccess(PermissionConstants.MARK_POSITION)){
-                    findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
-                    new GPSLocationProvider(AreaDetailsActivity.this).getLocation();
-                }else {
-                    Toast.makeText(getApplicationContext(), "You do not enough rights !!", Toast.LENGTH_LONG).show();
-                }
-            }
-        });
-
-        ImageView deleteAreaItem = (ImageView)findViewById(R.id.action_delete_area);
+        ImageView deleteAreaItem = (ImageView) findViewById(R.id.action_delete_area);
         deleteAreaItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(PermissionManager.INSTANCE.hasAccess(PermissionConstants.REMOVE_AREA)){
+                if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.REMOVE_AREA)) {
                     findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
                     final AreaDBHelper adh = new AreaDBHelper(getApplicationContext(), new DeleteAreaCallback());
                     adh.deleteArea(ae);
                     adh.deleteAreaFromServer(ae);
-                }else {
+                } else {
                     Toast.makeText(getApplicationContext(), "You do not enough rights !!", Toast.LENGTH_LONG).show();
                 }
             }
         });
 
-        ImageView shareAreaItem = (ImageView)findViewById(R.id.action_share_area);
-        shareAreaItem.setOnClickListener(new View.OnClickListener() {
+        ImageView markLocationItem = (ImageView) findViewById(R.id.action_mark_location);
+        markLocationItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent areaShareIntent = new Intent(AreaDetailsActivity.this, AreaShareActivity.class);
-                startActivity(areaShareIntent);
+                if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.MARK_POSITION)) {
+                    findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
+                    new GPSLocationProvider(AreaDetailsActivity.this).getLocation();
+                } else {
+                    Toast.makeText(getApplicationContext(), "You do not enough rights !!", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
-        ImageView navigateItem = (ImageView)findViewById(R.id.action_navigate_area);
+        ImageView plotItem = (ImageView) findViewById(R.id.action_plot_area);
+        plotItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(AreaDetailsActivity.this, AreaMapPlotterActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        ImageView navigateItem = (ImageView) findViewById(R.id.action_navigate_area);
         navigateItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Uri gmmIntentUri = Uri.parse("google.navigation:q=" + ae.getCenterLat()+ "," + ae.getCenterLon());
+                Uri gmmIntentUri = Uri.parse("google.navigation:q=" + ae.getCenterLat() + "," + ae.getCenterLon());
                 Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
                 mapIntent.setPackage("com.google.android.apps.maps");
                 startActivity(mapIntent);
             }
         });
 
-        ImageView driveItem = (ImageView)findViewById(R.id.action_drive_area);
-        driveItem.setOnClickListener(new View.OnClickListener() {
+        ImageView shareAreaItem = (ImageView) findViewById(R.id.action_share_area);
+        shareAreaItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(AreaDetailsActivity.this, CreateFolderStructureActivity.class);
-                startActivity(intent);
+                if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.SHARE_READ_ONLY)) {
+                    Intent areaShareIntent = new Intent(AreaDetailsActivity.this, AreaShareActivity.class);
+                    startActivity(areaShareIntent);
+                } else {
+                    Toast.makeText(getApplicationContext(), "You do not enough rights !!", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
-        ImageView displayResItem = (ImageView)findViewById(R.id.action_display_res);
+        ImageView addResourcesItem = (ImageView) findViewById(R.id.action_drive_area);
+        addResourcesItem.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.ADD_RESOURCES)) {
+                    Intent intent = new Intent(AreaDetailsActivity.this, CreateFolderStructureActivity.class);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(getApplicationContext(), "You do not enough rights !!", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+
+        ImageView displayResItem = (ImageView) findViewById(R.id.action_display_res);
         displayResItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -177,17 +185,19 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         // Add some marker in the context saying that GPS is not enabled.
-                        Intent myIntent = new Intent( Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                         startActivity(myIntent);
-                    }})
+                    }
+                })
                 .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         // Add some marker in the context saying that GPS is not enabled.
-                    }})
+                    }
+                })
                 .show();
     }
 
-    private boolean approachLocationPermissions() {
+    private boolean askForLocationPermission() {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
@@ -195,14 +205,14 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
             return true;
         } else {
             ActivityCompat.requestPermissions(this, new String[]{
-                            android.Manifest.permission.ACCESS_FINE_LOCATION,
-                            android.Manifest.permission.ACCESS_COARSE_LOCATION},1);
+                    android.Manifest.permission.ACCESS_FINE_LOCATION,
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
             if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
                     PackageManager.PERMISSION_GRANTED &&
                     ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
                             PackageManager.PERMISSION_GRANTED) {
                 return true;
-            }else {
+            } else {
                 return false;
             }
         }
@@ -228,21 +238,21 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         startActivity(areaDashboardIntent);
     }
 
-    private boolean isGPSEnabled(){
+    private boolean isGPSEnabled() {
         LocationManager locationManager = null;
-        boolean gps_enabled= false;
+        boolean gps_enabled = false;
 
-        if(locationManager ==null)
+        if (locationManager == null)
             locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        try{
+        try {
             gps_enabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
-        }catch(Exception ex){
+        } catch (Exception ex) {
             //do nothing...
         }
         return gps_enabled;
     }
 
-    private class DeleteAreaCallback implements AsyncTaskCallback{
+    private class DeleteAreaCallback implements AsyncTaskCallback {
 
         @Override
         public void taskCompleted(Object result) {

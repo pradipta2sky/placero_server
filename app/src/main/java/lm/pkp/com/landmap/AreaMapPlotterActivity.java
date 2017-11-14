@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -35,6 +36,8 @@ import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.custom.MapWrapperLayout;
 import lm.pkp.com.landmap.custom.OnInfoWindowElemTouchListener;
+import lm.pkp.com.landmap.permission.PermissionConstants;
+import lm.pkp.com.landmap.permission.PermissionManager;
 import lm.pkp.com.landmap.position.PositionElement;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
 
@@ -112,10 +115,10 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                 String markerTitle = marker.getTitle();
                 infoTitle.setText(markerTitle);
                 infoSnippet.setText(marker.getSnippet());
-                if(markerTitle.indexOf("Center") != -1){
+                if (markerTitle.indexOf("Center") != -1) {
                     infoButton.setVisibility(View.INVISIBLE);
                     return infoWindow;
-                }else {
+                } else {
                     infoButton.setVisibility(View.VISIBLE);
                     infoButtonListener.setMarker(marker);
                 }
@@ -167,18 +170,24 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
         ae.setCenterLon(lonAvg);
         ae.setMeasureSqFt(polygonAreaSqFt);
 
-        new Thread(new Runnable() {
-            public void run() {
-                adh.updateArea(ae);
-                adh.updateAreaOnServer(ae);
-            }
-        }).start();
-
+        if(PermissionManager.INSTANCE.hasAccess(PermissionConstants.UPDATE_AREA)){
+            adh.updateArea(ae);
+            new Thread(new Runnable() {
+                public void run() {
+                    adh.updateAreaOnServer(ae);
+                }
+            }).start();
+        }else {
+            Toast.makeText(getApplicationContext(), "You do not have permissions to update the place specs. " +
+                    "\nWhatever changes you do will be lost.", Toast.LENGTH_LONG).show();
+        }
 
         MarkerOptions markerOptions = new MarkerOptions().position(new LatLng(latAvg, lonAvg));
         centerMarker = googleMap.addMarker(markerOptions);
         centerMarker.setVisible(true);
-        centerMarker.setTitle("Center Marker, \nLat: " + latAvg + ",Long: " + lonAvg);
+        centerMarker.setAlpha(1);
+        centerMarker.setTitle(ae.getName().concat(",").concat(ae.getDescription()));
+        centerMarker.showInfoWindow();
     }
 
     public Marker drawMarkerUsingPosition(final PositionElement pe) {

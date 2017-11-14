@@ -54,7 +54,6 @@ final class AreaDocumentDisplayAdaptor extends BaseAdapter {
         final Picasso picassoElem = Picasso.with(context);//
         picassoElem.setIndicatorsEnabled(true);
         picassoElem.load(Uri.fromFile(getThumbFile(currElem))) //
-                .placeholder(R.drawable.placeholder) //
                 .error(R.drawable.error) //
                 .config(Bitmap.Config.RGB_565)
                 .centerCrop()

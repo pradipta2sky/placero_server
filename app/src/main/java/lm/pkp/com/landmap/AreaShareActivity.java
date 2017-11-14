@@ -1,5 +1,6 @@
 package lm.pkp.com.landmap;
 
+import android.content.Intent;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
@@ -14,6 +15,7 @@ import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
@@ -27,6 +29,8 @@ import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
+import lm.pkp.com.landmap.permission.PermissionConstants;
+import lm.pkp.com.landmap.permission.PermissionManager;
 import lm.pkp.com.landmap.permission.PermissionsDBHelper;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.user.UserInfoSearchAsyncTask;
@@ -37,6 +41,7 @@ import lm.pkp.com.landmap.util.GeneralUtil;
 public class AreaShareActivity extends AppCompatActivity{
 
     private ArrayAdapter<String> adapter;
+    private String targetUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,10 +82,21 @@ public class AreaShareActivity extends AppCompatActivity{
                 searcherTask.setCompletionCallback(new UserInfoCallBack());
                 searcherTask.execute(searchParams);
             }
+
             @Override
             public void afterTextChanged(Editable s) {
             }
         });
+
+        RadioButton shareFullRadio = (RadioButton)findViewById(R.id.share_full_radio);
+        if(PermissionManager.INSTANCE.hasAccess(PermissionConstants.FULL_CONTROL)){
+            shareFullRadio.setEnabled(true);
+        }
+
+        RadioButton shareRestrictedRadio = (RadioButton)findViewById(R.id.share_restricted_radio);
+        if(PermissionManager.INSTANCE.hasAccess(PermissionConstants.SHARE_READ_WRITE)){
+            shareRestrictedRadio.setEnabled(true);
+        }
 
         final RadioGroup roleGroup = (RadioGroup) findViewById(R.id.area_share_role_group);
         roleGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -115,7 +131,7 @@ public class AreaShareActivity extends AppCompatActivity{
                 findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
 
                 final AutoCompleteTextView userIdView = (AutoCompleteTextView) findViewById(R.id.user_search_text);
-                final String targetUser = userIdView.getText().toString();
+                targetUser = userIdView.getText().toString();
                 // target user should be a valid email.
                 if(!GeneralUtil.isValidEmail(targetUser)){
                     Toast.makeText(getApplicationContext(), "Please enter a valid email", Toast.LENGTH_SHORT).show();
@@ -204,6 +220,9 @@ public class AreaShareActivity extends AppCompatActivity{
         @Override
         public void taskCompleted(Object result) {
             finish();
+            Intent shareDriveResourcesIntent = new Intent(getApplicationContext(), ShareDriveResourcesActivity.class);
+            shareDriveResourcesIntent.putExtra("share_to_user", targetUser);
+            startActivity(shareDriveResourcesIntent);
         }
     }
 

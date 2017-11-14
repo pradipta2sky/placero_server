@@ -98,7 +98,7 @@
                         android:id="@+id/share_full_radio"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:checked="true"
+                        android:checked="false"
                         android:text="Everything" />
 
                     <RadioButton
@@ -106,6 +106,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="right"
+                        android:checked="false"
                         android:text="Restricted" />
                 </RadioGroup>
             </LinearLayout>

@@ -62,6 +62,8 @@ public class ShareDriveResourcesActivity extends Activity implements EasyPermiss
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
 
+        setContentView(R.layout.activity_share_area_resources);
+
         Bundle extras = getIntent().getExtras();
         if(extras != null){
             shareToUser = extras.getString("share_to_user");
@@ -97,9 +99,7 @@ public class ShareDriveResourcesActivity extends Activity implements EasyPermiss
                 shareResources();
             } else {
                 // Start a dialog from which the user can choose an account
-                startActivityForResult(
-                        mCredential.newChooseAccountIntent(),
-                        REQUEST_ACCOUNT_PICKER);
+                startActivityForResult(mCredential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
             }
         } else {
             // Request the GET_ACCOUNTS permission via a user dialog
@@ -124,13 +124,10 @@ public class ShareDriveResourcesActivity extends Activity implements EasyPermiss
                 }
                 break;
             case REQUEST_ACCOUNT_PICKER:
-                if (resultCode == RESULT_OK && data != null &&
-                        data.getExtras() != null) {
-                    String accountName =
-                            data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+                if (resultCode == RESULT_OK && data != null && data.getExtras() != null) {
+                    String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
                     if (accountName != null) {
-                        SharedPreferences settings =
-                                getPreferences(Context.MODE_PRIVATE);
+                        SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
                         SharedPreferences.Editor editor = settings.edit();
                         editor.putString(PREF_ACCOUNT_NAME, accountName);
                         editor.apply();
@@ -148,12 +145,9 @@ public class ShareDriveResourcesActivity extends Activity implements EasyPermiss
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode,
-                                           @NonNull String[] permissions,
-                                           @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        EasyPermissions.onRequestPermissionsResult(
-                requestCode, permissions, grantResults, this);
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
 
     @Override
@@ -167,18 +161,14 @@ public class ShareDriveResourcesActivity extends Activity implements EasyPermiss
     }
 
     private boolean isGooglePlayServicesAvailable() {
-        GoogleApiAvailability apiAvailability =
-                GoogleApiAvailability.getInstance();
-        final int connectionStatusCode =
-                apiAvailability.isGooglePlayServicesAvailable(this);
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        final int connectionStatusCode = apiAvailability.isGooglePlayServicesAvailable(this);
         return connectionStatusCode == ConnectionResult.SUCCESS;
     }
 
     private void acquireGooglePlayServices() {
-        GoogleApiAvailability apiAvailability =
-                GoogleApiAvailability.getInstance();
-        final int connectionStatusCode =
-                apiAvailability.isGooglePlayServicesAvailable(this);
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        final int connectionStatusCode = apiAvailability.isGooglePlayServicesAvailable(this);
         if (apiAvailability.isUserResolvableError(connectionStatusCode)) {
             showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode);
         }
@@ -215,8 +205,7 @@ public class ShareDriveResourcesActivity extends Activity implements EasyPermiss
                 List<DriveResource> drs = AreaContext.getInstance().getAreaElement().getDriveResources();
                 for (final DriveResource dr : drs) {
                     BatchRequest batch = mService.batch();
-                    Permission userPermission = new Permission().setType("user").setRole("writer")
-                            .setEmailAddress(shareToUser);
+                    Permission userPermission = new Permission().setType("user").setRole("reader").setEmailAddress(shareToUser);
                     mService.permissions().create(dr.getDriveResourceId(), userPermission)
                             .setFields("id")
                             .queue(batch, new JsonBatchCallback<Permission>() {
@@ -251,6 +240,8 @@ public class ShareDriveResourcesActivity extends Activity implements EasyPermiss
         protected void onPostExecute(List<String> output) {
             mProgress.hide();
             finish();
+            Intent areaDetailsIntent = new Intent(getApplicationContext(), AreaDetailsActivity.class);
+            startActivity(areaDetailsIntent);
         }
 
         @Override
