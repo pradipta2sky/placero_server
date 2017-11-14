@@ -54,6 +54,11 @@ public class UploadResourcesActivity extends BaseDriveActivity {
 
     private Stack<DriveResource> processStack = new Stack<>();
 
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_upload_area_resources);
+    }
 
     @Override
     public void onConnected(Bundle connectionHint) {
