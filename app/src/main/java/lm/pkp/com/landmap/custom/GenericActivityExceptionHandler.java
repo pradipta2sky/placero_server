@@ -6,7 +6,12 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Environment;
+
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
 
 import lm.pkp.com.landmap.google.signin.SignInActivity;
 import lm.pkp.com.landmap.mail.GMailSender;
@@ -28,37 +33,47 @@ public class GenericActivityExceptionHandler implements Thread.UncaughtException
         final StringBuffer content = new StringBuffer();
         content.append("\n\n Exception trace ! \n");
 
-        System.out.println("\n\n Exception trace ! \n");
         final StackTraceElement[] exceptionTrace = ex.getStackTrace();
         for (int i = 0; i < exceptionTrace.length ; i++) {
-            System.out.println(exceptionTrace[i]);
             content.append(exceptionTrace[i].toString());
             content.append("\n");
         }
 
         content.append("\n\n Thread trace ! \n");
-        System.out.println("\n\n Thread trace ! \n");
         final StackTraceElement[] threadStackTrace = thread.getStackTrace();
         for (int i = 0; i < threadStackTrace.length ; i++) {
-            System.out.println(threadStackTrace[i]);
             content.append(threadStackTrace[i].toString());
             content.append("\n");
         }
-
-        /*
-        Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                sendEmail(content.toString());
-            }
-        };
-        */
 
         if(ex instanceof  UserUnavailableException){
             // Check why the user went off. ?? Do something here.
         }
 
-        /*
+        new SendEmailAsyncTask(content.toString()).execute();
+    }
+
+    private class SendEmailAsyncTask extends AsyncTask{
+
+        private String content;
+
+        public SendEmailAsyncTask(String mailContent){
+            this.content = mailContent;
+        }
+        @Override
+        protected Object doInBackground(Object[] params) {
+            sendEmail(content);
+            return "";
+        }
+
+        @Override
+        protected void onPostExecute(Object o) {
+            super.onPostExecute(o);
+            restartApplication();
+        }
+    }
+
+    private void restartApplication() {
         Intent intent = new Intent(activity, SignInActivity.class);
         intent.putExtra("crash", true);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
@@ -72,7 +87,6 @@ public class GenericActivityExceptionHandler implements Thread.UncaughtException
         AlarmManager mgr = (AlarmManager) LandmapApplication.getInstance().getBaseContext()
                 .getSystemService(Context.ALARM_SERVICE);
         mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 100, pendingIntent);
-        */
 
         activity.finish();
         System.exit(2);
@@ -80,11 +94,9 @@ public class GenericActivityExceptionHandler implements Thread.UncaughtException
 
     private void sendEmail(String content){
         try {
+            final Date currDate = Calendar.getInstance(TimeZone.getTimeZone("Asia/Calcutta")).getTime();
             GMailSender sender = new GMailSender("pradhans.prasanna@gmail.com", "baramania");
-            sender.sendMail("Landmap crash report",
-                    content,
-                    "pradhans.prasanna@gmail.com",
-                    "pradipta2sky@gmail.com");
+            sender.sendMail("Landmap crash report - " + currDate, content, "pradhans.prasanna@gmail.com", "pradipta2sky@gmail.com");
         } catch (Exception e) {
             e.printStackTrace();
         }

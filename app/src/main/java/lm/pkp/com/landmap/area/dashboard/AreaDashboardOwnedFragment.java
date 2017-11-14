@@ -135,6 +135,9 @@ public class AreaDashboardOwnedFragment extends Fragment {
             }
         });
 
+        final EditText inputSearch = (EditText) getActivity().findViewById(R.id.dashboard_search_box);
+        inputSearch.addTextChangedListener(new UserInputWatcher());
+
         view.findViewById(R.id.splash_panel).setVisibility(View.GONE);
     }
 
