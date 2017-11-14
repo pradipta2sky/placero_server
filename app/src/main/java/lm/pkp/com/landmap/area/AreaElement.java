@@ -130,4 +130,8 @@ public class AreaElement implements Serializable{
     public Map<String, PermissionElement> getPermissions() {
         return this.permissions;
     }
+
+    public void setPermissions(Map<String, PermissionElement> permissions) {
+        this.permissions = permissions;
+    }
 }

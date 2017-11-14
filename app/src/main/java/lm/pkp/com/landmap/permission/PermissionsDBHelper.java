@@ -3,15 +3,20 @@ package lm.pkp.com.landmap.permission;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
+import lm.pkp.com.landmap.position.PositionElement;
 import lm.pkp.com.landmap.sync.LMSRestAsyncTask;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.user.UserElement;
@@ -91,6 +96,27 @@ public class PermissionsDBHelper extends SQLiteOpenHelper {
         db.execSQL("DELETE FROM " + ACCESS_TABLE_NAME + " WHERE "
                 + ACCESS_COLUMN_AREA_ID + " = '" + areaId + "'");
         db.close();
+    }
+
+    public Map<String, PermissionElement> fetchPermissionsByAreaId(String areaId) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        Map<String, PermissionElement> perMap = new HashMap<>();
+        Cursor cursor = db.rawQuery("select * from " + ACCESS_TABLE_NAME
+                        + " WHERE " + ACCESS_COLUMN_AREA_ID + "=?", new String[]{areaId});
+        if(cursor != null){
+            cursor.moveToFirst();
+            while (cursor.isAfterLast() == false) {
+                PermissionElement pe = new PermissionElement();
+                pe.setUserId(cursor.getString(cursor.getColumnIndex(ACCESS_COLUMN_USER_ID)));
+                pe.setAreaId(areaId);
+                final String functionCode = cursor.getString(cursor.getColumnIndex(ACCESS_COLUMN_FUNCTION_CODE));
+                pe.setFunctionCode(functionCode);
+                perMap.put(functionCode, pe);
+                cursor.moveToNext();
+            }
+            cursor.close();
+        }
+        return perMap;
     }
 
     public void setCompletionCallback(AsyncTaskCallback callback) {

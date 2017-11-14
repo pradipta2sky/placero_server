@@ -203,6 +203,7 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         ArrayList<AreaElement> allAreas = new ArrayList<AreaElement>();
         SQLiteDatabase db = this.getReadableDatabase();
         final DriveDBHelper ddh = new DriveDBHelper(localContext);
+        final PermissionsDBHelper pdh = new PermissionsDBHelper(localContext);
         Cursor cursor = null;
         try {
             cursor = db.rawQuery("select * from " + AREA_TABLE_NAME, null);
@@ -226,6 +227,7 @@ public class AreaDBHelper extends SQLiteOpenHelper {
                     ae.getDriveResources().addAll(ddh.getDriveResourcesByAreaId(ae.getUniqueId()));
                     allAreas.add(ae);
 
+                    ae.setPermissions(pdh.fetchPermissionsByAreaId(ae.getUniqueId()));
                     cursor.moveToNext();
                 }
             }
@@ -242,6 +244,7 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         ArrayList<AreaElement> allAreas = new ArrayList<AreaElement>();
         SQLiteDatabase db = this.getReadableDatabase();
         final DriveDBHelper ddh = new DriveDBHelper(localContext);
+        final PermissionsDBHelper pdh = new PermissionsDBHelper(localContext);
         Cursor cursor = null;
         try {
             cursor = db.rawQuery("select * from " + AREA_TABLE_NAME + " WHERE " + AREA_COLUMN_TYPE + "=?",
@@ -266,6 +269,7 @@ public class AreaDBHelper extends SQLiteOpenHelper {
                     ae.getDriveResources().addAll(ddh.getDriveResourcesByAreaId(ae.getUniqueId()));
                     allAreas.add(ae);
 
+                    ae.setPermissions(pdh.fetchPermissionsByAreaId(ae.getUniqueId()));
                     cursor.moveToNext();
                 }
             }
