@@ -109,6 +109,8 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
                 if(PermissionManager.INSTANCE.hasAccess(PermissionConstants.MARK_POSITION)){
                     findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
                     new GPSLocationProvider(AreaDetailsActivity.this).getLocation();
+                }else {
+                    Toast.makeText(getApplicationContext(), "You do not enough rights !!", Toast.LENGTH_LONG).show();
                 }
             }
         });
@@ -117,10 +119,14 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         deleteAreaItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
-                final AreaDBHelper adh = new AreaDBHelper(getApplicationContext(), new DeleteAreaCallback());
-                adh.deleteArea(ae);
-                adh.deleteAreaFromServer(ae);
+                if(PermissionManager.INSTANCE.hasAccess(PermissionConstants.REMOVE_AREA)){
+                    findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
+                    final AreaDBHelper adh = new AreaDBHelper(getApplicationContext(), new DeleteAreaCallback());
+                    adh.deleteArea(ae);
+                    adh.deleteAreaFromServer(ae);
+                }else {
+                    Toast.makeText(getApplicationContext(), "You do not enough rights !!", Toast.LENGTH_LONG).show();
+                }
             }
         });
 

@@ -1,5 +1,7 @@
 package lm.pkp.com.landmap.permission;
 
+import java.util.Map;
+
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaElement;
 
@@ -14,16 +16,20 @@ public class PermissionManager {
     }
 
     public boolean hasAccess(String functionCode){
-        if(functionCode.equalsIgnoreCase(PermissionConstants.FULL_CONTROL)){
+        final AreaElement areaElement = AreaContext.getInstance().getAreaElement();
+        final Map<String, PermissionElement> areaPermissions = areaElement.getPermissions();
+
+        final PermissionElement fullControl = areaPermissions.get(PermissionConstants.FULL_CONTROL);
+        if(fullControl != null){
             return true;
         }
 
-        if(functionCode.equalsIgnoreCase(PermissionConstants.VIEW_ONLY)){
+        final PermissionElement viewOnly = areaPermissions.get(PermissionConstants.VIEW_ONLY);
+        if(viewOnly != null){
             return false;
         }
 
-        final AreaElement areaElement = AreaContext.getInstance().getAreaElement();
-        final PermissionElement permission = areaElement.getPermissions().get(functionCode);
+        final PermissionElement permission = areaPermissions.get(functionCode);
         if(permission != null){
             return true;
         }else {

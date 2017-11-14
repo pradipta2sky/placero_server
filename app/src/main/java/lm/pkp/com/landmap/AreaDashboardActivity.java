@@ -24,6 +24,9 @@ import lm.pkp.com.landmap.area.dashboard.AreaDashboardSharedFragment;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
+import lm.pkp.com.landmap.permission.PermissionConstants;
+import lm.pkp.com.landmap.permission.PermissionElement;
+import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.util.ColorProvider;
 
 public class AreaDashboardActivity extends AppCompatActivity {
@@ -56,6 +59,13 @@ public class AreaDashboardActivity extends AppCompatActivity {
                 AreaDBHelper adh = new AreaDBHelper(getApplicationContext());
 
                 AreaElement areaElement = adh.insertAreaLocally();
+
+                PermissionElement pe = new PermissionElement();
+                pe.setUserId(UserContext.getInstance().getUserElement().getEmail());
+                pe.setAreaId(areaElement.getUniqueId());
+                pe.setFunctionCode(PermissionConstants.FULL_CONTROL);
+                areaElement.getPermissions().put(PermissionConstants.FULL_CONTROL, pe);
+
                 AreaContext.getInstance().setAreaElement(areaElement, getApplicationContext());
 
                 adh = new AreaDBHelper(getApplicationContext(), new DataInsertServerCallback());
