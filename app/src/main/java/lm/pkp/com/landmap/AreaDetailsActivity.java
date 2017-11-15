@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import lm.pkp.com.landmap.area.AreaContext;
@@ -125,8 +126,13 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         plotItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(AreaDetailsActivity.this, AreaMapPlotterActivity.class);
-                startActivity(intent);
+                final List<PositionElement> positions = ae.getPositions();
+                if(positions.size() >= 3){
+                    Intent intent = new Intent(AreaDetailsActivity.this, AreaMapPlotterActivity.class);
+                    startActivity(intent);
+                }else {
+                    Toast.makeText(getApplicationContext(),"You need atleast 3 points to plot.!!!", Toast.LENGTH_LONG).show();
+                }
             }
         });
 
@@ -134,10 +140,25 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         navigateItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Uri gmmIntentUri = Uri.parse("google.navigation:q=" + ae.getCenterLat() + "," + ae.getCenterLon());
-                Intent mapIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-                mapIntent.setPackage("com.google.android.apps.maps");
-                startActivity(mapIntent);
+                final double centerLat = ae.getCenterLat();
+                final double centerLon = ae.getCenterLon();
+                if(centerLat == 0 && centerLon == 0){
+                    final List<PositionElement> positions = ae.getPositions();
+                    if(positions.size() > 0){
+                        final PositionElement pe = positions.get(0);
+                        Uri gmmIntentUri = Uri.parse("google.navigation:q=" + pe.getLat() + "," + pe.getLon());
+                        Intent navigationIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                        navigationIntent.setPackage("com.google.android.apps.maps");
+                        startActivity(navigationIntent);
+                    }else {
+                        Toast.makeText(getApplicationContext(),"No locations available to navigate.!!!", Toast.LENGTH_LONG).show();
+                    }
+                }else {
+                    Uri gmmIntentUri = Uri.parse("google.navigation:q=" + centerLat + "," + centerLon);
+                    Intent navigationIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
+                    navigationIntent.setPackage("com.google.android.apps.maps");
+                    startActivity(navigationIntent);
+                }
             }
         });
 
