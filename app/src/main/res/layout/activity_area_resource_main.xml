@@ -78,16 +78,17 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@+id/upload_section"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_marginLeft="15dp">
 
         <ListView
             android:id="@+id/file_display_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="top"
+            android:layout_gravity="top|center_horizontal"
             android:layout_margin="5dp"
-            android:divider="@color/aluminum"
-            android:dividerHeight="1dp" />
+            android:divider="@android:color/transparent"
+            android:dividerHeight="5.0sp" />
 
     </LinearLayout>
 
