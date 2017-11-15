@@ -4,13 +4,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -178,8 +178,8 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                 }
             }).start();
         }else {
-            Toast.makeText(getApplicationContext(), "You do not have permissions to update the place specs. " +
-                    "\nWhatever changes you do will be lost.", Toast.LENGTH_LONG).show();
+            showWarningMessage("You do not have permissions to update the place specs. " +
+                    "\nWhatever changes you do will be lost.");
         }
 
         MarkerOptions markerOptions = new MarkerOptions().position(new LatLng(latAvg, lonAvg));
@@ -203,8 +203,6 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
             @SuppressWarnings("unchecked")
             @Override
             public void onMarkerDragEnd(Marker marker) {
-                Log.d("System out", "onMarkerDragEnd..." + marker.getPosition().latitude + "..."
-                        + marker.getPosition().longitude);
                 googleMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
 
                 PositionElement newPositionElem = new PositionElement();
@@ -255,6 +253,14 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
 
         Intent positionMarkerIntent = new Intent(AreaMapPlotterActivity.this, AreaDetailsActivity.class);
         startActivity(positionMarkerIntent);
+    }
+
+    private void showWarningMessage(String message) {
+        Snackbar snackbar = Snackbar.make(getWindow().getDecorView(),message, Snackbar.LENGTH_LONG);
+        View sbView = snackbar.getView();
+        TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+        textView.setTextColor(Color.YELLOW);
+        snackbar.show();
     }
 
 }

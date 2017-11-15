@@ -5,11 +5,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -18,7 +20,6 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -63,7 +64,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         bottomDrawable.setColor(ColorProvider.getAreaToolBarColor(ae));
 
         if (!askForLocationPermission()) {
-            Toast.makeText(getApplicationContext(), "No permission for location access.", Toast.LENGTH_LONG);
+            showErrorMessage("No permission given for location fix !!");
             finish();
         }
 
@@ -104,7 +105,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
                     adh.deleteArea(ae);
                     adh.deleteAreaFromServer(ae);
                 } else {
-                    Toast.makeText(getApplicationContext(), "You do not enough rights !!", Toast.LENGTH_LONG).show();
+                    showErrorMessage("You do not have removal rights !!");
                 }
             }
         });
@@ -117,7 +118,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
                     findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
                     new GPSLocationProvider(AreaDetailsActivity.this).getLocation();
                 } else {
-                    Toast.makeText(getApplicationContext(), "You do not enough rights !!", Toast.LENGTH_LONG).show();
+                    showErrorMessage("You do not have Plotting rights !!");
                 }
             }
         });
@@ -131,7 +132,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
                     Intent intent = new Intent(AreaDetailsActivity.this, AreaMapPlotterActivity.class);
                     startActivity(intent);
                 }else {
-                    Toast.makeText(getApplicationContext(),"You need atleast 3 points to plot.!!!", Toast.LENGTH_LONG).show();
+                    showErrorMessage("You need atleast 3 points to plot.!!!");
                 }
             }
         });
@@ -151,7 +152,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
                         navigationIntent.setPackage("com.google.android.apps.maps");
                         startActivity(navigationIntent);
                     }else {
-                        Toast.makeText(getApplicationContext(),"No locations available to navigate.!!!", Toast.LENGTH_LONG).show();
+                        showErrorMessage("No locations available for navigation");
                     }
                 }else {
                     Uri gmmIntentUri = Uri.parse("google.navigation:q=" + centerLat + "," + centerLon);
@@ -170,7 +171,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
                     Intent areaShareIntent = new Intent(AreaDetailsActivity.this, AreaShareActivity.class);
                     startActivity(areaShareIntent);
                 } else {
-                    Toast.makeText(getApplicationContext(), "You do not enough rights !!", Toast.LENGTH_LONG).show();
+                    showErrorMessage("You do not have area sharing rights !!");
                 }
             }
         });
@@ -183,7 +184,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
                     Intent intent = new Intent(AreaDetailsActivity.this, CreateFolderStructureActivity.class);
                     startActivity(intent);
                 } else {
-                    Toast.makeText(getApplicationContext(), "You do not enough rights !!", Toast.LENGTH_LONG).show();
+                    showErrorMessage("You do not have resource modification rights !!");
                 }
             }
         });
@@ -309,6 +310,14 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
                     }
                 })
                 .show();
+    }
+
+    private void showErrorMessage(String message) {
+        Snackbar snackbar = Snackbar.make(getWindow().getDecorView(),message, Snackbar.LENGTH_LONG);
+        View sbView = snackbar.getView();
+        TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+        textView.setTextColor(Color.RED);
+        snackbar.show();
     }
 
 }

@@ -1,8 +1,10 @@
 package lm.pkp.com.landmap;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
@@ -17,7 +19,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -134,7 +136,7 @@ public class AreaShareActivity extends AppCompatActivity{
                 targetUser = userIdView.getText().toString();
                 // target user should be a valid email.
                 if(!GeneralUtil.isValidEmail(targetUser)){
-                    Toast.makeText(getApplicationContext(), "Please enter a valid email", Toast.LENGTH_SHORT).show();
+                    showErrorMessage("Please enter a valid email");
                     findViewById(R.id.splash_panel).setVisibility(View.GONE);
                     return;
                 }
@@ -226,5 +228,12 @@ public class AreaShareActivity extends AppCompatActivity{
         }
     }
 
+    private void showErrorMessage(String message) {
+        Snackbar snackbar = Snackbar.make(getWindow().getDecorView(),message, Snackbar.LENGTH_LONG);
+        View sbView = snackbar.getView();
+        TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+        textView.setTextColor(Color.RED);
+        snackbar.show();
+    }
 
 }

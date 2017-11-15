@@ -1,8 +1,10 @@
 package lm.pkp.com.landmap;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
@@ -10,7 +12,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
@@ -72,7 +73,7 @@ public class AreaEditActivity extends AppCompatActivity{
 
                 String areaName = nameText.getText().toString();
                 if(areaName.trim().equalsIgnoreCase("")){
-                    Toast.makeText(getApplicationContext(), "A name is required !!", Toast.LENGTH_LONG);
+                    showErrorMessage("User selection is required for share !!");
                     findViewById(R.id.splash_panel).setVisibility(View.GONE);
                     return;
                 }
@@ -131,4 +132,13 @@ public class AreaEditActivity extends AppCompatActivity{
             startActivity(areaDetailsIntent);
         }
     }
+
+    private void showErrorMessage(String message) {
+        Snackbar snackbar = Snackbar.make(getWindow().getDecorView(),message, Snackbar.LENGTH_LONG);
+        View sbView = snackbar.getView();
+        TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+        textView.setTextColor(Color.RED);
+        snackbar.show();
+    }
+
 }
