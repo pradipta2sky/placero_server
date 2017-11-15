@@ -199,34 +199,16 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         });
     }
 
-    private boolean askForLocationPermission() {
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
-                PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
-                        PackageManager.PERMISSION_GRANTED) {
-            return true;
-        } else {
-            ActivityCompat.requestPermissions(this, new String[]{
-                    android.Manifest.permission.ACCESS_FINE_LOCATION,
-                    android.Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
-            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
-                    PackageManager.PERMISSION_GRANTED &&
-                    ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
-                            PackageManager.PERMISSION_GRANTED) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-    }
-
     @Override
     public void receivedLocationPostion(PositionElement pe) {
         pe.setName("P_" + UUID.randomUUID().toString());
         pe.setUniqueAreaId(ae.getUniqueId());
 
+        final AreaContext areaContext = AreaContext.getInstance();
+        areaContext.getAreaElement().getPositions().add(pe);
+        areaContext.addPosition(pe);
+
         pe = pdb.insertPositionLocally(pe);
-        AreaContext.getInstance().addPosition(pe);
         pdb.insertPositionToServer(pe);
 
         positionList.add(pe);
@@ -275,6 +257,27 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         }
     }
 
+    private boolean askForLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                        PackageManager.PERMISSION_GRANTED) {
+            return true;
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{
+                    android.Manifest.permission.ACCESS_FINE_LOCATION,
+                    android.Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
+            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
+                    PackageManager.PERMISSION_GRANTED &&
+                    ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                            PackageManager.PERMISSION_GRANTED) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
     private void showEnableGPSDialog() {
         new AlertDialog.Builder(this)
                 .setTitle("GPS Location disabled.")
@@ -319,5 +322,6 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         textView.setTextColor(Color.RED);
         snackbar.show();
     }
+
 
 }
