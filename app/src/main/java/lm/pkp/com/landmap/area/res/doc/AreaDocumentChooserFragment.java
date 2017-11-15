@@ -1,4 +1,4 @@
-package lm.pkp.com.landmap.lib.fe;
+package lm.pkp.com.landmap.area.res.doc;
 
 import android.app.AlertDialog;
 import android.content.ContentResolver;
@@ -10,7 +10,6 @@ import android.os.Bundle;
 import android.provider.MediaStore.Files;
 import android.provider.MediaStore.Files.FileColumns;
 import android.support.v4.app.Fragment;
-import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,6 +18,9 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.TimeZone;
 import java.util.UUID;
 
 import lm.pkp.com.landmap.AreaAddResourcesActivity;
@@ -32,7 +34,7 @@ import lm.pkp.com.landmap.drive.DriveResource;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.util.FileUtil;
 
-public class FileSearcherFragment extends Fragment {
+public class AreaDocumentChooserFragment extends Fragment {
 
     private View fragmentView;
     private ListView listView;
@@ -151,13 +153,17 @@ public class FileSearcherFragment extends Fragment {
         int sizeMB = (int) (((float) sizeKB) / 1024);
         StringBuffer descBuffer = new StringBuffer();
         if (sizeKB > 1024) {
-            descBuffer.append("size " + sizeMB + "MBs,");
+            descBuffer.append("Size " + sizeMB + "MBs, ");
         } else {
-            descBuffer.append("size " + sizeKB + "KBs,");
+            descBuffer.append("Size " + sizeKB + "KBs, ");
         }
+
         // Prepare the last modified
-        CharSequence relativeTime = DateUtils.getRelativeTimeSpanString(getContext(), new Long(fileLastModifed));
-        descBuffer.append(relativeTime);
+        SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
+        final Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Calcutta"));
+        calendar.setTimeInMillis(new Long(fileLastModifed) * 1000);
+        final String formattedDate = format.format(calendar.getTime());
+        descBuffer.append(formattedDate);
 
         return descBuffer.toString();
     }

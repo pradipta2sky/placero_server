@@ -6,7 +6,7 @@
  * Copyright Nikolai Kudashov, 2013-2014.
  */
 
-package lm.pkp.com.landmap.lib.fe;
+package lm.pkp.com.landmap.area.res.doc;
 
 import android.database.DataSetObserver;
 import android.view.View;

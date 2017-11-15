@@ -2,8 +2,11 @@ package lm.pkp.com.landmap;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
@@ -24,6 +27,10 @@ import com.google.android.gms.maps.model.Polygon;
 import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.maps.android.SphericalUtil;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
@@ -35,10 +42,14 @@ import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.custom.MapWrapperLayout;
 import lm.pkp.com.landmap.custom.OnInfoWindowElemTouchListener;
+import lm.pkp.com.landmap.drive.DriveResource;
 import lm.pkp.com.landmap.permission.PermissionConstants;
 import lm.pkp.com.landmap.permission.PermissionManager;
 import lm.pkp.com.landmap.position.PositionElement;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
+import lm.pkp.com.landmap.sync.LocalFolderStructureManager;
+import lm.pkp.com.landmap.user.UserContext;
+import lm.pkp.com.landmap.util.FileUtil;
 
 public class AreaMapPlotterActivity extends FragmentActivity implements OnMapReadyCallback {
 
@@ -187,6 +198,8 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
         centerMarker.setAlpha(1);
         centerMarker.setTitle(ae.getName().concat(",").concat(ae.getDescription()));
         centerMarker.showInfoWindow();
+
+        new TakeSnapshotOfPlotAsyncTask().execute();
     }
 
     public Marker drawMarkerUsingPosition(final PositionElement pe) {
@@ -254,12 +267,69 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
         startActivity(positionMarkerIntent);
     }
 
+
     private void showWarningMessage(String message) {
         Snackbar snackbar = Snackbar.make(getWindow().getDecorView(), message, Snackbar.LENGTH_LONG);
         View sbView = snackbar.getView();
         TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
         textView.setTextColor(Color.YELLOW);
         snackbar.show();
+    }
+
+    private class TakeSnapshotOfPlotAsyncTask extends AsyncTask{
+
+        @Override
+        protected Object doInBackground(Object[] params) {
+            takeSnap();
+            return null;
+        }
+    }
+
+    private void takeSnap() {
+        View v = getWindow().getDecorView().getRootView();
+        v.setDrawingCacheEnabled(true);
+        Bitmap bmp = Bitmap.createBitmap(v.getDrawingCache());
+        v.setDrawingCacheEnabled(false);
+        try {
+            final AreaElement areaElement = AreaContext.getInstance().getAreaElement();
+            final File imageStorageDir = LocalFolderStructureManager.getImageStorageDir();
+            final String dirPath = imageStorageDir.getAbsolutePath();
+
+            String screenShotFolderPath = dirPath + areaElement.getUniqueId();
+            final File screenshotFolder = new File(screenShotFolderPath);
+            if(!screenshotFolder.exists()){
+                screenshotFolder.mkdirs();
+            }
+            String screenShotFileName = "plot_" + areaElement.getUniqueId() + "_ss.png";
+            String screenShotFilePath = screenShotFolderPath + File.separatorChar + screenShotFileName;
+            File screenShotFile = new File(screenShotFilePath);
+            if(!screenShotFile.exists()){
+                screenShotFile.createNewFile();
+            }
+            FileOutputStream fos = new FileOutputStream(screenShotFile);
+            bmp.compress(Bitmap.CompressFormat.PNG, 100, fos);
+            fos.flush();
+            fos.close();
+
+            DriveResource dr = new DriveResource();
+            dr.setContainerDriveId(AreaContext.getInstance().getImagesRootDriveResource().getDriveId());
+            dr.setContentType("Image");
+            dr.setUserId(UserContext.getInstance().getUserElement().getEmail());
+            dr.setMimeType(FileUtil.getMimeType(screenShotFile));
+            dr.setAreaId(areaElement.getUniqueId());
+            dr.setName(screenShotFileName);
+            dr.setPath(screenShotFilePath);
+            dr.setSize(screenShotFile.length() + "");
+            dr.setType("file");
+            dr.setUniqueId(UUID.randomUUID().toString());
+
+            areaElement.getDriveResources().add(dr);
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }

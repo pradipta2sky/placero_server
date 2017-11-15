@@ -6,7 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
-import lm.pkp.com.landmap.lib.fe.FileSearcherFragment;
+import lm.pkp.com.landmap.area.res.doc.AreaDocumentChooserFragment;
 
 public class AreaDocumentChooserActivity extends AppCompatActivity {
 
@@ -25,8 +25,8 @@ public class AreaDocumentChooserActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.fragment_container, new FileSearcherFragment(),
-                FileSearcherFragment.class.getSimpleName());
+        fragmentTransaction.add(R.id.fragment_container, new AreaDocumentChooserFragment(),
+                AreaDocumentChooserFragment.class.getSimpleName());
         fragmentTransaction.commit();
     }
 

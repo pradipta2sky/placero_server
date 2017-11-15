@@ -95,7 +95,8 @@ public class GenericActivityExceptionHandler implements Thread.UncaughtException
         try {
             final Date currDate = Calendar.getInstance(TimeZone.getTimeZone("Asia/Calcutta")).getTime();
             GMailSender sender = new GMailSender("pradhans.prasanna@gmail.com", "baramania");
-            sender.sendMail("Landmap crash report - " + currDate, content, "pradhans.prasanna@gmail.com", "pradipta2sky@gmail.com");
+            sender.sendMail("Landmap crash report - " + currDate, content,
+                    "pradhans.prasanna@gmail.com", "pradipta2sky@gmail.com");
         } catch (Exception e) {
             e.printStackTrace();
         }

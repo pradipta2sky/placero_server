@@ -68,10 +68,6 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
             finish();
         }
 
-        if (!isGPSEnabled()) {
-            showEnableGPSDialog();
-        }
-
         pdb = new PositionsDBHelper(getApplicationContext());
         ListView posListView = (ListView) findViewById(R.id.positionList);
         positionList.addAll(AreaContext.getInstance().getPositions());
@@ -85,6 +81,14 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
             areaName = areaName.substring(0, 19).concat("...");
         }
         areaNameView.setText(areaName);
+
+        if(positionList.size() == 0){
+            findViewById(R.id.position_list_scroll).setVisibility(View.GONE);
+            findViewById(R.id.position_list_empty_img).setVisibility(View.VISIBLE);
+        }else {
+            findViewById(R.id.position_list_scroll).setVisibility(View.VISIBLE);
+            findViewById(R.id.position_list_empty_img).setVisibility(View.GONE);
+        }
 
         ImageView areaEditItem = (ImageView) findViewById(R.id.action_area_edit);
         areaEditItem.setOnClickListener(new View.OnClickListener() {
@@ -115,6 +119,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
             @Override
             public void onClick(View v) {
                 if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.MARK_POSITION)) {
+                    findViewById(R.id.position_list_empty_img).setVisibility(View.GONE);
                     findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
                     new GPSLocationProvider(AreaDetailsActivity.this).getLocation();
                 } else {
@@ -211,20 +216,39 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         pe = pdb.insertPositionLocally(pe);
         pdb.insertPositionToServer(pe);
 
+        findViewById(R.id.position_list_scroll).setVisibility(View.VISIBLE);
+        findViewById(R.id.position_list_empty_img).setVisibility(View.GONE);
+        findViewById(R.id.splash_panel).setVisibility(View.GONE);
+
         positionList.add(pe);
         adaptor.notifyDataSetChanged();
-        findViewById(R.id.splash_panel).setVisibility(View.GONE);
     }
 
     @Override
     public void locationFixTimedOut() {
-        findViewById(R.id.splash_panel).setVisibility(View.GONE);
+        if(positionList.size() == 0){
+            findViewById(R.id.position_list_scroll).setVisibility(View.GONE);
+            findViewById(R.id.position_list_empty_img).setVisibility(View.VISIBLE);
+            findViewById(R.id.splash_panel).setVisibility(View.GONE);
+        }else {
+            findViewById(R.id.position_list_scroll).setVisibility(View.VISIBLE);
+            findViewById(R.id.position_list_empty_img).setVisibility(View.GONE);
+            findViewById(R.id.splash_panel).setVisibility(View.GONE);
+        }
         showLocationFixFailureDialog();
     }
 
     @Override
     public void providerDisabled() {
-        findViewById(R.id.splash_panel).setVisibility(View.GONE);
+        if(positionList.size() == 0){
+            findViewById(R.id.position_list_scroll).setVisibility(View.GONE);
+            findViewById(R.id.position_list_empty_img).setVisibility(View.VISIBLE);
+            findViewById(R.id.splash_panel).setVisibility(View.GONE);
+        }else {
+            findViewById(R.id.position_list_scroll).setVisibility(View.VISIBLE);
+            findViewById(R.id.position_list_empty_img).setVisibility(View.GONE);
+            findViewById(R.id.splash_panel).setVisibility(View.GONE);
+        }
         showEnableGPSDialog();
     }
 
@@ -303,6 +327,8 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
                 .setMessage("Do you want to try again ?")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
+                        findViewById(R.id.position_list_scroll).setVisibility(View.GONE);
+                        findViewById(R.id.position_list_empty_img).setVisibility(View.GONE);
                         findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
                         new GPSLocationProvider(AreaDetailsActivity.this).getLocation();
                     }

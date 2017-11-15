@@ -5,8 +5,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import lm.pkp.com.landmap.custom.PermittedFileArrayList;
-import lm.pkp.com.landmap.lib.fe.BaseFragmentAdapter;
-import lm.pkp.com.landmap.lib.fe.TextDetailDocumentsCell;
+import lm.pkp.com.landmap.area.res.doc.BaseFragmentAdapter;
+import lm.pkp.com.landmap.area.res.doc.TextDetailDocumentsCell;
 
 /**
  * Created by USER on 11/7/2017.

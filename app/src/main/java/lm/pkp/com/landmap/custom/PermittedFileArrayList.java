@@ -13,6 +13,10 @@ public class PermittedFileArrayList<E> extends ArrayList<E> {
     public boolean add(E object) {
         if (object instanceof FileDisplayElement) {
             FileDisplayElement item = (FileDisplayElement) object;
+            final String itemPath = item.getPath();
+            if(itemPath.contains("/LMS_DOCS/")){
+                return false;
+            }
             final String itemName = item.getName();
             if (!itemName.contains(".")) {
                 return super.add(object);

@@ -6,9 +6,10 @@
  * Copyright Nikolai Kudashov, 2013-2014.
  */
 
-package lm.pkp.com.landmap.lib.fe;
+package lm.pkp.com.landmap.area.res.doc;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.text.TextUtils;
 import android.util.TypedValue;
@@ -31,12 +32,13 @@ public class TextDetailDocumentsCell extends FrameLayout {
         density = getResources().getDisplayMetrics().density;
 
         textView = new TextView(context);
-        textView.setTextColor(0xff212121);
-        textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 16);
+        textView.setTextColor(Color.BLACK);
+        textView.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 14);
         textView.setLines(1);
         textView.setMaxLines(1);
         textView.setSingleLine(true);
         textView.setGravity(Gravity.LEFT);
+        textView.setTypeface(null, Typeface.BOLD);
         addView(textView);
         LayoutParams layoutParams = (LayoutParams) textView.getLayoutParams();
         layoutParams.width = LayoutParams.WRAP_CONTENT;

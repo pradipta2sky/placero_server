@@ -2,17 +2,26 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:fillViewport="true">
+
     <ListView
         android:id="@+id/document_list_view"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:cacheColorHint="#ffffffff"
         android:clipToPadding="false"
-        android:divider="@color/blue_grey_500"
-        android:dividerHeight="4px"
+        android:layout_gravity="top"
+        android:layout_margin="10dp"
+        android:divider="@android:color/transparent"
+        android:dividerHeight="10.0sp"
         android:fadingEdge="none"
         android:fadingEdgeLength="0dp"
         android:scrollbars="none" />
+
+    </ScrollView>
 
     <TextView
         android:id="@+id/searchEmptyView"
@@ -22,6 +31,7 @@
         android:gravity="center"
         android:textColor="#808080"
         android:textSize="20dp"
+        android:text="No PDF files found"
         android:visibility="gone" />
 
 </FrameLayout>
