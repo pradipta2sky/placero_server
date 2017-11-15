@@ -113,14 +113,14 @@ public class AreaDBHelper extends SQLiteOpenHelper {
 
         db.close();
 
-        if(callback != null){
+        if (callback != null) {
             callback.taskCompleted(ae);
         }
         return ae;
     }
 
-    public void insertAreaToServer(AreaElement ae){
-        LMSRestAsyncTask insertTask =  new LMSRestAsyncTask(callback);
+    public void insertAreaToServer(AreaElement ae) {
+        LMSRestAsyncTask insertTask = new LMSRestAsyncTask(callback);
         insertTask.execute(preparePostParams("insert", ae));
     }
 
@@ -158,9 +158,9 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         contentValues.put(AREA_COLUMN_TYPE, ae.getType());
 
         final String areaTags = ae.getAddress();
-        if(areaTags != null && !areaTags.trim().equals("")){
+        if (areaTags != null && !areaTags.trim().equals("")) {
             contentValues.put(AREA_COLUMN_ADDRESS, ae.getAddress());
-        }else {
+        } else {
             String address
                     = CommonGeoHelper.INSTANCE.getAddressByGeoLocation(localContext, ae.getCenterLat(), ae.getCenterLon());
             contentValues.put(AREA_COLUMN_ADDRESS, address);
@@ -181,8 +181,8 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public void updateAreaOnServer(AreaElement ae){
-        LMSRestAsyncTask updateTask =  new LMSRestAsyncTask(callback);
+    public void updateAreaOnServer(AreaElement ae) {
+        LMSRestAsyncTask updateTask = new LMSRestAsyncTask(callback);
         updateTask.execute(preparePostParams("update", ae));
     }
 
@@ -194,7 +194,7 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         pdb.deletePositionByAreaId(ae.getUniqueId());
     }
 
-    public void deleteAreaFromServer(AreaElement ae){
+    public void deleteAreaFromServer(AreaElement ae) {
         final LMSRestAsyncTask deleteTask = new LMSRestAsyncTask(callback);
         deleteTask.execute(preparePostParams("delete", ae));
     }
@@ -319,7 +319,7 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         for (int i = 0; i < publicAreas.size(); i++) {
             final String areaId = publicAreas.get(i).getUniqueId();
             db.delete(AREA_TABLE_NAME, AREA_COLUMN_UNIQUE_ID + "=? AND "
-                            + AREA_COLUMN_TYPE + "=?", new String[]{areaId, "public"});
+                    + AREA_COLUMN_TYPE + "=?", new String[]{areaId, "public"});
             pdh.deletePositionByAreaId(areaId);
             ddh.deleteResourcesByAreaId(areaId);
             pmh.deletePermissionsByAreaId(areaId);

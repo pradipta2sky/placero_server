@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="lm.pkp.com.landmap" >
+    package="lm.pkp.com.landmap">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -28,6 +28,7 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyAGQItIMMsVu8kjvrU1KCR-zm1Xfdcxgnw" />
+
         <activity
             android:name=".google.signin.SignInActivity"
             android:label="@string/app_name"
@@ -43,69 +44,54 @@
             android:name=".AreaDashboardActivity"
             android:label="@string/title_activity_area_dashboard"
             android:theme="@style/AppTheme.NoActionBar"
-            android:windowSoftInputMode="stateHidden">
-        </activity>
+            android:windowSoftInputMode="stateHidden"></activity>
         <activity
             android:name=".AreaDetailsActivity"
-            android:label="@string/title_activity_position_marker">
-        </activity>
+            android:label="@string/title_activity_position_marker"></activity>
         <activity
             android:name=".AreaMapPlotterActivity"
-            android:label="@string/title_activity_land_plotter" >
-        </activity>
+            android:label="@string/title_activity_land_plotter"></activity>
         <activity
             android:name=".AreaEditActivity"
-            android:label="@string/title_activity_area_edit" >
-        </activity>
+            android:label="@string/title_activity_area_edit"></activity>
         <activity
             android:name=".AreaShareActivity"
             android:label="@string/label_share_area"
-            android:windowSoftInputMode="stateHidden">
-        </activity>
+            android:windowSoftInputMode="stateHidden"></activity>
         <activity
             android:name=".SplashActivity"
-            android:label="@string/label_pre_load_splash">
-        </activity>
+            android:label="@string/label_pre_load_splash"></activity>
         <activity
             android:name=".CreateFolderStructureActivity"
-            android:label="@string/create_folder_structure">
-        </activity>
+            android:label="@string/create_folder_structure"></activity>
         <activity
             android:name=".AreaCameraPictureActivity"
             android:screenOrientation="portrait"
-            android:label="@string/area_add_image">
-        </activity>
+            android:label="@string/area_add_image"></activity>
         <activity
             android:name=".AreaCameraVideoActivity"
             android:screenOrientation="portrait"
-            android:label="@string/area_add_video">
-        </activity>
+            android:label="@string/area_add_video"></activity>
         <activity
             android:name=".AreaDocumentChooserActivity"
             android:screenOrientation="portrait"
             android:label="@string/choose_document"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity
             android:name=".AreaAddResourcesActivity"
-            android:label="@string/area_add_resources">
-        </activity>
+            android:label="@string/area_add_resources"></activity>
         <activity
             android:name=".UploadResourcesActivity"
-            android:label="@string/choose_document">
-        </activity>
+            android:label="@string/choose_document"></activity>
         <activity
             android:name=".DownloadResourcesActivity"
-            android:label="@string/area_resources">
-        </activity>
+            android:label="@string/area_resources"></activity>
         <activity
             android:name=".ShareDriveResourcesActivity"
-            android:label="@string/choose_document">
-        </activity>
+            android:label="@string/choose_document"></activity>
         <activity
             android:name=".AreaDisplayResourcesActivity"
             android:label="@string/area_resources"
-            android:theme="@style/AppTheme.NoActionBar">
-        </activity>
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 </manifest>

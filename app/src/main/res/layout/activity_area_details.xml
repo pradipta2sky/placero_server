@@ -1,5 +1,4 @@
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
@@ -33,8 +32,7 @@
             android:layout_height="fill_parent"
             android:divider="@android:color/transparent"
             android:dividerHeight="10.0sp"
-            android:layout_weight="1"
-            />
+            android:layout_weight="1" />
 
     </ScrollView>
 
@@ -46,13 +44,13 @@
         android:background="?attr/colorPrimary"
         android:minHeight="65dp"
         android:layout_weight="0.1"
-        app:contentInsetStart="5dp"
-        >
+        app:contentInsetStart="5dp">
 
-        <include layout="@layout/area_details_bottom_toolbar"
+        <include
+            layout="@layout/area_details_bottom_toolbar"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:id="@+id/bottom_toolbar_include"/>
+            android:id="@+id/bottom_toolbar_include" />
 
     </android.support.v7.widget.Toolbar>
 

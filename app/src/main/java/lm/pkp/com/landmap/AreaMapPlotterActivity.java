@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -31,8 +30,8 @@ import java.util.Set;
 import java.util.UUID;
 
 import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.custom.MapWrapperLayout;
 import lm.pkp.com.landmap.custom.OnInfoWindowElemTouchListener;
@@ -82,12 +81,12 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
         settings.setZoomGesturesEnabled(true);
 
 
-        final MapWrapperLayout mapWrapperLayout = (MapWrapperLayout)findViewById(R.id.map_relative_layout);
+        final MapWrapperLayout mapWrapperLayout = (MapWrapperLayout) findViewById(R.id.map_relative_layout);
         mapWrapperLayout.init(googleMap, getPixelsFromDp(getApplicationContext(), 39 + 20));
-        this.infoWindow = (ViewGroup)getLayoutInflater().inflate(R.layout.info_window, null);
-        this.infoTitle = (TextView)infoWindow.findViewById(R.id.title);
-        this.infoSnippet = (TextView)infoWindow.findViewById(R.id.snippet);
-        this.infoButton = (Button)infoWindow.findViewById(R.id.button);
+        this.infoWindow = (ViewGroup) getLayoutInflater().inflate(R.layout.info_window, null);
+        this.infoTitle = (TextView) infoWindow.findViewById(R.id.title);
+        this.infoSnippet = (TextView) infoWindow.findViewById(R.id.snippet);
+        this.infoButton = (Button) infoWindow.findViewById(R.id.button);
         this.infoButtonListener = new OnInfoWindowElemTouchListener(infoButton,
                 getResources().getDrawable(R.drawable.round_but_green_sel), //btn_default_normal_holo_light
                 getResources().getDrawable(R.drawable.round_but_red_sel)) //btn_default_pressed_holo_light
@@ -126,7 +125,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                 return infoWindow;
             }
         });
-       plotPolygonUsingPositions();
+        plotPolygonUsingPositions();
     }
 
     private void plotPolygonUsingPositions() {
@@ -139,7 +138,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
             m.remove();
         }
         areaMarkers = new LinkedHashMap<>();
-        if(centerMarker != null){
+        if (centerMarker != null) {
             centerMarker.remove();
         }
 
@@ -170,14 +169,14 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
         ae.setCenterLon(lonAvg);
         ae.setMeasureSqFt(polygonAreaSqFt);
 
-        if(PermissionManager.INSTANCE.hasAccess(PermissionConstants.UPDATE_AREA)){
+        if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.UPDATE_AREA)) {
             adh.updateArea(ae);
             new Thread(new Runnable() {
                 public void run() {
                     adh.updateAreaOnServer(ae);
                 }
             }).start();
-        }else {
+        } else {
             showWarningMessage("You do not have permissions to update the place specs. " +
                     "\nWhatever changes you do will be lost.");
         }
@@ -243,7 +242,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
 
     public static int getPixelsFromDp(Context context, float dp) {
         final float scale = context.getResources().getDisplayMetrics().density;
-        return (int)(dp * scale + 0.5f);
+        return (int) (dp * scale + 0.5f);
     }
 
     @Override
@@ -256,7 +255,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
     }
 
     private void showWarningMessage(String message) {
-        Snackbar snackbar = Snackbar.make(getWindow().getDecorView(),message, Snackbar.LENGTH_LONG);
+        Snackbar snackbar = Snackbar.make(getWindow().getDecorView(), message, Snackbar.LENGTH_LONG);
         View sbView = snackbar.getView();
         TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
         textView.setTextColor(Color.YELLOW);

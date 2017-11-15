@@ -11,19 +11,19 @@ public class PermittedFileArrayList<E> extends ArrayList<E> {
 
     @Override
     public boolean add(E object) {
-        if(object instanceof FileDisplayElement){
+        if (object instanceof FileDisplayElement) {
             FileDisplayElement item = (FileDisplayElement) object;
             final String itemName = item.getName();
-            if(!itemName.contains(".")){
+            if (!itemName.contains(".")) {
                 return super.add(object);
             }
-            if(itemName.endsWith(".pdf")){
+            if (itemName.endsWith(".pdf")) {
                 return super.add(object);
             }
-            if(itemName.endsWith(".jpg")){
+            if (itemName.endsWith(".jpg")) {
                 return super.add(object);
             }
-            if(itemName.endsWith(".mp4")){
+            if (itemName.endsWith(".mp4")) {
                 return super.add(object);
             }
         }

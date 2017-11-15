@@ -11,7 +11,7 @@ import lm.pkp.com.landmap.user.UserElement;
  */
 public class UserMappingUtil {
 
-    public static final UserElement convertGoogleAccountToLocalAccount(GoogleSignInAccount acct){
+    public static final UserElement convertGoogleAccountToLocalAccount(GoogleSignInAccount acct) {
         UserElement ue = new UserElement();
         ue.setDisplayName(acct.getDisplayName());
         ue.setEmail(acct.getEmail());
@@ -19,9 +19,9 @@ public class UserMappingUtil {
         ue.setGivenName(acct.getGivenName());
         ue.setAuthSystemId(acct.getServerAuthCode());
         Uri photoUri = acct.getPhotoUrl();
-        if(photoUri != null){
+        if (photoUri != null) {
             ue.setPhotoUrl(photoUri.toString());
-        }else {
+        } else {
             ue.setPhotoUrl("");
         }
         return ue;

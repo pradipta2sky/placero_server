@@ -5,18 +5,14 @@ package lm.pkp.com.landmap.provider;
  */
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.view.View;
 
-import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.custom.LocationPositionReceiver;
 import lm.pkp.com.landmap.position.PositionElement;
 
@@ -32,7 +28,7 @@ public class GPSLocationProvider implements LocationListener {
         try {
             final LocationManager locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
             Looper looper = Looper.myLooper();
-            locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER,this,null);
+            locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, this, null);
             final Handler handler = new Handler(looper);
             handler.postDelayed(new Runnable() {
                 public void run() {
@@ -66,7 +62,7 @@ public class GPSLocationProvider implements LocationListener {
     public void onStatusChanged(String provider, int status, Bundle extras) {
     }
 
-    public void notifyFailureForLocationFix(){
+    public void notifyFailureForLocationFix() {
         ((LocationPositionReceiver) activity).locationFixTimedOut();
     }
 

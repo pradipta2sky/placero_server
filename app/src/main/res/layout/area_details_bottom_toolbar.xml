@@ -11,7 +11,7 @@
         android:layout_gravity="center_vertical"
         android:src="@drawable/mark_icon"
         android:layout_weight="1"
-        android:padding="5dp"/>
+        android:padding="5dp" />
 
     <ImageView
         android:id="@+id/action_plot_area"
@@ -20,7 +20,7 @@
         android:layout_gravity="center_vertical"
         android:src="@drawable/maps_64dp"
         android:layout_weight="1"
-        android:padding="5dp"/>
+        android:padding="5dp" />
 
     <ImageView
         android:id="@+id/action_navigate_area"
@@ -29,7 +29,7 @@
         android:layout_gravity="center_vertical"
         android:src="@drawable/navigate_icon"
         android:layout_weight="1"
-        android:padding="5dp"/>
+        android:padding="5dp" />
 
     <ImageView
         android:id="@+id/action_share_area"
@@ -38,7 +38,7 @@
         android:layout_gravity="center_vertical"
         android:src="@drawable/sharing"
         android:layout_weight="1"
-        android:padding="5dp"/>
+        android:padding="5dp" />
 
     <ImageView
         android:id="@+id/action_drive_area"
@@ -47,7 +47,7 @@
         android:layout_gravity="center_vertical"
         android:src="@drawable/upload_drive"
         android:layout_weight="1"
-        android:padding="5dp"/>
+        android:padding="5dp" />
 
     <ImageView
         android:id="@+id/action_display_res"
@@ -56,6 +56,6 @@
         android:layout_gravity="center_vertical"
         android:src="@drawable/display_resources"
         android:layout_weight="1"
-        android:padding="5dp"/>
+        android:padding="5dp" />
 
 </LinearLayout>

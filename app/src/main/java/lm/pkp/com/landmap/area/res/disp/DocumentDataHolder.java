@@ -24,8 +24,8 @@ final class DocumentDataHolder {
         String rootPath = LocalFolderStructureManager.getDocsStorageDir().getAbsolutePath() + File.separatorChar;
         for (int i = 0; i < driveResources.size(); i++) {
             final DriveResource resource = driveResources.get(i);
-            if(resource.getType().equals("file")){
-                if(resource.getContentType().equals("Document")){
+            if (resource.getType().equals("file")) {
+                if (resource.getContentType().equals("Document")) {
                     final DocumentDisplayElement docDisplayElement = new DocumentDisplayElement();
                     docDisplayElement.setName(resource.getName());
                     docDisplayElement.setAbsPath(rootPath + resource.getName());

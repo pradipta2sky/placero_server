@@ -4,9 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
 import android.provider.MediaStore;
-import android.util.Log;
 
 import com.iceteck.silicompressorr.SiliCompressor;
 
@@ -78,7 +76,7 @@ public class AreaCameraPictureActivity extends Activity {
 
                 String outputPath = LocalFolderStructureManager.getImageStorageDir().getAbsolutePath();
                 File outputFolder = new File(outputPath);
-                if(!outputFolder.exists()){
+                if (!outputFolder.exists()) {
                     outputFolder.mkdirs();
                 }
 
@@ -86,7 +84,7 @@ public class AreaCameraPictureActivity extends Activity {
                         .compress(imageFile.getAbsolutePath(), outputFolder, true);
 
                 File outputFile = new File(compressedFilePath);
-                if(outputFile.exists()){
+                if (outputFile.exists()) {
                     final String outputMime = FileUtil.getMimeType(outputFile);
                     final AreaContext areaContext = AreaContext.getInstance();
                     AreaElement ae = areaContext.getAreaElement();
@@ -120,13 +118,13 @@ public class AreaCameraPictureActivity extends Activity {
     }
 
     public Uri getOutputMediaFileUri(int type) {
-        return Uri.fromFile(getOutputMediaFile(type));
+        return Uri.fromFile(getOutputMediaFile());
     }
 
     /**
      * returning image / video
      */
-    private static File getOutputMediaFile(int type) {
+    private static File getOutputMediaFile() {
         // Create a media file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         File mediaFile = new File(LocalFolderStructureManager.getTempStorageDir().getPath()

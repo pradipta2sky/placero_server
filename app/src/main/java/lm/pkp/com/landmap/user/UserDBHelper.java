@@ -74,7 +74,7 @@ public class UserDBHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public void insertUserToServer(UserElement user){
+    public void insertUserToServer(UserElement user) {
         JSONObject postParams = preparePostParams("insert", user);
         new LMSRestAsyncTask().execute(postParams);
     }
@@ -92,7 +92,7 @@ public class UserDBHelper extends SQLiteOpenHelper {
             postParams.put(USER_COLUMN_EMAIL, user.getEmail());
             postParams.put(USER_COLUMN_PHOTO_URL, user.getPhotoUrl());
 
-            } catch (JSONException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
         return postParams;
@@ -101,7 +101,7 @@ public class UserDBHelper extends SQLiteOpenHelper {
     public UserElement getUserByEmail(String email) {
         Cursor cursor = null;
         UserElement ue = null;
-        SQLiteDatabase db =  this.getReadableDatabase();
+        SQLiteDatabase db = this.getReadableDatabase();
         try {
             cursor = db.rawQuery("SELECT * FROM " + USER_TABLE_NAME + " WHERE " + USER_COLUMN_EMAIL + "=?",
                     new String[]{email});

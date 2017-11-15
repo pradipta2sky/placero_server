@@ -3,10 +3,7 @@ package lm.pkp.com.landmap.area.res.disp;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
-import android.provider.MediaStore;
-import android.provider.MediaStore.Images.Media;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -17,7 +14,6 @@ import com.tom_roush.pdfbox.rendering.PDFRenderer;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.ArrayList;
 import java.util.List;
 
 import lm.pkp.com.landmap.R;
@@ -43,7 +39,7 @@ final class AreaDocumentDisplayAdaptor extends BaseAdapter {
         if (view == null) {
             view = new SquaredImageView(context);
             view.setScaleType(CENTER_CROP);
-        }else {
+        } else {
             return view;
         }
 
@@ -52,7 +48,6 @@ final class AreaDocumentDisplayAdaptor extends BaseAdapter {
         final DocumentDisplayElement currElem = docElems.get(position);
 
         final Picasso picassoElem = Picasso.with(context);//
-        picassoElem.setIndicatorsEnabled(true);
         picassoElem.load(Uri.fromFile(getThumbFile(currElem))) //
                 .error(R.drawable.error) //
                 .config(Bitmap.Config.RGB_565)
@@ -78,9 +73,9 @@ final class AreaDocumentDisplayAdaptor extends BaseAdapter {
     private File getThumbFile(DocumentDisplayElement currElem) {
         String thumbPath = thumbsDirPath + File.separatorChar + currElem.getName() + "_t.jpg";
         File thumbFile = new File(thumbPath);
-        if(thumbFile.exists()){
+        if (thumbFile.exists()) {
             return thumbFile;
-        }else {
+        } else {
             return createThumbFile(thumbPath, currElem);
         }
     }
@@ -96,14 +91,14 @@ final class AreaDocumentDisplayAdaptor extends BaseAdapter {
 
             // Save the render result to an image
             File thumbsDir = new File(thumbsDirPath);
-            if(!thumbsDir.exists()){
+            if (!thumbsDir.exists()) {
                 thumbsDir.mkdirs();
             }
             File thumbFile = new File(thumbPath);
             FileOutputStream fileOut = new FileOutputStream(thumbFile);
             pageImage.compress(Bitmap.CompressFormat.JPEG, 100, fileOut);
             fileOut.close();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;

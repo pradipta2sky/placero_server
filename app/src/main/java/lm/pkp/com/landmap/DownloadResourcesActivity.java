@@ -1,12 +1,12 @@
 /**
  * Copyright 2013 Google Inc. All Rights Reserved.
- *
- *  Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * <p/>
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
  * in compliance with the License. You may obtain a copy of the License at
- *
- *  http://www.apache.org/licenses/LICENSE-2.0
- *
- *  Unless required by applicable law or agreed to in writing, software distributed under the
+ * <p/>
+ * http://www.apache.org/licenses/LICENSE-2.0
+ * <p/>
+ * Unless required by applicable law or agreed to in writing, software distributed under the
  * License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either
  * express or implied. See the License for the specific language governing permissions and
  * limitations under the License.
@@ -34,9 +34,8 @@ import java.util.List;
 import java.util.Stack;
 
 import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
-import lm.pkp.com.landmap.drive.DriveDBHelper;
+import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
 import lm.pkp.com.landmap.sync.LocalFolderStructureManager;
 
@@ -62,9 +61,9 @@ public class DownloadResourcesActivity extends BaseDriveActivity {
             ac.setAreaElement(areaElement, getApplicationContext());
 
             List<DriveResource> resources = ac.getAreaElement().getDriveResources();
-            for(int j = 0; j < resources.size(); j++){
+            for (int j = 0; j < resources.size(); j++) {
                 DriveResource dr = resources.get(j);
-                if(!dr.getType().equalsIgnoreCase("folder")){
+                if (!dr.getType().equalsIgnoreCase("folder")) {
                     processStack.push(dr);
                 }
             }
@@ -76,7 +75,7 @@ public class DownloadResourcesActivity extends BaseDriveActivity {
         if (!processStack.isEmpty()) {
             DriveResource res = processStack.pop();
             processResource(res);
-        }else {
+        } else {
             finish();
             Intent areaDashboardIntent = new Intent(getApplicationContext(), AreaDashboardActivity.class);
             startActivity(areaDashboardIntent);
@@ -87,7 +86,7 @@ public class DownloadResourcesActivity extends BaseDriveActivity {
         new ResourceDownloadTask(res).execute();
     }
 
-    private class ResourceDownloadTask extends AsyncTask{
+    private class ResourceDownloadTask extends AsyncTask {
         private DriveResource resource = null;
 
         public ResourceDownloadTask(DriveResource dr) {
@@ -108,8 +107,8 @@ public class DownloadResourcesActivity extends BaseDriveActivity {
                 DriveContents driveContents = driveContentsResult.getDriveContents();
                 String localDir = LocalFolderStructureManager.getLocalFolderByMimeType(resource.getMimeType())
                         .getAbsolutePath();
-                File localFile = new File( localDir + File.separatorChar + resource.getName());
-                if(!localFile.exists()){
+                File localFile = new File(localDir + File.separatorChar + resource.getName());
+                if (!localFile.exists()) {
                     InputStream driveStream = driveContents.getInputStream();
                     OutputStream localStream = new FileOutputStream(localFile);
                     try {

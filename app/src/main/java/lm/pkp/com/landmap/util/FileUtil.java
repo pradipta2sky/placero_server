@@ -30,7 +30,7 @@ public class FileUtil {
         return mimeType != null && mimeType.startsWith("video");
     }
 
-    public static String getMimeType(File file){
+    public static String getMimeType(File file) {
         String path = file.getAbsolutePath();
         return URLConnection.guessContentTypeFromName(path);
     }

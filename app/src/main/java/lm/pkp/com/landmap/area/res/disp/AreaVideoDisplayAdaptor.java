@@ -35,7 +35,7 @@ final class AreaVideoDisplayAdaptor extends BaseAdapter {
         if (view == null) {
             view = new SquaredImageView(context);
             view.setScaleType(CENTER_CROP);
-        }else {
+        } else {
             return view;
         }
 
@@ -47,7 +47,6 @@ final class AreaVideoDisplayAdaptor extends BaseAdapter {
         String thumbPath = Media.insertImage(context.getContentResolver(), bMap, "title", null);
 
         final Picasso picassoElem = Picasso.with(context);//
-        picassoElem.setIndicatorsEnabled(true);
         picassoElem.load(Uri.parse(thumbPath)) //
                 .error(R.drawable.error) //
                 .config(Bitmap.Config.RGB_565)

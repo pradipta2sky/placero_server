@@ -17,7 +17,7 @@ import lm.pkp.com.landmap.custom.AsyncTaskCallback;
  * Created by Rinky on 21-10-2017.
  */
 
-public class DriveResourceSearchAsyncTask extends AsyncTask<JSONObject, Void, String>{
+public class DriveResourceSearchAsyncTask extends AsyncTask<JSONObject, Void, String> {
 
     private AsyncTaskCallback callback = null;
 

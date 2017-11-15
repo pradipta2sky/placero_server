@@ -5,7 +5,7 @@ package lm.pkp.com.landmap.util;
  */
 public class GeneralUtil {
 
-    private GeneralUtil(){
+    private GeneralUtil() {
 
     }
 

@@ -15,7 +15,7 @@ import lm.pkp.com.landmap.position.PositionElement;
 /**
  * Created by USER on 10/16/2017.
  */
-public class AreaElement implements Serializable{
+public class AreaElement implements Serializable {
 
     private String name;
     private String description;
@@ -99,7 +99,7 @@ public class AreaElement implements Serializable{
         this.uniqueId = uniqueId;
     }
 
-    public AreaElement copy(){
+    public AreaElement copy() {
         return SerializationUtils.clone(this);
     }
 

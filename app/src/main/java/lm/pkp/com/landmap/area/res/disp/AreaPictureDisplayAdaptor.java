@@ -13,6 +13,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 import lm.pkp.com.landmap.R;
+
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
 
 final class AreaPictureDisplayAdaptor extends BaseAdapter {
@@ -30,7 +31,7 @@ final class AreaPictureDisplayAdaptor extends BaseAdapter {
         if (view == null) {
             view = new SquaredImageView(context);
             view.setScaleType(CENTER_CROP);
-        }else {
+        } else {
             return view;
         }
 
@@ -38,13 +39,12 @@ final class AreaPictureDisplayAdaptor extends BaseAdapter {
         final String url = getItem(position);
 
         // Trigger the download of the URL asynchronously into the image view.
-        final String fileUrl = "file://"+ url;
+        final String fileUrl = "file://" + url;
 
         final Picasso picassoElem = Picasso.with(context);//
-        picassoElem.setIndicatorsEnabled(true);
         picassoElem.load(fileUrl) //
                 .error(R.drawable.error) //
-                .resize(300,300)
+                .resize(300, 300)
                 .tag(context) //
                 .into(view);
 

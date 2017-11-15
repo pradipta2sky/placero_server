@@ -49,7 +49,7 @@ public abstract class BaseDriveActivity extends Activity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode,
-            Intent data) {
+                                    Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == REQUEST_CODE_RESOLUTION && resultCode == RESULT_OK) {
             mGoogleApiClient.connect();
@@ -94,7 +94,7 @@ public abstract class BaseDriveActivity extends Activity implements
     }
 
     public GoogleApiClient getGoogleApiClient() {
-      return mGoogleApiClient;
+        return mGoogleApiClient;
     }
 
     @Override

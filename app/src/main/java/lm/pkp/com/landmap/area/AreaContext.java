@@ -51,38 +51,38 @@ public class AreaContext {
     }
 
     // Drive specific resources.
-    public void addNewDriveResource(DriveResource dr){
+    public void addNewDriveResource(DriveResource dr) {
         uploadedDriveResources.add(dr);
     }
 
-    public void removeUploadedDriveResource(DriveResource dr){
+    public void removeUploadedDriveResource(DriveResource dr) {
         uploadedDriveResources.remove(dr);
     }
 
-    public ArrayList<DriveResource> getUploadedDriveResources(){
+    public ArrayList<DriveResource> getUploadedDriveResources() {
         return uploadedDriveResources;
     }
 
     // Position specific resources.
-    public void addPosition(PositionElement position){
+    public void addPosition(PositionElement position) {
         currArea.getPositions().add(position);
         positionElements.add(position);
     }
 
-    public void removePosition(PositionElement position){
+    public void removePosition(PositionElement position) {
         positionElements.remove(position);
     }
 
-    public ArrayList<PositionElement> getPositions(){
+    public ArrayList<PositionElement> getPositions() {
         return positionElements;
     }
 
-    public DriveResource getImagesRootDriveResource(){
+    public DriveResource getImagesRootDriveResource() {
         DriveResource imagesDriveRes = null;
         List<DriveResource> existingResouces = currArea.getDriveResources();
-        for(int i = 0; i < existingResouces.size(); i++){
+        for (int i = 0; i < existingResouces.size(); i++) {
             DriveResource dr = existingResouces.get(i);
-            if(dr.getName().equals(IMAGE_FOLDER_NAME)){
+            if (dr.getName().equals(IMAGE_FOLDER_NAME)) {
                 imagesDriveRes = dr;
                 break;
             }
@@ -90,12 +90,12 @@ public class AreaContext {
         return imagesDriveRes;
     }
 
-    public DriveResource getVideosRootDriveResource(){
+    public DriveResource getVideosRootDriveResource() {
         DriveResource videoDriveRes = null;
         List<DriveResource> existingResouces = currArea.getDriveResources();
-        for(int i = 0; i < existingResouces.size(); i++){
+        for (int i = 0; i < existingResouces.size(); i++) {
             DriveResource dr = existingResouces.get(i);
-            if(dr.getName().equals(VIDEO_FOLDER_NAME)){
+            if (dr.getName().equals(VIDEO_FOLDER_NAME)) {
                 videoDriveRes = dr;
                 break;
             }
@@ -103,12 +103,12 @@ public class AreaContext {
         return videoDriveRes;
     }
 
-    public DriveResource getDocumentRootDriveResource(){
+    public DriveResource getDocumentRootDriveResource() {
         DriveResource docDriveRes = null;
         List<DriveResource> existingResouces = currArea.getDriveResources();
-        for(int i = 0; i < existingResouces.size(); i++){
+        for (int i = 0; i < existingResouces.size(); i++) {
             DriveResource dr = existingResouces.get(i);
-            if(dr.getName().equals(DOCUMENT_FOLDER_NAME)){
+            if (dr.getName().equals(DOCUMENT_FOLDER_NAME)) {
                 docDriveRes = dr;
             }
         }

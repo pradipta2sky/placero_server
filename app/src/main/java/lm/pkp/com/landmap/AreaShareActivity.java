@@ -40,7 +40,7 @@ import lm.pkp.com.landmap.util.AreaPopulationUtil;
 import lm.pkp.com.landmap.util.ColorProvider;
 import lm.pkp.com.landmap.util.GeneralUtil;
 
-public class AreaShareActivity extends AppCompatActivity{
+public class AreaShareActivity extends AppCompatActivity {
 
     private ArrayAdapter<String> adapter;
     private String targetUser;
@@ -90,13 +90,13 @@ public class AreaShareActivity extends AppCompatActivity{
             }
         });
 
-        RadioButton shareFullRadio = (RadioButton)findViewById(R.id.share_full_radio);
-        if(PermissionManager.INSTANCE.hasAccess(PermissionConstants.FULL_CONTROL)){
+        RadioButton shareFullRadio = (RadioButton) findViewById(R.id.share_full_radio);
+        if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.FULL_CONTROL)) {
             shareFullRadio.setEnabled(true);
         }
 
-        RadioButton shareRestrictedRadio = (RadioButton)findViewById(R.id.share_restricted_radio);
-        if(PermissionManager.INSTANCE.hasAccess(PermissionConstants.SHARE_READ_WRITE)){
+        RadioButton shareRestrictedRadio = (RadioButton) findViewById(R.id.share_restricted_radio);
+        if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.SHARE_READ_WRITE)) {
             shareRestrictedRadio.setEnabled(true);
         }
 
@@ -112,13 +112,13 @@ public class AreaShareActivity extends AppCompatActivity{
                         if (inflatedStub.getVisibility() == View.VISIBLE) {
                             inflatedStub.setVisibility(View.GONE);
                         } else {
-                            if(checkedId == R.id.share_restricted_radio){
+                            if (checkedId == R.id.share_restricted_radio) {
                                 inflatedStub.setVisibility(View.VISIBLE);
                             }
                         }
                     }
                 } else {
-                    if(checkedId == R.id.share_restricted_radio){
+                    if (checkedId == R.id.share_restricted_radio) {
                         stub.setLayoutResource(R.layout.area_share_restricted);
                         stub.inflate();
                     }
@@ -126,7 +126,7 @@ public class AreaShareActivity extends AppCompatActivity{
             }
         });
 
-        Button saveButton = (Button)findViewById(R.id.area_share_save_btn);
+        Button saveButton = (Button) findViewById(R.id.area_share_save_btn);
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -135,7 +135,7 @@ public class AreaShareActivity extends AppCompatActivity{
                 final AutoCompleteTextView userIdView = (AutoCompleteTextView) findViewById(R.id.user_search_text);
                 targetUser = userIdView.getText().toString();
                 // target user should be a valid email.
-                if(!GeneralUtil.isValidEmail(targetUser)){
+                if (!GeneralUtil.isValidEmail(targetUser)) {
                     showErrorMessage("Please enter a valid email");
                     findViewById(R.id.splash_panel).setVisibility(View.GONE);
                     return;
@@ -147,28 +147,28 @@ public class AreaShareActivity extends AppCompatActivity{
 
                 final PermissionsDBHelper pmh = new PermissionsDBHelper(getApplicationContext(),
                         new DatabaseUpdateCallback());
-                if(idx == 0){
+                if (idx == 0) {
                     // For view insert view_only permission.
                     pmh.insertPermissionsToServer(targetUser, "view_only");
-                }else if(idx == 1){
+                } else if (idx == 1) {
                     // For Full control insert full_control permission.
                     pmh.insertPermissionsToServer(targetUser, "full_control");
-                }else if(idx == 2){
+                } else if (idx == 2) {
                     View inflatedStub = findViewById(R.id.share_details_stub_restricted);
                     // For restricted read all the values.
                     ArrayList<View> touchableViews = inflatedStub.getTouchables();
                     List<String> checkedFunctions = new ArrayList<String>();
                     for (int i = 0; i < touchableViews.size(); i++) {
                         View actualView = touchableViews.get(i);
-                        if(actualView instanceof CheckBox) {
+                        if (actualView instanceof CheckBox) {
                             final CheckBox checkBox = (CheckBox) actualView;
-                            if(checkBox.isChecked()){
+                            if (checkBox.isChecked()) {
                                 checkedFunctions.add(checkBox.getTag().toString());
                             }
                         }
                     }
                     String joinedFunctions = TextUtils.join(",", checkedFunctions);
-                    pmh.insertPermissionsToServer(targetUser,joinedFunctions);
+                    pmh.insertPermissionsToServer(targetUser, joinedFunctions);
                 }
             }
         });
@@ -187,10 +187,10 @@ public class AreaShareActivity extends AppCompatActivity{
 
     @Override
     public void onBackPressed() {
-            finish();
+        finish();
     }
 
-    private class UserInfoCallBack implements AsyncTaskCallback{
+    private class UserInfoCallBack implements AsyncTaskCallback {
 
         @Override
         public void taskCompleted(Object result) {
@@ -199,25 +199,25 @@ public class AreaShareActivity extends AppCompatActivity{
                 String currUserEmail = UserContext.getInstance().getUserElement().getEmail();
                 adapter.clear();
 
-                if(!userArray.trim().equalsIgnoreCase("[]")){
+                if (!userArray.trim().equalsIgnoreCase("[]")) {
                     JSONArray responseArr = new JSONArray(userArray);
                     for (int i = 0; i < responseArr.length(); i++) {
                         JSONObject responseObj = (JSONObject) responseArr.get(i);
                         String emailStr = responseObj.getString("email");
-                        if(!currUserEmail.equalsIgnoreCase(emailStr)){
+                        if (!currUserEmail.equalsIgnoreCase(emailStr)) {
                             adapter.add(emailStr);
                         }
                     }
                     adapter.notifyDataSetChanged();
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
     }
 
 
-    private class DatabaseUpdateCallback implements AsyncTaskCallback{
+    private class DatabaseUpdateCallback implements AsyncTaskCallback {
 
         @Override
         public void taskCompleted(Object result) {
@@ -229,7 +229,7 @@ public class AreaShareActivity extends AppCompatActivity{
     }
 
     private void showErrorMessage(String message) {
-        Snackbar snackbar = Snackbar.make(getWindow().getDecorView(),message, Snackbar.LENGTH_LONG);
+        Snackbar snackbar = Snackbar.make(getWindow().getDecorView(), message, Snackbar.LENGTH_LONG);
         View sbView = snackbar.getView();
         TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
         textView.setTextColor(Color.RED);

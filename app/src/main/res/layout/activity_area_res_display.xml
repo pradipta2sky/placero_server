@@ -1,5 +1,4 @@
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -9,8 +8,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentTop="true"
         android:background="?attr/colorPrimary"
-        android:minHeight="?attr/actionBarSize"
-        />
+        android:minHeight="?attr/actionBarSize" />
 
     <android.support.design.widget.TabLayout
         android:id="@+id/tab_layout"
@@ -18,13 +16,12 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/toolbar_ar_res_disp"
         android:background="?attr/colorPrimary"
-        android:minHeight="?attr/actionBarSize"
-        />
+        android:minHeight="?attr/actionBarSize" />
 
     <android.support.v4.view.ViewPager
         android:id="@+id/area_tab_pager"
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
-        android:layout_below="@id/tab_layout"/>
+        android:layout_below="@id/tab_layout" />
 
 </RelativeLayout>

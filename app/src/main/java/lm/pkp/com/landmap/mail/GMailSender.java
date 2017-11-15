@@ -74,7 +74,7 @@ public class GMailSender extends Authenticator {
             message.setContent(_multipart);
             if (recipients.indexOf(',') > 0) {
                 message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipients));
-            }else {
+            } else {
                 message.setRecipient(Message.RecipientType.TO, new InternetAddress(recipients));
             }
             Transport.send(message);

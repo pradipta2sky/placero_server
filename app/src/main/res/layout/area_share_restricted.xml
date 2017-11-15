@@ -25,7 +25,7 @@
             android:textSize="17sp"
             android:textColor="#000000"
             android:paddingLeft="10dp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <CheckBox
             android:id="@+id/attribute_change_name"
@@ -34,7 +34,7 @@
             android:text="Change place name."
             android:checked="false"
             android:layout_marginTop="5dp"
-            android:tag="change_name"/>
+            android:tag="change_name" />
 
         <CheckBox
             android:id="@+id/attribute_change_description"
@@ -43,7 +43,7 @@
             android:text="Change place description."
             android:checked="false"
             android:layout_marginTop="5dp"
-            android:tag="change_description"/>
+            android:tag="change_description" />
 
         <CheckBox
             android:id="@+id/attribute_change_address"
@@ -52,7 +52,7 @@
             android:text="Change place address"
             android:checked="false"
             android:layout_marginTop="5dp"
-            android:tag="change_address"/>
+            android:tag="change_address" />
 
         <CheckBox
             android:id="@+id/attribute_make_public"
@@ -61,7 +61,7 @@
             android:text="Make place public"
             android:checked="false"
             android:layout_marginTop="5dp"
-            android:tag="make_public"/>
+            android:tag="make_public" />
 
     </LinearLayout>
 
@@ -83,7 +83,7 @@
             android:textSize="17sp"
             android:textColor="#000000"
             android:paddingLeft="10dp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <CheckBox
             android:id="@+id/mark_position"
@@ -92,7 +92,7 @@
             android:text="Add positions to place. This will impact the plotting, area measurement, location and navigation."
             android:checked="false"
             android:layout_marginTop="10dp"
-            android:tag="mark_position"/>
+            android:tag="mark_position" />
 
         <CheckBox
             android:id="@+id/remove_position"
@@ -101,7 +101,7 @@
             android:text="Remove place position. This will impact the plotting, area measurement, location and navigation."
             android:checked="false"
             android:layout_marginTop="10dp"
-            android:tag="delete_position"/>
+            android:tag="delete_position" />
 
         <CheckBox
             android:id="@+id/move_position"
@@ -110,7 +110,7 @@
             android:text="Move position marker. This will impact the plotting, area measurement, location and navigation."
             android:checked="false"
             android:layout_marginTop="10dp"
-            android:tag="move_position"/>
+            android:tag="move_position" />
 
     </LinearLayout>
 
@@ -132,7 +132,7 @@
             android:textSize="17sp"
             android:textColor="#000000"
             android:paddingLeft="10dp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <CheckBox
             android:id="@+id/share_area_ro"
@@ -141,7 +141,7 @@
             android:text="Share place in view only mode."
             android:checked="false"
             android:layout_marginTop="5dp"
-            android:tag="share_ro"/>
+            android:tag="share_ro" />
 
         <CheckBox
             android:id="@+id/share_area_rw"
@@ -150,7 +150,7 @@
             android:text="Share place with your permissions."
             android:checked="false"
             android:layout_marginTop="5dp"
-            android:tag="share_rw"/>
+            android:tag="share_rw" />
 
     </LinearLayout>
 
@@ -172,7 +172,7 @@
             android:textSize="17sp"
             android:textColor="#000000"
             android:paddingLeft="10dp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <CheckBox
             android:id="@+id/add_resources"
@@ -181,7 +181,7 @@
             android:text="Add resources to place. i.e. pictures, videos, documents."
             android:checked="false"
             android:layout_marginTop="10dp"
-            android:tag="add_resources"/>
+            android:tag="add_resources" />
 
         <CheckBox
             android:id="@+id/remove_resources"
@@ -190,7 +190,7 @@
             android:text="Remove place resources. i.e. pictures, videos, documents."
             android:checked="false"
             android:layout_marginTop="10dp"
-            android:tag="remove_resources"/>
+            android:tag="remove_resources" />
 
     </LinearLayout>
 

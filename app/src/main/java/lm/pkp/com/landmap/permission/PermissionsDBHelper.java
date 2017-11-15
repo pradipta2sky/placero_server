@@ -16,7 +16,6 @@ import java.util.Map;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
-import lm.pkp.com.landmap.position.PositionElement;
 import lm.pkp.com.landmap.sync.LMSRestAsyncTask;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.user.UserElement;
@@ -84,11 +83,11 @@ public class PermissionsDBHelper extends SQLiteOpenHelper {
             postParams.put("source_user", userElement.getEmail());
             postParams.put("target_user", targetUser);
             postParams.put("area_id", areaElement.getUniqueId());
-            postParams.put("function_codes",functionCodes);
+            postParams.put("function_codes", functionCodes);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return  postParams;
+        return postParams;
     }
 
     public void deletePermissionsByAreaId(String areaId) {
@@ -102,8 +101,8 @@ public class PermissionsDBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getWritableDatabase();
         Map<String, PermissionElement> perMap = new HashMap<>();
         Cursor cursor = db.rawQuery("select * from " + ACCESS_TABLE_NAME
-                        + " WHERE " + ACCESS_COLUMN_AREA_ID + "=?", new String[]{areaId});
-        if(cursor != null){
+                + " WHERE " + ACCESS_COLUMN_AREA_ID + "=?", new String[]{areaId});
+        if (cursor != null) {
             cursor.moveToFirst();
             while (cursor.isAfterLast() == false) {
                 PermissionElement pe = new PermissionElement();
@@ -123,7 +122,7 @@ public class PermissionsDBHelper extends SQLiteOpenHelper {
         this.callback = callback;
     }
 
-    public void finalizeTaskCompletion(){
+    public void finalizeTaskCompletion() {
         callback.taskCompleted("");
     }
 

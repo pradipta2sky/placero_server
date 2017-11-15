@@ -14,8 +14,8 @@ import java.net.URLEncoder;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
@@ -28,7 +28,7 @@ import lm.pkp.com.landmap.position.PositionsDBHelper;
  * Created by Rinky on 21-10-2017.
  */
 
-public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>{
+public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String> {
 
     private Context localContext = null;
     private AreaDBHelper adh = null;
@@ -93,7 +93,7 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
             for (int i = 0; i < responseArr.length(); i++) {
                 JSONObject responseObj = (JSONObject) responseArr.get(i);
 
-                JSONObject areaObj = (JSONObject)responseObj.get("area");
+                JSONObject areaObj = (JSONObject) responseObj.get("area");
 
                 AreaElement ae = new AreaElement();
                 ae.setName(areaObj.getString("name"));
@@ -108,7 +108,7 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
 
                 adh.insertAreaFromServer(ae);
 
-                JSONArray positionsArr = (JSONArray)responseObj.get("positions");
+                JSONArray positionsArr = (JSONArray) responseObj.get("positions");
                 for (int p = 0; p < positionsArr.length(); p++) {
                     JSONObject positionObj = (JSONObject) positionsArr.get(p);
 
@@ -124,7 +124,7 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
                     pdh.insertPositionFromServer(pe);
                 }
 
-                JSONArray driveArr = (JSONArray)responseObj.get("drs");
+                JSONArray driveArr = (JSONArray) responseObj.get("drs");
                 for (int d = 0; d < driveArr.length(); d++) {
                     JSONObject driveObj = (JSONObject) driveArr.get(d);
 
@@ -144,7 +144,7 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
                     ddh.insertResourceFromServer(dr);
                 }
 
-                JSONArray permissionsArr = (JSONArray)responseObj.get("permissions");
+                JSONArray permissionsArr = (JSONArray) responseObj.get("permissions");
                 for (int e = 0; e < permissionsArr.length(); e++) {
                     JSONObject permissionObj = (JSONObject) permissionsArr.get(e);
 
@@ -156,7 +156,7 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
                     pmh.insertPermission(pe);
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         finalizeTaskCompletion();
@@ -166,7 +166,7 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
         this.callback = callback;
     }
 
-    public void finalizeTaskCompletion(){
+    public void finalizeTaskCompletion() {
         callback.taskCompleted("");
     }
 }

@@ -32,17 +32,17 @@ public class PostionListAdaptor extends ArrayAdapter<PositionElement> {
     public View getView(final int position, View convertView, ViewGroup parent) {
         View v = convertView;
         if (v == null) {
-            LayoutInflater vi = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             v = vi.inflate(R.layout.position_element_row, null);
-        }else {
+        } else {
             return v;
         }
 
         final PositionElement pe = items.get(position);
         TextView nameText = (TextView) v.findViewById(R.id.pos_name);
         String pName = pe.getName();
-        if(pName.length() > 25){
-            pName = pName.substring(0,22).concat("...");
+        if (pName.length() > 25) {
+            pName = pName.substring(0, 22).concat("...");
         }
         nameText.setText(pName);
 

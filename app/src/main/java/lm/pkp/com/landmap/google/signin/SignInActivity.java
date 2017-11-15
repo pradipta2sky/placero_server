@@ -55,7 +55,7 @@ public class SignInActivity extends AppCompatActivity implements
         ActionBar ab = this.getSupportActionBar();
         ab.hide();
 
-        mStatusTextView = (TextView)findViewById(R.id.status);
+        mStatusTextView = (TextView) findViewById(R.id.status);
 
         findViewById(R.id.sign_in_button).setOnClickListener(this);
         findViewById(R.id.sign_out_button).setOnClickListener(this);
@@ -68,7 +68,7 @@ public class SignInActivity extends AppCompatActivity implements
                 .enableAutoManage(this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
-        SignInButton signInButton = (SignInButton)findViewById(R.id.sign_in_button);
+        SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
         signInButton.setSize(SignInButton.SIZE_STANDARD);
     }
 
@@ -121,7 +121,7 @@ public class SignInActivity extends AppCompatActivity implements
 
             UserDBHelper udh = new UserDBHelper(getApplicationContext());
             UserElement localUser = udh.getUserByEmail(signedUser.getEmail());
-            if(localUser == null){
+            if (localUser == null) {
                 udh.insertUserLocally(signedUser);
             }
             UserContext.getInstance().setUserElement(signedUser);
@@ -141,7 +141,7 @@ public class SignInActivity extends AppCompatActivity implements
             params.put("ss", ue.getEmail());
             params.put("sf", "email");
             searchUserTask.execute(params);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         searchUserTask.setCompletionCallback(this);
@@ -152,10 +152,10 @@ public class SignInActivity extends AppCompatActivity implements
         try {
             String userDetails = result.toString();
             UserDBHelper udh = new UserDBHelper(getApplicationContext());
-            if(userDetails.trim().equalsIgnoreCase("[]")){
+            if (userDetails.trim().equalsIgnoreCase("[]")) {
                 udh.insertUserToServer(signedUser);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

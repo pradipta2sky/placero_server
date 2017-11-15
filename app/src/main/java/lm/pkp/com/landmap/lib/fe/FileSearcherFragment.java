@@ -1,8 +1,5 @@
 package lm.pkp.com.landmap.lib.fe;
 
-import java.io.File;
-import java.util.UUID;
-
 import android.app.AlertDialog;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -20,6 +17,9 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+
+import java.io.File;
+import java.util.UUID;
 
 import lm.pkp.com.landmap.AreaAddResourcesActivity;
 import lm.pkp.com.landmap.R;
@@ -45,7 +45,7 @@ public class FileSearcherFragment extends Fragment {
                              Bundle savedInstanceState) {
 
         if (fragmentView == null) {
-            fragmentView = inflater.inflate(R.layout.document_select_layout,container, false);
+            fragmentView = inflater.inflate(R.layout.document_select_layout, container, false);
 
             listAdapter = new DocumentChooserAdaptor(getContext(), items);
             TextView emptyView = (TextView) fragmentView.findViewById(R.id.searchEmptyView);
@@ -55,7 +55,7 @@ public class FileSearcherFragment extends Fragment {
 
             listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
-                public void onItemClick(AdapterView<?> adapterView, View view,int i, long l) {
+                public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                     FileDisplayElement item = items.get(i);
                     File file = new File(item.getPath());
                     if (!file.canRead()) {
@@ -147,12 +147,12 @@ public class FileSearcherFragment extends Fragment {
     private String createDescriptionText(String fileSize, String fileLastModifed) {
         // Prepare the size desc.
         Long size = new Long(fileSize);
-        int sizeKB = (int)(((float)size) / 1024);
-        int sizeMB = (int)(((float)sizeKB) / 1024);
+        int sizeKB = (int) (((float) size) / 1024);
+        int sizeMB = (int) (((float) sizeKB) / 1024);
         StringBuffer descBuffer = new StringBuffer();
-        if(sizeKB > 1024){
+        if (sizeKB > 1024) {
             descBuffer.append("size " + sizeMB + "MBs,");
-        }else {
+        } else {
             descBuffer.append("size " + sizeKB + "KBs,");
         }
         // Prepare the last modified

@@ -105,9 +105,9 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
 
     public void deletePositionById(String uniqueId, String uniqueAreaId) {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.execSQL("DELETE FROM "+POSITION_TABLE_NAME+" WHERE "
-                + POSITION_COLUMN_UNIQUE_AREA_ID +" = '"+uniqueAreaId
-                + "' AND "+ POSITION_COLUMN_UNIQUE_ID +" = '" + uniqueId + "'");
+        db.execSQL("DELETE FROM " + POSITION_TABLE_NAME + " WHERE "
+                + POSITION_COLUMN_UNIQUE_AREA_ID + " = '" + uniqueAreaId
+                + "' AND " + POSITION_COLUMN_UNIQUE_ID + " = '" + uniqueId + "'");
 
         PositionElement pe = new PositionElement();
         pe.setUniqueAreaId(uniqueAreaId);
@@ -130,7 +130,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery("select * from " + POSITION_TABLE_NAME + " WHERE " + POSITION_COLUMN_UNIQUE_AREA_ID + "=?",
                 new String[]{ae.getUniqueId()});
-        if(cursor != null){
+        if (cursor != null) {
             cursor.moveToFirst();
             while (cursor.isAfterLast() == false) {
                 PositionElement pe = new PositionElement();
@@ -163,18 +163,18 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         try {
             postParams.put("requestType", "PositionMaster");
             postParams.put("queryType", queryType);
-            postParams.put("deviceID",AndroidSystemUtil.getDeviceId());
-            postParams.put("lon",pe.getLon() + "");
-            postParams.put("lat",pe.getLat() + "");
-            postParams.put("desc",pe.getDescription());
-            postParams.put("tags",pe.getTags());
-            postParams.put("name",pe.getName());
-            postParams.put("uniqueAreaId",pe.getUniqueAreaId());
-            postParams.put("uniqueId",pe.getUniqueId());
+            postParams.put("deviceID", AndroidSystemUtil.getDeviceId());
+            postParams.put("lon", pe.getLon() + "");
+            postParams.put("lat", pe.getLat() + "");
+            postParams.put("desc", pe.getDescription());
+            postParams.put("tags", pe.getTags());
+            postParams.put("name", pe.getName());
+            postParams.put("uniqueAreaId", pe.getUniqueAreaId());
+            postParams.put("uniqueId", pe.getUniqueId());
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        return  postParams;
+        return postParams;
     }
 
     public void deletePositionsLocally() {

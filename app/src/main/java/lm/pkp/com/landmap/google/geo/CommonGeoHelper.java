@@ -15,12 +15,12 @@ public class CommonGeoHelper {
 
     public static final CommonGeoHelper INSTANCE = new CommonGeoHelper();
 
-    private CommonGeoHelper(){
+    private CommonGeoHelper() {
     }
 
-    public String getAddressByGeoLocation(Context context, Double lat, Double lon){
+    public String getAddressByGeoLocation(Context context, Double lat, Double lon) {
         StringBuffer buf = new StringBuffer();
-        try{
+        try {
             Location areaLocation = new Location("");
             areaLocation.setLatitude(lat);
             areaLocation.setLongitude(lon);
@@ -32,12 +32,12 @@ public class CommonGeoHelper {
                 int maxLine = address.getMaxAddressLineIndex();
                 for (int j = 0; j <= maxLine; j++) {
                     buf.append(address.getAddressLine(j));
-                    if(j != maxLine){
+                    if (j != maxLine) {
                         buf.append(",");
                     }
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             // Do nothing if fails.
         }
         return buf.toString();

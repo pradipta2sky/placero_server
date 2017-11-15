@@ -43,7 +43,7 @@ public class LocalDataRefresher implements AsyncTaskCallback {
             JSONObject queryObj = new JSONObject();
             queryObj.put("us", UserContext.getInstance().getUserElement().getEmail());
             loadTask.execute(queryObj);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -56,7 +56,7 @@ public class LocalDataRefresher implements AsyncTaskCallback {
         loadTask.setCompletionCallback(this);
         try {
             loadTask.execute();
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -70,7 +70,7 @@ public class LocalDataRefresher implements AsyncTaskCallback {
             JSONObject queryObj = new JSONObject();
             queryObj.put("sk", searchKey);
             loadTask.execute(queryObj);
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         loadTask.setCompletionCallback(this);

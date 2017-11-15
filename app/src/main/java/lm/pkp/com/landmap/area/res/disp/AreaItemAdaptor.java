@@ -18,7 +18,7 @@ import lm.pkp.com.landmap.util.AreaPopulationUtil;
 /**
  * Created by USER on 10/20/2017.
  */
-public class AreaItemAdaptor extends ArrayAdapter implements Filterable{
+public class AreaItemAdaptor extends ArrayAdapter implements Filterable {
 
     private ArrayList<AreaElement> items;
     private ArrayList<AreaElement> fixedItems = new ArrayList<>();
@@ -35,15 +35,15 @@ public class AreaItemAdaptor extends ArrayAdapter implements Filterable{
     public View getView(final int position, View convertView, ViewGroup parent) {
         View v = convertView;
         if (v == null) {
-            LayoutInflater vi = (LayoutInflater)context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             v = vi.inflate(R.layout.area_element_row, null);
         }
         AreaPopulationUtil.INSTANCE.populateAreaElement(v, items.get(position));
         return v;
     }
 
-    public int getCount () {
-        return items.size ();
+    public int getCount() {
+        return items.size();
     }
 
     @Override
@@ -74,7 +74,7 @@ public class AreaItemAdaptor extends ArrayAdapter implements Filterable{
                     String description = areaElement.getDescription().toLowerCase();
                     String address = areaElement.getAddress().toLowerCase();
                     String cons = constraint.toString().toLowerCase();
-                    if(areaName.contains(cons) || description.contains(constraint) || address.contains(constraint)){
+                    if (areaName.contains(cons) || description.contains(constraint) || address.contains(constraint)) {
                         results.add(areaElement);
                     }
                 }

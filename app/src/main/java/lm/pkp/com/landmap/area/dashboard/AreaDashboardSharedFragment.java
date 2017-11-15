@@ -112,7 +112,7 @@ public class AreaDashboardSharedFragment extends Fragment {
 
             final EditText inputSearch = (EditText) getActivity().findViewById(R.id.dashboard_search_box);
             String filterStr = inputSearch.getText().toString().trim();
-            if(!filterStr.equalsIgnoreCase("")){
+            if (!filterStr.equalsIgnoreCase("")) {
                 adaptor.getFilter().filter(filterStr);
             }
 

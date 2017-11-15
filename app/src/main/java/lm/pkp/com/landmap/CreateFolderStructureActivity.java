@@ -35,7 +35,6 @@ import java.util.UUID;
 
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaElement;
-import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
 import lm.pkp.com.landmap.user.UserContext;
@@ -189,7 +188,7 @@ public class CreateFolderStructureActivity extends BaseDriveActivity {
                 DriveFolder eventFolder = changeEvent.getDriveId().asDriveFolder();
                 DriveId driveId = eventFolder.getDriveId();
                 String resourceId = driveId.getResourceId();
-                if(resourceId != null){
+                if (resourceId != null) {
                     eventFolder.removeChangeListener(getGoogleApiClient(), this);
                     DriveDBHelper ddh = new DriveDBHelper(getApplicationContext());
 

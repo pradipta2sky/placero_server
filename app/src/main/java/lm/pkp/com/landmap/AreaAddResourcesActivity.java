@@ -20,7 +20,7 @@ import lm.pkp.com.landmap.drive.DriveResource;
 import lm.pkp.com.landmap.util.AreaPopulationUtil;
 import lm.pkp.com.landmap.util.ColorProvider;
 
-public class AreaAddResourcesActivity extends AppCompatActivity{
+public class AreaAddResourcesActivity extends AppCompatActivity {
 
     private AreaAddResourceAdaptor adaptor = null;
     private ArrayList<DriveResource> areaResourcesDisplayList = new ArrayList<>();
@@ -51,7 +51,7 @@ public class AreaAddResourcesActivity extends AppCompatActivity{
         areaResourcesDisplayList.addAll(driveResources);
         adaptor.notifyDataSetChanged();
 
-        Button takeSnapButton = (Button)findViewById(R.id.take_snap_button);
+        Button takeSnapButton = (Button) findViewById(R.id.take_snap_button);
         takeSnapButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -60,7 +60,7 @@ public class AreaAddResourcesActivity extends AppCompatActivity{
             }
         });
 
-        Button captureVideoButton = (Button)findViewById(R.id.shoot_video_button);
+        Button captureVideoButton = (Button) findViewById(R.id.shoot_video_button);
         captureVideoButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -69,7 +69,7 @@ public class AreaAddResourcesActivity extends AppCompatActivity{
             }
         });
 
-        Button chooseDocumentButton = (Button)findViewById(R.id.add_document_button);
+        Button chooseDocumentButton = (Button) findViewById(R.id.add_document_button);
         chooseDocumentButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -78,7 +78,7 @@ public class AreaAddResourcesActivity extends AppCompatActivity{
             }
         });
 
-        Button driveUploadButton = (Button)findViewById(R.id.upload_to_drive_button);
+        Button driveUploadButton = (Button) findViewById(R.id.upload_to_drive_button);
         driveUploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

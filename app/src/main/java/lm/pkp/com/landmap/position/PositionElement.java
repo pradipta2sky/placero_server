@@ -7,7 +7,7 @@ import java.io.Serializable;
 /**
  * Created by USER on 10/16/2017.
  */
-public class PositionElement implements Serializable{
+public class PositionElement implements Serializable {
 
     private String name;
     private String description;
@@ -66,10 +66,10 @@ public class PositionElement implements Serializable{
         this.viewPos = viewPos;
     }
 
-    public boolean isPositionValid(){
-        if(lat != 0.0 && lon != 0.0){
+    public boolean isPositionValid() {
+        if (lat != 0.0 && lon != 0.0) {
             return true;
-        }else {
+        } else {
             return false;
         }
     }
@@ -90,7 +90,7 @@ public class PositionElement implements Serializable{
         this.uniqueId = uniqueId;
     }
 
-    public PositionElement copy(){
+    public PositionElement copy() {
         return SerializationUtils.clone(this);
     }
 }

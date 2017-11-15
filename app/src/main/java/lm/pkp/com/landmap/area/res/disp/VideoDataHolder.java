@@ -25,8 +25,8 @@ final class VideoDataHolder {
                 + File.separatorChar;
         for (int i = 0; i < driveResources.size(); i++) {
             final DriveResource resource = driveResources.get(i);
-            if(resource.getType().equals("file")){
-                if(resource.getContentType().equals("Video")){
+            if (resource.getType().equals("file")) {
+                if (resource.getContentType().equals("Video")) {
                     final VideoDisplayElement videoDisplayElement = new VideoDisplayElement();
                     videoDisplayElement.setName(resource.getName());
                     videoDisplayElement.setAbsPath(imgRootPath + resource.getName());

@@ -26,7 +26,7 @@ public class SplashActivity extends Activity {
         LocalFolderStructureManager.create();
     }
 
-    private class DataReloadCallback implements AsyncTaskCallback{
+    private class DataReloadCallback implements AsyncTaskCallback {
 
         @Override
         public void taskCompleted(Object result) {

@@ -14,8 +14,6 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 
-import java.util.ArrayList;
-
 import lm.pkp.com.landmap.AreaDetailsActivity;
 import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.area.AreaContext;
@@ -50,7 +48,7 @@ public class AreaDashboardPublicFragment extends Fragment {
     @Override
     public void setUserVisibleHint(boolean visible) {
         super.setUserVisibleHint(visible);
-        if (visible  && isResumed()) {
+        if (visible && isResumed()) {
             loadFragment();
         }
     }
@@ -63,10 +61,10 @@ public class AreaDashboardPublicFragment extends Fragment {
         final String availableKey = inputSearch.getText().toString();
         inputSearch.addTextChangedListener(new UserInputWatcher());
 
-        if(availableKey.trim().equalsIgnoreCase("")){
+        if (availableKey.trim().equalsIgnoreCase("")) {
             LocalDataRefresher dataRefresher = new LocalDataRefresher(getContext(), new DataReloadCallback());
             dataRefresher.refreshPublicAreas();
-        }else {
+        } else {
             LocalDataRefresher dataRefresher = new LocalDataRefresher(getContext(), new DataReloadCallback(availableKey.trim()));
             dataRefresher.refreshPublicAreas(availableKey.trim());
         }
@@ -119,7 +117,7 @@ public class AreaDashboardPublicFragment extends Fragment {
             ListView areaListView = (ListView) getView().findViewById(R.id.area_display_list);
             areaListView.setAdapter(adaptor);
 
-            if(!filterStr.equalsIgnoreCase("")){
+            if (!filterStr.equalsIgnoreCase("")) {
                 adaptor.getFilter().filter(filterStr);
             }
 
@@ -152,10 +150,10 @@ public class AreaDashboardPublicFragment extends Fragment {
         public void afterTextChanged(Editable editable) {
             getView().findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
             String filterStr = editable.toString().trim();
-            if(!filterStr.equalsIgnoreCase("")){
+            if (!filterStr.equalsIgnoreCase("")) {
                 LocalDataRefresher dataRefresher = new LocalDataRefresher(getContext(), new DataReloadCallback(filterStr));
                 dataRefresher.refreshPublicAreas(filterStr);
-            }else {
+            } else {
                 LocalDataRefresher dataRefresher = new LocalDataRefresher(getContext(), new DataReloadCallback());
                 dataRefresher.refreshPublicAreas();
             }

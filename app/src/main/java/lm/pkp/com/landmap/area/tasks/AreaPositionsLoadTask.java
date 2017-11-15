@@ -20,7 +20,7 @@ import lm.pkp.com.landmap.position.PositionsDBHelper;
  * Created by Rinky on 21-10-2017.
  */
 
-public class AreaPositionsLoadTask extends AsyncTask<JSONObject, Void, String>{
+public class AreaPositionsLoadTask extends AsyncTask<JSONObject, Void, String> {
 
     private Context localContext = null;
     private PositionsDBHelper pdh = null;
@@ -90,7 +90,7 @@ public class AreaPositionsLoadTask extends AsyncTask<JSONObject, Void, String>{
 
                 pdh.insertPositionFromServer(pe);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         System.out.println(s);

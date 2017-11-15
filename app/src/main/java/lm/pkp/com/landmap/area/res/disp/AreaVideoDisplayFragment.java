@@ -38,5 +38,4 @@ public class AreaVideoDisplayFragment extends Fragment {
     }
 
 
-
 }

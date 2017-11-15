@@ -5,9 +5,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Environment;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -23,7 +21,7 @@ public class GenericActivityExceptionHandler implements Thread.UncaughtException
 
     private Activity activity;
 
-    public GenericActivityExceptionHandler(Activity context){
+    public GenericActivityExceptionHandler(Activity context) {
         this.activity = context;
         Thread.setDefaultUncaughtExceptionHandler(this);
     }
@@ -34,32 +32,33 @@ public class GenericActivityExceptionHandler implements Thread.UncaughtException
         content.append("\n\n Exception trace ! \n");
 
         final StackTraceElement[] exceptionTrace = ex.getStackTrace();
-        for (int i = 0; i < exceptionTrace.length ; i++) {
+        for (int i = 0; i < exceptionTrace.length; i++) {
             content.append(exceptionTrace[i].toString());
             content.append("\n");
         }
 
         content.append("\n\n Thread trace ! \n");
         final StackTraceElement[] threadStackTrace = thread.getStackTrace();
-        for (int i = 0; i < threadStackTrace.length ; i++) {
+        for (int i = 0; i < threadStackTrace.length; i++) {
             content.append(threadStackTrace[i].toString());
             content.append("\n");
         }
 
-        if(ex instanceof  UserUnavailableException){
+        if (ex instanceof UserUnavailableException) {
             // Check why the user went off. ?? Do something here.
         }
 
         new SendEmailAsyncTask(content.toString()).execute();
     }
 
-    private class SendEmailAsyncTask extends AsyncTask{
+    private class SendEmailAsyncTask extends AsyncTask {
 
         private String content;
 
-        public SendEmailAsyncTask(String mailContent){
+        public SendEmailAsyncTask(String mailContent) {
             this.content = mailContent;
         }
+
         @Override
         protected Object doInBackground(Object[] params) {
             sendEmail(content);
@@ -92,7 +91,7 @@ public class GenericActivityExceptionHandler implements Thread.UncaughtException
         System.exit(2);
     }
 
-    private void sendEmail(String content){
+    private void sendEmail(String content) {
         try {
             final Date currDate = Calendar.getInstance(TimeZone.getTimeZone("Asia/Calcutta")).getTime();
             GMailSender sender = new GMailSender("pradhans.prasanna@gmail.com", "baramania");

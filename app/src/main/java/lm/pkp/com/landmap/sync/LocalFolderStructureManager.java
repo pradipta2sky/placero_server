@@ -5,8 +5,6 @@ import android.util.Log;
 
 import java.io.File;
 
-import lm.pkp.com.landmap.util.FileUtil;
-
 /**
  * Created by USER on 11/5/2017.
  */
@@ -29,7 +27,7 @@ public class LocalFolderStructureManager {
     private static void createTempFolder() {
         // External sdcard location
         tempStorageDir = new File(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS),"LMS_TEMP");
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "LMS_TEMP");
         // Create the storage directory if it does not exist
         if (!tempStorageDir.exists()) {
             if (!tempStorageDir.mkdirs()) {
@@ -42,7 +40,7 @@ public class LocalFolderStructureManager {
     private static void createDocumentsFolder() {
         // External sdcard location
         docsStorageDir = new File(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS),"LMS_DOCS");
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "LMS_DOCS");
         // Create the storage directory if it does not exist
         if (!docsStorageDir.exists()) {
             if (!docsStorageDir.mkdirs()) {
@@ -54,7 +52,7 @@ public class LocalFolderStructureManager {
     private static void createVideosFolder() {
         // External sdcard location
         videoStorageDir = new File(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES),"LMS_VIDEOS");
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES), "LMS_VIDEOS");
         // Create the storage directory if it does not exist
         if (!videoStorageDir.exists()) {
             if (!videoStorageDir.mkdirs()) {
@@ -66,7 +64,7 @@ public class LocalFolderStructureManager {
     private static void createImagesFolder() {
         // External sdcard location
         imageStorageDir = new File(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),"LMS_IMAGES");
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM), "LMS_IMAGES");
         // Create the storage directory if it does not exist
         if (!imageStorageDir.exists()) {
             if (!imageStorageDir.mkdirs()) {
@@ -92,11 +90,11 @@ public class LocalFolderStructureManager {
     }
 
     public static File getLocalFolderByMimeType(String mimeType) {
-        if(mimeType != null && mimeType.startsWith("image")){
+        if (mimeType != null && mimeType.startsWith("image")) {
             return imageStorageDir;
-        }else if(mimeType != null && mimeType.startsWith("video")){
+        } else if (mimeType != null && mimeType.startsWith("video")) {
             return videoStorageDir;
-        }else {
+        } else {
             return docsStorageDir;
         }
     }

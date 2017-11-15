@@ -29,7 +29,7 @@ public class AreaDocumentChooserActivity extends AppCompatActivity {
                 FileSearcherFragment.class.getSimpleName());
         fragmentTransaction.commit();
     }
-	
+
     @Override
     protected void onDestroy() {
         super.onDestroy();

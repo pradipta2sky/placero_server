@@ -128,10 +128,10 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
             @Override
             public void onClick(View v) {
                 final List<PositionElement> positions = ae.getPositions();
-                if(positions.size() >= 3){
+                if (positions.size() >= 3) {
                     Intent intent = new Intent(AreaDetailsActivity.this, AreaMapPlotterActivity.class);
                     startActivity(intent);
-                }else {
+                } else {
                     showErrorMessage("You need atleast 3 points to plot.!!!");
                 }
             }
@@ -143,18 +143,18 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
             public void onClick(View v) {
                 final double centerLat = ae.getCenterLat();
                 final double centerLon = ae.getCenterLon();
-                if(centerLat == 0 && centerLon == 0){
+                if (centerLat == 0 && centerLon == 0) {
                     final List<PositionElement> positions = ae.getPositions();
-                    if(positions.size() > 0){
+                    if (positions.size() > 0) {
                         final PositionElement pe = positions.get(0);
                         Uri gmmIntentUri = Uri.parse("google.navigation:q=" + pe.getLat() + "," + pe.getLon());
                         Intent navigationIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
                         navigationIntent.setPackage("com.google.android.apps.maps");
                         startActivity(navigationIntent);
-                    }else {
+                    } else {
                         showErrorMessage("No locations available for navigation");
                     }
-                }else {
+                } else {
                     Uri gmmIntentUri = Uri.parse("google.navigation:q=" + centerLat + "," + centerLon);
                     Intent navigationIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
                     navigationIntent.setPackage("com.google.android.apps.maps");
@@ -316,7 +316,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
     }
 
     private void showErrorMessage(String message) {
-        Snackbar snackbar = Snackbar.make(getWindow().getDecorView(),message, Snackbar.LENGTH_LONG);
+        Snackbar snackbar = Snackbar.make(getWindow().getDecorView(), message, Snackbar.LENGTH_LONG);
         View sbView = snackbar.getView();
         TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
         textView.setTextColor(Color.RED);

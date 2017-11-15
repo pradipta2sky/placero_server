@@ -25,8 +25,8 @@ final class PictureDataHolder {
                 + File.separatorChar;
         for (int i = 0; i < driveResources.size(); i++) {
             final DriveResource resource = driveResources.get(i);
-            if(resource.getType().equals("file")){
-                if(resource.getContentType().equals("Image")){
+            if (resource.getType().equals("file")) {
+                if (resource.getContentType().equals("Image")) {
                     final PictureDisplayElement imageDisplayElement = new PictureDisplayElement();
                     imageDisplayElement.setName(resource.getName());
                     imageDisplayElement.setAbsPath(imgRootPath + resource.getName());

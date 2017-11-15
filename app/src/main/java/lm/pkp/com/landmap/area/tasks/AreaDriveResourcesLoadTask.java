@@ -20,7 +20,7 @@ import lm.pkp.com.landmap.drive.DriveResource;
  * Created by Rinky on 21-10-2017.
  */
 
-public class AreaDriveResourcesLoadTask extends AsyncTask<JSONObject, Void, String>{
+public class AreaDriveResourcesLoadTask extends AsyncTask<JSONObject, Void, String> {
 
     private Context localContext = null;
     private DriveDBHelper ddh = null;
@@ -90,7 +90,7 @@ public class AreaDriveResourcesLoadTask extends AsyncTask<JSONObject, Void, Stri
 
                 ddh.insertResourceFromServer(dr);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         System.out.println(s);

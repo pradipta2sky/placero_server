@@ -2,7 +2,6 @@ package lm.pkp.com.landmap.util;
 
 import android.graphics.Color;
 
-import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaElement;
 
 /**
@@ -10,7 +9,7 @@ import lm.pkp.com.landmap.area.AreaElement;
  */
 public class ColorProvider {
 
-    private ColorProvider(){
+    private ColorProvider() {
     }
 
     public static final int DEFAULT_TOOLBAR_COLOR = Color.parseColor("#07063D");
@@ -23,22 +22,22 @@ public class ColorProvider {
     public static final int BUFF_BLUE_AREA_DISPLAY = Color.parseColor("#C5D2F7");
     public static final int BUFF_ORANGE_AREA_DISPLAY = Color.parseColor("#F7C7AC");
 
-    public static final int getAreaToolBarColor(AreaElement areaElement){
-        if(areaElement.getType().equalsIgnoreCase("shared")){
+    public static final int getAreaToolBarColor(AreaElement areaElement) {
+        if (areaElement.getType().equalsIgnoreCase("shared")) {
             return BUFF_YELLOW_TOOLBAR;
-        }else if(areaElement.getType().equalsIgnoreCase("public")){
+        } else if (areaElement.getType().equalsIgnoreCase("public")) {
             return BUFF_ORANGE_TOOLBAR;
-        }else {
+        } else {
             return BUFF_BLUE_TOOLBAR;
         }
     }
 
-    public static final int getAreaDetailsColor(AreaElement areaElement){
-        if(areaElement.getType().equalsIgnoreCase("shared")){
+    public static final int getAreaDetailsColor(AreaElement areaElement) {
+        if (areaElement.getType().equalsIgnoreCase("shared")) {
             return BUFF_YELLOW_AREA_DISPLAY;
-        }else if(areaElement.getType().equalsIgnoreCase("public")){
+        } else if (areaElement.getType().equalsIgnoreCase("public")) {
             return BUFF_ORANGE_AREA_DISPLAY;
-        }else {
+        } else {
             return BUFF_BLUE_AREA_DISPLAY;
         }
     }

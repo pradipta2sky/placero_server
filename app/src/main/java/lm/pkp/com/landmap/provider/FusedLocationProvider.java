@@ -22,7 +22,7 @@ public class FusedLocationProvider {
         this.mContext = context;
     }
 
-    public void getLocation(){
+    public void getLocation() {
 
         Criteria criteria = new Criteria();
         criteria.setAccuracy(Criteria.ACCURACY_COARSE);
@@ -31,7 +31,7 @@ public class FusedLocationProvider {
         criteria.setBearingRequired(false);
         criteria.setCostAllowed(true);
 
-        final LocationManager manager = (LocationManager)mContext.getSystemService(Context.LOCATION_SERVICE);
+        final LocationManager manager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
         final PositionElement pe = new PositionElement();
 
         LocationListener listener = new LocationListener() {
@@ -39,7 +39,7 @@ public class FusedLocationProvider {
             public void onLocationChanged(Location location) {
                 pe.setLon(location.getLongitude());
                 pe.setLat(location.getLatitude());
-                ((LocationPositionReceiver)mContext).receivedLocationPostion(pe);
+                ((LocationPositionReceiver) mContext).receivedLocationPostion(pe);
             }
 
             @Override
@@ -56,7 +56,7 @@ public class FusedLocationProvider {
         };
         try {
             manager.requestSingleUpdate(criteria, listener, null);
-        }catch (SecurityException se){
+        } catch (SecurityException se) {
             se.printStackTrace();
         }
     }

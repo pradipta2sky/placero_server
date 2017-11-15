@@ -90,7 +90,7 @@ public class DriveDBHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public void insertResourceToServer(DriveResource dr){
+    public void insertResourceToServer(DriveResource dr) {
         LMSRestAsyncTask task = new LMSRestAsyncTask(callback);
         task.execute(preparePostParams("insert", dr));
     }
@@ -140,7 +140,7 @@ public class DriveDBHelper extends SQLiteOpenHelper {
     }
 
     public void deleteResource(DriveResource dr) {
-        if(dr == null){
+        if (dr == null) {
             return;
         }
         SQLiteDatabase db = this.getWritableDatabase();
@@ -396,7 +396,7 @@ public class DriveDBHelper extends SQLiteOpenHelper {
         this.callback = callback;
     }
 
-    public void finalizeTaskCompletion(){
+    public void finalizeTaskCompletion() {
         callback.taskCompleted("");
     }
 }

@@ -14,8 +14,8 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 
 import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.permission.PermissionConstants;
@@ -24,7 +24,7 @@ import lm.pkp.com.landmap.permission.PermissionsDBHelper;
 import lm.pkp.com.landmap.util.AreaPopulationUtil;
 import lm.pkp.com.landmap.util.ColorProvider;
 
-public class AreaEditActivity extends AppCompatActivity{
+public class AreaEditActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,36 +43,36 @@ public class AreaEditActivity extends AppCompatActivity{
         View includedView = findViewById(R.id.selected_area_include);
         AreaPopulationUtil.INSTANCE.populateAreaElement(includedView);
 
-        final TextView nameText = (TextView)findViewById(R.id.area_name_edit);
+        final TextView nameText = (TextView) findViewById(R.id.area_name_edit);
         String areaName = ae.getName();
-        if(areaName.length() > 20){
-            areaName = areaName.substring(0,19).concat("...");
+        if (areaName.length() > 20) {
+            areaName = areaName.substring(0, 19).concat("...");
         }
         nameText.setText(areaName);
-        if(!PermissionManager.INSTANCE.hasAccess(PermissionConstants.CHANGE_NAME)){
+        if (!PermissionManager.INSTANCE.hasAccess(PermissionConstants.CHANGE_NAME)) {
             nameText.setEnabled(false);
         }
 
-        final TextView descText = (TextView)findViewById(R.id.area_desc_edit);
+        final TextView descText = (TextView) findViewById(R.id.area_desc_edit);
         descText.setText(ae.getDescription());
-        if(!PermissionManager.INSTANCE.hasAccess(PermissionConstants.CHANGE_DESCRIPTION)){
+        if (!PermissionManager.INSTANCE.hasAccess(PermissionConstants.CHANGE_DESCRIPTION)) {
             descText.setEnabled(false);
         }
 
-        final TextView addressText = (TextView)findViewById(R.id.area_address_edit);
+        final TextView addressText = (TextView) findViewById(R.id.area_address_edit);
         addressText.setText(ae.getAddress());
-        if(!PermissionManager.INSTANCE.hasAccess(PermissionConstants.CHANGE_ADDRESS)){
+        if (!PermissionManager.INSTANCE.hasAccess(PermissionConstants.CHANGE_ADDRESS)) {
             addressText.setEnabled(false);
         }
 
-        Button saveButton = (Button)findViewById(R.id.area_edit_save_btn);
+        Button saveButton = (Button) findViewById(R.id.area_edit_save_btn);
         saveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
 
                 String areaName = nameText.getText().toString();
-                if(areaName.trim().equalsIgnoreCase("")){
+                if (areaName.trim().equalsIgnoreCase("")) {
                     showErrorMessage("User selection is required for share !!");
                     findViewById(R.id.splash_panel).setVisibility(View.GONE);
                     return;
@@ -104,16 +104,16 @@ public class AreaEditActivity extends AppCompatActivity{
         finish();
     }
 
-    private class UpdateAreaToServerCallback implements AsyncTaskCallback{
+    private class UpdateAreaToServerCallback implements AsyncTaskCallback {
 
         @Override
         public void taskCompleted(Object result) {
             // Work on the make public option.
             final CheckBox makePublicCheckBox = (CheckBox) findViewById(R.id.make_area_public);
-            if(makePublicCheckBox.isChecked()){
+            if (makePublicCheckBox.isChecked()) {
                 PermissionsDBHelper pdh = new PermissionsDBHelper(getApplicationContext(), new MakeAreaPublicCallback());
                 pdh.insertPermissionsToServer("any", "view_only");
-            }else {
+            } else {
                 findViewById(R.id.splash_panel).setVisibility(View.INVISIBLE);
                 finish();
                 Intent areaDetailsIntent = new Intent(AreaEditActivity.this, AreaDetailsActivity.class);
@@ -122,7 +122,7 @@ public class AreaEditActivity extends AppCompatActivity{
         }
     }
 
-    private class MakeAreaPublicCallback implements AsyncTaskCallback{
+    private class MakeAreaPublicCallback implements AsyncTaskCallback {
 
         @Override
         public void taskCompleted(Object result) {
@@ -134,7 +134,7 @@ public class AreaEditActivity extends AppCompatActivity{
     }
 
     private void showErrorMessage(String message) {
-        Snackbar snackbar = Snackbar.make(getWindow().getDecorView(),message, Snackbar.LENGTH_LONG);
+        Snackbar snackbar = Snackbar.make(getWindow().getDecorView(), message, Snackbar.LENGTH_LONG);
         View sbView = snackbar.getView();
         TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
         textView.setTextColor(Color.RED);

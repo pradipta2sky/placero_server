@@ -13,7 +13,6 @@ import android.graphics.Typeface;
 import android.text.TextUtils;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.widget.CheckBox;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -42,9 +41,9 @@ public class TextDetailDocumentsCell extends FrameLayout {
         LayoutParams layoutParams = (LayoutParams) textView.getLayoutParams();
         layoutParams.width = LayoutParams.WRAP_CONTENT;
         layoutParams.height = LayoutParams.WRAP_CONTENT;
-        layoutParams.topMargin = (int)(density * 10);
-        layoutParams.leftMargin = (int)(density * 71);
-        layoutParams.rightMargin = (int)(density * 16);
+        layoutParams.topMargin = (int) (density * 10);
+        layoutParams.leftMargin = (int) (density * 71);
+        layoutParams.rightMargin = (int) (density * 16);
         layoutParams.gravity = Gravity.LEFT;
         textView.setLayoutParams(layoutParams);
 
@@ -59,9 +58,9 @@ public class TextDetailDocumentsCell extends FrameLayout {
         layoutParams = (LayoutParams) valueTextView.getLayoutParams();
         layoutParams.width = LayoutParams.WRAP_CONTENT;
         layoutParams.height = LayoutParams.WRAP_CONTENT;
-        layoutParams.topMargin = (int)(density * 35);
-        layoutParams.leftMargin = (int)(density * 71);
-        layoutParams.rightMargin = (int)(density * 16);
+        layoutParams.topMargin = (int) (density * 35);
+        layoutParams.leftMargin = (int) (density * 71);
+        layoutParams.rightMargin = (int) (density * 16);
         layoutParams.gravity = Gravity.LEFT;
         valueTextView.setLayoutParams(layoutParams);
 
@@ -75,20 +74,20 @@ public class TextDetailDocumentsCell extends FrameLayout {
         typeTextView.setTypeface(Typeface.DEFAULT_BOLD);
         addView(typeTextView);
         layoutParams = (LayoutParams) typeTextView.getLayoutParams();
-        layoutParams.width = (int)(density * 40);
-        layoutParams.height = (int)(density * 40);
-        layoutParams.leftMargin = (int)(density * 16);
-        layoutParams.rightMargin = (int)(density * 0);
+        layoutParams.width = (int) (density * 40);
+        layoutParams.height = (int) (density * 40);
+        layoutParams.leftMargin = (int) (density * 16);
+        layoutParams.rightMargin = (int) (density * 0);
         layoutParams.gravity = Gravity.LEFT | Gravity.CENTER_VERTICAL;
         typeTextView.setLayoutParams(layoutParams);
 
         imageView = new ImageView(context);
         addView(imageView);
         layoutParams = (LayoutParams) imageView.getLayoutParams();
-        layoutParams.width = (int)(density * 40);
-        layoutParams.height = (int)(density * 40);
-        layoutParams.leftMargin = (int)(density * 16);
-        layoutParams.rightMargin = (int)(density * 0);
+        layoutParams.width = (int) (density * 40);
+        layoutParams.height = (int) (density * 40);
+        layoutParams.leftMargin = (int) (density * 16);
+        layoutParams.rightMargin = (int) (density * 0);
         layoutParams.gravity = Gravity.LEFT | Gravity.CENTER_VERTICAL;
         imageView.setLayoutParams(layoutParams);
     }
