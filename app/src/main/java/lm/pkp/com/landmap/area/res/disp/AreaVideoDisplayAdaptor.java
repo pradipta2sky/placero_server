@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.area.AreaContext;
+import lm.pkp.com.landmap.area.AreaElement;
 
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
 
@@ -47,7 +48,10 @@ final class AreaVideoDisplayAdaptor extends BaseAdapter {
         final VideoDisplayElement displayElement = dataSet.get(position);
         final File displayFile = new File(displayElement.getAbsPath());
 
-        String thumbPath = AreaContext.INSTANCE.getAreaLocalVideoThumbnailRoot().getAbsolutePath();
+        AreaContext ac = AreaContext.INSTANCE;
+        AreaElement ae = ac.getAreaElement();
+
+        String thumbPath = ac.INSTANCE.getAreaLocalVideoThumbnailRoot(ae.getUniqueId()).getAbsolutePath();
         File thumbFile = new File(thumbPath + File.separatorChar + displayElement.getName());
 
         final Picasso picassoElem = Picasso.with(context);//

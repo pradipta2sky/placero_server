@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Stack;
 
 import lm.pkp.com.landmap.area.AreaContext;
+import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.custom.ApiClientAsyncTask;
 import lm.pkp.com.landmap.custom.ThumbnailCreator;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
@@ -165,19 +166,22 @@ public class UploadResourcesActivity extends BaseDriveActivity {
 
         @Override
         protected void onPostExecute(Boolean result) {
+
             AreaContext.INSTANCE.removeResourceFromQueue(resource);
-            AreaContext.INSTANCE.getAreaElement().getDriveResources().add(resource);
+            AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
+            areaElement.getDriveResources().add(resource);
 
             // Create thumbnails of the uploaded files for display.
             String resourcePath = resource.getPath();
             File resourceFile = new File(resourcePath);
+
             ThumbnailCreator tCreator = new ThumbnailCreator(getApplicationContext());
             if(FileUtil.isImageFile(resourceFile)){
-                tCreator.createImageThumbnail(resourceFile);
+                tCreator.createImageThumbnail(resourceFile, areaElement.getUniqueId());
             }else if(FileUtil.isVideoFile(resourceFile)){
-                tCreator.createVideoThumbnail(resourceFile);
+                tCreator.createVideoThumbnail(resourceFile, areaElement.getUniqueId());
             }else {
-                tCreator.createDocumentThumbnail(resourceFile);
+                tCreator.createDocumentThumbnail(resourceFile, areaElement.getUniqueId());
             }
 
             processResources();

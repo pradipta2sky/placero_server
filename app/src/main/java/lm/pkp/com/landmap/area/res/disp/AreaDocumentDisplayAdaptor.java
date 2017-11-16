@@ -20,6 +20,7 @@ import java.util.List;
 
 import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.area.AreaContext;
+import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.sync.LocalFolderStructureManager;
 
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
@@ -28,9 +29,6 @@ final class AreaDocumentDisplayAdaptor extends BaseAdapter {
 
     private final Context context;
     private final List<DocumentDisplayElement> docElems = DocumentDataHolder.INSTANCE.getData();
-
-    private final String tempRoot = LocalFolderStructureManager.getTempStorageDir().getAbsolutePath();
-    private final String thumbsDirPath = tempRoot + File.separatorChar + "thumb" + File.separatorChar;
 
     public AreaDocumentDisplayAdaptor(Context context) {
         this.context = context;
@@ -46,9 +44,12 @@ final class AreaDocumentDisplayAdaptor extends BaseAdapter {
             return view;
         }
 
+        AreaContext areaContext = AreaContext.INSTANCE;
+        AreaElement areaElement = areaContext.getAreaElement();
         // Get the image URL for the current position.
         final DocumentDisplayElement currElem = docElems.get(position);
-        String thumbnailRoot = AreaContext.INSTANCE.getAreaLocalDocumentThumbnailRoot().getAbsolutePath();
+        String thumbnailRoot = areaContext
+                .getAreaLocalDocumentThumbnailRoot(areaElement.getUniqueId()).getAbsolutePath();
         String thumbnailFilePath = thumbnailRoot + File.separatorChar + currElem.getName();
         File thumbFile = new File(thumbnailFilePath);
 

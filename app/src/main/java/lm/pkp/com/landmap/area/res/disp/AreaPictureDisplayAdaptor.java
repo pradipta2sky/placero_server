@@ -16,6 +16,7 @@ import java.util.ArrayList;
 
 import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.area.AreaContext;
+import lm.pkp.com.landmap.area.AreaElement;
 
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
 
@@ -40,8 +41,9 @@ final class AreaPictureDisplayAdaptor extends BaseAdapter {
 
         // Get the image URL for the current position.
         final String url = getItem(position);
-
-        String thumbnailRoot = AreaContext.INSTANCE.getAreaLocalPictureThumbnailRoot().getAbsolutePath();
+        AreaContext ac = AreaContext.INSTANCE;
+        AreaElement ae = ac.getAreaElement();
+        String thumbnailRoot = ac.getAreaLocalPictureThumbnailRoot(ae.getUniqueId()).getAbsolutePath();
         String thumbnailFilePath = thumbnailRoot + File.separatorChar + dataSet.get(position).getName();
         File thumbFile = new File(thumbnailFilePath);
 

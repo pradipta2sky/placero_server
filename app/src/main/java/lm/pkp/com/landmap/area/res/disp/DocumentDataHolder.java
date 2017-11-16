@@ -19,10 +19,11 @@ final class DocumentDataHolder {
 
     public ArrayList<DocumentDisplayElement> getData() {
         final ArrayList<DocumentDisplayElement> docItems = new ArrayList<>();
-        final AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
-        List<DriveResource> driveResources = areaElement.getDriveResources();
-        String rootPath = AreaContext.INSTANCE.getAreaLocalDocumentRoot().getAbsolutePath()
-                + File.separatorChar;
+        AreaContext ac = AreaContext.INSTANCE;
+
+        final AreaElement ae = ac.getAreaElement();
+        List<DriveResource> driveResources = ae.getDriveResources();
+        String rootPath = ac.getAreaLocalDocumentRoot(ae.getUniqueId()).getAbsolutePath() + File.separatorChar;
         for (int i = 0; i < driveResources.size(); i++) {
             final DriveResource resource = driveResources.get(i);
             if (resource.getType().equals("file")) {

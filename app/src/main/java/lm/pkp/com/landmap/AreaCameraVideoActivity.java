@@ -130,9 +130,9 @@ public class AreaCameraVideoActivity extends Activity {
      * returning image / video
      */
     private static File getOutputMediaFile() {
+        AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-        File mediaFile = new File(AreaContext.INSTANCE.getAreaLocalVideoRoot().getAbsolutePath()
-                + File.separator + "VID_" + timeStamp + ".mp4");
-        return mediaFile;
+        File localRoot = AreaContext.INSTANCE.getAreaLocalVideoRoot(areaElement.getUniqueId());
+        return new File(localRoot + File.separator + "VID_" + timeStamp + ".mp4");
     }
 }

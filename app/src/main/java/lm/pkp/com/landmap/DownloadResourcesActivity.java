@@ -24,6 +24,9 @@ import com.google.android.gms.drive.DriveApi.DriveIdResult;
 import com.google.android.gms.drive.DriveContents;
 import com.google.android.gms.drive.DriveFile;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -36,8 +39,10 @@ import java.util.Stack;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
+import lm.pkp.com.landmap.custom.ThumbnailCreator;
 import lm.pkp.com.landmap.drive.DriveResource;
 import lm.pkp.com.landmap.sync.LocalFolderStructureManager;
+import lm.pkp.com.landmap.util.FileUtil;
 
 
 /**
@@ -77,6 +82,7 @@ public class DownloadResourcesActivity extends BaseDriveActivity {
             processResource(res);
         } else {
             finish();
+
             Intent areaDashboardIntent = new Intent(getApplicationContext(), AreaDashboardActivity.class);
             startActivity(areaDashboardIntent);
         }
@@ -105,30 +111,38 @@ public class DownloadResourcesActivity extends BaseDriveActivity {
                     return false;
                 }
                 DriveContents driveContents = driveContentsResult.getDriveContents();
-                String localDir = LocalFolderStructureManager.getLocalFolderByMimeType(resource.getMimeType())
-                        .getAbsolutePath();
-                File localFile = new File(localDir + File.separatorChar + resource.getName());
-                if (!localFile.exists()) {
+                String contentType = resource.getContentType();
+
+                File localStoreRoot = null;
+                if(contentType.equalsIgnoreCase("Image")){
+                    localStoreRoot = AreaContext.INSTANCE.getAreaLocalImageRoot(resource.getAreaId());
+                }else if(contentType.equalsIgnoreCase("Video")){
+                    localStoreRoot = AreaContext.INSTANCE.getAreaLocalVideoRoot(resource.getAreaId());
+                }else {
+                    localStoreRoot = AreaContext.INSTANCE.getAreaLocalDocumentRoot(resource.getAreaId());
+                }
+
+                String storeFilePath = localStoreRoot.getAbsolutePath()
+                        + File.separatorChar + resource.getName();
+                File storeFile = new File(storeFilePath);
+                if (!storeFile.exists()) {
                     InputStream driveStream = driveContents.getInputStream();
-                    OutputStream localStream = new FileOutputStream(localFile);
-                    try {
-                        int bytesRead;
-                        long size = new Long(resource.getSize());
-                        byte[] chunk = new byte[1024 * 10];
-                        long noOfChunks = size / (chunk.length);
-                        int chunkCtr = 0;
-                        while ((bytesRead = driveStream.read(chunk)) != -1) {
-                            localStream.write(chunk, 0, bytesRead);
-                            chunkCtr++;
-                            System.out.println("Writing chunk of file ["
-                                    + resource.getName() + "] status [" + chunkCtr + "/" + noOfChunks + "]");
-                        }
-                    } catch (IOException e1) {
-                        e1.printStackTrace();
-                    }
+                    OutputStream localStream = new FileOutputStream(storeFile);
+                    IOUtils.copyLarge(driveStream,localStream);
                     localStream.flush();
                     localStream.close();
                 }
+
+                // Create the thumbnail of the file.
+                ThumbnailCreator tCreator = new ThumbnailCreator(getApplicationContext());
+                if(contentType.equalsIgnoreCase("Image")){
+                    tCreator.createImageThumbnail(storeFile, resource.getAreaId());
+                }else if(contentType.equalsIgnoreCase("Video")){
+                    tCreator.createVideoThumbnail(storeFile, resource.getAreaId());
+                }else {
+                    tCreator.createDocumentThumbnail(storeFile, resource.getAreaId());
+                }
+
                 processResources();
                 return true;
             } catch (IOException e) {

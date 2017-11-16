@@ -67,9 +67,9 @@ public class AreaContext {
         return new DriveDBHelper(context).getDriveResourceRoot(FileStorageConstants.DOCUMENT_ROOT_FOLDER_NAME);
     }
 
-    public File getAreaLocalImageRoot(){
+    public File getAreaLocalImageRoot(String areaId){
         String areaImageRoot = LocalFolderStructureManager.getImageStorageDir().getAbsolutePath()
-                + File.separatorChar + currArea.getUniqueId();
+                + File.separatorChar + areaId;
         final File areaImageFolder = new File(areaImageRoot);
         if(areaImageFolder.exists()){
             return areaImageFolder;
@@ -79,9 +79,9 @@ public class AreaContext {
         return areaImageFolder;
     }
 
-    public File getAreaLocalVideoRoot(){
+    public File getAreaLocalVideoRoot(String areaId){
         String areaVideosRoot = LocalFolderStructureManager.getVideoStorageDir().getAbsolutePath()
-                + File.separatorChar + currArea.getUniqueId();
+                + File.separatorChar + areaId;
         final File areaVideosFolder = new File(areaVideosRoot);
         if(areaVideosFolder.exists()){
             return areaVideosFolder;
@@ -91,9 +91,9 @@ public class AreaContext {
         return areaVideosFolder;
     }
 
-    public File getAreaLocalDocumentRoot(){
+    public File getAreaLocalDocumentRoot(String areaId){
         String areaDocumentsRoot = LocalFolderStructureManager.getDocsStorageDir().getAbsolutePath()
-                + File.separatorChar + currArea.getUniqueId();
+                + File.separatorChar + areaId;
         final File areaDocumentsFolder = new File(areaDocumentsRoot);
         if(areaDocumentsFolder.exists()){
             return areaDocumentsFolder;
@@ -103,9 +103,9 @@ public class AreaContext {
         return areaDocumentsFolder;
     }
 
-    public File getAreaLocalPictureThumbnailRoot(){
-        final String localImageRootPath = getAreaLocalImageRoot().getAbsolutePath();
-        final String pictureThumbnailRoot = localImageRootPath + File.separatorChar + ".thumb" + File.separatorChar;
+    public File getAreaLocalPictureThumbnailRoot(String areaId){
+        final String localImageRootPath = getAreaLocalImageRoot(areaId).getAbsolutePath();
+        final String pictureThumbnailRoot = localImageRootPath + File.separatorChar + "thumb" + File.separatorChar;
         final File pictureThumbnailFolder = new File(pictureThumbnailRoot);
         if(pictureThumbnailFolder.exists()){
             return pictureThumbnailFolder;
@@ -115,9 +115,9 @@ public class AreaContext {
         return pictureThumbnailFolder;
     }
 
-    public File getAreaLocalVideoThumbnailRoot(){
-        final String localVideoRootPath = getAreaLocalVideoRoot().getAbsolutePath();
-        final String videoThumbnailRoot = localVideoRootPath + File.separatorChar + ".thumb" + File.separatorChar;
+    public File getAreaLocalVideoThumbnailRoot(String areaId){
+        final String localVideoRootPath = getAreaLocalVideoRoot(areaId).getAbsolutePath();
+        final String videoThumbnailRoot = localVideoRootPath + File.separatorChar + "thumb" + File.separatorChar;
         final File videoThumbnailFolder = new File(videoThumbnailRoot);
         if(videoThumbnailFolder.exists()){
             return videoThumbnailFolder;
@@ -127,9 +127,9 @@ public class AreaContext {
         return videoThumbnailFolder;
     }
 
-    public File getAreaLocalDocumentThumbnailRoot(){
-        final String localDocumentRootPath = getAreaLocalDocumentRoot().getAbsolutePath();
-        final String documentThumbnailRoot = localDocumentRootPath + File.separatorChar + ".thumb" + File.separatorChar;
+    public File getAreaLocalDocumentThumbnailRoot(String areaId){
+        final String localDocumentRootPath = getAreaLocalDocumentRoot(areaId).getAbsolutePath();
+        final String documentThumbnailRoot = localDocumentRootPath + File.separatorChar + "thumb" + File.separatorChar;
         final File documentThumbnailFolder = new File(documentThumbnailRoot);
         if(documentThumbnailFolder.exists()){
             return documentThumbnailFolder;

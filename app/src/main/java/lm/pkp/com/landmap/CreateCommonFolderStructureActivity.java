@@ -151,6 +151,8 @@ public class CreateCommonFolderStructureActivity extends BaseDriveActivity {
 
         public void processCreateStack() {
             if (createStack.isEmpty()) {
+                finish();
+
                 Intent i = new Intent(CreateCommonFolderStructureActivity.this, DownloadResourcesActivity.class);
                 startActivity(i);
             } else {

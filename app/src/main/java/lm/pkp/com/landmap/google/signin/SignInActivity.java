@@ -127,6 +127,8 @@ public class SignInActivity extends AppCompatActivity implements
             UserContext.getInstance().setUserElement(signedUser);
             searchOnRemoteAndUpdate(signedUser);
 
+            finish();
+
             Intent spashIntent = new Intent(SignInActivity.this, SplashActivity.class);
             startActivity(spashIntent);
         } else {

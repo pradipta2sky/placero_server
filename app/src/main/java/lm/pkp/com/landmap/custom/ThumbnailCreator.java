@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 
 import lm.pkp.com.landmap.area.AreaContext;
+import lm.pkp.com.landmap.area.AreaElement;
 
 public class ThumbnailCreator {
 
@@ -23,7 +24,7 @@ public class ThumbnailCreator {
         this.context = context;
     }
 
-    public void createImageThumbnail(File resourceFile) {
+    public void createImageThumbnail(File resourceFile, String areaId) {
         BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
 
         bitmapOptions.inJustDecodeBounds = true; // obtain the size of the image, without loading it in memory
@@ -47,7 +48,8 @@ public class ThumbnailCreator {
         // Let's load just the part of the image necessary for creating the thumbnail, not the whole image
         Bitmap thumbnail = BitmapFactory.decodeFile(resourceFile.getAbsolutePath(), bitmapOptions);
 
-        File thumbnailRoot = AreaContext.INSTANCE.getAreaLocalPictureThumbnailRoot();
+        File thumbnailRoot = AreaContext.INSTANCE
+                .getAreaLocalPictureThumbnailRoot(areaId);
         String thumbFilePath = thumbnailRoot.getAbsolutePath()
                 + File.separatorChar + resourceFile.getName();
         // Save the thumbnail
@@ -63,18 +65,17 @@ public class ThumbnailCreator {
             thumbnail.recycle();
             thumbnail = null;
 
-            System.gc();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void createVideoThumbnail(File resourceFile) {
+    public void createVideoThumbnail(File resourceFile, String areaId) {
         Bitmap bMap = ThumbnailUtils.createVideoThumbnail(resourceFile.getAbsolutePath(),
                 MediaStore.Video.Thumbnails.MICRO_KIND);
         FileOutputStream out = null;
         try {
-            File thumbnailRoot = AreaContext.INSTANCE.getAreaLocalVideoThumbnailRoot();
+            File thumbnailRoot = AreaContext.INSTANCE.getAreaLocalVideoThumbnailRoot(areaId);
             String thumbFilePath = thumbnailRoot.getAbsolutePath()
                     + File.separatorChar + resourceFile.getName();
             out = new FileOutputStream(thumbFilePath);
@@ -86,13 +87,12 @@ public class ThumbnailCreator {
             bMap.recycle();
             bMap = null;
 
-            System.gc();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void createDocumentThumbnail(File resourceFile) {
+    public void createDocumentThumbnail(File resourceFile, String areaId) {
         try {
             if(!PDFBoxResourceLoader.isReady()){
                 PDFBoxResourceLoader.init(context);
@@ -102,7 +102,8 @@ public class ThumbnailCreator {
             PDFRenderer renderer = new PDFRenderer(document);
             Bitmap pageImage = renderer.renderImage(0, 1, Bitmap.Config.RGB_565);
 
-            String thumbRoot = AreaContext.INSTANCE.getAreaLocalDocumentThumbnailRoot().getAbsolutePath();
+            String thumbRoot = AreaContext.INSTANCE
+                    .getAreaLocalDocumentThumbnailRoot(areaId).getAbsolutePath();
             String thumbFilePath = thumbRoot + File.separatorChar + resourceFile.getName();
             File thumbFile = new File(thumbFilePath);
             if (!thumbFile.exists()) {
@@ -120,7 +121,6 @@ public class ThumbnailCreator {
             document = null;
             pageImage.recycle();
 
-            System.gc();
         } catch (Exception e) {
             e.printStackTrace();
         }

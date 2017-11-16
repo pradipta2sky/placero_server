@@ -115,6 +115,7 @@ public class PermissionsDBHelper extends SQLiteOpenHelper {
             }
             cursor.close();
         }
+        db.close();
         return perMap;
     }
 

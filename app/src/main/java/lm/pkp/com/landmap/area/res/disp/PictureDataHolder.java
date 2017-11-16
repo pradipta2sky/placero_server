@@ -19,10 +19,11 @@ final class PictureDataHolder {
 
     public ArrayList<PictureDisplayElement> getData() {
         final ArrayList<PictureDisplayElement> imageItems = new ArrayList<>();
-        final AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
-        List<DriveResource> driveResources = areaElement.getDriveResources();
-        String imgRootPath = AreaContext.INSTANCE.getAreaLocalImageRoot().getAbsolutePath()
-                + File.separatorChar;
+        AreaContext ac = AreaContext.INSTANCE;
+
+        final AreaElement ae = ac.getAreaElement();
+        List<DriveResource> driveResources = ae.getDriveResources();
+        String imgRootPath = ac.getAreaLocalImageRoot(ae.getUniqueId()).getAbsolutePath() + File.separatorChar;
         for (int i = 0; i < driveResources.size(); i++) {
             final DriveResource resource = driveResources.get(i);
             if (resource.getType().equals("file")) {

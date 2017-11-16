@@ -19,10 +19,11 @@ final class VideoDataHolder {
 
     public ArrayList<VideoDisplayElement> getData() {
         final ArrayList<VideoDisplayElement> videoItems = new ArrayList<>();
-        final AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
-        List<DriveResource> driveResources = areaElement.getDriveResources();
-        String imgRootPath = AreaContext.INSTANCE.getAreaLocalVideoRoot().getAbsolutePath()
-                + File.separatorChar;
+        AreaContext ac = AreaContext.INSTANCE;
+
+        final AreaElement ae = ac.getAreaElement();
+        List<DriveResource> driveResources = ae.getDriveResources();
+        String imgRootPath = ac.getAreaLocalVideoRoot(ae.getUniqueId()).getAbsolutePath() + File.separatorChar;
         for (int i = 0; i < driveResources.size(); i++) {
             final DriveResource resource = driveResources.get(i);
             if (resource.getType().equals("file")) {

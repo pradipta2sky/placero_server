@@ -1,5 +1,6 @@
 package lm.pkp.com.landmap;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -87,5 +88,13 @@ public class AreaDisplayResourcesActivity extends AppCompatActivity {
                     return null;
             }
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+
+        Intent areaDashboardIntent = new Intent(getApplicationContext(), AreaDetailsActivity.class);
+        startActivity(areaDashboardIntent);
     }
 }

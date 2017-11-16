@@ -75,8 +75,8 @@ public class AreaDocumentChooserFragment extends Fragment {
                     final AreaContext areaContext = AreaContext.INSTANCE;
                     AreaElement ae = areaContext.getAreaElement();
 
-                    File loadFile = new File(areaContext.getAreaLocalDocumentRoot().getAbsolutePath()
-                            + File.separatorChar + documentFile.getName());
+                    File loadFile = new File(areaContext.getAreaLocalDocumentRoot(ae.getUniqueId())
+                            .getAbsolutePath() + File.separatorChar + documentFile.getName());
                     try {
                         FileUtils.copyFile(documentFile, loadFile);
                     } catch (IOException e) {

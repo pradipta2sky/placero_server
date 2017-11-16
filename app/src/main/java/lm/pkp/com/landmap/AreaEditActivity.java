@@ -89,17 +89,6 @@ public class AreaEditActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return false;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
     public void onBackPressed() {
         finish();
     }
@@ -115,9 +104,9 @@ public class AreaEditActivity extends AppCompatActivity {
                 pdh.insertPermissionsToServer("any", "view_only");
             } else {
                 findViewById(R.id.splash_panel).setVisibility(View.INVISIBLE);
-                finish();
-                Intent areaDetailsIntent = new Intent(AreaEditActivity.this, AreaDetailsActivity.class);
+                Intent areaDetailsIntent = new Intent(getApplicationContext(), AreaDetailsActivity.class);
                 startActivity(areaDetailsIntent);
+                finish();
             }
         }
     }
@@ -127,9 +116,9 @@ public class AreaEditActivity extends AppCompatActivity {
         @Override
         public void taskCompleted(Object result) {
             findViewById(R.id.splash_panel).setVisibility(View.INVISIBLE);
-            finish();
             Intent areaDetailsIntent = new Intent(AreaEditActivity.this, AreaDetailsActivity.class);
             startActivity(areaDetailsIntent);
+            finish();
         }
     }
 

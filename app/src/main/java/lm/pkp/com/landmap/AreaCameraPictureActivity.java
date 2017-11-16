@@ -80,7 +80,7 @@ public class AreaCameraPictureActivity extends Activity {
 
                 final SiliCompressor compressor = SiliCompressor.with(getApplicationContext());
                 final String compressedFilePath = compressor.compress(imageFile.getAbsolutePath(),
-                        areaContext.getAreaLocalPictureThumbnailRoot(), true);
+                        areaContext.getAreaLocalPictureThumbnailRoot(ae.getUniqueId()), true);
 
                 File compressedFile = new File(compressedFilePath);
                 final File loadableFile = getOutputMediaFile();
@@ -126,9 +126,9 @@ public class AreaCameraPictureActivity extends Activity {
      * returning image / video
      */
     private static File getOutputMediaFile() {
+        AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-        File mediaFile = new File(AreaContext.INSTANCE.getAreaLocalImageRoot().getAbsolutePath()
-                + File.separator + "IMG_" + timeStamp + ".jpg");
-        return mediaFile;
+        File localRoot = AreaContext.INSTANCE.getAreaLocalImageRoot(areaElement.getUniqueId());
+        return new File(localRoot.getAbsolutePath() + File.separator + "IMG_" + timeStamp + ".jpg");
     }
 }
