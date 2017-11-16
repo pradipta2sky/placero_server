@@ -141,7 +141,8 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
 
     private void plotPolygonUsingPositions() {
         final AreaDBHelper adh = new AreaDBHelper(getApplicationContext());
-        List<PositionElement> positionElements = AreaContext.getInstance().getPositions();
+        List<PositionElement> positionElements
+                = AreaContext.INSTANCE.getAreaElement().getPositions();
         int noOfPositions = positionElements.size();
 
         Set<Marker> markerSet = areaMarkers.keySet();
@@ -175,7 +176,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
         double polygonAreaSqMt = SphericalUtil.computeArea(polygon.getPoints());
         double polygonAreaSqFt = polygonAreaSqMt * 10.7639;
 
-        final AreaElement ae = AreaContext.getInstance().getAreaElement();
+        final AreaElement ae = AreaContext.INSTANCE.getAreaElement();
         ae.setCenterLat(latAvg);
         ae.setCenterLon(lonAvg);
         ae.setMeasureSqFt(polygonAreaSqFt);
@@ -220,7 +221,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                 PositionElement newPositionElem = new PositionElement();
                 String pid = UUID.randomUUID().toString();
                 newPositionElem.setUniqueId(pid);
-                newPositionElem.setUniqueAreaId(AreaContext.getInstance().getAreaElement().getUniqueId());
+                newPositionElem.setUniqueAreaId(AreaContext.INSTANCE.getAreaElement().getUniqueId());
                 newPositionElem.setName("P_" + pid);
                 newPositionElem.setDescription("No Description");
                 newPositionElem.setTags("");
@@ -230,10 +231,13 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                 PositionsDBHelper pdh = new PositionsDBHelper(getApplicationContext());
                 pdh.insertPositionLocally(newPositionElem);
                 pdh.insertPositionToServer(newPositionElem);
-                AreaContext.getInstance().addPosition(newPositionElem);
+
+                final List<PositionElement> areaPositions
+                        = AreaContext.INSTANCE.getAreaElement().getPositions();
+                areaPositions.add(newPositionElem);
 
                 pdh.deletePosition(areaMarkers.get(marker));
-                AreaContext.getInstance().removePosition(areaMarkers.get(marker));
+                areaPositions.remove(areaMarkers.get(marker));
 
                 polygon.remove();
                 plotPolygonUsingPositions();
@@ -291,7 +295,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
         Bitmap bmp = Bitmap.createBitmap(v.getDrawingCache());
         v.setDrawingCacheEnabled(false);
         try {
-            final AreaElement areaElement = AreaContext.getInstance().getAreaElement();
+            final AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
             final File imageStorageDir = LocalFolderStructureManager.getImageStorageDir();
             final String dirPath = imageStorageDir.getAbsolutePath();
 
@@ -300,7 +304,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
             if(!screenshotFolder.exists()){
                 screenshotFolder.mkdirs();
             }
-            String screenShotFileName = "plot_" + areaElement.getUniqueId() + "_ss.png";
+            String screenShotFileName = "plot_screenshot.png";
             String screenShotFilePath = screenShotFolderPath + File.separatorChar + screenShotFileName;
             File screenShotFile = new File(screenShotFilePath);
             if(!screenShotFile.exists()){
@@ -312,13 +316,12 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
             fos.close();
 
             DriveResource dr = new DriveResource();
-            dr.setContainerDriveId(AreaContext.getInstance().getImagesRootDriveResource().getDriveId());
+            dr.setContainerId(AreaContext.INSTANCE.getImagesRootDriveResource().getResourceId());
             dr.setContentType("Image");
             dr.setUserId(UserContext.getInstance().getUserElement().getEmail());
             dr.setMimeType(FileUtil.getMimeType(screenShotFile));
             dr.setAreaId(areaElement.getUniqueId());
             dr.setName(screenShotFileName);
-            dr.setPath(screenShotFilePath);
             dr.setSize(screenShotFile.length() + "");
             dr.setType("file");
             dr.setUniqueId(UUID.randomUUID().toString());

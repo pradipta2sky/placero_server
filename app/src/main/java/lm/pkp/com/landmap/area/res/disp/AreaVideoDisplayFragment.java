@@ -15,6 +15,9 @@ import lm.pkp.com.landmap.R;
  */
 public class AreaVideoDisplayFragment extends Fragment {
 
+    private GridView gridView;
+    private AreaVideoDisplayAdaptor adaptor;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         return inflater.inflate(R.layout.fragment_video_display, container, false);
@@ -28,8 +31,9 @@ public class AreaVideoDisplayFragment extends Fragment {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        GridView gridView = (GridView) getView().findViewById(R.id.gridView);
-        gridView.setAdapter(new AreaVideoDisplayAdaptor(this.getContext()));
+        gridView = (GridView) getView().findViewById(R.id.gridView);
+        adaptor = new AreaVideoDisplayAdaptor(this.getContext());
+        gridView.setAdapter(adaptor);
     }
 
     @Override
@@ -37,5 +41,14 @@ public class AreaVideoDisplayFragment extends Fragment {
         super.onActivityResult(requestCode, resultCode, data);
     }
 
+    @Override
+    public void setUserVisibleHint(boolean visible) {
+        super.setUserVisibleHint(visible);
+        if (visible && isResumed()) {
+            loadFragment();
+        }
+    }
 
+    private void loadFragment() {
+    }
 }

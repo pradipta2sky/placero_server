@@ -33,7 +33,7 @@ public class AreaEditActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_area_edit);
 
-        final AreaElement ae = AreaContext.getInstance().getAreaElement();
+        final AreaElement ae = AreaContext.INSTANCE.getAreaElement();
         ActionBar ab = getSupportActionBar();
         ab.setHomeButtonEnabled(false);
         ab.setDisplayHomeAsUpEnabled(false);

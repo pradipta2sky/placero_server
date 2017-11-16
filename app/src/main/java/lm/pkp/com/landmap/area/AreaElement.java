@@ -30,9 +30,8 @@ public class AreaElement implements Serializable {
     private String address;
 
     private List<PositionElement> positions = new ArrayList<>();
-
     private List<DriveResource> driveResources = new ArrayList<>();
-
+    private Map<String, DriveResource> commonResources = new HashMap<>();
     private Map<String, PermissionElement> permissions = new HashMap<>();
 
     public double getMeasureSqFt() {
@@ -133,5 +132,13 @@ public class AreaElement implements Serializable {
 
     public void setPermissions(Map<String, PermissionElement> permissions) {
         this.permissions = permissions;
+    }
+
+    public Map<String, DriveResource> getCommonResources() {
+        return this.commonResources;
+    }
+
+    public void setCommonResources(Map<String, DriveResource> commonResources) {
+        this.commonResources = commonResources;
     }
 }

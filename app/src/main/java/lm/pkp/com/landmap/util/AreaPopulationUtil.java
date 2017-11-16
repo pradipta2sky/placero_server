@@ -8,6 +8,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -33,7 +35,7 @@ public class AreaPopulationUtil {
     }
 
     public void populateAreaElement(View view) {
-        final AreaElement areaElement = AreaContext.getInstance().getAreaElement();
+        final AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
         populateAreaElement(view, areaElement);
     }
 
@@ -84,12 +86,19 @@ public class AreaPopulationUtil {
         while (resIter.hasNext() && !loadSuccess.isSuccess()) {
             final DriveResource res = resIter.next();
             final String resName = res.getName();
-            final String resLocalPath = "file://" + LocalFolderStructureManager.getImageStorageDir().getPath()
-                    + File.separatorChar + resName;
-            if (FileUtil.isImageFile(resLocalPath)) {
-                ImageView areaImg = (ImageView) view.findViewById(R.id.area_default_img);
+            String resType = res.getContentType();
+            ImageView areaImg = (ImageView) view.findViewById(R.id.area_default_img);
+            if(resType.equalsIgnoreCase("Image")) {
+                String thumbRootPath = AreaContext.INSTANCE.getAreaLocalPictureThumbnailRoot().getAbsolutePath();
+                String thumbnailPath = thumbRootPath + File.separatorChar + resName;
+                File thumbFile = new File(thumbnailPath);
+                if(!thumbFile.exists()){
+                    continue;
+                }
                 final Picasso picassoElem = Picasso.with(view.getContext());//
-                picassoElem.load(resLocalPath) //
+                picassoElem.load(thumbFile) //
+                        .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
+                        .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
                         .tag(view.getContext()) //
                         .error(R.drawable.app_icon1)
                         .resize(128, 128)
@@ -104,8 +113,8 @@ public class AreaPopulationUtil {
                                 loadSuccess.setSuccess(false);
                             }
                         });
+                }
             }
-        }
     }
 
     private class LoadStatus {

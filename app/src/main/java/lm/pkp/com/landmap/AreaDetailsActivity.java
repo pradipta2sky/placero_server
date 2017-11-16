@@ -54,7 +54,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         setContentView(R.layout.activity_area_details);
         getSupportActionBar().hide();
 
-        ae = AreaContext.getInstance().getAreaElement();
+        ae = AreaContext.INSTANCE.getAreaElement();
         Toolbar topTB = (Toolbar) findViewById(R.id.toolbar_top);
         final ColorDrawable topDrawable = (ColorDrawable) topTB.getBackground().getCurrent();
         topDrawable.setColor(ColorProvider.getAreaToolBarColor(ae));
@@ -70,7 +70,8 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
 
         pdb = new PositionsDBHelper(getApplicationContext());
         ListView posListView = (ListView) findViewById(R.id.positionList);
-        positionList.addAll(AreaContext.getInstance().getPositions());
+        positionList.addAll(ae.getPositions());
+
         adaptor = new PostionListAdaptor(getApplicationContext(), R.id.positionList, positionList);
         posListView.setAdapter(adaptor);
         adaptor.notifyDataSetChanged();
@@ -186,7 +187,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
             @Override
             public void onClick(View v) {
                 if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.ADD_RESOURCES)) {
-                    Intent intent = new Intent(AreaDetailsActivity.this, CreateFolderStructureActivity.class);
+                    Intent intent = new Intent(AreaDetailsActivity.this, AreaAddResourcesActivity.class);
                     startActivity(intent);
                 } else {
                     showErrorMessage("You do not have resource modification rights !!");
@@ -209,9 +210,8 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         pe.setName("P_" + UUID.randomUUID().toString());
         pe.setUniqueAreaId(ae.getUniqueId());
 
-        final AreaContext areaContext = AreaContext.getInstance();
-        areaContext.getAreaElement().getPositions().add(pe);
-        areaContext.addPosition(pe);
+        final AreaElement ae = AreaContext.INSTANCE.getAreaElement();
+        ae.getPositions().add(pe);
 
         pe = pdb.insertPositionLocally(pe);
         pdb.insertPositionToServer(pe);

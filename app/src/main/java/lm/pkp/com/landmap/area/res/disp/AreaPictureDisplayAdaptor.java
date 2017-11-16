@@ -7,12 +7,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.ArrayList;
 
 import lm.pkp.com.landmap.R;
+import lm.pkp.com.landmap.area.AreaContext;
 
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
 
@@ -38,11 +41,17 @@ final class AreaPictureDisplayAdaptor extends BaseAdapter {
         // Get the image URL for the current position.
         final String url = getItem(position);
 
+        String thumbnailRoot = AreaContext.INSTANCE.getAreaLocalPictureThumbnailRoot().getAbsolutePath();
+        String thumbnailFilePath = thumbnailRoot + File.separatorChar + dataSet.get(position).getName();
+        File thumbFile = new File(thumbnailFilePath);
+
         // Trigger the download of the URL asynchronously into the image view.
         final String fileUrl = "file://" + url;
 
         final Picasso picassoElem = Picasso.with(context);//
-        picassoElem.load(fileUrl) //
+        picassoElem.load(thumbFile) //
+                .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
+                .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
                 .error(R.drawable.error) //
                 .resize(300, 300)
                 .tag(context) //

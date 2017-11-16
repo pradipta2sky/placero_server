@@ -8,7 +8,10 @@ import android.provider.MediaStore;
 
 import com.iceteck.silicompressorr.SiliCompressor;
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -18,7 +21,6 @@ import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.drive.DriveResource;
-import lm.pkp.com.landmap.sync.LocalFolderStructureManager;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.util.FileUtil;
 
@@ -73,40 +75,39 @@ public class AreaCameraPictureActivity extends Activity {
         if (requestCode == CAMERA_CAPTURE_IMAGE_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 File imageFile = new File(fileUri.getPath());
+                final AreaContext areaContext = AreaContext.INSTANCE;
+                AreaElement ae = areaContext.getAreaElement();
 
-                String outputPath = LocalFolderStructureManager.getImageStorageDir().getAbsolutePath();
-                File outputFolder = new File(outputPath);
-                if (!outputFolder.exists()) {
-                    outputFolder.mkdirs();
+                final SiliCompressor compressor = SiliCompressor.with(getApplicationContext());
+                final String compressedFilePath = compressor.compress(imageFile.getAbsolutePath(),
+                        areaContext.getAreaLocalPictureThumbnailRoot(), true);
+
+                File compressedFile = new File(compressedFilePath);
+                final File loadableFile = getOutputMediaFile();
+                try {
+                    FileUtils.copyFile(compressedFile, loadableFile);
+                    compressedFile.delete();
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
 
-                final String compressedFilePath = SiliCompressor.with(getApplicationContext())
-                        .compress(imageFile.getAbsolutePath(), outputFolder, true);
+                DriveResource uploadResource = new DriveResource();
+                uploadResource.setName(loadableFile.getName());
+                uploadResource.setPath(loadableFile.getAbsolutePath());
+                uploadResource.setType("file");
+                uploadResource.setUserId(UserContext.getInstance().getUserElement().getEmail());
+                uploadResource.setSize(loadableFile.length() + "");
+                uploadResource.setUniqueId(UUID.randomUUID().toString());
+                uploadResource.setAreaId(ae.getUniqueId());
+                uploadResource.setMimeType(FileUtil.getMimeType(loadableFile));
+                uploadResource.setContentType("Image");
+                uploadResource.setContainerId(areaContext.getImagesRootDriveResource().getResourceId());
 
-                File outputFile = new File(compressedFilePath);
-                if (outputFile.exists()) {
-                    final String outputMime = FileUtil.getMimeType(outputFile);
-                    final AreaContext areaContext = AreaContext.getInstance();
-                    AreaElement ae = areaContext.getAreaElement();
+                areaContext.addResourceToQueue(uploadResource);
 
-                    DriveResource dr = new DriveResource();
-                    dr.setName(outputFile.getName());
-                    dr.setPath(outputPath);
-                    dr.setType("file");
-                    dr.setUserId(UserContext.getInstance().getUserElement().getEmail());
-                    dr.setSize(outputFile.length() + "");
-                    dr.setUniqueId(UUID.randomUUID().toString());
-                    dr.setAreaId(ae.getUniqueId());
-                    dr.setMimeType(outputMime);
-                    dr.setContentType("Image");
+                Intent i = new Intent(AreaCameraPictureActivity.this, AreaAddResourcesActivity.class);
+                startActivity(i);
 
-                    String containerDriveId = areaContext.getImagesRootDriveResource().getDriveId();
-                    dr.setContainerDriveId(containerDriveId);
-                    areaContext.addNewDriveResource(dr);
-
-                    Intent i = new Intent(AreaCameraPictureActivity.this, AreaAddResourcesActivity.class);
-                    startActivity(i);
-                }
             } else if (resultCode == RESULT_CANCELED) {
                 // Cancelled case
                 finish();
@@ -125,9 +126,8 @@ public class AreaCameraPictureActivity extends Activity {
      * returning image / video
      */
     private static File getOutputMediaFile() {
-        // Create a media file name
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-        File mediaFile = new File(LocalFolderStructureManager.getTempStorageDir().getPath()
+        File mediaFile = new File(AreaContext.INSTANCE.getAreaLocalImageRoot().getAbsolutePath()
                 + File.separator + "IMG_" + timeStamp + ".jpg");
         return mediaFile;
     }

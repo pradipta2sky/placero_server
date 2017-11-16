@@ -52,7 +52,7 @@ public class AreaShareActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_area_share);
 
-        final AreaElement areaElement = AreaContext.getInstance().getAreaElement();
+        final AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
         ActionBar ab = getSupportActionBar();
         ab.setHomeButtonEnabled(true);
         ab.setDisplayHomeAsUpEnabled(true);

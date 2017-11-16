@@ -91,7 +91,7 @@ public class AreaDashboardSharedFragment extends Fragment {
             public void onItemClick(AdapterView<?> adapter, View v, int position,
                                     long arg3) {
                 AreaElement ae = (AreaElement) adapter.getItemAtPosition(position);
-                AreaContext.getInstance().setAreaElement(ae, getContext());
+                AreaContext.INSTANCE.setAreaElement(ae, getContext());
                 Intent intent = new Intent(getContext(), AreaDetailsActivity.class);
                 startActivity(intent);
             }

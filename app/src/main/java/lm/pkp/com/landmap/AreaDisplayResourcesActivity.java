@@ -29,7 +29,7 @@ public class AreaDisplayResourcesActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_area_res_display);
 
-        final AreaElement areaElement = AreaContext.getInstance().getAreaElement();
+        final AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
         // Setup Toolbar
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_ar_res_disp);
         setSupportActionBar(toolbar);

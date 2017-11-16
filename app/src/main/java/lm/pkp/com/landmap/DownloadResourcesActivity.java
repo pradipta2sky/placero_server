@@ -55,7 +55,7 @@ public class DownloadResourcesActivity extends BaseDriveActivity {
         AreaDBHelper adh = new AreaDBHelper(getApplicationContext());
 
         ArrayList<AreaElement> areas = adh.getAllAreas();
-        AreaContext ac = AreaContext.getInstance();
+        AreaContext ac = AreaContext.INSTANCE;
         for (int i = 0; i < areas.size(); i++) {
             AreaElement areaElement = areas.get(i);
             ac.setAreaElement(areaElement, getApplicationContext());
@@ -96,7 +96,7 @@ public class DownloadResourcesActivity extends BaseDriveActivity {
         @Override
         protected Object doInBackground(Object[] params) {
             DriveIdResult driveIdResult = Drive.DriveApi.fetchDriveId(getGoogleApiClient(),
-                    resource.getDriveResourceId()).await();
+                    resource.getResourceId()).await();
             DriveFile driveFile = driveIdResult.getDriveId().asDriveFile();
             try {
                 DriveContentsResult driveContentsResult =

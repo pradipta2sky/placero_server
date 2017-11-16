@@ -8,9 +8,8 @@ public class DriveResource {
     private String uniqueId = "";
     private String userId = "";
     private String areaId = "";
-    private String driveId = "";
-    private String driveResourceId = "";
-    private String containerDriveId = "";
+    private String resourceId = "";
+    private String containerId = "";
     private String name = "";
     private String path = "";
     private String type = "";
@@ -58,22 +57,6 @@ public class DriveResource {
         this.areaId = areaId;
     }
 
-    public String getDriveId() {
-        return driveId;
-    }
-
-    public void setDriveId(String driveId) {
-        this.driveId = driveId;
-    }
-
-    public String getDriveResourceId() {
-        return driveResourceId;
-    }
-
-    public void setDriveResourceId(String driveResourceId) {
-        this.driveResourceId = driveResourceId;
-    }
-
     public String getType() {
         return type;
     }
@@ -98,14 +81,6 @@ public class DriveResource {
         this.contentType = contentType;
     }
 
-    public String getContainerDriveId() {
-        return containerDriveId;
-    }
-
-    public void setContainerDriveId(String containerDriveId) {
-        this.containerDriveId = containerDriveId;
-    }
-
     public String getMimeType() {
         return mimeType;
     }
@@ -114,5 +89,19 @@ public class DriveResource {
         this.mimeType = mimeType;
     }
 
+    public String getResourceId() {
+        return this.resourceId;
+    }
 
+    public void setResourceId(String resourceId) {
+        this.resourceId = resourceId;
+    }
+
+    public String getContainerId() {
+        return this.containerId;
+    }
+
+    public void setContainerId(String containerId) {
+        this.containerId = containerId;
+    }
 }

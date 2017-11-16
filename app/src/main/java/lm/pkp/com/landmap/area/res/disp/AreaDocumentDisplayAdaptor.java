@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 import com.tom_roush.pdfbox.pdmodel.PDDocument;
 import com.tom_roush.pdfbox.rendering.PDFRenderer;
@@ -17,6 +19,7 @@ import java.io.FileOutputStream;
 import java.util.List;
 
 import lm.pkp.com.landmap.R;
+import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.sync.LocalFolderStructureManager;
 
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
@@ -44,11 +47,15 @@ final class AreaDocumentDisplayAdaptor extends BaseAdapter {
         }
 
         // Get the image URL for the current position.
-        final String url = getItem(position);
         final DocumentDisplayElement currElem = docElems.get(position);
+        String thumbnailRoot = AreaContext.INSTANCE.getAreaLocalDocumentThumbnailRoot().getAbsolutePath();
+        String thumbnailFilePath = thumbnailRoot + File.separatorChar + currElem.getName();
+        File thumbFile = new File(thumbnailFilePath);
 
         final Picasso picassoElem = Picasso.with(context);//
-        picassoElem.load(Uri.fromFile(getThumbFile(currElem))) //
+        picassoElem.load(thumbFile) //
+                .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
+                .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
                 .error(R.drawable.error) //
                 .config(Bitmap.Config.RGB_565)
                 .centerCrop()
@@ -57,6 +64,8 @@ final class AreaDocumentDisplayAdaptor extends BaseAdapter {
                 .into(view);
 
         final View referredView = view;
+        final String url = getItem(position);
+
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -68,40 +77,6 @@ final class AreaDocumentDisplayAdaptor extends BaseAdapter {
             }
         });
         return view;
-    }
-
-    private File getThumbFile(DocumentDisplayElement currElem) {
-        String thumbPath = thumbsDirPath + File.separatorChar + currElem.getName() + "_t.jpg";
-        File thumbFile = new File(thumbPath);
-        if (thumbFile.exists()) {
-            return thumbFile;
-        } else {
-            return createThumbFile(thumbPath, currElem);
-        }
-    }
-
-    private File createThumbFile(String thumbPath, DocumentDisplayElement currElem) {
-        try {
-            // Get PDF thumbnail here.
-            PDDocument document = PDDocument.load(new File(currElem.getAbsPath()));
-            // Create a renderer for the document
-            PDFRenderer renderer = new PDFRenderer(document);
-            // Render the image to an RGB Bitmap
-            Bitmap pageImage = renderer.renderImage(0, 1, Bitmap.Config.RGB_565);
-
-            // Save the render result to an image
-            File thumbsDir = new File(thumbsDirPath);
-            if (!thumbsDir.exists()) {
-                thumbsDir.mkdirs();
-            }
-            File thumbFile = new File(thumbPath);
-            FileOutputStream fileOut = new FileOutputStream(thumbFile);
-            pageImage.compress(Bitmap.CompressFormat.JPEG, 100, fileOut);
-            fileOut.close();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     @Override

@@ -9,7 +9,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:layout_centerInParent="true"
-        android:background="@drawable/synchronizing_resources" />
+        android:background="@drawable/synchronizing_folders" />
 
     <ProgressBar
         android:layout_width="wrap_content"

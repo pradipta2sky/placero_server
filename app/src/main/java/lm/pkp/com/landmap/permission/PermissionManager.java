@@ -16,7 +16,7 @@ public class PermissionManager {
     }
 
     public boolean hasAccess(String functionCode) {
-        final AreaElement areaElement = AreaContext.getInstance().getAreaElement();
+        final AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
         final Map<String, PermissionElement> areaPermissions = areaElement.getPermissions();
 
         final PermissionElement fullControl = areaPermissions.get(PermissionConstants.FULL_CONTROL);

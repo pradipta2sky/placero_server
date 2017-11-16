@@ -11,12 +11,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 
+import com.squareup.picasso.MemoryPolicy;
+import com.squareup.picasso.NetworkPolicy;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.ArrayList;
 
 import lm.pkp.com.landmap.R;
+import lm.pkp.com.landmap.area.AreaContext;
 
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
 
@@ -41,13 +44,16 @@ final class AreaVideoDisplayAdaptor extends BaseAdapter {
 
         // Get the image URL for the current position.
         final String url = getItem(position);
+        final VideoDisplayElement displayElement = dataSet.get(position);
+        final File displayFile = new File(displayElement.getAbsPath());
 
-        // Trigger the download of the URL asynchronously into the image view.
-        Bitmap bMap = ThumbnailUtils.createVideoThumbnail(url, MediaStore.Video.Thumbnails.MICRO_KIND);
-        String thumbPath = Media.insertImage(context.getContentResolver(), bMap, "title", null);
+        String thumbPath = AreaContext.INSTANCE.getAreaLocalVideoThumbnailRoot().getAbsolutePath();
+        File thumbFile = new File(thumbPath + File.separatorChar + displayElement.getName());
 
         final Picasso picassoElem = Picasso.with(context);//
-        picassoElem.load(Uri.parse(thumbPath)) //
+        picassoElem.load(thumbFile) //
+                .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
+                .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
                 .error(R.drawable.error) //
                 .config(Bitmap.Config.RGB_565)
                 .centerCrop()
@@ -62,7 +68,7 @@ final class AreaVideoDisplayAdaptor extends BaseAdapter {
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_VIEW);
                 File file = new File(url);
-                intent.setDataAndType(Uri.fromFile(file), "video/*");
+                intent.setDataAndType(Uri.fromFile(displayFile), "video/*");
                 referredView.getContext().startActivity(intent);
             }
         });

@@ -2,6 +2,7 @@ package lm.pkp.com.landmap.custom;
 
 import java.util.ArrayList;
 
+import lm.pkp.com.landmap.area.FileStorageConstants;
 import lm.pkp.com.landmap.area.res.disp.FileDisplayElement;
 
 /**
@@ -14,7 +15,7 @@ public class PermittedFileArrayList<E> extends ArrayList<E> {
         if (object instanceof FileDisplayElement) {
             FileDisplayElement item = (FileDisplayElement) object;
             final String itemPath = item.getPath();
-            if(itemPath.contains("/LMS_DOCS/")){
+            if(itemPath.contains(FileStorageConstants.DOCUMENT_ROOT_FOLDER_NAME)){
                 return false;
             }
             final String itemName = item.getName();

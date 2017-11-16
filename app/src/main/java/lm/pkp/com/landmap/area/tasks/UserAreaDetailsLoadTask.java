@@ -24,10 +24,6 @@ import lm.pkp.com.landmap.permission.PermissionsDBHelper;
 import lm.pkp.com.landmap.position.PositionElement;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
 
-/**
- * Created by Rinky on 21-10-2017.
- */
-
 public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String> {
 
     private Context localContext = null;
@@ -35,7 +31,6 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
     private PositionsDBHelper pdh = null;
     private DriveDBHelper ddh = null;
     private PermissionsDBHelper pmh = null;
-
     private AsyncTaskCallback callback = null;
 
     public UserAreaDetailsLoadTask(Context appContext) {
@@ -89,11 +84,12 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
         try {
-            JSONArray responseArr = new JSONArray(s);
-            for (int i = 0; i < responseArr.length(); i++) {
-                JSONObject responseObj = (JSONObject) responseArr.get(i);
+            JSONObject responseObj = new JSONObject(s);
 
-                JSONObject areaObj = (JSONObject) responseObj.get("area");
+            final JSONArray areaResponse = responseObj.getJSONArray("area_response");
+            for (int i = 0; i < areaResponse.length(); i++) {
+                JSONObject areaResponseObj = (JSONObject) areaResponse.get(i);
+                JSONObject areaObj = (JSONObject) areaResponseObj.get("area");
 
                 AreaElement ae = new AreaElement();
                 ae.setName(areaObj.getString("name"));
@@ -108,7 +104,7 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
 
                 adh.insertAreaFromServer(ae);
 
-                JSONArray positionsArr = (JSONArray) responseObj.get("positions");
+                JSONArray positionsArr = (JSONArray) areaResponseObj.get("positions");
                 for (int p = 0; p < positionsArr.length(); p++) {
                     JSONObject positionObj = (JSONObject) positionsArr.get(p);
 
@@ -124,17 +120,16 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
                     pdh.insertPositionFromServer(pe);
                 }
 
-                JSONArray driveArr = (JSONArray) responseObj.get("drs");
+                JSONArray driveArr = (JSONArray) areaResponseObj.get("drs");
                 for (int d = 0; d < driveArr.length(); d++) {
                     JSONObject driveObj = (JSONObject) driveArr.get(d);
 
                     DriveResource dr = new DriveResource();
                     dr.setUniqueId(driveObj.getString("unique_id"));
                     dr.setAreaId(driveObj.getString("area_id"));
-                    dr.setDriveId(driveObj.getString("drive_id"));
                     dr.setUserId(driveObj.getString("user_id"));
-                    dr.setContainerDriveId(driveObj.getString("container_id"));
-                    dr.setDriveResourceId(driveObj.getString("resource_id"));
+                    dr.setContainerId(driveObj.getString("container_id"));
+                    dr.setResourceId(driveObj.getString("resource_id"));
                     dr.setName(driveObj.getString("name"));
                     dr.setType(driveObj.getString("type"));
                     dr.setSize(driveObj.getString("size"));
@@ -144,7 +139,7 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
                     ddh.insertResourceFromServer(dr);
                 }
 
-                JSONArray permissionsArr = (JSONArray) responseObj.get("permissions");
+                JSONArray permissionsArr = (JSONArray) areaResponseObj.get("permissions");
                 for (int e = 0; e < permissionsArr.length(); e++) {
                     JSONObject permissionObj = (JSONObject) permissionsArr.get(e);
 
@@ -155,6 +150,25 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
 
                     pmh.insertPermission(pe);
                 }
+            }
+
+            final JSONArray commonResponse = responseObj.getJSONArray("common_response");
+            for (int i = 0; i < commonResponse.length(); i++) {
+                final JSONObject driveObj = commonResponse.getJSONObject(i);
+
+                DriveResource dr = new DriveResource();
+                dr.setUniqueId(driveObj.getString("unique_id"));
+                dr.setAreaId(driveObj.getString("area_id"));
+                dr.setUserId(driveObj.getString("user_id"));
+                dr.setContainerId(driveObj.getString("container_id"));
+                dr.setResourceId(driveObj.getString("resource_id"));
+                dr.setName(driveObj.getString("name"));
+                dr.setType(driveObj.getString("type"));
+                dr.setSize(driveObj.getString("size"));
+                dr.setMimeType(driveObj.getString("mime_type"));
+                dr.setContentType(driveObj.getString("content_type"));
+
+                ddh.insertResourceFromServer(dr);
             }
         } catch (Exception e) {
             e.printStackTrace();

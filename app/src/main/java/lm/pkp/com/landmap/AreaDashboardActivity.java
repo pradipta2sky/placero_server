@@ -64,7 +64,7 @@ public class AreaDashboardActivity extends AppCompatActivity {
                 pe.setFunctionCode(PermissionConstants.FULL_CONTROL);
                 areaElement.getPermissions().put(PermissionConstants.FULL_CONTROL, pe);
 
-                AreaContext.getInstance().setAreaElement(areaElement, getApplicationContext());
+                AreaContext.INSTANCE.setAreaElement(areaElement, getApplicationContext());
 
                 adh = new AreaDBHelper(getApplicationContext(), new DataInsertServerCallback());
                 adh.insertAreaToServer(areaElement);
@@ -138,7 +138,7 @@ public class AreaDashboardActivity extends AppCompatActivity {
         @Override
         public void taskCompleted(Object result) {
             finish();
-            Intent intent = new Intent(getApplicationContext(), AreaDetailsActivity.class);
+            Intent intent = new Intent(getApplicationContext(), CreateAreaFolderStructureActivity.class);
             startActivity(intent);
         }
     }

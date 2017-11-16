@@ -35,7 +35,7 @@ public class AreaAddResourcesActivity extends AppCompatActivity {
         ActionBar ab = getSupportActionBar();
         ab.setHomeButtonEnabled(true);
         ab.setDisplayHomeAsUpEnabled(true);
-        final AreaElement areaElement = AreaContext.getInstance().getAreaElement();
+        final AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
         ab.setBackgroundDrawable(new ColorDrawable(ColorProvider.getAreaToolBarColor(areaElement)));
         ab.show();
 
@@ -46,7 +46,7 @@ public class AreaAddResourcesActivity extends AppCompatActivity {
         adaptor = new AreaAddResourceAdaptor(getApplicationContext(), R.id.file_display_list, areaResourcesDisplayList);
         resourceFileList.setAdapter(adaptor);
 
-        ArrayList<DriveResource> driveResources = AreaContext.getInstance().getUploadedDriveResources();
+        ArrayList<DriveResource> driveResources = AreaContext.INSTANCE.getUploadedQueue();
         areaResourcesDisplayList.clear();
         areaResourcesDisplayList.addAll(driveResources);
         adaptor.notifyDataSetChanged();

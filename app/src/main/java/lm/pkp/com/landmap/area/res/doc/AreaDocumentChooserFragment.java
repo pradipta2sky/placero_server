@@ -17,7 +17,10 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import org.apache.commons.io.FileUtils;
+
 import java.io.File;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
@@ -59,35 +62,43 @@ public class AreaDocumentChooserFragment extends Fragment {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                     FileDisplayElement item = items.get(i);
-                    File file = new File(item.getPath());
-                    if (!file.canRead()) {
+                    File documentFile = new File(item.getPath());
+                    if (!documentFile.canRead()) {
                         showErrorBox("Error: File cannot be read. Probably corrupt / locked.");
                         return;
                     }
-                    if (file.length() == 0) {
+                    if (documentFile.length() == 0) {
                         showErrorBox("Error: File does not have any contents.");
                         return;
                     }
 
-                    final AreaContext areaContext = AreaContext.getInstance();
+                    final AreaContext areaContext = AreaContext.INSTANCE;
                     AreaElement ae = areaContext.getAreaElement();
 
-                    DriveResource dr = new DriveResource();
-                    dr.setName(file.getName());
-                    dr.setPath(file.getAbsolutePath());
-                    dr.setType("file");
-                    dr.setUserId(UserContext.getInstance().getUserElement().getEmail());
-                    dr.setSize(file.length() + "");
-                    dr.setUniqueId(UUID.randomUUID().toString());
-                    dr.setAreaId(ae.getUniqueId());
-                    dr.setMimeType(FileUtil.getMimeType(file));
-                    dr.setContentType("Document");
-                    String containerDriveId = areaContext.getDocumentRootDriveResource().getDriveId();
-                    dr.setContainerDriveId(containerDriveId);
+                    File loadFile = new File(areaContext.getAreaLocalDocumentRoot().getAbsolutePath()
+                            + File.separatorChar + documentFile.getName());
+                    try {
+                        FileUtils.copyFile(documentFile, loadFile);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
 
-                    areaContext.addNewDriveResource(dr);
+                    DriveResource resource = new DriveResource();
+                    resource.setName(loadFile.getName());
+                    resource.setPath(loadFile.getAbsolutePath());
+                    resource.setType("file");
+                    resource.setUserId(UserContext.getInstance().getUserElement().getEmail());
+                    resource.setSize(loadFile.length() + "");
+                    resource.setUniqueId(UUID.randomUUID().toString());
+                    resource.setAreaId(ae.getUniqueId());
+                    resource.setMimeType(FileUtil.getMimeType(loadFile));
+                    resource.setContentType("Document");
+                    resource.setContainerId(areaContext.getDocumentRootDriveResource().getResourceId());
+
+                    areaContext.addResourceToQueue(resource);
 
                     getActivity().finish();
+
                     Intent intent = new Intent(getActivity(), AreaAddResourcesActivity.class);
                     startActivity(intent);
                 }

@@ -90,23 +90,22 @@ public class AreaCameraVideoActivity extends Activity {
         if (requestCode == CAMERA_CAPTURE_VIDEO_REQUEST_CODE) {
             if (resultCode == RESULT_OK) {
                 File videoFile = new File(fileUri.getPath());
-                final AreaContext areaContext = AreaContext.getInstance();
+                final AreaContext areaContext = AreaContext.INSTANCE;
                 AreaElement ae = areaContext.getAreaElement();
 
-                DriveResource dr = new DriveResource();
-                dr.setName(videoFile.getName());
-                dr.setPath(fileUri.getPath());
-                dr.setType("file");
-                dr.setUserId(UserContext.getInstance().getUserElement().getEmail());
-                dr.setSize(videoFile.length() + "");
-                dr.setUniqueId(UUID.randomUUID().toString());
-                dr.setAreaId(ae.getUniqueId());
-                dr.setMimeType(FileUtil.getMimeType(videoFile));
-                dr.setContentType("Video");
-                String containerDriveId = areaContext.getImagesRootDriveResource().getDriveId();
-                dr.setContainerDriveId(containerDriveId);
+                DriveResource resource = new DriveResource();
+                resource.setName(videoFile.getName());
+                resource.setPath(videoFile.getAbsolutePath());
+                resource.setType("file");
+                resource.setUserId(UserContext.getInstance().getUserElement().getEmail());
+                resource.setSize(videoFile.length() + "");
+                resource.setUniqueId(UUID.randomUUID().toString());
+                resource.setAreaId(ae.getUniqueId());
+                resource.setMimeType(FileUtil.getMimeType(videoFile));
+                resource.setContentType("Video");
+                resource.setContainerId(areaContext.getVideosRootDriveResource().getResourceId());
 
-                AreaContext.getInstance().addNewDriveResource(dr);
+                AreaContext.INSTANCE.addResourceToQueue(resource);
 
                 Intent i = new Intent(AreaCameraVideoActivity.this, AreaAddResourcesActivity.class);
                 startActivity(i);
@@ -132,7 +131,7 @@ public class AreaCameraVideoActivity extends Activity {
      */
     private static File getOutputMediaFile() {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-        File mediaFile = new File(LocalFolderStructureManager.getVideoStorageDir().getPath()
+        File mediaFile = new File(AreaContext.INSTANCE.getAreaLocalVideoRoot().getAbsolutePath()
                 + File.separator + "VID_" + timeStamp + ".mp4");
         return mediaFile;
     }

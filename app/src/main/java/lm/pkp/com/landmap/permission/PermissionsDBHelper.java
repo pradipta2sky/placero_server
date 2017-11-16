@@ -75,7 +75,7 @@ public class PermissionsDBHelper extends SQLiteOpenHelper {
 
     private JSONObject preparePostParams(String queryType, String targetUser, String functionCodes) {
         JSONObject postParams = new JSONObject();
-        final AreaElement areaElement = AreaContext.getInstance().getAreaElement();
+        final AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
         final UserElement userElement = UserContext.getInstance().getUserElement();
         try {
             postParams.put("requestType", "AreaShare");

@@ -62,9 +62,6 @@
             android:name=".SplashActivity"
             android:label="@string/label_pre_load_splash"></activity>
         <activity
-            android:name=".CreateFolderStructureActivity"
-            android:label="@string/create_folder_structure"></activity>
-        <activity
             android:name=".AreaCameraPictureActivity"
             android:screenOrientation="portrait"
             android:label="@string/area_add_image"></activity>
@@ -93,5 +90,11 @@
             android:name=".AreaDisplayResourcesActivity"
             android:label="@string/area_resources"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".CreateCommonFolderStructureActivity"
+            android:label="@string/choose_document"></activity>
+        <activity
+            android:name=".CreateAreaFolderStructureActivity"
+            android:label="@string/choose_document"></activity>
     </application>
 </manifest>

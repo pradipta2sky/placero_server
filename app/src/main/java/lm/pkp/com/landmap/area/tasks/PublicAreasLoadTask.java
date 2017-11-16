@@ -135,10 +135,9 @@ public class PublicAreasLoadTask extends AsyncTask<JSONObject, Void, String> {
                     DriveResource dr = new DriveResource();
                     dr.setUniqueId(driveObj.getString("unique_id"));
                     dr.setAreaId(driveObj.getString("area_id"));
-                    dr.setDriveId(driveObj.getString("drive_id"));
                     dr.setUserId(driveObj.getString("user_id"));
-                    dr.setContainerDriveId(driveObj.getString("container_id"));
-                    dr.setDriveResourceId(driveObj.getString("resource_id"));
+                    dr.setContainerId(driveObj.getString("container_id"));
+                    dr.setResourceId(driveObj.getString("resource_id"));
                     dr.setName(driveObj.getString("name"));
                     dr.setType(driveObj.getString("type"));
                     dr.setSize(driveObj.getString("size"));

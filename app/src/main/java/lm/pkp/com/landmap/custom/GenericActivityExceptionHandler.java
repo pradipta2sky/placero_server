@@ -48,29 +48,10 @@ public class GenericActivityExceptionHandler implements Thread.UncaughtException
             // Check why the user went off. ?? Do something here.
         }
 
-        new SendEmailAsyncTask(content.toString()).execute();
+        sendEmail(content.toString());
+        restartApplication();
     }
 
-    private class SendEmailAsyncTask extends AsyncTask {
-
-        private String content;
-
-        public SendEmailAsyncTask(String mailContent) {
-            this.content = mailContent;
-        }
-
-        @Override
-        protected Object doInBackground(Object[] params) {
-            sendEmail(content);
-            return "";
-        }
-
-        @Override
-        protected void onPostExecute(Object o) {
-            super.onPostExecute(o);
-            restartApplication();
-        }
-    }
 
     private void restartApplication() {
         Intent intent = new Intent(activity, SignInActivity.class);
