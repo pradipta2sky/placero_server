@@ -175,17 +175,6 @@ public class AreaShareActivity extends AppCompatActivity {
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                finish();
-                return false;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    @Override
     public void onBackPressed() {
         finish();
     }
@@ -221,10 +210,10 @@ public class AreaShareActivity extends AppCompatActivity {
 
         @Override
         public void taskCompleted(Object result) {
-            finish();
             Intent shareDriveResourcesIntent = new Intent(getApplicationContext(), ShareDriveResourcesActivity.class);
             shareDriveResourcesIntent.putExtra("share_to_user", targetUser);
             startActivity(shareDriveResourcesIntent);
+            finish();
         }
     }
 

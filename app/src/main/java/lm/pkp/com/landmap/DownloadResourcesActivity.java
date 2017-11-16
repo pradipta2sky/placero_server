@@ -24,7 +24,6 @@ import com.google.android.gms.drive.DriveApi.DriveIdResult;
 import com.google.android.gms.drive.DriveContents;
 import com.google.android.gms.drive.DriveFile;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
@@ -41,8 +40,6 @@ import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.custom.ThumbnailCreator;
 import lm.pkp.com.landmap.drive.DriveResource;
-import lm.pkp.com.landmap.sync.LocalFolderStructureManager;
-import lm.pkp.com.landmap.util.FileUtil;
 
 
 /**
@@ -78,8 +75,7 @@ public class DownloadResourcesActivity extends BaseDriveActivity {
 
     private void processResources() {
         if (!processStack.isEmpty()) {
-            DriveResource res = processStack.pop();
-            processResource(res);
+            processResource(processStack.pop());
         } else {
             finish();
 
@@ -103,6 +99,11 @@ public class DownloadResourcesActivity extends BaseDriveActivity {
         protected Object doInBackground(Object[] params) {
             DriveIdResult driveIdResult = Drive.DriveApi.fetchDriveId(getGoogleApiClient(),
                     resource.getResourceId()).await();
+            if(!driveIdResult.getStatus().isSuccess()){
+                // This resource is not available. // Process the next in queue.
+                processResources();
+                return false;
+            }
             DriveFile driveFile = driveIdResult.getDriveId().asDriveFile();
             try {
                 DriveContentsResult driveContentsResult =

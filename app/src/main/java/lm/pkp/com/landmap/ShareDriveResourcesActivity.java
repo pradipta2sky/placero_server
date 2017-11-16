@@ -65,13 +65,13 @@ public class ShareDriveResourcesActivity extends Activity implements EasyPermiss
         if (extras != null) {
             shareToUser = extras.getString("share_to_user");
         }
-        shareResources();
 
         mProgress = new ProgressDialog(this);
         mProgress.setMessage("Sharing Area ...");
         mCredential = GoogleAccountCredential.usingOAuth2(
                 getApplicationContext(), Arrays.asList(SCOPES))
                 .setBackOff(new ExponentialBackOff());
+        shareResources();
     }
 
 
