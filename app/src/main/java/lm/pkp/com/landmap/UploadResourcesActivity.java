@@ -67,6 +67,7 @@ public class UploadResourcesActivity extends BaseDriveActivity {
             processResource(processStack.pop());
         } else {
             finish();
+            getGoogleApiClient().disconnect();
             Intent addResourcesIntent = new Intent(UploadResourcesActivity.this, AreaAddResourcesActivity.class);
             startActivity(addResourcesIntent);
         }

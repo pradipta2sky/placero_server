@@ -88,26 +88,13 @@ public class AreaPopulationUtil {
             final DriveResource imageResource = imageResIter.next();
             final String imageName = imageResource.getName();
             String thumbnailPath = thumbRootPath + File.separatorChar + imageName;
-            Bitmap bMap = BitmapFactory.decodeFile(thumbnailPath);
-            areaImg.setImageBitmap(bMap);
+            File thumbFile = new File(thumbnailPath);
+            if(thumbFile.exists()){
+                Bitmap bMap = BitmapFactory.decodeFile(thumbnailPath);
+                areaImg.setImageBitmap(bMap);
+            }
             break;
         }
     }
 
-    private class LoadStatus {
-
-        private boolean success;
-
-        public LoadStatus(boolean status) {
-            success = status;
-        }
-
-        public boolean isSuccess() {
-            return this.success;
-        }
-
-        public void setSuccess(boolean success) {
-            this.success = success;
-        }
-    }
 }

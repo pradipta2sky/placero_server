@@ -15,7 +15,10 @@ import java.util.UUID;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
+import lm.pkp.com.landmap.custom.LocationPositionReceiver;
 import lm.pkp.com.landmap.drive.DriveResource;
+import lm.pkp.com.landmap.position.PositionElement;
+import lm.pkp.com.landmap.provider.GPSLocationProvider;
 import lm.pkp.com.landmap.sync.LocalFolderStructureManager;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.util.FileUtil;
@@ -23,7 +26,7 @@ import lm.pkp.com.landmap.util.FileUtil;
 /**
  * Created by USER on 11/1/2017.
  */
-public class AreaCameraVideoActivity extends Activity {
+public class AreaCameraVideoActivity extends Activity implements LocationPositionReceiver {
 
     // LogCat tag
     private static final String TAG = AreaCameraVideoActivity.class.getSimpleName();
@@ -34,15 +37,19 @@ public class AreaCameraVideoActivity extends Activity {
     public static final int MEDIA_TYPE_VIDEO = 2;
 
     private Uri fileUri; // file url to store image/video
+    private DriveResource videoResource = new DriveResource();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
-
+        startPositioning();
         recordVideo();
     }
 
+    private void startPositioning() {
+        new GPSLocationProvider(AreaCameraVideoActivity.this, this, 20).getLocation();
+    }
 
     /**
      * Launching camera app to record video
@@ -109,6 +116,7 @@ public class AreaCameraVideoActivity extends Activity {
 
                 Intent i = new Intent(AreaCameraVideoActivity.this, AreaAddResourcesActivity.class);
                 startActivity(i);
+
             } else if (resultCode == RESULT_CANCELED) {
                 // Cancelled case
                 finish();
@@ -134,5 +142,21 @@ public class AreaCameraVideoActivity extends Activity {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         File localRoot = AreaContext.INSTANCE.getAreaLocalVideoRoot(areaElement.getUniqueId());
         return new File(localRoot + File.separator + "VID_" + timeStamp + ".mp4");
+    }
+
+    @Override
+    public void receivedLocationPostion(PositionElement pe) {
+        videoResource.setLatitude(pe.getLat() + "");
+        videoResource.setLongitude(pe.getLon() + "");
+    }
+
+    @Override
+    public void locationFixTimedOut() {
+
+    }
+
+    @Override
+    public void providerDisabled() {
+
     }
 }

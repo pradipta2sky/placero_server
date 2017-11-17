@@ -19,23 +19,37 @@ import lm.pkp.com.landmap.position.PositionElement;
 public class GPSLocationProvider implements LocationListener {
 
     private final Activity activity;
+    private LocationPositionReceiver receiver = null;
+    private int timeout = 30;
 
-    public GPSLocationProvider(Activity context) {
-        this.activity = context;
+    public GPSLocationProvider(Activity activity) {
+        this.activity = activity;
+    }
+
+    public GPSLocationProvider(Activity activity, LocationPositionReceiver receiver) {
+        this.activity = activity;
+        this.receiver = receiver;
+    }
+
+    public GPSLocationProvider(Activity activity, LocationPositionReceiver receiver, int timeoutSecs) {
+        this.activity = activity;
+        this.receiver = receiver;
+        this.timeout = timeoutSecs;
     }
 
     public void getLocation() {
         try {
             final LocationManager locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
-            Looper looper = Looper.myLooper();
             locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, this, null);
+
+            Looper looper = Looper.myLooper();
             final Handler handler = new Handler(looper);
             handler.postDelayed(new Runnable() {
                 public void run() {
                     locationManager.removeUpdates(GPSLocationProvider.this);
                     notifyFailureForLocationFix();
                 }
-            }, (1000 * 30)); // timeout after 30 secs
+            }, (1000 * timeout));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -46,12 +60,20 @@ public class GPSLocationProvider implements LocationListener {
         PositionElement pe = new PositionElement();
         pe.setLon(location.getLongitude());
         pe.setLat(location.getLatitude());
-        ((LocationPositionReceiver) activity).receivedLocationPostion(pe);
+        if(receiver != null){
+            receiver.receivedLocationPostion(pe);
+        }else {
+            ((LocationPositionReceiver) activity).receivedLocationPostion(pe);
+        }
     }
 
     @Override
     public void onProviderDisabled(String provider) {
-        ((LocationPositionReceiver) activity).providerDisabled();
+        if(receiver != null){
+            receiver.providerDisabled();
+        }else {
+            ((LocationPositionReceiver) activity).providerDisabled();
+        }
     }
 
     @Override
@@ -63,7 +85,11 @@ public class GPSLocationProvider implements LocationListener {
     }
 
     public void notifyFailureForLocationFix() {
-        ((LocationPositionReceiver) activity).locationFixTimedOut();
+        if(receiver != null){
+            receiver.locationFixTimedOut();
+        }else {
+            ((LocationPositionReceiver) activity).locationFixTimedOut();
+        }
     }
 
 }

@@ -14,25 +14,13 @@
         android:layout_gravity="left|center_vertical"
         android:weightSum="2">
 
-        <TextView
-            android:id="@+id/area_name_text"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:paddingBottom="2dp"
-            android:paddingTop="10dp"
-            android:textColor="#ffffffff"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:text="Dashboard"
-            android:layout_gravity="left|center_vertical"
-            android:layout_weight="1.3" />
-
         <FrameLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="9dp"
+            android:layout_marginLeft="10dp"
             android:padding="5dp"
-            android:layout_weight="0.8"
+            android:layout_weight="0.9"
             android:layout_gravity="left|center_vertical">
 
             <EditText
@@ -66,16 +54,16 @@
 
         <ImageView
             android:id="@+id/action_area_refresh"
-            android:layout_width="128px"
-            android:layout_height="128px"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_gravity="right|center"
             android:src="@drawable/refresh_icon"
             android:padding="5dp" />
 
         <ImageView
             android:id="@+id/action_area_create"
-            android:layout_width="128px"
-            android:layout_height="128px"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_gravity="right|center"
             android:src="@drawable/plus"
             android:padding="5dp" />

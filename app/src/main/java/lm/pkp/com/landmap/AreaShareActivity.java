@@ -176,6 +176,8 @@ public class AreaShareActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        Intent areaDetails = new Intent(getApplicationContext(), AreaDetailsActivity.class);
+        startActivity(areaDetails);
         finish();
     }
 
@@ -210,9 +212,9 @@ public class AreaShareActivity extends AppCompatActivity {
 
         @Override
         public void taskCompleted(Object result) {
-            Intent shareDriveResourcesIntent = new Intent(getApplicationContext(), ShareDriveResourcesActivity.class);
-            shareDriveResourcesIntent.putExtra("share_to_user", targetUser);
-            startActivity(shareDriveResourcesIntent);
+            Intent shareResourcesIntent = new Intent(getApplicationContext(), ShareDriveResourcesActivity.class);
+            shareResourcesIntent.putExtra("share_to_user", targetUser);
+            startActivity(shareResourcesIntent);
             finish();
         }
     }

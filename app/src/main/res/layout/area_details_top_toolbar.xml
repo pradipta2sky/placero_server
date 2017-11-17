@@ -34,16 +34,16 @@
 
         <ImageView
             android:id="@+id/action_area_edit"
-            android:layout_width="128px"
-            android:layout_height="128px"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_gravity="right|center"
             android:src="@drawable/content"
             android:padding="5dp" />
 
         <ImageView
             android:id="@+id/action_delete_area"
-            android:layout_width="128px"
-            android:layout_height="128px"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_gravity="right|center"
             android:src="@drawable/garbage"
             android:padding="5dp" />

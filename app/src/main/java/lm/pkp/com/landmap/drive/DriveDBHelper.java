@@ -39,6 +39,8 @@ public class DriveDBHelper extends SQLiteOpenHelper {
     public static final String DRIVE_COLUMN_CONTENT_TYPE = "content_type";
     public static final String DRIVE_COLUMN_MIME_TYPE = "mime_type";
     public static final String DRIVE_COLUMN_SIZE = "size";
+    public static final String DRIVE_COLUMN_LATITUDE = "latitude";
+    public static final String DRIVE_COLUMN_LONGITUDE = "longitude";
 
     public DriveDBHelper(Context context, AsyncTaskCallback callback) {
         super(context, DATABASE_NAME, null, 1);
@@ -304,6 +306,8 @@ public class DriveDBHelper extends SQLiteOpenHelper {
             postParams.put(DRIVE_COLUMN_CONTENT_TYPE, dr.getContentType());
             postParams.put(DRIVE_COLUMN_MIME_TYPE, dr.getMimeType());
             postParams.put(DRIVE_COLUMN_SIZE, dr.getSize());
+            postParams.put(DRIVE_COLUMN_LATITUDE, dr.getLatitude());
+            postParams.put(DRIVE_COLUMN_LONGITUDE, dr.getLongitude());
 
         } catch (JSONException e) {
             e.printStackTrace();

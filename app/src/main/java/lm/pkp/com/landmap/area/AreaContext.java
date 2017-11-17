@@ -139,4 +139,18 @@ public class AreaContext {
         return documentThumbnailFolder;
     }
 
+    public File getLocalStoreLocationForDriveResource(DriveResource resource){
+        // Assuming that folders will not be passed.
+        File dumpRoot = null;
+        String contentType = resource.getContentType();
+        if(contentType.equalsIgnoreCase("Image")){
+            dumpRoot = getAreaLocalImageRoot(resource.getAreaId());
+        }else if(contentType.equalsIgnoreCase("Video")){
+            dumpRoot = getAreaLocalVideoRoot(resource.getAreaId());
+        }else if(contentType.equalsIgnoreCase("Document")){
+            dumpRoot = getAreaLocalDocumentRoot(resource.getAreaId());
+        }
+        return dumpRoot;
+    }
+
 }

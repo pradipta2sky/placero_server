@@ -73,7 +73,7 @@ public class AreaEditActivity extends AppCompatActivity {
 
                 String areaName = nameText.getText().toString();
                 if (areaName.trim().equalsIgnoreCase("")) {
-                    showErrorMessage("User selection is required for share !!");
+                    showErrorMessage("Area Name is required !!");
                     findViewById(R.id.splash_panel).setVisibility(View.GONE);
                     return;
                 }
@@ -90,6 +90,8 @@ public class AreaEditActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        Intent areaDetails = new Intent(getApplicationContext(), AreaDetailsActivity.class);
+        startActivity(areaDetails);
         finish();
     }
 
@@ -115,8 +117,8 @@ public class AreaEditActivity extends AppCompatActivity {
 
         @Override
         public void taskCompleted(Object result) {
-            findViewById(R.id.splash_panel).setVisibility(View.INVISIBLE);
-            Intent areaDetailsIntent = new Intent(AreaEditActivity.this, AreaDetailsActivity.class);
+            Intent areaDetailsIntent = new Intent(AreaEditActivity.this, ShareDriveResourcesActivity.class);
+            areaDetailsIntent.putExtra("share_to_user", "äny");
             startActivity(areaDetailsIntent);
             finish();
         }

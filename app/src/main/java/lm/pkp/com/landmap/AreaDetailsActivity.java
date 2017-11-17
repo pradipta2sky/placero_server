@@ -174,8 +174,6 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
             @Override
             public void onClick(View v) {
                 if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.SHARE_READ_ONLY)) {
-                    finish();
-
                     Intent areaShareIntent = new Intent(AreaDetailsActivity.this, AreaShareActivity.class);
                     startActivity(areaShareIntent);
                 } else {
@@ -189,8 +187,6 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
             @Override
             public void onClick(View v) {
                 if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.ADD_RESOURCES)) {
-                    finish();
-
                     Intent intent = new Intent(AreaDetailsActivity.this, AreaAddResourcesActivity.class);
                     startActivity(intent);
                 } else {
@@ -203,9 +199,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         displayResItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                finish();
-
-                Intent intent = new Intent(AreaDetailsActivity.this, AreaDisplayResourcesActivity.class);
+                Intent intent = new Intent(AreaDetailsActivity.this, DownloadDriveResourcesActivity.class);
                 startActivity(intent);
             }
         });
@@ -260,10 +254,9 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
 
     @Override
     public void onBackPressed() {
-        finish();
-
-        Intent areaDashboardIntent = new Intent(AreaDetailsActivity.this, AreaDashboardActivity.class);
+        Intent areaDashboardIntent = new Intent(getApplicationContext(), AreaDashboardActivity.class);
         startActivity(areaDashboardIntent);
+        finish();
     }
 
 
@@ -271,7 +264,8 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         @Override
         public void taskCompleted(Object result) {
             finish();
-            Intent areaDashboardIntent = new Intent(AreaDetailsActivity.this, AreaDashboardActivity.class);
+
+            Intent areaDashboardIntent = new Intent(AreaDetailsActivity.this, RemoveDriveResourcesActivity.class);
             startActivity(areaDashboardIntent);
         }
     }

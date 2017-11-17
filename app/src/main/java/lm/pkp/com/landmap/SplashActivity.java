@@ -30,10 +30,10 @@ public class SplashActivity extends Activity {
 
         @Override
         public void taskCompleted(Object result) {
+            Intent commonFoldersIntent = new Intent(SplashActivity.this,
+                    CreateCommonFolderStructureActivity.class);
+            startActivity(commonFoldersIntent);
             finish();
-
-            Intent areaDashboardIntent = new Intent(SplashActivity.this, CreateCommonFolderStructureActivity.class);
-            startActivity(areaDashboardIntent);
         }
     }
 

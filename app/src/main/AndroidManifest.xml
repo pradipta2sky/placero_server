@@ -81,7 +81,10 @@
             android:name=".UploadResourcesActivity"
             android:label="@string/choose_document"></activity>
         <activity
-            android:name=".DownloadResourcesActivity"
+            android:name=".DownloadDriveResourcesActivity"
+            android:label="@string/area_resources"></activity>
+        <activity
+            android:name=".RemoveDriveResourcesActivity"
             android:label="@string/area_resources"></activity>
         <activity
             android:name=".ShareDriveResourcesActivity"

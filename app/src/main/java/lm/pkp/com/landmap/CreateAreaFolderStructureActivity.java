@@ -81,6 +81,7 @@ public class CreateAreaFolderStructureActivity extends BaseDriveActivity {
 
         public void processCreateStack() {
             if (createStack.isEmpty()) {
+                getGoogleApiClient().disconnect();
                 Intent i = new Intent(CreateAreaFolderStructureActivity.this, AreaDetailsActivity.class);
                 startActivity(i);
             } else {

@@ -151,10 +151,10 @@ public class CreateCommonFolderStructureActivity extends BaseDriveActivity {
 
         public void processCreateStack() {
             if (createStack.isEmpty()) {
-                finish();
-
-                Intent i = new Intent(CreateCommonFolderStructureActivity.this, DownloadResourcesActivity.class);
+                getGoogleApiClient().disconnect();
+                Intent i = new Intent(CreateCommonFolderStructureActivity.this, AreaDashboardActivity.class);
                 startActivity(i);
+                finish();
             } else {
                 DriveResource res = createStack.pop();
                 MetadataChangeSet changeSet

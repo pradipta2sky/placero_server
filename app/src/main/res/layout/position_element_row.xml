@@ -5,7 +5,7 @@
     android:background="@drawable/rounded_corner"
     android:baselineAligned="false"
     android:elevation="5dp"
-    android:minHeight="70dp"
+    android:minHeight="80dp"
     android:orientation="horizontal"
     android:paddingBottom="10dp"
     android:paddingTop="10dp">
@@ -14,14 +14,15 @@
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:orientation="vertical"
-        android:layout_weight="0.15"
+        android:layout_weight="0.05"
         android:layout_gravity="top">
 
         <ImageView
             android:id="@+id/position_default_img"
-            android:layout_width="128px"
-            android:layout_height="128px"
-            android:padding="10dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="10dp"
             android:src="@drawable/marker_image" />
     </LinearLayout>
 
@@ -32,7 +33,7 @@
         android:orientation="vertical"
         android:layout_gravity="center_vertical"
         android:weightSum="1"
-        android:layout_weight="0.85">
+        android:layout_weight="0.75">
 
         <TextView
             android:id="@+id/pos_name"
@@ -41,7 +42,7 @@
             android:fontFamily="sans-serif-medium"
             android:paddingLeft="10dp"
             android:textColor="#000000"
-            android:textSize="17sp"
+            android:textSize="15sp"
             android:textStyle="bold" />
 
         <TextView
@@ -58,9 +59,9 @@
 
     <ImageView
         android:id="@+id/del_row"
-        android:layout_width="48px"
-        android:layout_height="48px"
-        android:layout_marginTop="15dip"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:layout_marginTop="5dp"
         android:layout_marginRight="10dp"
         android:gravity="right|center_vertical"
         android:src="@drawable/delete" />
