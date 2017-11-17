@@ -48,22 +48,32 @@ public class AreaDashboardOwnedFragment extends Fragment {
 
         final ArrayList<AreaElement> areas = new AreaDBHelper(view.getContext()).getAreas("self");
         ListView areaListView = (ListView) view.findViewById(R.id.area_display_list);
-        AreaItemAdaptor adaptor = new AreaItemAdaptor(getContext(), R.layout.area_element_row, areas);
 
-        areaListView.setAdapter(adaptor);
-        areaListView.setDescendantFocusability(ListView.FOCUS_BLOCK_DESCENDANTS);
-        areaListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapter, View v, int position,
-                                    long arg3) {
-                getActivity().finish();
+        if(areas.size() > 0){
+            view.findViewById(R.id.owned_area_empty_layout).setVisibility(View.GONE);
+            areaListView.setVisibility(View.VISIBLE);
 
-                AreaElement ae = (AreaElement) adapter.getItemAtPosition(position);
-                AreaContext.INSTANCE.setAreaElement(ae, getContext());
-                Intent intent = new Intent(getContext(), AreaDetailsActivity.class);
-                startActivity(intent);
-            }
-        });
+            AreaItemAdaptor adaptor = new AreaItemAdaptor(getContext(), R.layout.area_element_row, areas);
+
+            areaListView.setAdapter(adaptor);
+            areaListView.setDescendantFocusability(ListView.FOCUS_BLOCK_DESCENDANTS);
+            areaListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapter, View v, int position,
+                                        long arg3) {
+                    getActivity().finish();
+
+                    AreaElement ae = (AreaElement) adapter.getItemAtPosition(position);
+                    AreaContext.INSTANCE.setAreaElement(ae, getContext());
+                    Intent intent = new Intent(getContext(), AreaDetailsActivity.class);
+                    startActivity(intent);
+                }
+            });
+
+        }else {
+            areaListView.setVisibility(View.GONE);
+            view.findViewById(R.id.owned_area_empty_layout).setVisibility(View.VISIBLE);
+        }
 
         final EditText inputSearch = (EditText) getActivity().findViewById(R.id.dashboard_search_box);
         inputSearch.addTextChangedListener(new UserInputWatcher());
@@ -93,6 +103,33 @@ public class AreaDashboardOwnedFragment extends Fragment {
         public void taskCompleted(Object result) {
             final ArrayList<AreaElement> areas = new AreaDBHelper(getView().getContext()).getAreas("self");
             ListView areaListView = (ListView) getView().findViewById(R.id.area_display_list);
+
+            if(areas.size() > 0){
+                getView().findViewById(R.id.owned_area_empty_layout).setVisibility(View.GONE);
+                areaListView.setVisibility(View.VISIBLE);
+
+                AreaItemAdaptor adaptor = new AreaItemAdaptor(getContext(), R.layout.area_element_row, areas);
+
+                areaListView.setAdapter(adaptor);
+                areaListView.setDescendantFocusability(ListView.FOCUS_BLOCK_DESCENDANTS);
+                areaListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> adapter, View v, int position,
+                                            long arg3) {
+                        getActivity().finish();
+
+                        AreaElement ae = (AreaElement) adapter.getItemAtPosition(position);
+                        AreaContext.INSTANCE.setAreaElement(ae, getContext());
+                        Intent intent = new Intent(getContext(), AreaDetailsActivity.class);
+                        startActivity(intent);
+                    }
+                });
+
+            }else {
+                areaListView.setVisibility(View.GONE);
+                getView().findViewById(R.id.owned_area_empty_layout).setVisibility(View.VISIBLE);
+            }
+
             AreaItemAdaptor adaptor = new AreaItemAdaptor(getContext(), R.layout.area_element_row, areas);
             areaListView.setAdapter(adaptor);
 

@@ -82,22 +82,31 @@ public class AreaDashboardSharedFragment extends Fragment {
 
         final AreaDBHelper adh = new AreaDBHelper(view.getContext());
         ListView areaListView = (ListView) view.findViewById(R.id.area_display_list);
-        AreaItemAdaptor adaptor = new AreaItemAdaptor(getContext(), R.layout.area_element_row, adh.getAreas("shared"));
+        ArrayList<AreaElement> sharedAreas = adh.getAreas("shared");
+        AreaItemAdaptor adaptor = new AreaItemAdaptor(getContext(), R.layout.area_element_row, sharedAreas);
 
-        areaListView.setAdapter(adaptor);
-        areaListView.setDescendantFocusability(ListView.FOCUS_BLOCK_DESCENDANTS);
-        areaListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapter, View v, int position,
-                                    long arg3) {
-                getActivity().finish();
+        if(sharedAreas.size() > 0) {
+            view.findViewById(R.id.shared_area_empty_layout).setVisibility(View.GONE);
+            areaListView.setVisibility(View.VISIBLE);
 
-                AreaElement ae = (AreaElement) adapter.getItemAtPosition(position);
-                AreaContext.INSTANCE.setAreaElement(ae, getContext());
-                Intent intent = new Intent(getContext(), AreaDetailsActivity.class);
-                startActivity(intent);
-            }
-        });
+            areaListView.setAdapter(adaptor);
+            areaListView.setDescendantFocusability(ListView.FOCUS_BLOCK_DESCENDANTS);
+            areaListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> adapter, View v, int position,
+                                        long arg3) {
+                    getActivity().finish();
+
+                    AreaElement ae = (AreaElement) adapter.getItemAtPosition(position);
+                    AreaContext.INSTANCE.setAreaElement(ae, getContext());
+                    Intent intent = new Intent(getContext(), AreaDetailsActivity.class);
+                    startActivity(intent);
+                }
+            });
+        }else {
+            areaListView.setVisibility(View.GONE);
+            view.findViewById(R.id.shared_area_empty_layout).setVisibility(View.VISIBLE);
+        }
 
         view.findViewById(R.id.splash_panel).setVisibility(View.GONE);
     }
