@@ -56,7 +56,7 @@ public class RemoveDriveResourcesActivity extends Activity implements EasyPermis
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
 
-        setContentView(R.layout.activity_generic_wait);
+        setContentView(R.layout.activity_remove_resources);
 
         mProgress = new ProgressDialog(this);
         mProgress.setMessage("Removing area files ...");
