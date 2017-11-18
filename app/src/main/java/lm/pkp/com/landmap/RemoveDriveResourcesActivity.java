@@ -198,9 +198,9 @@ public class RemoveDriveResourcesActivity extends Activity implements EasyPermis
                         }
                         continue;
                     }
-                    if(resource.getContainerId().trim().equalsIgnoreCase("")){
+                    if(!resource.getContainerId().trim().equalsIgnoreCase("")){
                         // Delete only the area specific folders and not the common folders.
-                        mService.files().delete(resource.getResourceId());
+                        mService.files().delete(resource.getResourceId()).execute();
                     }
                 }
             } catch (Exception e) {

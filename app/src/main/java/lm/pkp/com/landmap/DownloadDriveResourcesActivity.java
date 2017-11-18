@@ -112,7 +112,7 @@ public class DownloadDriveResourcesActivity extends Activity implements EasyPerm
                 if (resultCode == RESULT_OK) {
                     downloadResources();
                 } else {
-                    // TODO Share the error with the user
+                    backToDetails("error", "Play services unavailable.");
                 }
                 break;
             case REQUEST_ACCOUNT_PICKER:
@@ -126,11 +126,15 @@ public class DownloadDriveResourcesActivity extends Activity implements EasyPerm
                         mCredential.setSelectedAccountName(accountName);
                         downloadResources();
                     }
+                }else {
+                    backToDetails("error", "Could not choose account.");
                 }
                 break;
             case REQUEST_AUTHORIZATION:
                 if (resultCode == RESULT_OK) {
                     downloadResources();
+                }else {
+                    backToDetails("error", "Authorization failed.");
                 }
                 break;
         }
@@ -256,5 +260,14 @@ public class DownloadDriveResourcesActivity extends Activity implements EasyPerm
             }
             finish();
         }
+    }
+
+    private void backToDetails(String code, String message){
+        Intent detailsIntent = new Intent(getApplicationContext(),AreaDetailsActivity.class);
+        detailsIntent.putExtra("outcome_type", code);
+        detailsIntent.putExtra("outcome", message);
+        detailsIntent.putExtra("action", "Download Resources");
+        startActivity(detailsIntent);
+        finish();
     }
 }

@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -64,7 +65,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         bottomDrawable.setColor(ColorProvider.getAreaToolBarColor(ae));
 
         if (!askForLocationPermission()) {
-            showErrorMessage("No permission given for location fix !!");
+            showErrorMessage("No permission given for location fix !!", "error");
             finish();
         }
 
@@ -109,7 +110,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
                     adh.deleteArea(ae);
                     adh.deleteAreaFromServer(ae);
                 } else {
-                    showErrorMessage("You do not have removal rights !!");
+                    showErrorMessage("You do not have removal rights !!", "error");
                 }
             }
         });
@@ -123,7 +124,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
                     findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
                     new GPSLocationProvider(AreaDetailsActivity.this).getLocation();
                 } else {
-                    showErrorMessage("You do not have Plotting rights !!");
+                    showErrorMessage("You do not have Plotting rights !!", "error");
                 }
             }
         });
@@ -137,7 +138,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
                     Intent intent = new Intent(AreaDetailsActivity.this, AreaMapPlotterActivity.class);
                     startActivity(intent);
                 } else {
-                    showErrorMessage("You need atleast 3 points to plot.!!!");
+                    showErrorMessage("You need atleast 3 points to plot.!!!", "error");
                 }
             }
         });
@@ -157,7 +158,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
                         navigationIntent.setPackage("com.google.android.apps.maps");
                         startActivity(navigationIntent);
                     } else {
-                        showErrorMessage("No locations available for navigation");
+                        showErrorMessage("No positions available for navigation", "error");
                     }
                 } else {
                     Uri gmmIntentUri = Uri.parse("google.navigation:q=" + centerLat + "," + centerLon);
@@ -176,7 +177,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
                     Intent areaShareIntent = new Intent(AreaDetailsActivity.this, AreaShareActivity.class);
                     startActivity(areaShareIntent);
                 } else {
-                    showErrorMessage("You do not have area sharing rights !!");
+                    showErrorMessage("You do not have area sharing rights !!", "error");
                 }
             }
         });
@@ -189,7 +190,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
                     Intent intent = new Intent(AreaDetailsActivity.this, AreaAddResourcesActivity.class);
                     startActivity(intent);
                 } else {
-                    showErrorMessage("You do not have resource modification rights !!");
+                    showErrorMessage("You do not have resource modification rights !!", "error");
                 }
             }
         });
@@ -202,6 +203,18 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
                 startActivity(intent);
             }
         });
+
+        showErrorsIfAny();
+    }
+
+    private void showErrorsIfAny() {
+        Bundle intentBundle = getIntent().getExtras();
+        if(intentBundle != null){
+            String action = intentBundle.getString("action");
+            String outcome = intentBundle.getString("outcome");
+            String outcomeType = intentBundle.getString("outcome_type");
+            showErrorMessage(action + " " + outcomeType + ". " + outcome , "error");
+        }
     }
 
     @Override
@@ -329,11 +342,30 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
                 .show();
     }
 
-    private void showErrorMessage(String message) {
-        Snackbar snackbar = Snackbar.make(getWindow().getDecorView(), message, Snackbar.LENGTH_LONG);
+    private void showErrorMessage(String message, String type) {
+        final Snackbar snackbar = Snackbar.make(getWindow().getDecorView(), message, Snackbar.LENGTH_INDEFINITE);
+
         View sbView = snackbar.getView();
+        snackbar.getView().setBackgroundColor(Color.WHITE);
+
         TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
-        textView.setTextColor(Color.RED);
+        if(type.equalsIgnoreCase("info")){
+            textView.setTextColor(Color.GREEN);
+        } else if(type.equalsIgnoreCase("error")) {
+            textView.setTextColor(Color.RED);
+        }else{
+            textView.setTextColor(Color.DKGRAY);
+        }
+        textView.setTypeface(Typeface.SANS_SERIF,Typeface.BOLD);
+        textView.setTextSize(15);
+        textView.setMaxLines(3);
+
+        snackbar.setAction("Dismiss", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                snackbar.dismiss();
+            }
+        });
         snackbar.show();
     }
 

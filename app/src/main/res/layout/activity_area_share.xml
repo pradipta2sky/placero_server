@@ -43,7 +43,9 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="top"
                     android:layout_weight="0.6"
-                    android:minWidth="100dp" />
+                    android:minWidth="100dp"
+                    android:inputType="textPhonetic"
+                    />
             </LinearLayout>
 
             <LinearLayout
