@@ -19,6 +19,22 @@
 
     </android.support.v7.widget.Toolbar>
 
+    <LinearLayout
+        android:id="@+id/splash_panel"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:gravity="center"
+        android:visibility="gone"
+        android:layout_weight="0.8"
+        android:orientation="vertical"
+        >
+        <ProgressBar
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:indeterminate="true"
+            android:layout_gravity="center_vertical|center_horizontal"/>
+    </LinearLayout>
+
     <ScrollView
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
@@ -26,7 +42,9 @@
         android:fillViewport="true"
         android:layout_margin="10dp"
         android:layout_weight="0.8"
-        android:id="@+id/position_list_scroll">
+        android:id="@+id/position_list_scroll"
+        android:visibility="gone"
+        >
 
         <ListView
             android:id="@+id/positionList"
@@ -44,7 +62,8 @@
         android:orientation="vertical"
         android:layout_weight="0.8"
         android:id="@+id/position_list_empty_img"
-        android:background="@color/white">
+        android:background="@color/white"
+        android:visibility="gone">
         <ImageView
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
@@ -52,21 +71,6 @@
             android:src="@drawable/area_details_tutorial"
             />
     </LinearLayout>
-
-    <RelativeLayout
-        android:id="@+id/splash_panel"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:gravity="center"
-        android:visibility="gone"
-        android:layout_weight="0.8">
-
-        <ProgressBar
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:indeterminate="true" />
-    </RelativeLayout>
-
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar_bottom"
@@ -84,5 +88,6 @@
             android:id="@+id/bottom_toolbar_include" />
 
     </android.support.v7.widget.Toolbar>
+
 
 </LinearLayout>

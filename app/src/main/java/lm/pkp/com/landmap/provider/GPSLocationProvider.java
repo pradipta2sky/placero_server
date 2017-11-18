@@ -50,7 +50,8 @@ public class GPSLocationProvider implements LocationListener {
             handler.postDelayed(new Runnable() {
                 public void run() {
                     locationManager.removeUpdates(GPSLocationProvider.this);
-                    if(pe.getUniqueId().equalsIgnoreCase("")){
+                    String uniqueId = pe.getUniqueId();
+                    if(uniqueId == null){
                         notifyFailureForLocationFix();
                     }
                 }

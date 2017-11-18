@@ -84,6 +84,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         }
         areaNameView.setText(areaName);
 
+        findViewById(R.id.splash_panel).setVisibility(View.GONE);
         if(positionList.size() == 0){
             findViewById(R.id.position_list_scroll).setVisibility(View.GONE);
             findViewById(R.id.position_list_empty_img).setVisibility(View.VISIBLE);
@@ -121,6 +122,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
             public void onClick(View v) {
                 if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.MARK_POSITION)) {
                     findViewById(R.id.position_list_empty_img).setVisibility(View.GONE);
+                    findViewById(R.id.position_list_scroll).setVisibility(View.GONE);
                     findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
                     new GPSLocationProvider(AreaDetailsActivity.this).getLocation();
                 } else {
@@ -238,28 +240,26 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
 
     @Override
     public void locationFixTimedOut() {
+        findViewById(R.id.splash_panel).setVisibility(View.GONE);
         if(positionList.size() == 0){
             findViewById(R.id.position_list_scroll).setVisibility(View.GONE);
             findViewById(R.id.position_list_empty_img).setVisibility(View.VISIBLE);
-            findViewById(R.id.splash_panel).setVisibility(View.GONE);
         }else {
             findViewById(R.id.position_list_scroll).setVisibility(View.VISIBLE);
             findViewById(R.id.position_list_empty_img).setVisibility(View.GONE);
-            findViewById(R.id.splash_panel).setVisibility(View.GONE);
         }
         showLocationFixFailureDialog();
     }
 
     @Override
     public void providerDisabled() {
+        findViewById(R.id.splash_panel).setVisibility(View.GONE);
         if(positionList.size() == 0){
             findViewById(R.id.position_list_scroll).setVisibility(View.GONE);
             findViewById(R.id.position_list_empty_img).setVisibility(View.VISIBLE);
-            findViewById(R.id.splash_panel).setVisibility(View.GONE);
         }else {
-            findViewById(R.id.position_list_scroll).setVisibility(View.VISIBLE);
             findViewById(R.id.position_list_empty_img).setVisibility(View.GONE);
-            findViewById(R.id.splash_panel).setVisibility(View.GONE);
+            findViewById(R.id.position_list_scroll).setVisibility(View.VISIBLE);
         }
         showEnableGPSDialog();
     }
