@@ -56,6 +56,10 @@ public class ThumbnailCreator {
         FileOutputStream fos = null;
         try {
             File thumbnailFile = new File(thumbFilePath);
+            if(thumbnailFile.exists()){
+                thumbnailFile.delete();
+            }
+            thumbnailFile.createNewFile();
             fos = new FileOutputStream(thumbnailFile);
             thumbnail.compress(Bitmap.CompressFormat.JPEG, 100, fos);
 

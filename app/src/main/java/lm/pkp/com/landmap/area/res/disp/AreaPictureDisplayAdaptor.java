@@ -47,9 +47,6 @@ final class AreaPictureDisplayAdaptor extends BaseAdapter {
         String thumbnailFilePath = thumbnailRoot + File.separatorChar + dataSet.get(position).getName();
         File thumbFile = new File(thumbnailFilePath);
 
-        // Trigger the download of the URL asynchronously into the image view.
-        final String fileUrl = "file://" + url;
-
         final Picasso picassoElem = Picasso.with(context);//
         picassoElem.load(thumbFile) //
                 .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)

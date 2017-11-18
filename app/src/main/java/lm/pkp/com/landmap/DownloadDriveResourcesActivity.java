@@ -203,6 +203,9 @@ public class DownloadDriveResourcesActivity extends Activity implements EasyPerm
                         if (!storeRoot.exists()) {
                             storeRoot.mkdirs();
                         }
+                        if(resource.getResourceId().equalsIgnoreCase("")){
+                            continue;
+                        }
                         File storeFile = new File(storeRoot.getAbsolutePath()
                                 + File.separatorChar + resource.getName());
 

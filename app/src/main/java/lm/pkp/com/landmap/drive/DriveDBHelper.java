@@ -329,6 +329,14 @@ public class DriveDBHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    public void deleteResource(DriveResource resource) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DELETE FROM " + DRIVE_TABLE_NAME + " WHERE "
+                + DRIVE_COLUMN_AREA_ID + "='" + resource.getAreaId() + "' and "
+                + DRIVE_COLUMN_NAME + "='" + resource.getName() + "'");
+        db.close();
+    }
+
 
     public void deleteDriveElementsLocally() {
         SQLiteDatabase db = this.getWritableDatabase();

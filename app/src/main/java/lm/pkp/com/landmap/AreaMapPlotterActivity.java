@@ -3,11 +3,10 @@ package lm.pkp.com.landmap;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
-import android.os.AsyncTask;
+import android.graphics.Matrix;
 import android.os.Bundle;
-import android.os.Environment;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.view.ViewGroup;
@@ -28,9 +27,7 @@ import com.google.android.gms.maps.model.PolygonOptions;
 import com.google.maps.android.SphericalUtil;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
@@ -42,12 +39,13 @@ import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.custom.MapWrapperLayout;
 import lm.pkp.com.landmap.custom.OnInfoWindowElemTouchListener;
+import lm.pkp.com.landmap.custom.ThumbnailCreator;
+import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
 import lm.pkp.com.landmap.permission.PermissionConstants;
 import lm.pkp.com.landmap.permission.PermissionManager;
 import lm.pkp.com.landmap.position.PositionElement;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
-import lm.pkp.com.landmap.sync.LocalFolderStructureManager;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.util.FileUtil;
 
@@ -57,12 +55,16 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
     private LinkedHashMap<Marker, PositionElement> areaMarkers = new LinkedHashMap<>();
     private Polygon polygon = null;
     private Marker centerMarker = null;
+    private String centerLat;
+    private String centerLong;
 
+    private MapWrapperLayout mapWrapperLayout = null;
     private ViewGroup infoWindow;
     private TextView infoTitle;
     private TextView infoSnippet;
     private Button infoButton;
     private OnInfoWindowElemTouchListener infoButtonListener;
+    private SupportMapFragment mapFragment = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,20 +72,24 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
         new GenericActivityExceptionHandler(this);
 
         setContentView(R.layout.activity_area_plotter);
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
+        mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.googleMap);
         mapFragment.getMapAsync(this);
     }
 
     @Override
-    public void onMapReady(GoogleMap googleMap) {
+    public void onMapReady(final GoogleMap googleMap) {
         this.googleMap = googleMap;
         googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
         googleMap.setIndoorEnabled(true);
         googleMap.setMyLocationEnabled(true);
         googleMap.setBuildingsEnabled(true);
-
-
+        googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+            @Override
+            public void onMapLoaded() {
+                googleMap.snapshot(new MapSnapshotTaker());
+            }
+        });
         UiSettings settings = googleMap.getUiSettings();
         settings.setMapToolbarEnabled(true);
         settings.setAllGesturesEnabled(true);
@@ -92,13 +98,14 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
         settings.setZoomGesturesEnabled(true);
 
 
-        final MapWrapperLayout mapWrapperLayout = (MapWrapperLayout) findViewById(R.id.map_relative_layout);
+        mapWrapperLayout = (MapWrapperLayout) findViewById(R.id.map_relative_layout);
         mapWrapperLayout.init(googleMap, getPixelsFromDp(getApplicationContext(), 39 + 20));
-        this.infoWindow = (ViewGroup) getLayoutInflater().inflate(R.layout.info_window, null);
-        this.infoTitle = (TextView) infoWindow.findViewById(R.id.title);
-        this.infoSnippet = (TextView) infoWindow.findViewById(R.id.snippet);
-        this.infoButton = (Button) infoWindow.findViewById(R.id.button);
-        this.infoButtonListener = new OnInfoWindowElemTouchListener(infoButton,
+
+        infoWindow = (ViewGroup) getLayoutInflater().inflate(R.layout.info_window, null);
+        infoTitle = (TextView) infoWindow.findViewById(R.id.title);
+        infoSnippet = (TextView) infoWindow.findViewById(R.id.snippet);
+        infoButton = (Button) infoWindow.findViewById(R.id.button);
+        infoButtonListener = new OnInfoWindowElemTouchListener(infoButton,
                 getResources().getDrawable(R.drawable.round_but_green_sel), //btn_default_normal_holo_light
                 getResources().getDrawable(R.drawable.round_but_red_sel)) //btn_default_pressed_holo_light
         {
@@ -112,7 +119,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                 plotPolygonUsingPositions();
             }
         };
-        this.infoButton.setOnTouchListener(infoButtonListener);
+        infoButton.setOnTouchListener(infoButtonListener);
 
         googleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
             @Override
@@ -132,7 +139,6 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                     infoButton.setVisibility(View.VISIBLE);
                     infoButtonListener.setMarker(marker);
                 }
-                mapWrapperLayout.setMarkerWithInfoWindow(marker, infoWindow);
                 return infoWindow;
             }
         });
@@ -178,7 +184,9 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
 
         final AreaElement ae = AreaContext.INSTANCE.getAreaElement();
         ae.setCenterLat(latAvg);
+        centerLat = latAvg + "";
         ae.setCenterLon(lonAvg);
+        centerLong = latAvg + "";
         ae.setMeasureSqFt(polygonAreaSqFt);
 
         if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.UPDATE_AREA)) {
@@ -188,73 +196,72 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                     adh.updateAreaOnServer(ae);
                 }
             }).start();
-        } else {
-            showWarningMessage("You do not have permissions to update the place specs. " +
-                    "\nWhatever changes you do will be lost.");
         }
 
         MarkerOptions markerOptions = new MarkerOptions().position(new LatLng(latAvg, lonAvg));
         centerMarker = googleMap.addMarker(markerOptions);
         centerMarker.setVisible(true);
-        centerMarker.setAlpha(1);
-        centerMarker.setTitle(ae.getName().concat(",").concat(ae.getDescription()));
-        centerMarker.showInfoWindow();
+        centerMarker.setAlpha(0);
+        centerMarker.setTitle("Center");
 
-        new TakeSnapshotOfPlotAsyncTask().execute();
+        googleMap.snapshot(new MapSnapshotTaker());
+
     }
 
     public Marker drawMarkerUsingPosition(final PositionElement pe) {
         LatLng position = new LatLng(pe.getLat(), pe.getLon());
         Marker marker = googleMap.addMarker((new MarkerOptions().position(position)));
         marker.setTitle(pe.getUniqueId());
-        marker.setDraggable(true);
-        googleMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
-            @Override
-            public void onMarkerDragStart(Marker marker) {
-            }
+        marker.setDraggable(false);
+        if(PermissionManager.INSTANCE.hasAccess(PermissionConstants.UPDATE_AREA)){
+            marker.setDraggable(true);
+            googleMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+                @Override
+                public void onMarkerDragStart(Marker marker) {
+                }
+                @SuppressWarnings("unchecked")
+                @Override
+                public void onMarkerDragEnd(Marker marker) {
+                    googleMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
 
-            @SuppressWarnings("unchecked")
-            @Override
-            public void onMarkerDragEnd(Marker marker) {
-                googleMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+                    PositionElement newPositionElem = new PositionElement();
+                    String pid = UUID.randomUUID().toString();
+                    newPositionElem.setUniqueId(pid);
+                    newPositionElem.setUniqueAreaId(AreaContext.INSTANCE.getAreaElement().getUniqueId());
+                    newPositionElem.setName("P_" + pid);
+                    newPositionElem.setDescription("No Description");
+                    newPositionElem.setTags("");
+                    newPositionElem.setLat(marker.getPosition().latitude);
+                    newPositionElem.setLon(marker.getPosition().longitude);
 
-                PositionElement newPositionElem = new PositionElement();
-                String pid = UUID.randomUUID().toString();
-                newPositionElem.setUniqueId(pid);
-                newPositionElem.setUniqueAreaId(AreaContext.INSTANCE.getAreaElement().getUniqueId());
-                newPositionElem.setName("P_" + pid);
-                newPositionElem.setDescription("No Description");
-                newPositionElem.setTags("");
-                newPositionElem.setLat(marker.getPosition().latitude);
-                newPositionElem.setLon(marker.getPosition().longitude);
+                    PositionsDBHelper pdh = new PositionsDBHelper(getApplicationContext());
+                    pdh.insertPositionLocally(newPositionElem);
+                    pdh.insertPositionToServer(newPositionElem);
 
-                PositionsDBHelper pdh = new PositionsDBHelper(getApplicationContext());
-                pdh.insertPositionLocally(newPositionElem);
-                pdh.insertPositionToServer(newPositionElem);
+                    final List<PositionElement> areaPositions
+                            = AreaContext.INSTANCE.getAreaElement().getPositions();
+                    areaPositions.add(newPositionElem);
 
-                final List<PositionElement> areaPositions
-                        = AreaContext.INSTANCE.getAreaElement().getPositions();
-                areaPositions.add(newPositionElem);
+                    pdh.deletePosition(areaMarkers.get(marker));
+                    areaPositions.remove(areaMarkers.get(marker));
 
-                pdh.deletePosition(areaMarkers.get(marker));
-                areaPositions.remove(areaMarkers.get(marker));
+                    polygon.remove();
+                    plotPolygonUsingPositions();
+                }
+                @Override
+                public void onMarkerDrag(Marker marker) {
+                }
+            });
 
-                polygon.remove();
-                plotPolygonUsingPositions();
-            }
-
-            @Override
-            public void onMarkerDrag(Marker marker) {
-            }
-        });
+        }
         return marker;
     }
 
     private void zoomCameraToPosition(double latAvg, double lonAvg) {
         LatLng position = new LatLng(latAvg, lonAvg);
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(position, 19f);
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(position, 20f);
         googleMap.animateCamera(cameraUpdate);
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(position, 19f));
+        googleMap.moveCamera(cameraUpdate);
     }
 
     public static int getPixelsFromDp(Context context, float dp) {
@@ -267,71 +274,93 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
         googleMap.clear();
         googleMap = null;
 
+        finish();
         Intent positionMarkerIntent = new Intent(AreaMapPlotterActivity.this, AreaDetailsActivity.class);
         startActivity(positionMarkerIntent);
     }
 
-
-    private void showWarningMessage(String message) {
-        Snackbar snackbar = Snackbar.make(getWindow().getDecorView(), message, Snackbar.LENGTH_LONG);
-        View sbView = snackbar.getView();
-        TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
-        textView.setTextColor(Color.YELLOW);
-        snackbar.show();
-    }
-
-    private class TakeSnapshotOfPlotAsyncTask extends AsyncTask{
+    private class MapSnapshotTaker implements GoogleMap.SnapshotReadyCallback{
 
         @Override
-        protected Object doInBackground(Object[] params) {
-            takeSnap();
-            return null;
-        }
-    }
+        public void onSnapshotReady(Bitmap snapshot) {
+            try{
+                final AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
+                final File imageStorageDir = AreaContext.INSTANCE.getAreaLocalImageRoot(areaElement.getUniqueId());
+                final String dirPath = imageStorageDir.getAbsolutePath();
 
-    private void takeSnap() {
-        View v = getWindow().getDecorView().getRootView();
-        v.setDrawingCacheEnabled(true);
-        Bitmap bmp = Bitmap.createBitmap(v.getDrawingCache());
-        v.setDrawingCacheEnabled(false);
-        try {
-            final AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
-            final File imageStorageDir = LocalFolderStructureManager.getImageStorageDir();
-            final String dirPath = imageStorageDir.getAbsolutePath();
-
-            String screenShotFolderPath = dirPath + areaElement.getUniqueId();
-            final File screenshotFolder = new File(screenShotFolderPath);
-            if(!screenshotFolder.exists()){
-                screenshotFolder.mkdirs();
-            }
-            String screenShotFileName = "plot_screenshot.png";
-            String screenShotFilePath = screenShotFolderPath + File.separatorChar + screenShotFileName;
-            File screenShotFile = new File(screenShotFilePath);
-            if(!screenShotFile.exists()){
+                String screenshotFileName = "plot_screenshot.png";
+                String screenShotFilePath = dirPath + File.separatorChar + screenshotFileName;
+                File screenShotFile = new File(screenShotFilePath);
+                if(screenShotFile.exists()){
+                    screenShotFile.delete();
+                }
                 screenShotFile.createNewFile();
+
+                View rootView = mapFragment.getView();
+                rootView.setDrawingCacheEnabled(true);
+                Bitmap backBitmap = rootView.getDrawingCache();
+                Bitmap bmOverlay = Bitmap.createBitmap(
+                        backBitmap.getWidth(), backBitmap.getHeight(),
+                        backBitmap.getConfig());
+                Canvas canvas = new Canvas(bmOverlay);
+                canvas.drawBitmap(snapshot, new Matrix(), null);
+                canvas.drawBitmap(backBitmap, 0, 0, null);
+
+                FileOutputStream fos = new FileOutputStream(screenShotFile);
+                bmOverlay.compress(Bitmap.CompressFormat.PNG, 90, fos);
+                fos.flush();
+                fos.close();
+
+                backBitmap.recycle();
+                bmOverlay.recycle();
+
+                List<DriveResource> driveResources = areaElement.getDriveResources();
+
+                DriveResource screenShotResource = null;
+                for (int i = 0; i < driveResources.size(); i++) {
+                    DriveResource resource = driveResources.get(i);
+                    if(resource.getType().equalsIgnoreCase("file")){
+                        String resourceName = resource.getName();
+                        if(resourceName.equalsIgnoreCase(screenshotFileName)){
+                            screenShotResource = resource;
+                            break;
+                        }
+                    }
+                }
+
+                DriveResource resource = new DriveResource();
+                resource.setUniqueId(UUID.randomUUID().toString());
+                resource.setContainerId(AreaContext.INSTANCE.getImagesRootDriveResource().getResourceId());
+                resource.setContentType("Image");
+                resource.setMimeType(FileUtil.getMimeType(screenShotFile));
+                resource.setType("file");
+                resource.setUserId(UserContext.getInstance().getUserElement().getEmail());
+                resource.setAreaId(areaElement.getUniqueId());
+                resource.setName(screenshotFileName);
+                resource.setSize(screenShotFile.length() + "");
+                resource.setLatitude(centerLat);
+                resource.setLongitude(centerLong);
+                resource.setPath(screenShotFilePath);
+
+                DriveDBHelper ddh = new DriveDBHelper(getApplicationContext());
+                if(screenShotResource == null){
+                    ddh.insertResourceLocally(resource);
+                    ddh.insertResourceToServer(resource);
+                }else {
+                    ddh.deleteResource(screenShotResource);
+                    ddh.insertResourceLocally(resource);
+                    ddh.updateResourceOnServer(resource);
+                    driveResources.remove(screenShotResource);
+                }
+                driveResources.add(resource);
+
+                ThumbnailCreator creator = new ThumbnailCreator(getApplicationContext());
+                creator.createImageThumbnail(screenShotFile, areaElement.getUniqueId());
+
+            }catch (Exception e){
+                e.printStackTrace();
             }
-            FileOutputStream fos = new FileOutputStream(screenShotFile);
-            bmp.compress(Bitmap.CompressFormat.PNG, 100, fos);
-            fos.flush();
-            fos.close();
 
-            DriveResource dr = new DriveResource();
-            dr.setContainerId(AreaContext.INSTANCE.getImagesRootDriveResource().getResourceId());
-            dr.setContentType("Image");
-            dr.setUserId(UserContext.getInstance().getUserElement().getEmail());
-            dr.setMimeType(FileUtil.getMimeType(screenShotFile));
-            dr.setAreaId(areaElement.getUniqueId());
-            dr.setName(screenShotFileName);
-            dr.setSize(screenShotFile.length() + "");
-            dr.setType("file");
-            dr.setUniqueId(UUID.randomUUID().toString());
-
-            areaElement.getDriveResources().add(dr);
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
