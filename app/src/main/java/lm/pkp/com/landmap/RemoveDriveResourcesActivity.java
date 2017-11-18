@@ -189,9 +189,19 @@ public class RemoveDriveResourcesActivity extends Activity implements EasyPermis
                 List<DriveResource> resources = ae.getDriveResources();
                 for (int j = 0; j < resources.size(); j++) {
                     DriveResource resource = resources.get(j);
-                    File storeRoot = ac.getLocalStoreLocationForDriveResource(resource);
-                    FileUtils.deleteDirectory(storeRoot);
-                    mService.files().delete(resource.getContainerId());
+                    if(resource.getType().equalsIgnoreCase("File")){
+                        File storeRoot = ac.getLocalStoreLocationForDriveResource(resource);
+                        if(storeRoot != null){
+                            if(storeRoot.exists()){
+                                FileUtils.deleteDirectory(storeRoot);
+                            }
+                        }
+                        continue;
+                    }
+                    if(resource.getContainerId().trim().equalsIgnoreCase("")){
+                        // Delete only the area specific folders and not the common folders.
+                        mService.files().delete(resource.getResourceId());
+                    }
                 }
             } catch (Exception e) {
                 mLastError = e;

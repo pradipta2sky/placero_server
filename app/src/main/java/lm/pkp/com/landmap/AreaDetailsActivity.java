@@ -105,7 +105,6 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
             @Override
             public void onClick(View v) {
                 if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.REMOVE_AREA)) {
-                    findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
                     final AreaDBHelper adh = new AreaDBHelper(getApplicationContext(), new DeleteAreaCallback());
                     adh.deleteArea(ae);
                     adh.deleteAreaFromServer(ae);
