@@ -1,14 +1,18 @@
 package lm.pkp.com.landmap;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -82,6 +86,10 @@ public class AreaAddResourcesActivity extends AppCompatActivity {
         driveUploadButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(adaptor.getCount() == 0){
+                    showErrorMessage("Nothing to upload.", "error");
+                    return;
+                }
                 Intent i = new Intent(AreaAddResourcesActivity.this, UploadResourcesActivity.class);
                 startActivity(i);
             }
@@ -105,4 +113,32 @@ public class AreaAddResourcesActivity extends AppCompatActivity {
         Intent i = new Intent(AreaAddResourcesActivity.this, AreaDetailsActivity.class);
         startActivity(i);
     }
+
+    private void showErrorMessage(String message, String type) {
+        final Snackbar snackbar = Snackbar.make(getWindow().getDecorView(), message, Snackbar.LENGTH_INDEFINITE);
+
+        View sbView = snackbar.getView();
+        snackbar.getView().setBackgroundColor(Color.WHITE);
+
+        TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+        if(type.equalsIgnoreCase("info")){
+            textView.setTextColor(Color.GREEN);
+        } else if(type.equalsIgnoreCase("error")) {
+            textView.setTextColor(Color.RED);
+        }else{
+            textView.setTextColor(Color.DKGRAY);
+        }
+        textView.setTypeface(Typeface.SANS_SERIF,Typeface.BOLD);
+        textView.setTextSize(15);
+        textView.setMaxLines(3);
+
+        snackbar.setAction("Dismiss", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                snackbar.dismiss();
+            }
+        });
+        snackbar.show();
+    }
+
 }

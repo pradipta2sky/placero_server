@@ -53,7 +53,7 @@ public class AreaCameraPictureActivity extends Activity implements LocationPosit
     }
 
     private void startPositioning() {
-        new GPSLocationProvider(AreaCameraPictureActivity.this, this, 20).getLocation();
+        new GPSLocationProvider(AreaCameraPictureActivity.this, this, 30).getLocation();
     }
 
     /**

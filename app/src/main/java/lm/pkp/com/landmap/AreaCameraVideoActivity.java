@@ -48,7 +48,7 @@ public class AreaCameraVideoActivity extends Activity implements LocationPositio
     }
 
     private void startPositioning() {
-        new GPSLocationProvider(AreaCameraVideoActivity.this, this, 20).getLocation();
+        new GPSLocationProvider(AreaCameraVideoActivity.this, this, 60).getLocation();
     }
 
     /**
@@ -111,6 +111,8 @@ public class AreaCameraVideoActivity extends Activity implements LocationPositio
                 resource.setMimeType(FileUtil.getMimeType(videoFile));
                 resource.setContentType("Video");
                 resource.setContainerId(areaContext.getVideosRootDriveResource().getResourceId());
+                resource.setLatitude(videoResource.getLatitude());
+                resource.setLongitude(videoResource.getLongitude());
 
                 AreaContext.INSTANCE.addResourceToQueue(resource);
 

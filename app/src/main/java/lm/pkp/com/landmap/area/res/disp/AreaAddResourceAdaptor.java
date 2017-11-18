@@ -38,7 +38,15 @@ public class AreaAddResourceAdaptor extends ArrayAdapter<DriveResource> {
         nameText.setText(dr.getName());
 
         TextView filePathText = (TextView) v.findViewById(R.id.ar_file_path);
-        filePathText.setText(dr.getPath());
+        String message = "";
+        String resLat = dr.getLatitude();
+        String resLong = dr.getLongitude();
+        if(!resLat.trim().equalsIgnoreCase("")){
+            message = "Position: " + resLat + ", " + resLong;
+            filePathText.setText(message);
+        }else {
+            filePathText.setText(dr.getPath());
+        }
 
         return v;
     }

@@ -13,6 +13,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 
+import java.util.UUID;
+
 import lm.pkp.com.landmap.custom.LocationPositionReceiver;
 import lm.pkp.com.landmap.position.PositionElement;
 
@@ -20,7 +22,8 @@ public class GPSLocationProvider implements LocationListener {
 
     private final Activity activity;
     private LocationPositionReceiver receiver = null;
-    private int timeout = 30;
+    private int timeout = 60;
+    private PositionElement pe = new PositionElement();
 
     public GPSLocationProvider(Activity activity) {
         this.activity = activity;
@@ -47,7 +50,9 @@ public class GPSLocationProvider implements LocationListener {
             handler.postDelayed(new Runnable() {
                 public void run() {
                     locationManager.removeUpdates(GPSLocationProvider.this);
-                    notifyFailureForLocationFix();
+                    if(pe.getUniqueId().equalsIgnoreCase("")){
+                        notifyFailureForLocationFix();
+                    }
                 }
             }, (1000 * timeout));
         } catch (Exception e) {
@@ -57,7 +62,7 @@ public class GPSLocationProvider implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-        PositionElement pe = new PositionElement();
+        pe.setUniqueId(UUID.randomUUID().toString());
         pe.setLon(location.getLongitude());
         pe.setLat(location.getLatitude());
         if(receiver != null){
