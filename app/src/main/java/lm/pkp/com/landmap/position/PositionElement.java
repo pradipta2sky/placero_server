@@ -1,5 +1,9 @@
 package lm.pkp.com.landmap.position;
 
+import android.location.Location;
+
+import com.google.android.gms.maps.model.LatLng;
+
 import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.Serializable;
@@ -9,14 +13,14 @@ import java.io.Serializable;
  */
 public class PositionElement implements Serializable {
 
-    private String name;
-    private String description;
-    private double lat;
-    private double lon;
-    private String tags;
-    private Integer viewPos;
-    private String uniqueAreaId;
-    private String uniqueId;
+    private String name = "";
+    private String description = "";
+    private double lat = 0;
+    private double lon = 0;
+    private String tags = "";
+    private String uniqueAreaId = "";
+    private String uniqueId = "";
+    private String createdOnMillis = "";
 
     public String getName() {
         return name;
@@ -58,22 +62,6 @@ public class PositionElement implements Serializable {
         this.tags = tags;
     }
 
-    public Integer getViewPos() {
-        return viewPos;
-    }
-
-    public void setViewPos(Integer viewPos) {
-        this.viewPos = viewPos;
-    }
-
-    public boolean isPositionValid() {
-        if (lat != 0.0 && lon != 0.0) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
     public String getUniqueAreaId() {
         return uniqueAreaId;
     }
@@ -93,4 +81,13 @@ public class PositionElement implements Serializable {
     public PositionElement copy() {
         return SerializationUtils.clone(this);
     }
+
+    public String getCreatedOnMillis() {
+        return this.createdOnMillis;
+    }
+
+    public void setCreatedOnMillis(String createdOnMillis) {
+        this.createdOnMillis = createdOnMillis;
+    }
+
 }

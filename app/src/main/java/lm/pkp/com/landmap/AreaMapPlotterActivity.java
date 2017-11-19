@@ -10,6 +10,7 @@ import android.graphics.Matrix;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.text.format.DateUtils;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -32,6 +33,8 @@ import com.google.maps.android.SphericalUtil;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
@@ -42,7 +45,9 @@ import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.custom.MapWrapperLayout;
+import lm.pkp.com.landmap.custom.MarkerSorter;
 import lm.pkp.com.landmap.custom.OnInfoWindowElemTouchListener;
+import lm.pkp.com.landmap.custom.PositionSorter;
 import lm.pkp.com.landmap.custom.ThumbnailCreator;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
@@ -60,8 +65,6 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
     private LinkedHashMap<Marker, DriveResource> resourceMarkers = new LinkedHashMap<>();
     private Polygon polygon = null;
     private Marker centerMarker = null;
-    private String centerLat;
-    private String centerLong;
 
     private MapWrapperLayout mapWrapperLayout = null;
     private ViewGroup infoWindow;
@@ -195,12 +198,16 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                             infoImage.setImageBitmap(bMap);
                         }
                         infoTitle.setText(resource.getName());
-                        infoSnippet.setText(resource.getUserId());
+                        CharSequence timeSpan = DateUtils.getRelativeTimeSpanString(new Long(resource.getCreatedOnMillis()),
+                                System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS);
+                        infoSnippet.setText(timeSpan.toString());
                         infoButton.setText("Open");
                     }else {
                         infoImage.setImageResource(R.drawable.marker_image);
                         infoTitle.setText(position.getName());
-                        infoSnippet.setText("");
+                        CharSequence timeSpan = DateUtils.getRelativeTimeSpanString(new Long(position.getCreatedOnMillis()),
+                                System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS);
+                        infoSnippet.setText(timeSpan.toString());
                         infoButton.setText("Remove");
                     }
                 }
@@ -247,42 +254,53 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
         List<PositionElement> positionElements = AreaContext.INSTANCE.getAreaElement().getPositions();
         int noOfPositions = positionElements.size();
 
-        Set<Marker> markerSet = areaMarkers.keySet();
-        for (Marker m : markerSet) {
+        Set<Marker> markers = areaMarkers.keySet();
+        for (Marker m : markers) {
             m.remove();
         }
-        areaMarkers = new LinkedHashMap<>();
+        areaMarkers.clear();
         if (centerMarker != null) {
             centerMarker.remove();
         }
 
-        PolygonOptions polyOptions = new PolygonOptions();
-        polyOptions = polyOptions.strokeColor(Color.RED).fillColor(Color.DKGRAY);
+        double latSum = 0.0;
+        double longSum = 0.0;
 
-        double latTotal = 0.0;
-        double lonTotal = 0.0;
+        areaMarkers = new LinkedHashMap<>();
         for (int i = 0; i < noOfPositions; i++) {
             PositionElement pe = positionElements.get(i);
             Marker m = drawMarkerUsingPosition(pe);
-            latTotal += pe.getLat();
-            lonTotal += pe.getLon();
+            latSum += pe.getLat();
+            longSum += pe.getLon();
             areaMarkers.put(m, pe);
+        }
+        final double latAvg = latSum / noOfPositions;
+        final double lonAvg = longSum / noOfPositions;
+
+        MarkerOptions markerOptions = new MarkerOptions().position(new LatLng(latAvg, lonAvg));
+        centerMarker = googleMap.addMarker(markerOptions);
+        centerMarker.setVisible(true);
+        centerMarker.setAlpha((float) 0.5);
+        centerMarker.setTitle("Center");
+        zoomCameraToPosition(centerMarker);
+
+        PolygonOptions polyOptions = new PolygonOptions();
+        polyOptions = polyOptions.strokeColor(Color.RED).fillColor(Color.DKGRAY);
+        markers = areaMarkers.keySet();
+
+        List<Marker> markerList = new ArrayList<>(markers);
+        MarkerSorter.sortMarkers(markerList,centerMarker);
+        for (Marker m : markerList) {
             polyOptions.add(m.getPosition());
         }
         polygon = googleMap.addPolygon(polyOptions);
-
-        final double latAvg = latTotal / noOfPositions;
-        final double lonAvg = lonTotal / noOfPositions;
-        zoomCameraToPosition(latAvg, lonAvg);
 
         double polygonAreaSqMt = SphericalUtil.computeArea(polygon.getPoints());
         double polygonAreaSqFt = polygonAreaSqMt * 10.7639;
 
         final AreaElement ae = AreaContext.INSTANCE.getAreaElement();
         ae.setCenterLat(latAvg);
-        centerLat = latAvg + "";
         ae.setCenterLon(lonAvg);
-        centerLong = latAvg + "";
         ae.setMeasureSqFt(polygonAreaSqFt);
 
         if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.UPDATE_AREA)) {
@@ -295,11 +313,6 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
             }).start();
         }
 
-        MarkerOptions markerOptions = new MarkerOptions().position(new LatLng(latAvg, lonAvg));
-        centerMarker = googleMap.addMarker(markerOptions);
-        centerMarker.setVisible(true);
-        centerMarker.setAlpha((float) 0.5);
-        centerMarker.setTitle("Center");
     }
 
     public Marker drawMarkerUsingPosition(final PositionElement pe) {
@@ -353,8 +366,8 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
         return marker;
     }
 
-    private void zoomCameraToPosition(double latAvg, double lonAvg) {
-        LatLng position = new LatLng(latAvg, lonAvg);
+    private void zoomCameraToPosition(Marker marker) {
+        LatLng position = marker.getPosition();
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(position, 21f);
         googleMap.animateCamera(cameraUpdate);
         googleMap.moveCamera(cameraUpdate);
@@ -434,8 +447,8 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                 resource.setAreaId(areaElement.getUniqueId());
                 resource.setName(screenshotFileName);
                 resource.setSize(screenShotFile.length() + "");
-                resource.setLatitude(centerLat);
-                resource.setLongitude(centerLong);
+                resource.setLatitude(areaElement.getCenterLat() + "");
+                resource.setLongitude(areaElement.getCenterLon() + "");
                 resource.setPath(screenShotFilePath);
 
                 DriveDBHelper ddh = new DriveDBHelper(getApplicationContext());
@@ -456,7 +469,6 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
         }
     }
 

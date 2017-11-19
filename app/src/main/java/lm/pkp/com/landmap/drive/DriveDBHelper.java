@@ -41,6 +41,7 @@ public class DriveDBHelper extends SQLiteOpenHelper {
     public static final String DRIVE_COLUMN_SIZE = "size";
     public static final String DRIVE_COLUMN_LATITUDE = "latitude";
     public static final String DRIVE_COLUMN_LONGITUDE = "longitude";
+    public static final String DRIVE_COLUMN_CREATED_MILLIS = "created_millis";
 
     public DriveDBHelper(Context context, AsyncTaskCallback callback) {
         super(context, DATABASE_NAME, null, 1);
@@ -66,6 +67,7 @@ public class DriveDBHelper extends SQLiteOpenHelper {
                         DRIVE_COLUMN_MIME_TYPE + " text," +
                         DRIVE_COLUMN_LATITUDE + " text," +
                         DRIVE_COLUMN_LONGITUDE + " text," +
+                        DRIVE_COLUMN_CREATED_MILLIS + " text," +
                         DRIVE_COLUMN_SIZE + " text)"
         );
     }
@@ -92,6 +94,7 @@ public class DriveDBHelper extends SQLiteOpenHelper {
         contentValues.put(DRIVE_COLUMN_SIZE, dr.getSize());
         contentValues.put(DRIVE_COLUMN_LATITUDE, dr.getLatitude());
         contentValues.put(DRIVE_COLUMN_LONGITUDE, dr.getLongitude());
+        contentValues.put(DRIVE_COLUMN_CREATED_MILLIS, dr.getCreatedOnMillis());
 
         db.insert(DRIVE_TABLE_NAME, null, contentValues);
         db.close();
@@ -123,6 +126,7 @@ public class DriveDBHelper extends SQLiteOpenHelper {
         contentValues.put(DRIVE_COLUMN_SIZE, dr.getSize());
         contentValues.put(DRIVE_COLUMN_LATITUDE, dr.getLatitude());
         contentValues.put(DRIVE_COLUMN_LONGITUDE, dr.getLongitude());
+        contentValues.put(DRIVE_COLUMN_CREATED_MILLIS, dr.getCreatedOnMillis());
 
         db.insert(DRIVE_TABLE_NAME, null, contentValues);
         db.close();
@@ -157,6 +161,7 @@ public class DriveDBHelper extends SQLiteOpenHelper {
                     dr.setSize(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_SIZE)));
                     dr.setLatitude(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_LATITUDE)));
                     dr.setLongitude(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_LONGITUDE)));
+                    dr.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CREATED_MILLIS)));
 
                     allResources.add(dr);
                     cursor.moveToNext();
@@ -197,6 +202,7 @@ public class DriveDBHelper extends SQLiteOpenHelper {
                     resource.setSize(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_SIZE)));
                     resource.setLatitude(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_LATITUDE)));
                     resource.setLongitude(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_LONGITUDE)));
+                    resource.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CREATED_MILLIS)));
                     break;
                 }
             }
@@ -238,6 +244,7 @@ public class DriveDBHelper extends SQLiteOpenHelper {
                     resource.setSize(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_SIZE)));
                     resource.setLatitude(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_LATITUDE)));
                     resource.setLongitude(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_LONGITUDE)));
+                    resource.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CREATED_MILLIS)));
 
                     Map<String, DriveResource> commonResources = getCommonResources();
                     DriveResource commonParent = commonResources.get(parentName);
@@ -287,6 +294,7 @@ public class DriveDBHelper extends SQLiteOpenHelper {
                     dr.setSize("0");
                     dr.setLatitude("");
                     dr.setLongitude("");
+                    dr.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CREATED_MILLIS)));
 
                     resources.put(dr.getName(), dr);
                     cursor.moveToNext();
@@ -329,6 +337,7 @@ public class DriveDBHelper extends SQLiteOpenHelper {
                     resource.setSize(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_SIZE)));
                     resource.setLatitude(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_LATITUDE)));
                     resource.setLongitude(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_LONGITUDE)));
+                    resource.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CREATED_MILLIS)));
 
                     resources.add(resource);
                     cursor.moveToNext();
@@ -361,7 +370,6 @@ public class DriveDBHelper extends SQLiteOpenHelper {
             postParams.put(DRIVE_COLUMN_SIZE, dr.getSize());
             postParams.put(DRIVE_COLUMN_LATITUDE, dr.getLatitude());
             postParams.put(DRIVE_COLUMN_LONGITUDE, dr.getLongitude());
-
         } catch (JSONException e) {
             e.printStackTrace();
         }

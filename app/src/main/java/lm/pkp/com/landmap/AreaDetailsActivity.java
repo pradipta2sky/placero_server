@@ -136,11 +136,11 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
             @Override
             public void onClick(View v) {
                 final List<PositionElement> positions = ae.getPositions();
-                if (positions.size() >= 3) {
+                if (positions.size() >= 1) {
                     Intent intent = new Intent(AreaDetailsActivity.this, AreaMapPlotterActivity.class);
                     startActivity(intent);
                 } else {
-                    showErrorMessage("You need atleast 3 points to plot.!!!", "error");
+                    showErrorMessage("You need atleast 1 points to plot.!!!", "error");
                 }
             }
         });

@@ -10,7 +10,7 @@ public class DriveResource{
     private String uniqueId = "";
     private String userId = "";
     private String areaId = "";
-    private String resourceId = "";
+    private String resourceId = "1"; // dummy for comparison
     private String containerId = "";
     private String name = "";
     private String path = "";
@@ -20,6 +20,7 @@ public class DriveResource{
     private String mimeType = "";
     private String latitude = "";
     private String longitude = "";
+    private String createdOnMillis = "";
 
     public String getUserId() {
         return userId;
@@ -132,5 +133,13 @@ public class DriveResource{
             return builder.isEquals();
         }
         return false;
+    }
+
+    public String getCreatedOnMillis() {
+        return this.createdOnMillis;
+    }
+
+    public void setCreatedOnMillis(String createdOnMillis) {
+        this.createdOnMillis = createdOnMillis;
     }
 }

@@ -16,11 +16,14 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.RemoveDriveResourcesActivity;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.drive.DriveDBHelper;
+import lm.pkp.com.landmap.drive.DriveResource;
 
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
 
@@ -81,19 +84,29 @@ final class AreaPictureDisplayAdaptor extends BaseAdapter {
             @Override
             public boolean onLongClick(View v) {
                 fragment.getView().findViewById(R.id.res_delete_layout).setVisibility(View.VISIBLE);
+                final String resourceId = dataSet.get(position).getResourceId();
                 FloatingActionButton deleteButton = (FloatingActionButton) fragment.getView().findViewById(R.id.res_delete);
                 deleteButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(referredView.getContext(), RemoveDriveResourcesActivity.class);
-                        String resourceId = dataSet.get(position).getResourceId();
-                        if(!resourceId.equalsIgnoreCase("")){
+                        if(!resourceId.equalsIgnoreCase("1")){
                             intent.putExtra("resource_ids", resourceId);
                             intent.putExtra("tab_position", tabPosition);
                             referredView.getContext().startActivity(intent);
                         }else {
                             Toast.makeText(referredView.getContext(),
-                                    "This image is auto generated. It cannot be removed.", Toast.LENGTH_LONG).show();
+                                    "Plot Image is auto generated. It will be recreated on Map plot.", Toast.LENGTH_LONG).show();
+
+                            AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
+                            List<DriveResource> driveResources = areaElement.getDriveResources();
+
+                            DriveResource driveResource = new DriveResource();
+                            driveResource.setResourceId(resourceId);
+                            driveResources.remove(driveResource);
+
+                            DriveDBHelper ddh = new DriveDBHelper(fragment.getContext());
+                            ddh.deleteResourceByResourceId(resourceId);
                         }
                     }
                 });

@@ -29,6 +29,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
     public static final String POSITION_COLUMN_TAGS = "tags";
     private static final String POSITION_COLUMN_UNIQUE_AREA_ID = "uniqueAreaId";
     private static final String POSITION_COLUMN_UNIQUE_ID = "uniqueId";
+    private static final String POSITION_COLUMN_CREATED_MILLIS = "created_millis";
 
     public PositionsDBHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
@@ -44,6 +45,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
                         POSITION_COLUMN_LON + " text," +
                         POSITION_COLUMN_UNIQUE_AREA_ID + " text," +
                         POSITION_COLUMN_UNIQUE_ID + " text," +
+                        POSITION_COLUMN_CREATED_MILLIS + " text," +
                         POSITION_COLUMN_TAGS + " text)"
         );
     }
@@ -68,6 +70,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         contentValues.put(POSITION_COLUMN_LAT, pe.getLat());
         contentValues.put(POSITION_COLUMN_LON, pe.getLon());
         contentValues.put(POSITION_COLUMN_TAGS, pe.getTags());
+        contentValues.put(POSITION_COLUMN_CREATED_MILLIS, pe.getCreatedOnMillis());
 
         db.insert(POSITION_TABLE_NAME, null, contentValues);
         db.close();
@@ -85,6 +88,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         contentValues.put(POSITION_COLUMN_LAT, pe.getLat());
         contentValues.put(POSITION_COLUMN_LON, pe.getLon());
         contentValues.put(POSITION_COLUMN_TAGS, pe.getTags());
+        contentValues.put(POSITION_COLUMN_CREATED_MILLIS, pe.getCreatedOnMillis());
 
         db.insert(POSITION_TABLE_NAME, null, contentValues);
         db.close();
@@ -134,8 +138,9 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
                 pe.setLon(Double.parseDouble(lonStr));
 
                 pe.setTags(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_TAGS)));
-                pes.add(pe);
+                pe.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_CREATED_MILLIS)));
 
+                pes.add(pe);
                 cursor.moveToNext();
             }
             cursor.close();

@@ -53,7 +53,6 @@ public class RemoveDriveResourcesActivity extends Activity implements EasyPermis
             DriveScopes.DRIVE, DriveScopes.DRIVE_FILE, DriveScopes.DRIVE_APPDATA};
 
     private String resourceIds = null;
-    private Integer tabPosition = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,9 +71,8 @@ public class RemoveDriveResourcesActivity extends Activity implements EasyPermis
             removeResources(resourceIds);
         } else {
             String resourceIds = extras.getString("resource_ids");
-            if(resourceIds != null){
+            if (resourceIds != null) {
                 this.resourceIds = resourceIds;
-                tabPosition = extras.getInt("tab_position");
             }
             removeResources(resourceIds);
         }
@@ -86,9 +84,9 @@ public class RemoveDriveResourcesActivity extends Activity implements EasyPermis
         } else if (mCredential.getSelectedAccountName() == null) {
             chooseAccount();
         } else {
-            if(resourceIds == null){
+            if (resourceIds == null) {
                 new RemoveRequestTask(mCredential).execute();
-            }else {
+            } else {
                 new RemoveRequestTask(mCredential, resourceIds).execute();
             }
         }
@@ -219,37 +217,35 @@ public class RemoveDriveResourcesActivity extends Activity implements EasyPermis
                     for (int i = 0; i < resourceArr.length; i++) {
                         String resourceID = resourceArr[i];
                         DriveResource fetchedResource = ddh.getDriveResourcesByResourceId(resourceID);
-                        if(fetchedResource != null){
-                            ddh.deleteResourceByResourceId(resourceID);
-                            ae.getDriveResources().remove(fetchedResource);
+                        ddh.deleteResourceByResourceId(resourceID);
+                        ae.getDriveResources().remove(fetchedResource);
 
-                            String contentType = fetchedResource.getContentType();
-                            String resourceRootPath = null;
-                            String thumbnailRootPath = null;
-                            if(contentType.equalsIgnoreCase("Image")){
-                                resourceRootPath = ac.getAreaLocalImageRoot(ae.getUniqueId()).getAbsolutePath();
-                                thumbnailRootPath = ac.getAreaLocalPictureThumbnailRoot(ae.getUniqueId()).getAbsolutePath();
-                            }else if(contentType.equalsIgnoreCase("Video")){
-                                resourceRootPath = ac.getAreaLocalVideoRoot(ae.getUniqueId()).getAbsolutePath();
-                                thumbnailRootPath = ac.getAreaLocalVideoThumbnailRoot(ae.getUniqueId()).getAbsolutePath();
-                            }else {
-                                resourceRootPath = ac.getAreaLocalDocumentRoot(ae.getUniqueId()).getAbsolutePath();
-                                thumbnailRootPath = ac.getAreaLocalDocumentThumbnailRoot(ae.getUniqueId()).getAbsolutePath();
-                            }
-
-                            File localFile = new File(resourceRootPath + File.separatorChar + fetchedResource.getName());
-                            if(localFile.exists()){
-                                localFile.delete();
-                            }
-
-                            File thumbFile = new File(thumbnailRootPath + File.separatorChar + fetchedResource.getName());
-                            if(thumbFile.exists()){
-                                thumbFile.delete();
-                            }
+                        String contentType = fetchedResource.getContentType();
+                        String resourceRootPath = null;
+                        String thumbnailRootPath = null;
+                        if (contentType.equalsIgnoreCase("Image")) {
+                            resourceRootPath = ac.getAreaLocalImageRoot(ae.getUniqueId()).getAbsolutePath();
+                            thumbnailRootPath = ac.getAreaLocalPictureThumbnailRoot(ae.getUniqueId()).getAbsolutePath();
+                        } else if (contentType.equalsIgnoreCase("Video")) {
+                            resourceRootPath = ac.getAreaLocalVideoRoot(ae.getUniqueId()).getAbsolutePath();
+                            thumbnailRootPath = ac.getAreaLocalVideoThumbnailRoot(ae.getUniqueId()).getAbsolutePath();
+                        } else {
+                            resourceRootPath = ac.getAreaLocalDocumentRoot(ae.getUniqueId()).getAbsolutePath();
+                            thumbnailRootPath = ac.getAreaLocalDocumentThumbnailRoot(ae.getUniqueId()).getAbsolutePath();
                         }
-                        try{
+
+                        File localFile = new File(resourceRootPath + File.separatorChar + fetchedResource.getName());
+                        if (localFile.exists()) {
+                            localFile.delete();
+                        }
+
+                        File thumbFile = new File(thumbnailRootPath + File.separatorChar + fetchedResource.getName());
+                        if (thumbFile.exists()) {
+                            thumbFile.delete();
+                        }
+                        try {
                             mService.files().delete(resourceID).execute();
-                        }catch (Exception e){
+                        } catch (Exception e) {
                             e.printStackTrace();
                         }
                     }
@@ -268,9 +264,9 @@ public class RemoveDriveResourcesActivity extends Activity implements EasyPermis
                         }
                         if (!resource.getContainerId().trim().equalsIgnoreCase("")) {
                             // Delete only the area specific folders and not the common folders.
-                            try{
+                            try {
                                 mService.files().delete(resource.getResourceId()).execute();
-                            }catch (Exception e){
+                            } catch (Exception e) {
                                 e.printStackTrace();
                             }
                         }
@@ -289,10 +285,10 @@ public class RemoveDriveResourcesActivity extends Activity implements EasyPermis
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
             Intent displayIntent = null;
-            if(resourceIds != null){
+            if (resourceIds != null) {
                 displayIntent = new Intent(getApplicationContext(), AreaResourceDisplayActivity.class);
-                displayIntent.putExtra("tab_position", tabPosition);
-            }else {
+                displayIntent.putExtras(getIntent().getExtras());
+            } else {
                 displayIntent = new Intent(getApplicationContext(), AreaDashboardActivity.class);
             }
             startActivity(displayIntent);

@@ -11,6 +11,8 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -117,6 +119,11 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
                     pe.setLon(positionObj.getDouble("lon"));
                     pe.setTags((String) positionObj.get("tags"));
 
+                    String createdAt = positionObj.getString("created_at");
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    Date parsedDate = format.parse(createdAt);
+                    pe.setCreatedOnMillis(parsedDate.getTime() + "");
+
                     pdh.insertPositionFromServer(pe);
                 }
 
@@ -137,6 +144,11 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
                     dr.setContentType(driveObj.getString("content_type"));
                     dr.setLatitude(driveObj.getString("latitude"));
                     dr.setLongitude(driveObj.getString("longitude"));
+
+                    String createdAt = driveObj.getString("created_at");
+                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                    Date parsedDate = format.parse(createdAt);
+                    dr.setCreatedOnMillis(parsedDate.getTime() + "");
 
                     ddh.insertResourceFromServer(dr);
                 }
@@ -169,6 +181,11 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
                 dr.setSize(driveObj.getString("size"));
                 dr.setMimeType(driveObj.getString("mime_type"));
                 dr.setContentType(driveObj.getString("content_type"));
+
+                String createdAt = driveObj.getString("created_at");
+                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+                Date parsedDate = format.parse(createdAt);
+                dr.setCreatedOnMillis(parsedDate.getTime() + "");
 
                 ddh.insertResourceFromServer(dr);
             }
