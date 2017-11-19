@@ -66,7 +66,7 @@ public class AreaPopulationUtil {
 
         TextView measureText = (TextView) view.findViewById(R.id.area_measure_text);
         String content = "<b>Area: </b>" + df.format(areaMeasureSqFt) + " Sqft, "
-                + df.format(areaMeasureAcre) + " Acre," + df.format(areaMeasureDecimals) + " Decimals.";
+                + df.format(areaMeasureAcre) + " Acre, " + df.format(areaMeasureDecimals) + " Decimals.";
         measureText.setText(Html.fromHtml(content));
 
         final Drawable drawable = view.getBackground().getCurrent();

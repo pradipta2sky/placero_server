@@ -1,12 +1,13 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal">
+    android:orientation="horizontal"
+    android:weightSum="3">
 
     <ImageView
         android:id="@+id/file_default_img"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
         android:src="@drawable/drive_resource"
         android:gravity="center_vertical"
         android:layout_weight="0.1" />
@@ -14,17 +15,17 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="10dp"
-        android:layout_weight="0.9"
+        android:layout_weight="3.0"
         android:orientation="vertical"
         android:gravity="center_vertical"
-        android:paddingTop="1dp">
+        android:paddingTop="1dp"
+        android:layout_marginLeft="5dp">
 
         <TextView
             android:id="@+id/ar_file_name"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:textSize="16sp"
+            android:textSize="14sp"
             android:textStyle="bold"
             android:textColor="#000000"
             android:layout_weight="1"
@@ -41,5 +42,14 @@
             android:lines="1" />
 
     </LinearLayout>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:text="X"
+        android:layout_marginRight="15dp"
+        android:layout_weight="0.1"
+        android:id="@+id/remove_upload_resource"
+        style="@style/Base.Widget.AppCompat.Button.Small" />
 
 </LinearLayout>

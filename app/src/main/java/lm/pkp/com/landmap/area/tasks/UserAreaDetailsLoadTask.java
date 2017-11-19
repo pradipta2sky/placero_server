@@ -135,6 +135,8 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
                     dr.setSize(driveObj.getString("size"));
                     dr.setMimeType(driveObj.getString("mime_type"));
                     dr.setContentType(driveObj.getString("content_type"));
+                    dr.setLatitude(driveObj.getString("latitude"));
+                    dr.setLongitude(driveObj.getString("longitude"));
 
                     ddh.insertResourceFromServer(dr);
                 }

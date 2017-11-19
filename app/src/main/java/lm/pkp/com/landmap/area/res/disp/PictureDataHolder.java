@@ -31,6 +31,7 @@ final class PictureDataHolder {
                     final PictureDisplayElement imageDisplayElement = new PictureDisplayElement();
                     imageDisplayElement.setName(resource.getName());
                     imageDisplayElement.setAbsPath(imgRootPath + resource.getName());
+                    imageDisplayElement.setResourceId(resource.getResourceId());
                     imageItems.add(imageDisplayElement);
                 }
             }

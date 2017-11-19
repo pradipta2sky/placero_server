@@ -90,7 +90,7 @@
             android:name=".ShareDriveResourcesActivity"
             android:label="@string/choose_document"></activity>
         <activity
-            android:name=".AreaDisplayResourcesActivity"
+            android:name=".AreaResourceDisplayActivity"
             android:label="@string/area_resources"
             android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity

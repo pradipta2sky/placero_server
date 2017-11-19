@@ -11,6 +11,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import lm.pkp.com.landmap.R;
+import lm.pkp.com.landmap.area.AreaContext;
 
 /**
  * Created by USER on 10/16/2017.
@@ -55,6 +56,7 @@ public class PostionListAdaptor extends ArrayAdapter<PositionElement> {
             public void onClick(View v) {
                 items.remove(position);
                 pdh.deletePosition(pe);
+                AreaContext.INSTANCE.getAreaElement().getPositions().remove(pe);
                 notifyDataSetChanged();
             }
         });

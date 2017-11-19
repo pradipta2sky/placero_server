@@ -1,9 +1,11 @@
 package lm.pkp.com.landmap.drive;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+
 /**
  * Created by USER on 10/31/2017.
  */
-public class DriveResource {
+public class DriveResource{
 
     private String uniqueId = "";
     private String userId = "";
@@ -121,5 +123,14 @@ public class DriveResource {
 
     public void setLongitude(String longitude) {
         this.longitude = longitude;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if(o instanceof DriveResource){
+            EqualsBuilder builder = new EqualsBuilder().append(this.getResourceId(), ((DriveResource)o).getResourceId());
+            return builder.isEquals();
+        }
+        return false;
     }
 }

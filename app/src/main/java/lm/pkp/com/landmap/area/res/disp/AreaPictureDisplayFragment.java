@@ -28,7 +28,7 @@ public class AreaPictureDisplayFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         GridView gridView = (GridView) getView().findViewById(R.id.gridView);
-        gridView.setAdapter(new AreaPictureDisplayAdaptor(this.getContext()));
+        gridView.setAdapter(new AreaPictureDisplayAdaptor(this.getContext(), this, 0));
     }
 
 }

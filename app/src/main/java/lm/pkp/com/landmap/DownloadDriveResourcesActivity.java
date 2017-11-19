@@ -242,7 +242,7 @@ public class DownloadDriveResourcesActivity extends Activity implements EasyPerm
         @Override
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
-            Intent displayIntent = new Intent(getApplicationContext(), AreaDisplayResourcesActivity.class);
+            Intent displayIntent = new Intent(getApplicationContext(), AreaResourceDisplayActivity.class);
             startActivity(displayIntent);
             finish();
         }

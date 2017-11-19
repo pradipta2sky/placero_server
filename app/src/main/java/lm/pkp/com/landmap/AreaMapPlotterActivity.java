@@ -3,14 +3,17 @@ package lm.pkp.com.landmap;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdate;
@@ -19,6 +22,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -53,6 +57,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
 
     private GoogleMap googleMap;
     private LinkedHashMap<Marker, PositionElement> areaMarkers = new LinkedHashMap<>();
+    private LinkedHashMap<Marker, DriveResource> resourceMarkers = new LinkedHashMap<>();
     private Polygon polygon = null;
     private Marker centerMarker = null;
     private String centerLat;
@@ -62,9 +67,11 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
     private ViewGroup infoWindow;
     private TextView infoTitle;
     private TextView infoSnippet;
-    private Button infoButton;
+    private ImageView infoImage;
     private OnInfoWindowElemTouchListener infoButtonListener;
     private SupportMapFragment mapFragment = null;
+
+    private Button infoButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,6 +97,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                 googleMap.snapshot(new MapSnapshotTaker());
             }
         });
+
         UiSettings settings = googleMap.getUiSettings();
         settings.setMapToolbarEnabled(true);
         settings.setAllGesturesEnabled(true);
@@ -97,30 +105,60 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
         settings.setZoomControlsEnabled(true);
         settings.setZoomGesturesEnabled(true);
 
-
         mapWrapperLayout = (MapWrapperLayout) findViewById(R.id.map_relative_layout);
-        mapWrapperLayout.init(googleMap, getPixelsFromDp(getApplicationContext(), 39 + 20));
+        mapWrapperLayout.init(googleMap, getPixelsFromDp(getApplicationContext(), 50));
 
         infoWindow = (ViewGroup) getLayoutInflater().inflate(R.layout.info_window, null);
         infoTitle = (TextView) infoWindow.findViewById(R.id.title);
         infoSnippet = (TextView) infoWindow.findViewById(R.id.snippet);
-        infoButton = (Button) infoWindow.findViewById(R.id.button);
-        infoButtonListener = new OnInfoWindowElemTouchListener(infoButton,
-                getResources().getDrawable(R.drawable.round_but_green_sel), //btn_default_normal_holo_light
-                getResources().getDrawable(R.drawable.round_but_red_sel)) //btn_default_pressed_holo_light
-        {
+        infoImage = (ImageView) infoWindow.findViewById(R.id.info_element_img);
+        infoButton = (Button) infoWindow.findViewById(R.id.map_info_action);
+
+        final AreaContext ac = AreaContext.INSTANCE;
+        infoButtonListener = new OnInfoWindowElemTouchListener(infoButton) {
+
             @Override
             protected void onClickConfirmed(View v, Marker marker) {
-                PositionsDBHelper pdh = new PositionsDBHelper(getApplicationContext());
-                PositionElement markedPosition = areaMarkers.get(marker);
-                pdh.deletePosition(markedPosition);
-                areaMarkers.remove(markedPosition);
-                polygon.remove();
-                plotPolygonUsingPositions();
+                PositionElement position = areaMarkers.get(marker);
+                AreaContext areaContext = ac;
+                AreaElement areaElement = areaContext.getAreaElement();
+
+                File areaLocalImageRoot = areaContext.getAreaLocalImageRoot(areaElement.getUniqueId());
+                File areaLocalVideoRoot = areaContext.getAreaLocalVideoRoot(areaElement.getUniqueId());
+                String imageRootPath = areaLocalImageRoot.getAbsolutePath();
+                String videoRootPath = areaLocalVideoRoot.getAbsolutePath();
+
+                Intent intent = new Intent();
+                intent.setAction(android.content.Intent.ACTION_VIEW);
+
+                if (position != null) {
+                    // Do something for non position item.
+                    // Implementation for remove button
+                    PositionsDBHelper pdh = new PositionsDBHelper(getApplicationContext());
+                    PositionElement markedPosition = areaMarkers.get(marker);
+                    pdh.deletePosition(markedPosition);
+                    areaMarkers.remove(markedPosition);
+                    polygon.remove();
+                    plotPolygonUsingPositions();
+
+                }else {
+                    DriveResource resource = resourceMarkers.get(marker);
+                    String contentType = resource.getContentType();
+                    if(contentType.equalsIgnoreCase("Image")){
+                        File file = new File(imageRootPath + File.separatorChar + resource.getName());
+                        intent.setDataAndType(Uri.fromFile(file), "image/*");
+                        startActivity(intent);
+                    }else {
+                        File file = new File(videoRootPath + File.separatorChar + resource.getName());
+                        intent.setDataAndType(Uri.fromFile(file), "video/*");
+                        startActivity(intent);
+                    }
+                }
             }
         };
         infoButton.setOnTouchListener(infoButtonListener);
 
+        final AreaElement ae = ac.getAreaElement();
         googleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
             @Override
             public View getInfoWindow(Marker marker) {
@@ -129,26 +167,84 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
 
             @Override
             public View getInfoContents(Marker marker) {
-                String markerTitle = marker.getTitle();
-                infoTitle.setText(markerTitle);
-                infoSnippet.setText(marker.getSnippet());
-                if (markerTitle.indexOf("Center") != -1) {
-                    infoButton.setVisibility(View.INVISIBLE);
-                    return infoWindow;
-                } else {
+
+                PositionElement position = areaMarkers.get(marker);
+                DriveResource resource = resourceMarkers.get(marker);
+
+                if(position == null && resource == null){
+                    // Center Marker.
+                    infoTitle.setText("Center");
+                    LatLng markerPosition = marker.getPosition();
+                    String snippetText = "Lat: " + markerPosition.latitude + ", Long: " + markerPosition.longitude;
+                    infoSnippet.setText(snippetText);
+                    infoImage.setImageResource(R.drawable.marker_image);
+                    infoButton.setVisibility(View.GONE);
+                }else {
                     infoButton.setVisibility(View.VISIBLE);
-                    infoButtonListener.setMarker(marker);
+                    if (position == null) {
+                        String thumbRootPath = "";
+                        if(resource.getContentType().equalsIgnoreCase("Video")){
+                            thumbRootPath = ac.getAreaLocalVideoThumbnailRoot(ae.getUniqueId()).getAbsolutePath();
+                        }else {
+                            thumbRootPath = ac.getAreaLocalPictureThumbnailRoot(ae.getUniqueId()).getAbsolutePath();
+                        }
+                        String thumbnailPath = thumbRootPath + File.separatorChar + resource.getName();
+                        File thumbFile = new File(thumbnailPath);
+                        if(thumbFile.exists()){
+                            Bitmap bMap = BitmapFactory.decodeFile(thumbnailPath);
+                            infoImage.setImageBitmap(bMap);
+                        }
+                        infoTitle.setText(resource.getName());
+                        infoSnippet.setText(resource.getUserId());
+                        infoButton.setText("Open");
+                    }else {
+                        infoImage.setImageResource(R.drawable.marker_image);
+                        infoTitle.setText(position.getName());
+                        infoSnippet.setText("");
+                        infoButton.setText("Remove");
+                    }
                 }
+                infoButtonListener.setMarker(marker);
+                mapWrapperLayout.setMarkerWithInfoWindow(marker, infoWindow);
                 return infoWindow;
             }
         });
+
         plotPolygonUsingPositions();
+        plotMediaPoints();
+    }
+
+    private void plotMediaPoints() {
+        List<DriveResource> driveResources = AreaContext.INSTANCE.getAreaElement().getDriveResources();
+        for (int i = 0; i < driveResources.size(); i++) {
+            DriveResource resource = driveResources.get(i);
+            if (resource.getType().equals("file")) {
+                if (!resource.getLatitude().trim().equalsIgnoreCase("")) {
+                    // Plot this resource
+                    if (resource.getName().equalsIgnoreCase("plot_screenshot.png")) {
+                        continue;
+                    }
+                    Double latitude = new Double(resource.getLatitude());
+                    Double longitude = new Double(resource.getLongitude());
+                    LatLng position = new LatLng(latitude, longitude);
+
+                    MarkerOptions markerOptions = new MarkerOptions()
+                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.camera1));
+                    markerOptions.position(position);
+
+                    Marker marker = googleMap.addMarker((markerOptions));
+                    marker.setTitle(resource.getName());
+                    marker.setDraggable(false);
+                    marker.setVisible(true);
+                    resourceMarkers.put(marker, resource);
+                }
+            }
+        }
     }
 
     private void plotPolygonUsingPositions() {
-        final AreaDBHelper adh = new AreaDBHelper(getApplicationContext());
-        List<PositionElement> positionElements
-                = AreaContext.INSTANCE.getAreaElement().getPositions();
+
+        List<PositionElement> positionElements = AreaContext.INSTANCE.getAreaElement().getPositions();
         int noOfPositions = positionElements.size();
 
         Set<Marker> markerSet = areaMarkers.keySet();
@@ -190,6 +286,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
         ae.setMeasureSqFt(polygonAreaSqFt);
 
         if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.UPDATE_AREA)) {
+            final AreaDBHelper adh = new AreaDBHelper(getApplicationContext());
             adh.updateArea(ae);
             new Thread(new Runnable() {
                 public void run() {
@@ -201,11 +298,8 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
         MarkerOptions markerOptions = new MarkerOptions().position(new LatLng(latAvg, lonAvg));
         centerMarker = googleMap.addMarker(markerOptions);
         centerMarker.setVisible(true);
-        centerMarker.setAlpha(0);
+        centerMarker.setAlpha((float) 0.5);
         centerMarker.setTitle("Center");
-
-        googleMap.snapshot(new MapSnapshotTaker());
-
     }
 
     public Marker drawMarkerUsingPosition(final PositionElement pe) {
@@ -213,12 +307,13 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
         Marker marker = googleMap.addMarker((new MarkerOptions().position(position)));
         marker.setTitle(pe.getUniqueId());
         marker.setDraggable(false);
-        if(PermissionManager.INSTANCE.hasAccess(PermissionConstants.UPDATE_AREA)){
+        if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.UPDATE_AREA)) {
             marker.setDraggable(true);
             googleMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
                 @Override
                 public void onMarkerDragStart(Marker marker) {
                 }
+
                 @SuppressWarnings("unchecked")
                 @Override
                 public void onMarkerDragEnd(Marker marker) {
@@ -248,6 +343,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                     polygon.remove();
                     plotPolygonUsingPositions();
                 }
+
                 @Override
                 public void onMarkerDrag(Marker marker) {
                 }
@@ -259,7 +355,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
 
     private void zoomCameraToPosition(double latAvg, double lonAvg) {
         LatLng position = new LatLng(latAvg, lonAvg);
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(position, 20f);
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(position, 21f);
         googleMap.animateCamera(cameraUpdate);
         googleMap.moveCamera(cameraUpdate);
     }
@@ -279,11 +375,11 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
         startActivity(positionMarkerIntent);
     }
 
-    private class MapSnapshotTaker implements GoogleMap.SnapshotReadyCallback{
+    private class MapSnapshotTaker implements GoogleMap.SnapshotReadyCallback {
 
         @Override
         public void onSnapshotReady(Bitmap snapshot) {
-            try{
+            try {
                 final AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
                 final File imageStorageDir = AreaContext.INSTANCE.getAreaLocalImageRoot(areaElement.getUniqueId());
                 final String dirPath = imageStorageDir.getAbsolutePath();
@@ -291,7 +387,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                 String screenshotFileName = "plot_screenshot.png";
                 String screenShotFilePath = dirPath + File.separatorChar + screenshotFileName;
                 File screenShotFile = new File(screenShotFilePath);
-                if(screenShotFile.exists()){
+                if (screenShotFile.exists()) {
                     screenShotFile.delete();
                 }
                 screenShotFile.createNewFile();
@@ -319,9 +415,9 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                 DriveResource screenShotResource = null;
                 for (int i = 0; i < driveResources.size(); i++) {
                     DriveResource resource = driveResources.get(i);
-                    if(resource.getType().equalsIgnoreCase("file")){
+                    if (resource.getType().equalsIgnoreCase("file")) {
                         String resourceName = resource.getName();
-                        if(resourceName.equalsIgnoreCase(screenshotFileName)){
+                        if (resourceName.equalsIgnoreCase(screenshotFileName)) {
                             screenShotResource = resource;
                             break;
                         }
@@ -343,10 +439,10 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                 resource.setPath(screenShotFilePath);
 
                 DriveDBHelper ddh = new DriveDBHelper(getApplicationContext());
-                if(screenShotResource == null){
+                if (screenShotResource == null) {
                     ddh.insertResourceLocally(resource);
                     ddh.insertResourceToServer(resource);
-                }else {
+                } else {
                     ddh.deleteResource(screenShotResource);
                     ddh.insertResourceLocally(resource);
                     ddh.updateResourceOnServer(resource);
@@ -357,7 +453,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                 ThumbnailCreator creator = new ThumbnailCreator(getApplicationContext());
                 creator.createImageThumbnail(screenShotFile, areaElement.getUniqueId());
 
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
 

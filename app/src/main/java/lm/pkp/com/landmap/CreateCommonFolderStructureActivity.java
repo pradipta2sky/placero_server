@@ -15,27 +15,18 @@ import com.google.android.gms.drive.MetadataBuffer;
 import com.google.android.gms.drive.MetadataChangeSet;
 import com.google.android.gms.drive.events.ChangeEvent;
 import com.google.android.gms.drive.events.ChangeListener;
-import com.google.android.gms.drive.query.Filters;
-import com.google.android.gms.drive.query.Query;
-import com.google.android.gms.drive.query.SearchableField;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Stack;
 import java.util.UUID;
 
-import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.area.FileStorageConstants;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
-import lm.pkp.com.landmap.sync.LocalFolderStructureManager;
 import lm.pkp.com.landmap.user.UserContext;
-import lm.pkp.com.landmap.user.UserElement;
 
 public class CreateCommonFolderStructureActivity extends BaseDriveActivity {
 
@@ -132,7 +123,7 @@ public class CreateCommonFolderStructureActivity extends BaseDriveActivity {
                             // A different folder with same name exists.
                             // Use it for this application.
                             resource.setResourceId(metadata.getDriveId().getResourceId());
-                            ddh.deleteResourcesByResourceId(resource.getResourceId());
+                            ddh.deleteResourceByResourceId(resource.getResourceId());
                             ddh.insertResourceLocally(resource);
                             ddh.updateResourceOnServer(resource);
                         }else {

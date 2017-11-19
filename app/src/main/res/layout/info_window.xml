@@ -1,35 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+    android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:gravity="center_vertical">
+    android:gravity="center_vertical"
+    android:weightSum="1"
+    android:background="@drawable/rounded_corner">
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
         android:orientation="vertical"
-        android:layout_marginRight="10dp">
+        android:layout_weight="0.4">
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="60dp"
+            android:id="@+id/info_element_img"
+            android:src="@drawable/marker_image"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:layout_weight="0.22"
+        android:weightSum="2"
+        android:layout_marginLeft="5dp">
 
         <TextView
             android:id="@+id/title"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:textSize="15sp"
-            android:text="Title" />
+            android:textSize="14sp"
+            android:text="Title"
+            android:layout_weight="0.8"
+            android:layout_gravity="bottom"
+            android:gravity="center_vertical|fill_vertical"
+            android:typeface="sans"
+            android:textStyle="bold"
+            android:singleLine="false"
+            android:textColor="#25395a" />
 
         <TextView
             android:id="@+id/snippet"
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:text="snippet" />
+            android:text="snippet"
+            android:layout_weight="1.2"/>
 
     </LinearLayout>
 
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@drawable/round_but_red_sel"
-        android:text="Delete" />
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:orientation="vertical"
+        android:layout_weight="0.38"
+        android:gravity="center">
+
+        <Button
+            android:id="@+id/map_info_action"
+            android:layout_width="wrap_content"
+            android:layout_height="fill_parent"
+            android:text="Sample"/>
+
+    </LinearLayout>
 
 </LinearLayout>

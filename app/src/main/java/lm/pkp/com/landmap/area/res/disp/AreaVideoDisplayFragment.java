@@ -32,7 +32,7 @@ public class AreaVideoDisplayFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         gridView = (GridView) getView().findViewById(R.id.gridView);
-        adaptor = new AreaVideoDisplayAdaptor(this.getContext());
+        adaptor = new AreaVideoDisplayAdaptor(this.getContext(), this, 1);
         gridView.setAdapter(adaptor);
     }
 

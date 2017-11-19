@@ -95,12 +95,12 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         new LMSRestAsyncTask().execute(preparePostParams("insert", pe));
     }
 
-    public Integer deletePosition(PositionElement pe) {
+    public void deletePosition(PositionElement pe) {
         SQLiteDatabase db = this.getWritableDatabase();
-        int delete = db.delete(POSITION_TABLE_NAME, POSITION_COLUMN_UNIQUE_ID + " = ? ", new String[]{pe.getUniqueId()});
+        db.delete(POSITION_TABLE_NAME, POSITION_COLUMN_UNIQUE_ID + " = ? ", new String[]{pe.getUniqueId()});
+
         new LMSRestAsyncTask().execute(preparePostParams("delete", pe));
         db.close();
-        return delete;
     }
 
     public void deletePositionByAreaId(String uniqueAreaId) {

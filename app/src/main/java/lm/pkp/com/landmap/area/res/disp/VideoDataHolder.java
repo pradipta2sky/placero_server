@@ -31,6 +31,7 @@ final class VideoDataHolder {
                     final VideoDisplayElement videoDisplayElement = new VideoDisplayElement();
                     videoDisplayElement.setName(resource.getName());
                     videoDisplayElement.setAbsPath(imgRootPath + resource.getName());
+                    videoDisplayElement.setResourceId(resource.getResourceId());
                     videoItems.add(videoDisplayElement);
                 }
             }
