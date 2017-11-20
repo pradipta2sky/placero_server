@@ -8,6 +8,8 @@ import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.Serializable;
 
+import lm.pkp.com.landmap.weather.model.WeatherElement;
+
 /**
  * Created by USER on 10/16/2017.
  */
@@ -21,6 +23,7 @@ public class PositionElement implements Serializable {
     private String uniqueAreaId = "";
     private String uniqueId = "";
     private String createdOnMillis = "";
+    private WeatherElement weather = null;
 
     public String getName() {
         return name;
@@ -90,4 +93,11 @@ public class PositionElement implements Serializable {
         this.createdOnMillis = createdOnMillis;
     }
 
+    public WeatherElement getWeather() {
+        return this.weather;
+    }
+
+    public void setWeather(WeatherElement weather) {
+        this.weather = weather;
+    }
 }

@@ -103,8 +103,8 @@ public class PublicAreasLoadTask extends AsyncTask<JSONObject, Void, String> {
                 ae.setName(areaObj.getString("name"));
                 ae.setCreatedBy(areaObj.getString("created_by"));
                 ae.setDescription(areaObj.getString("description"));
-                ae.setCenterLat(areaObj.getDouble("center_lat"));
-                ae.setCenterLon(areaObj.getDouble("center_lon"));
+                ae.getCenterPosition().setLat(areaObj.getDouble("center_lat"));
+                ae.getCenterPosition().setLon(areaObj.getDouble("center_lon"));
                 ae.setUniqueId(areaObj.getString("unique_id"));
                 ae.setMeasureSqFt(areaObj.getDouble("measure_sqft"));
                 ae.setAddress(areaObj.getString("address"));

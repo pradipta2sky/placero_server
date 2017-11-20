@@ -147,11 +147,8 @@ public class CreateAreaFolderStructureActivity extends BaseDriveActivity {
                     eventFolder.removeChangeListener(getGoogleApiClient(), this);
                     resource.setResourceId(resourceId);
 
-                    AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
-                    AreaContext.INSTANCE.setAreaElement(areaElement, getApplicationContext());
-
-                    DriveDBHelper ddh
-                            = new DriveDBHelper(getApplicationContext(), new DriveResourceInsertCallback(resource));
+                    DriveResourceInsertCallback callback = new DriveResourceInsertCallback(resource);
+                    DriveDBHelper ddh = new DriveDBHelper(getApplicationContext(), callback);
                     ddh.insertResourceLocally(resource);
                     ddh.insertResourceToServer(resource);
                 }

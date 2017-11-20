@@ -218,7 +218,7 @@ public class RemoveDriveResourcesActivity extends Activity implements EasyPermis
                         String resourceID = resourceArr[i];
                         DriveResource fetchedResource = ddh.getDriveResourcesByResourceId(resourceID);
                         ddh.deleteResourceByResourceId(resourceID);
-                        ae.getDriveResources().remove(fetchedResource);
+                        ae.getMediaResources().remove(fetchedResource);
 
                         String contentType = fetchedResource.getContentType();
                         String resourceRootPath = null;
@@ -250,7 +250,7 @@ public class RemoveDriveResourcesActivity extends Activity implements EasyPermis
                         }
                     }
                 } else {
-                    List<DriveResource> resources = ae.getDriveResources();
+                    List<DriveResource> resources = ae.getMediaResources();
                     for (int j = 0; j < resources.size(); j++) {
                         DriveResource resource = resources.get(j);
                         if (resource.getType().equalsIgnoreCase("File")) {

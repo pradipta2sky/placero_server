@@ -55,17 +55,16 @@ public class AreaDashboardActivity extends AppCompatActivity {
             public void onClick(View v) {
                 findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
                 AreaDBHelper adh = new AreaDBHelper(getApplicationContext());
-
                 AreaElement areaElement = adh.insertAreaLocally();
 
                 PermissionElement pe = new PermissionElement();
                 pe.setUserId(UserContext.getInstance().getUserElement().getEmail());
                 pe.setAreaId(areaElement.getUniqueId());
                 pe.setFunctionCode(PermissionConstants.FULL_CONTROL);
-                areaElement.getPermissions().put(PermissionConstants.FULL_CONTROL, pe);
+                areaElement.getUserPermissions().put(PermissionConstants.FULL_CONTROL, pe);
 
+                // Resetting the context for new Area
                 AreaContext.INSTANCE.setAreaElement(areaElement, getApplicationContext());
-
                 adh = new AreaDBHelper(getApplicationContext(), new DataInsertServerCallback());
                 adh.insertAreaToServer(areaElement);
             }

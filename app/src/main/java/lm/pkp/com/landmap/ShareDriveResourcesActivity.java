@@ -198,7 +198,7 @@ public class ShareDriveResourcesActivity extends Activity implements EasyPermiss
         protected List<String> doInBackground(Void... params) {
             try {
                 final List<String> fileInfo = new ArrayList<String>();
-                List<DriveResource> drs = AreaContext.INSTANCE.getAreaElement().getDriveResources();
+                List<DriveResource> drs = AreaContext.INSTANCE.getAreaElement().getMediaResources();
                 for (final DriveResource dr : drs) {
                     BatchRequest batch = mService.batch();
 

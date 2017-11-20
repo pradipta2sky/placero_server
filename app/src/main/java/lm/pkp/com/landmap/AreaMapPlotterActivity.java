@@ -34,7 +34,6 @@ import com.google.maps.android.SphericalUtil;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
@@ -47,7 +46,6 @@ import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.custom.MapWrapperLayout;
 import lm.pkp.com.landmap.custom.MarkerSorter;
 import lm.pkp.com.landmap.custom.OnInfoWindowElemTouchListener;
-import lm.pkp.com.landmap.custom.PositionSorter;
 import lm.pkp.com.landmap.custom.ThumbnailCreator;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
@@ -222,7 +220,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
     }
 
     private void plotMediaPoints() {
-        List<DriveResource> driveResources = AreaContext.INSTANCE.getAreaElement().getDriveResources();
+        List<DriveResource> driveResources = AreaContext.INSTANCE.getAreaElement().getMediaResources();
         for (int i = 0; i < driveResources.size(); i++) {
             DriveResource resource = driveResources.get(i);
             if (resource.getType().equals("file")) {
@@ -251,33 +249,28 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
 
     private void plotPolygonUsingPositions() {
 
-        List<PositionElement> positionElements = AreaContext.INSTANCE.getAreaElement().getPositions();
+        AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
+        List<PositionElement> positionElements = areaElement.getPositions();
         int noOfPositions = positionElements.size();
 
         Set<Marker> markers = areaMarkers.keySet();
         for (Marker m : markers) {
             m.remove();
         }
-        areaMarkers.clear();
         if (centerMarker != null) {
             centerMarker.remove();
         }
 
-        double latSum = 0.0;
-        double longSum = 0.0;
-
+        areaMarkers.clear();
         areaMarkers = new LinkedHashMap<>();
         for (int i = 0; i < noOfPositions; i++) {
             PositionElement pe = positionElements.get(i);
             Marker m = drawMarkerUsingPosition(pe);
-            latSum += pe.getLat();
-            longSum += pe.getLon();
             areaMarkers.put(m, pe);
         }
-        final double latAvg = latSum / noOfPositions;
-        final double lonAvg = longSum / noOfPositions;
-
-        MarkerOptions markerOptions = new MarkerOptions().position(new LatLng(latAvg, lonAvg));
+        PositionElement centerPosition = areaElement.getCenterPosition();
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(new LatLng(centerPosition.getLat(), centerPosition.getLon()));
         centerMarker = googleMap.addMarker(markerOptions);
         centerMarker.setVisible(true);
         centerMarker.setAlpha((float) 0.5);
@@ -298,9 +291,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
         double polygonAreaSqMt = SphericalUtil.computeArea(polygon.getPoints());
         double polygonAreaSqFt = polygonAreaSqMt * 10.7639;
 
-        final AreaElement ae = AreaContext.INSTANCE.getAreaElement();
-        ae.setCenterLat(latAvg);
-        ae.setCenterLon(lonAvg);
+        final AreaElement ae = areaElement;
         ae.setMeasureSqFt(polygonAreaSqFt);
 
         if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.UPDATE_AREA)) {
@@ -423,7 +414,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                 backBitmap.recycle();
                 bmOverlay.recycle();
 
-                List<DriveResource> driveResources = areaElement.getDriveResources();
+                List<DriveResource> driveResources = areaElement.getMediaResources();
 
                 DriveResource screenShotResource = null;
                 for (int i = 0; i < driveResources.size(); i++) {
@@ -447,8 +438,8 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                 resource.setAreaId(areaElement.getUniqueId());
                 resource.setName(screenshotFileName);
                 resource.setSize(screenShotFile.length() + "");
-                resource.setLatitude(areaElement.getCenterLat() + "");
-                resource.setLongitude(areaElement.getCenterLon() + "");
+                resource.setLatitude(areaElement.getCenterPosition().getLat() + "");
+                resource.setLongitude(areaElement.getCenterPosition().getLon() + "");
                 resource.setPath(screenShotFilePath);
 
                 DriveDBHelper ddh = new DriveDBHelper(getApplicationContext());

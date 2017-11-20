@@ -194,7 +194,7 @@ public class DownloadDriveResourcesActivity extends Activity implements EasyPerm
             try {
                 AreaContext ac = AreaContext.INSTANCE;
                 AreaElement ae = ac.getAreaElement();
-                List<DriveResource> resources = ae.getDriveResources();
+                List<DriveResource> resources = ae.getMediaResources();
                 for (int j = 0; j < resources.size(); j++) {
                     DriveResource resource = resources.get(j);
                     String contentType = resource.getContentType();

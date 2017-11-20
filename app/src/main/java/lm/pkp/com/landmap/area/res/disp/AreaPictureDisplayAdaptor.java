@@ -2,6 +2,8 @@ package lm.pkp.com.landmap.area.res.disp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -9,10 +11,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.Toast;
-
-import com.squareup.picasso.MemoryPolicy;
-import com.squareup.picasso.NetworkPolicy;
-import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -59,14 +57,10 @@ final class AreaPictureDisplayAdaptor extends BaseAdapter {
         String thumbnailFilePath = thumbnailRoot + File.separatorChar + dataSet.get(position).getName();
         File thumbFile = new File(thumbnailFilePath);
 
-        final Picasso picassoElem = Picasso.with(context);//
-        picassoElem.load(thumbFile) //
-                .memoryPolicy(MemoryPolicy.NO_CACHE, MemoryPolicy.NO_STORE)
-                .networkPolicy(NetworkPolicy.NO_CACHE, NetworkPolicy.NO_STORE)
-                .error(R.drawable.error) //
-                .resize(300, 300)
-                .tag(context) //
-                .into(view);
+        if(thumbFile.exists()){
+            Bitmap bMap = BitmapFactory.decodeFile(thumbnailFilePath);
+            view.setImageBitmap(bMap);
+        }
 
         final View referredView = view;
         view.setOnClickListener(new View.OnClickListener() {
@@ -99,7 +93,7 @@ final class AreaPictureDisplayAdaptor extends BaseAdapter {
                                     "Plot Image is auto generated. It will be recreated on Map plot.", Toast.LENGTH_LONG).show();
 
                             AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
-                            List<DriveResource> driveResources = areaElement.getDriveResources();
+                            List<DriveResource> driveResources = areaElement.getMediaResources();
 
                             DriveResource driveResource = new DriveResource();
                             driveResource.setResourceId(resourceId);

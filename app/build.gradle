@@ -61,7 +61,6 @@ dependencies {
     compile('com.google.apis:google-api-services-drive:v3-rev89-1.23.0') {
         exclude group: 'org.apache.httpcomponents'
     }
-    compile 'com.squareup.picasso:picasso:2.5.2'
     compile('com.iceteck.silicompressorr:silicompressor:2.1') {
         exclude group: 'com.android.support'
     }

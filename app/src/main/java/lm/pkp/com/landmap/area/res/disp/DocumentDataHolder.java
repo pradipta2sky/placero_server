@@ -7,7 +7,6 @@ import java.util.List;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.drive.DriveResource;
-import lm.pkp.com.landmap.sync.LocalFolderStructureManager;
 
 /**
  * Created by USER on 11/6/2017.
@@ -22,7 +21,7 @@ final class DocumentDataHolder {
         AreaContext ac = AreaContext.INSTANCE;
 
         final AreaElement ae = ac.getAreaElement();
-        List<DriveResource> driveResources = ae.getDriveResources();
+        List<DriveResource> driveResources = ae.getMediaResources();
         String rootPath = ac.getAreaLocalDocumentRoot(ae.getUniqueId()).getAbsolutePath() + File.separatorChar;
         for (int i = 0; i < driveResources.size(); i++) {
             final DriveResource resource = driveResources.get(i);

@@ -4,10 +4,12 @@ import android.content.Context;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Map;
+import java.util.List;
+import java.util.UUID;
 
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
+import lm.pkp.com.landmap.position.PositionElement;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.sync.LocalFolderStructureManager;
 
@@ -21,25 +23,47 @@ public class AreaContext {
     private AreaContext() {
     }
 
-    private AreaElement currArea;
+    private AreaElement currentArea;
     private Context context;
     private ArrayList<DriveResource> uploadQueue = new ArrayList<>();
 
     public AreaElement getAreaElement() {
-        return currArea;
+        return currentArea;
     }
 
     public void setAreaElement(AreaElement areaElement, Context context) {
-        currArea = areaElement;
+        currentArea = areaElement;
         this.context = context;
         uploadQueue.clear();
 
         PositionsDBHelper pdb = new PositionsDBHelper(context);
-        currArea.setPositions(pdb.getAllPositionForArea(currArea));
+        currentArea.setPositions(pdb.getAllPositionForArea(currentArea));
+        loadCenterPosition(currentArea);
 
         DriveDBHelper ddh = new DriveDBHelper(context);
-        currArea.setDriveResources(ddh.getDriveResourcesByAreaId(currArea.getUniqueId()));
-        currArea.setCommonResources(ddh.getCommonResources());
+        currentArea.setMediaResources(ddh.getDriveResourcesByAreaId(currentArea.getUniqueId()));
+        currentArea.setCommonResources(ddh.getCommonResources());
+    }
+
+    private void loadCenterPosition(AreaElement areaElement) {
+        double latSum = 0.0;
+        double longSum = 0.0;
+
+        List<PositionElement> positions = areaElement.getPositions();
+        int noOfPositions = positions.size();
+        for (int i = 0; i < noOfPositions; i++) {
+            PositionElement pe = positions.get(i);
+            latSum += pe.getLat();
+            longSum += pe.getLon();
+        }
+
+        final double latAvg = latSum / noOfPositions;
+        final double lonAvg = longSum / noOfPositions;
+
+        PositionElement centerPosition = areaElement.getCenterPosition();
+        centerPosition.setLat(latAvg);
+        centerPosition.setLon(lonAvg);
+        centerPosition.setUniqueId(UUID.randomUUID().toString());
     }
 
     // Drive specific resources.

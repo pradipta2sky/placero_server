@@ -1,10 +1,16 @@
 package lm.pkp.com.landmap.util;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.net.Uri;
+import android.support.design.widget.Snackbar;
 import android.text.Html;
 import android.view.View;
 import android.widget.ImageView;
@@ -15,11 +21,24 @@ import java.text.DecimalFormat;
 import java.util.Iterator;
 import java.util.List;
 
+import lm.pkp.com.landmap.AreaAddResourcesActivity;
+import lm.pkp.com.landmap.AreaDetailsActivity;
+import lm.pkp.com.landmap.AreaEditActivity;
+import lm.pkp.com.landmap.AreaMapPlotterActivity;
+import lm.pkp.com.landmap.AreaShareActivity;
+import lm.pkp.com.landmap.DownloadDriveResourcesActivity;
 import lm.pkp.com.landmap.R;
+import lm.pkp.com.landmap.RemoveDriveResourcesActivity;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.area.db.AreaDBHelper;
+import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
+import lm.pkp.com.landmap.permission.PermissionConstants;
+import lm.pkp.com.landmap.permission.PermissionManager;
+import lm.pkp.com.landmap.position.PositionElement;
+import lm.pkp.com.landmap.provider.GPSLocationProvider;
 
 /**
  * Created by USER on 11/2/2017.

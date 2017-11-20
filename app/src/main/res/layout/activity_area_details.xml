@@ -4,7 +4,8 @@
     android:layout_height="fill_parent"
     android:layout_gravity="center_vertical"
     android:orientation="vertical"
-    android:weightSum="1">
+    android:weightSum="1"
+    android:fitsSystemWindows="true">
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/toolbar_top"
@@ -35,26 +36,48 @@
             android:layout_gravity="center_vertical|center_horizontal"/>
     </LinearLayout>
 
-    <ScrollView
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:fillViewport="true"
-        android:layout_margin="10dp"
+        android:gravity="center"
+        android:visibility="visible"
         android:layout_weight="0.8"
-        android:id="@+id/position_list_scroll"
-        android:visibility="gone"
-        >
-
-        <ListView
-            android:id="@+id/positionList"
+        android:orientation="vertical"
+        android:id="@+id/positions_view_master"
+        android:weightSum="2">
+        <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:divider="@android:color/transparent"
-            android:dividerHeight="10.0sp"
-            android:layout_weight="1" />
-
-    </ScrollView>
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_weight="1">
+            <ScrollView
+                xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/position_list_scroll"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:fillViewport="true"
+                android:layout_margin="10dp"
+                android:visibility="visible">
+                <ListView
+                    android:id="@+id/positionList"
+                    android:layout_width="fill_parent"
+                    android:layout_height="match_parent"
+                    android:divider="@android:color/transparent"
+                    android:dividerHeight="10.0sp" />
+            </ScrollView>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="match_parent"
+            android:orientation="horizontal"
+            android:layout_weight="1">
+            <FrameLayout
+                android:id="@+id/weather_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#FF0099CC" />
+        </LinearLayout>
+    </LinearLayout>
 
     <LinearLayout
         android:layout_width="fill_parent"

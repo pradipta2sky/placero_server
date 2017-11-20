@@ -1,14 +1,12 @@
 package lm.pkp.com.landmap;
 
 import android.app.AlertDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
-import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
@@ -39,6 +37,9 @@ import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.position.PostionListAdaptor;
 import lm.pkp.com.landmap.provider.GPSLocationProvider;
 import lm.pkp.com.landmap.util.ColorProvider;
+import lm.pkp.com.landmap.weather.WeatherDisplayFragment;
+import lm.pkp.com.landmap.weather.WeatherManager;
+import lm.pkp.com.landmap.weather.model.WeatherElement;
 
 public class AreaDetailsActivity extends AppCompatActivity implements LocationPositionReceiver {
 
@@ -52,10 +53,14 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
+
         setContentView(R.layout.activity_area_details);
         getSupportActionBar().hide();
 
         ae = AreaContext.INSTANCE.getAreaElement();
+        WeatherManager weatherManager = new WeatherManager(getApplicationContext(), new WeatherDataCallback());
+        weatherManager.loadWeatherInfoForPosition(ae.getCenterPosition());
+
         Toolbar topTB = (Toolbar) findViewById(R.id.toolbar_top);
         final ColorDrawable topDrawable = (ColorDrawable) topTB.getBackground().getCurrent();
         topDrawable.setColor(ColorProvider.getAreaToolBarColor(ae));
@@ -85,12 +90,14 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         areaNameView.setText(areaName);
 
         findViewById(R.id.splash_panel).setVisibility(View.GONE);
-        if(positionList.size() == 0){
-            findViewById(R.id.position_list_scroll).setVisibility(View.GONE);
+        if (positionList.size() == 0) {
+            findViewById(R.id.positions_view_master).setVisibility(View.GONE);
             findViewById(R.id.position_list_empty_img).setVisibility(View.VISIBLE);
-        }else {
-            findViewById(R.id.position_list_scroll).setVisibility(View.VISIBLE);
+        } else {
+            findViewById(R.id.positions_view_master).setVisibility(View.VISIBLE);
             findViewById(R.id.position_list_empty_img).setVisibility(View.GONE);
+            // Render the weather data here.
+
         }
 
         ImageView areaEditItem = (ImageView) findViewById(R.id.action_area_edit);
@@ -122,7 +129,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
             public void onClick(View v) {
                 if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.MARK_POSITION)) {
                     findViewById(R.id.position_list_empty_img).setVisibility(View.GONE);
-                    findViewById(R.id.position_list_scroll).setVisibility(View.GONE);
+                    findViewById(R.id.positions_view_master).setVisibility(View.GONE);
                     findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
                     new GPSLocationProvider(AreaDetailsActivity.this).getLocation();
                 } else {
@@ -149,8 +156,8 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         navigateItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final double centerLat = ae.getCenterLat();
-                final double centerLon = ae.getCenterLon();
+                final double centerLat = ae.getCenterPosition().getLat();
+                final double centerLon = ae.getCenterPosition().getLon();
                 if (centerLat == 0 && centerLon == 0) {
                     final List<PositionElement> positions = ae.getPositions();
                     if (positions.size() > 0) {
@@ -211,11 +218,11 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
 
     private void showErrorsIfAny() {
         Bundle intentBundle = getIntent().getExtras();
-        if(intentBundle != null){
+        if (intentBundle != null) {
             String action = intentBundle.getString("action");
             String outcome = intentBundle.getString("outcome");
             String outcomeType = intentBundle.getString("outcome_type");
-            showErrorMessage(action + " " + outcomeType + ". " + outcome , "error");
+            showErrorMessage(action + " " + outcomeType + ". " + outcome, "error");
         }
     }
 
@@ -226,11 +233,12 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
 
         final AreaElement ae = AreaContext.INSTANCE.getAreaElement();
         ae.getPositions().add(pe);
+        AreaContext.INSTANCE.setAreaElement(ae, getApplicationContext());
 
         pe = pdb.insertPositionLocally(pe);
         pdb.insertPositionToServer(pe);
 
-        findViewById(R.id.position_list_scroll).setVisibility(View.VISIBLE);
+        findViewById(R.id.positions_view_master).setVisibility(View.VISIBLE);
         findViewById(R.id.position_list_empty_img).setVisibility(View.GONE);
         findViewById(R.id.splash_panel).setVisibility(View.GONE);
 
@@ -241,11 +249,11 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
     @Override
     public void locationFixTimedOut() {
         findViewById(R.id.splash_panel).setVisibility(View.GONE);
-        if(positionList.size() == 0){
-            findViewById(R.id.position_list_scroll).setVisibility(View.GONE);
+        if (positionList.size() == 0) {
+            findViewById(R.id.positions_view_master).setVisibility(View.GONE);
             findViewById(R.id.position_list_empty_img).setVisibility(View.VISIBLE);
-        }else {
-            findViewById(R.id.position_list_scroll).setVisibility(View.VISIBLE);
+        } else {
+            findViewById(R.id.positions_view_master).setVisibility(View.VISIBLE);
             findViewById(R.id.position_list_empty_img).setVisibility(View.GONE);
         }
         showLocationFixFailureDialog();
@@ -254,12 +262,12 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
     @Override
     public void providerDisabled() {
         findViewById(R.id.splash_panel).setVisibility(View.GONE);
-        if(positionList.size() == 0){
-            findViewById(R.id.position_list_scroll).setVisibility(View.GONE);
+        if (positionList.size() == 0) {
+            findViewById(R.id.positions_view_master).setVisibility(View.GONE);
             findViewById(R.id.position_list_empty_img).setVisibility(View.VISIBLE);
-        }else {
+        } else {
             findViewById(R.id.position_list_empty_img).setVisibility(View.GONE);
-            findViewById(R.id.position_list_scroll).setVisibility(View.VISIBLE);
+            findViewById(R.id.positions_view_master).setVisibility(View.VISIBLE);
         }
         showEnableGPSDialog();
     }
@@ -269,17 +277,6 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         Intent areaDashboardIntent = new Intent(getApplicationContext(), AreaDashboardActivity.class);
         startActivity(areaDashboardIntent);
         finish();
-    }
-
-
-     private class DeleteAreaCallback implements AsyncTaskCallback {
-        @Override
-        public void taskCompleted(Object result) {
-            finish();
-
-            Intent areaDashboardIntent = new Intent(AreaDetailsActivity.this, RemoveDriveResourcesActivity.class);
-            startActivity(areaDashboardIntent);
-        }
     }
 
     private boolean askForLocationPermission() {
@@ -328,7 +325,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
                 .setMessage("Do you want to try again ?")
                 .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        findViewById(R.id.position_list_scroll).setVisibility(View.GONE);
+                        findViewById(R.id.positions_view_master).setVisibility(View.GONE);
                         findViewById(R.id.position_list_empty_img).setVisibility(View.GONE);
                         findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
                         new GPSLocationProvider(AreaDetailsActivity.this).getLocation();
@@ -349,14 +346,14 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         snackbar.getView().setBackgroundColor(Color.WHITE);
 
         TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
-        if(type.equalsIgnoreCase("info")){
+        if (type.equalsIgnoreCase("info")) {
             textView.setTextColor(Color.GREEN);
-        } else if(type.equalsIgnoreCase("error")) {
+        } else if (type.equalsIgnoreCase("error")) {
             textView.setTextColor(Color.RED);
-        }else{
+        } else {
             textView.setTextColor(Color.DKGRAY);
         }
-        textView.setTypeface(Typeface.SANS_SERIF,Typeface.BOLD);
+        textView.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
         textView.setTextSize(15);
         textView.setMaxLines(3);
 
@@ -369,5 +366,24 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         snackbar.show();
     }
 
+    private class DeleteAreaCallback implements AsyncTaskCallback {
+        @Override
+        public void taskCompleted(Object result) {
+            finish();
+            Intent areaDashboardIntent = new Intent(AreaDetailsActivity.this, RemoveDriveResourcesActivity.class);
+            startActivity(areaDashboardIntent);
+        }
+    }
+
+    private class WeatherDataCallback implements AsyncTaskCallback {
+        @Override
+        public void taskCompleted(Object result) {
+            if (result instanceof WeatherElement) {
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.weather_container, new WeatherDisplayFragment())
+                        .commit();
+            }
+        }
+    }
 
 }

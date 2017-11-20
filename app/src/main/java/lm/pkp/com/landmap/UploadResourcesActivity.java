@@ -2,13 +2,8 @@ package lm.pkp.com.landmap;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Color;
-import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
-import android.view.View;
-import android.widget.TextView;
 
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveApi.DriveContentsResult;
@@ -22,7 +17,6 @@ import com.google.android.gms.drive.MetadataChangeSet;
 import com.google.android.gms.drive.events.ChangeEvent;
 import com.google.android.gms.drive.events.ChangeListener;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
 import java.io.File;
@@ -175,7 +169,7 @@ public class UploadResourcesActivity extends BaseDriveActivity {
 
             AreaContext.INSTANCE.removeResourceFromQueue(resource);
             AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
-            areaElement.getDriveResources().add(resource);
+            areaElement.getMediaResources().add(resource);
 
             // Create thumbnails of the uploaded files for display.
             String resourcePath = resource.getPath();

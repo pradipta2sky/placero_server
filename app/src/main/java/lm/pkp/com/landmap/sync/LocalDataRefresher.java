@@ -11,6 +11,7 @@ import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.user.UserContext;
+import lm.pkp.com.landmap.weather.db.WeatherDBHelper;
 
 /**
  * Created by USER on 11/4/2017.
@@ -32,6 +33,9 @@ public class LocalDataRefresher implements AsyncTaskCallback {
 
         PositionsDBHelper pdh = new PositionsDBHelper(ctxt);
         pdh.deletePositionsLocally();
+
+        WeatherDBHelper wdh = new WeatherDBHelper(ctxt);
+        wdh.deleteWeatherElementsLocally();
 
         DriveDBHelper ddh = new DriveDBHelper(ctxt);
         ddh.deleteDriveElementsLocally();

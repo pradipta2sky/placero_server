@@ -16,6 +16,7 @@ import lm.pkp.com.landmap.permission.PermissionsDBHelper;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.sync.LMSRestAsyncTask;
 import lm.pkp.com.landmap.util.AndroidSystemUtil;
+import lm.pkp.com.landmap.weather.db.WeatherDBHelper;
 
 public class UserDBHelper extends SQLiteOpenHelper {
 
@@ -51,6 +52,7 @@ public class UserDBHelper extends SQLiteOpenHelper {
         new PositionsDBHelper(localContext).onCreate(db);
         new DriveDBHelper(localContext).onCreate(db);
         new PermissionsDBHelper(localContext).onCreate(db);
+        new WeatherDBHelper(localContext).onCreate(db);
     }
 
     @Override

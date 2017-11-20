@@ -21,18 +21,15 @@ public class AreaElement implements Serializable {
     private String description;
     private String createdBy;
     private String type;
-
-    private double centerLat = 0.0;
-    private double centerLon = 0.0;
     private double measureSqFt = 0.0;
-
     private String uniqueId;
     private String address;
 
+    private PositionElement centerPosition = new PositionElement();
     private List<PositionElement> positions = new ArrayList<>();
-    private List<DriveResource> driveResources = new ArrayList<>();
+    private List<DriveResource> mediaResources = new ArrayList<>();
     private Map<String, DriveResource> commonResources = new HashMap<>();
-    private Map<String, PermissionElement> permissions = new HashMap<>();
+    private Map<String, PermissionElement> userPermissions = new HashMap<>();
 
     public double getMeasureSqFt() {
         return measureSqFt;
@@ -66,22 +63,6 @@ public class AreaElement implements Serializable {
         this.description = description;
     }
 
-    public double getCenterLat() {
-        return centerLat;
-    }
-
-    public void setCenterLat(double centerLat) {
-        this.centerLat = centerLat;
-    }
-
-    public double getCenterLon() {
-        return centerLon;
-    }
-
-    public void setCenterLon(double centerLon) {
-        this.centerLon = centerLon;
-    }
-
     public List<PositionElement> getPositions() {
         return positions;
     }
@@ -102,12 +83,12 @@ public class AreaElement implements Serializable {
         return SerializationUtils.clone(this);
     }
 
-    public List<DriveResource> getDriveResources() {
-        return driveResources;
+    public List<DriveResource> getMediaResources() {
+        return mediaResources;
     }
 
-    public void setDriveResources(List<DriveResource> driveResources) {
-        this.driveResources = driveResources;
+    public void setMediaResources(List<DriveResource> mediaResources) {
+        this.mediaResources = mediaResources;
     }
 
     public String getType() {
@@ -126,12 +107,12 @@ public class AreaElement implements Serializable {
         this.address = address;
     }
 
-    public Map<String, PermissionElement> getPermissions() {
-        return this.permissions;
+    public Map<String, PermissionElement> getUserPermissions() {
+        return this.userPermissions;
     }
 
-    public void setPermissions(Map<String, PermissionElement> permissions) {
-        this.permissions = permissions;
+    public void setUserPermissions(Map<String, PermissionElement> userPermissions) {
+        this.userPermissions = userPermissions;
     }
 
     public Map<String, DriveResource> getCommonResources() {
@@ -141,4 +122,9 @@ public class AreaElement implements Serializable {
     public void setCommonResources(Map<String, DriveResource> commonResources) {
         this.commonResources = commonResources;
     }
+
+    public PositionElement getCenterPosition() {
+        return this.centerPosition;
+    }
+
 }
