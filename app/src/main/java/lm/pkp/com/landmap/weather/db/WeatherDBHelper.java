@@ -119,7 +119,7 @@ public class WeatherDBHelper extends SQLiteOpenHelper {
                 we.setWindChill(cursor.getString(cursor.getColumnIndex(WEATHER_COLUMN_WIND_CHILL)));
                 we.setWindDirection(cursor.getString(cursor.getColumnIndex(WEATHER_COLUMN_WIND_DIRECTION)));
                 we.setWindSpeed(cursor.getString(cursor.getColumnIndex(WEATHER_COLUMN_WIND_SPEED)));
-                we.setCreatedOn(cursor.getString(cursor.getColumnIndex(WEATHER_COLUMN_UNIQUE_ID)));
+                we.setCreatedOn(cursor.getString(cursor.getColumnIndex(WEATHER_COLUMN_CREATED_MILLIS)));
                 we.setPositionId(pe.getUniqueId());
                 break;
             }

@@ -156,24 +156,15 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         navigateItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final double centerLat = ae.getCenterPosition().getLat();
-                final double centerLon = ae.getCenterPosition().getLon();
-                if (centerLat == 0 && centerLon == 0) {
-                    final List<PositionElement> positions = ae.getPositions();
-                    if (positions.size() > 0) {
-                        final PositionElement pe = positions.get(0);
-                        Uri gmmIntentUri = Uri.parse("google.navigation:q=" + pe.getLat() + "," + pe.getLon());
-                        Intent navigationIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
-                        navigationIntent.setPackage("com.google.android.apps.maps");
-                        startActivity(navigationIntent);
-                    } else {
-                        showErrorMessage("No positions available for navigation", "error");
-                    }
-                } else {
-                    Uri gmmIntentUri = Uri.parse("google.navigation:q=" + centerLat + "," + centerLon);
+                final List<PositionElement> positions = ae.getPositions();
+                if (positions.size() > 0) {
+                    final PositionElement pe = positions.get(0);
+                    Uri gmmIntentUri = Uri.parse("google.navigation:q=" + pe.getLat() + "," + pe.getLon());
                     Intent navigationIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
                     navigationIntent.setPackage("com.google.android.apps.maps");
                     startActivity(navigationIntent);
+                } else {
+                    showErrorMessage("No positions available for navigation", "error");
                 }
             }
         });

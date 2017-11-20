@@ -31,25 +31,28 @@ public class WeatherManager implements AsyncTaskCallback {
     }
 
     public void loadWeatherInfoForPosition(PositionElement pe) {
+        if(pe.getUniqueId() == null){
+            return;
+        }
         if ((pe.getLat() == 0.0) && (pe.getLon() == 0.0)) {
             return;
         }
+        this.position = pe;
         WeatherDBHelper wdh = new WeatherDBHelper(context);
         WeatherElement wbp = wdh.getWeatherByPosition(pe);
         if(wbp != null){
             position.setWeather(wbp);
             callback.taskCompleted(wbp);
-            return;
-        }
-        PositionWeatherLoadAsyncTask task = new PositionWeatherLoadAsyncTask(context, pe, this);
-        try {
-            this.position = pe;
-            JSONObject queryObj = new JSONObject();
-            queryObj.put("latitude", pe.getLat() + "");
-            queryObj.put("longitude", pe.getLon() + "");
-            task.execute(queryObj);
-        } catch (Exception e) {
-            e.printStackTrace();
+        }else {
+            PositionWeatherLoadAsyncTask task = new PositionWeatherLoadAsyncTask(context, pe, this);
+            try {
+                JSONObject queryObj = new JSONObject();
+                queryObj.put("latitude", pe.getLat() + "");
+                queryObj.put("longitude", pe.getLon() + "");
+                task.execute(queryObj);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
