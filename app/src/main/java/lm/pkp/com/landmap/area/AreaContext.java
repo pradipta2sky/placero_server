@@ -48,11 +48,15 @@ public class AreaContext {
     private void loadCenterPosition(AreaElement areaElement) {
         double latSum = 0.0;
         double longSum = 0.0;
+        String positionId = null;
 
         List<PositionElement> positions = areaElement.getPositions();
         int noOfPositions = positions.size();
         for (int i = 0; i < noOfPositions; i++) {
             PositionElement pe = positions.get(i);
+            if(positionId == null){
+                positionId = pe.getUniqueId();
+            }
             latSum += pe.getLat();
             longSum += pe.getLon();
         }
@@ -63,7 +67,7 @@ public class AreaContext {
         PositionElement centerPosition = areaElement.getCenterPosition();
         centerPosition.setLat(latAvg);
         centerPosition.setLon(lonAvg);
-        centerPosition.setUniqueId(UUID.randomUUID().toString());
+        centerPosition.setUniqueId(positionId);
     }
 
     // Drive specific resources.

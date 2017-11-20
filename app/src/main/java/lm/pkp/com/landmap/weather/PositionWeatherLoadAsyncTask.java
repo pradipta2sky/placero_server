@@ -37,11 +37,6 @@ public class PositionWeatherLoadAsyncTask extends AsyncTask<JSONObject, Void, St
     @Override
     protected String doInBackground(JSONObject... params) {
         try {
-            WeatherDBHelper wdh = new WeatherDBHelper(context);
-            WeatherElement weatherByPosition = wdh.getWeatherByPosition(position);
-            if(weatherByPosition != null){
-                return null;
-            }
             String urlString = "http://35.202.7.223/lm/FetchWeather.php";
             JSONObject postDataParam = params[0];
             String latitude = postDataParam.getString("latitude");

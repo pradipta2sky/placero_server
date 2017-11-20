@@ -4,6 +4,7 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.format.DateUtils;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,7 +32,10 @@ public class WeatherDisplayFragment extends Fragment {
         addressText.setText(weather.getAddress());
 
         TextView updatedText = (TextView) rootView.findViewById(R.id.w_updated);
-        updatedText.setText(weather.getCreatedOn());
+        Long createdMillis = new Long(weather.getCreatedOn());
+        CharSequence timeSpan = DateUtils.getRelativeTimeSpanString(createdMillis,
+                System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS);
+        updatedText.setText(timeSpan.toString());
 
         TextView weatherIcon = (TextView) rootView.findViewById(R.id.weather_icon);
         weatherIcon.setTypeface(Typeface.createFromAsset(getActivity().getAssets(), "fonts/weathericons-regular-webfont.ttf"));
@@ -41,18 +45,18 @@ public class WeatherDisplayFragment extends Fragment {
         condition.setText(weather.getConditionText());
 
         TextView temperature = (TextView) rootView.findViewById(R.id.w_temperature);
-        temperature.setText(weather.getTemperature());
+        temperature.setText("Temperature " + convertFarenheitToCelcius(weather.getTemperature()) + " \u2103");
 
         TextView humidity = (TextView) rootView.findViewById(R.id.w_humidity);
-        humidity.setText(weather.getHumidity());
+        humidity.setText("Humidity " + weather.getHumidity() + " %");
 
         TextView windDetails = (TextView) rootView.findViewById(R.id.w_wind_details);
         String windChill = convertFarenheitToCelcius(weather.getWindChill());
         String windDirection
                 = WindInterpreter.getDirectionFromBearing(Double.parseDouble(weather.getWindDirection()));
         String windSpeed = convertMilesToKms(weather.getWindSpeed());
-        String windText = "Wind is flowing @" + windSpeed + " km/hr, in "
-                + windDirection + " direction. Wind temperature is " + windChill + ".";
+        String windText = "Wind @" + windSpeed + " km/hr, "
+                + windDirection + ", " + windChill + " \u2103";
         windDetails.setText(windText);
 
         // Fill the data here
@@ -68,7 +72,7 @@ public class WeatherDisplayFragment extends Fragment {
     public String convertMilesToKms(String miles) {
         float milesFloat = Float.parseFloat(miles);
         double kilometers = milesFloat * 1.609344;
-        return kilometers + "";
+        return String.format("%.2f", kilometers);
     }
 
     private String getWeatherIcon(int code) {

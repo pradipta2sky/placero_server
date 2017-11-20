@@ -34,6 +34,13 @@ public class WeatherManager implements AsyncTaskCallback {
         if ((pe.getLat() == 0.0) && (pe.getLon() == 0.0)) {
             return;
         }
+        WeatherDBHelper wdh = new WeatherDBHelper(context);
+        WeatherElement wbp = wdh.getWeatherByPosition(pe);
+        if(wbp != null){
+            position.setWeather(wbp);
+            callback.taskCompleted(wbp);
+            return;
+        }
         PositionWeatherLoadAsyncTask task = new PositionWeatherLoadAsyncTask(context, pe, this);
         try {
             this.position = pe;
