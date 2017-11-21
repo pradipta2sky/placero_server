@@ -41,40 +41,40 @@ public class DriveDBHelper extends SQLiteOpenHelper {
     public static final String DRIVE_COLUMN_SIZE = "size";
     public static final String DRIVE_COLUMN_LATITUDE = "latitude";
     public static final String DRIVE_COLUMN_LONGITUDE = "longitude";
-    public static final String DRIVE_COLUMN_CREATED_MILLIS = "created_millis";
+    public static final String DRIVE_COLUMN_CREATED_ON = "created_on";
 
     public DriveDBHelper(Context context, AsyncTaskCallback callback) {
-        super(context, DriveDBHelper.DATABASE_NAME, null, 1);
+        super(context, DATABASE_NAME, null, 1);
         this.callback = callback;
     }
 
     public DriveDBHelper(Context context) {
-        super(context, DriveDBHelper.DATABASE_NAME, null, 1);
+        super(context, DATABASE_NAME, null, 1);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(
-                "create table " + DriveDBHelper.DRIVE_TABLE_NAME + "(" +
-                        DriveDBHelper.DRIVE_COLUMN_UNIQUE_ID + " text," +
-                        DriveDBHelper.DRIVE_COLUMN_AREA_ID + " text," +
-                        DriveDBHelper.DRIVE_COLUMN_USER_ID + " text," +
-                        DriveDBHelper.DRIVE_COLUMN_RESOURCE_ID + " text," +
-                        DriveDBHelper.DRIVE_COLUMN_CONTAINER_ID + " text," +
-                        DriveDBHelper.DRIVE_COLUMN_NAME + " text," +
-                        DriveDBHelper.DRIVE_COLUMN_TYPE + " text," +
-                        DriveDBHelper.DRIVE_COLUMN_CONTENT_TYPE + " text," +
-                        DriveDBHelper.DRIVE_COLUMN_MIME_TYPE + " text," +
-                        DriveDBHelper.DRIVE_COLUMN_LATITUDE + " text," +
-                        DriveDBHelper.DRIVE_COLUMN_LONGITUDE + " text," +
-                        DriveDBHelper.DRIVE_COLUMN_CREATED_MILLIS + " text," +
-                        DriveDBHelper.DRIVE_COLUMN_SIZE + " text)"
+                "create table " + DRIVE_TABLE_NAME + "(" +
+                        DRIVE_COLUMN_UNIQUE_ID + " text," +
+                        DRIVE_COLUMN_AREA_ID + " text," +
+                        DRIVE_COLUMN_USER_ID + " text," +
+                        DRIVE_COLUMN_RESOURCE_ID + " text," +
+                        DRIVE_COLUMN_CONTAINER_ID + " text," +
+                        DRIVE_COLUMN_NAME + " text," +
+                        DRIVE_COLUMN_TYPE + " text," +
+                        DRIVE_COLUMN_CONTENT_TYPE + " text," +
+                        DRIVE_COLUMN_MIME_TYPE + " text," +
+                        DRIVE_COLUMN_LATITUDE + " text," +
+                        DRIVE_COLUMN_LONGITUDE + " text," +
+                        DRIVE_COLUMN_CREATED_ON + " text," +
+                        DRIVE_COLUMN_SIZE + " text)"
         );
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + DriveDBHelper.DRIVE_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + DRIVE_TABLE_NAME);
         this.onCreate(db);
     }
 
@@ -82,21 +82,21 @@ public class DriveDBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
-        contentValues.put(DriveDBHelper.DRIVE_COLUMN_UNIQUE_ID, dr.getUniqueId());
-        contentValues.put(DriveDBHelper.DRIVE_COLUMN_AREA_ID, dr.getAreaId());
-        contentValues.put(DriveDBHelper.DRIVE_COLUMN_USER_ID, dr.getUserId());
-        contentValues.put(DriveDBHelper.DRIVE_COLUMN_RESOURCE_ID, dr.getResourceId());
-        contentValues.put(DriveDBHelper.DRIVE_COLUMN_CONTAINER_ID, dr.getContainerId());
-        contentValues.put(DriveDBHelper.DRIVE_COLUMN_NAME, dr.getName());
-        contentValues.put(DriveDBHelper.DRIVE_COLUMN_TYPE, dr.getType());
-        contentValues.put(DriveDBHelper.DRIVE_COLUMN_CONTENT_TYPE, dr.getContentType());
-        contentValues.put(DriveDBHelper.DRIVE_COLUMN_MIME_TYPE, dr.getMimeType());
-        contentValues.put(DriveDBHelper.DRIVE_COLUMN_SIZE, dr.getSize());
-        contentValues.put(DriveDBHelper.DRIVE_COLUMN_LATITUDE, dr.getLatitude());
-        contentValues.put(DriveDBHelper.DRIVE_COLUMN_LONGITUDE, dr.getLongitude());
-        contentValues.put(DriveDBHelper.DRIVE_COLUMN_CREATED_MILLIS, dr.getCreatedOnMillis());
+        contentValues.put(DRIVE_COLUMN_UNIQUE_ID, dr.getUniqueId());
+        contentValues.put(DRIVE_COLUMN_AREA_ID, dr.getAreaId());
+        contentValues.put(DRIVE_COLUMN_USER_ID, dr.getUserId());
+        contentValues.put(DRIVE_COLUMN_RESOURCE_ID, dr.getResourceId());
+        contentValues.put(DRIVE_COLUMN_CONTAINER_ID, dr.getContainerId());
+        contentValues.put(DRIVE_COLUMN_NAME, dr.getName());
+        contentValues.put(DRIVE_COLUMN_TYPE, dr.getType());
+        contentValues.put(DRIVE_COLUMN_CONTENT_TYPE, dr.getContentType());
+        contentValues.put(DRIVE_COLUMN_MIME_TYPE, dr.getMimeType());
+        contentValues.put(DRIVE_COLUMN_SIZE, dr.getSize());
+        contentValues.put(DRIVE_COLUMN_LATITUDE, dr.getLatitude());
+        contentValues.put(DRIVE_COLUMN_LONGITUDE, dr.getLongitude());
+        contentValues.put(DRIVE_COLUMN_CREATED_ON, dr.getCreatedOnMillis());
 
-        db.insert(DriveDBHelper.DRIVE_TABLE_NAME, null, contentValues);
+        db.insert(DRIVE_TABLE_NAME, null, contentValues);
         db.close();
     }
 
@@ -114,21 +114,21 @@ public class DriveDBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
-        contentValues.put(DriveDBHelper.DRIVE_COLUMN_UNIQUE_ID, dr.getUniqueId());
-        contentValues.put(DriveDBHelper.DRIVE_COLUMN_AREA_ID, dr.getAreaId());
-        contentValues.put(DriveDBHelper.DRIVE_COLUMN_USER_ID, dr.getUserId());
-        contentValues.put(DriveDBHelper.DRIVE_COLUMN_RESOURCE_ID, dr.getResourceId());
-        contentValues.put(DriveDBHelper.DRIVE_COLUMN_CONTAINER_ID, dr.getContainerId());
-        contentValues.put(DriveDBHelper.DRIVE_COLUMN_NAME, dr.getName());
-        contentValues.put(DriveDBHelper.DRIVE_COLUMN_TYPE, dr.getType());
-        contentValues.put(DriveDBHelper.DRIVE_COLUMN_CONTENT_TYPE, dr.getContentType());
-        contentValues.put(DriveDBHelper.DRIVE_COLUMN_MIME_TYPE, dr.getMimeType());
-        contentValues.put(DriveDBHelper.DRIVE_COLUMN_SIZE, dr.getSize());
-        contentValues.put(DriveDBHelper.DRIVE_COLUMN_LATITUDE, dr.getLatitude());
-        contentValues.put(DriveDBHelper.DRIVE_COLUMN_LONGITUDE, dr.getLongitude());
-        contentValues.put(DriveDBHelper.DRIVE_COLUMN_CREATED_MILLIS, dr.getCreatedOnMillis());
+        contentValues.put(DRIVE_COLUMN_UNIQUE_ID, dr.getUniqueId());
+        contentValues.put(DRIVE_COLUMN_AREA_ID, dr.getAreaId());
+        contentValues.put(DRIVE_COLUMN_USER_ID, dr.getUserId());
+        contentValues.put(DRIVE_COLUMN_RESOURCE_ID, dr.getResourceId());
+        contentValues.put(DRIVE_COLUMN_CONTAINER_ID, dr.getContainerId());
+        contentValues.put(DRIVE_COLUMN_NAME, dr.getName());
+        contentValues.put(DRIVE_COLUMN_TYPE, dr.getType());
+        contentValues.put(DRIVE_COLUMN_CONTENT_TYPE, dr.getContentType());
+        contentValues.put(DRIVE_COLUMN_MIME_TYPE, dr.getMimeType());
+        contentValues.put(DRIVE_COLUMN_SIZE, dr.getSize());
+        contentValues.put(DRIVE_COLUMN_LATITUDE, dr.getLatitude());
+        contentValues.put(DRIVE_COLUMN_LONGITUDE, dr.getLongitude());
+        contentValues.put(DRIVE_COLUMN_CREATED_ON, dr.getCreatedOnMillis());
 
-        db.insert(DriveDBHelper.DRIVE_TABLE_NAME, null, contentValues);
+        db.insert(DRIVE_TABLE_NAME, null, contentValues);
         db.close();
         return dr;
     }
@@ -138,8 +138,8 @@ public class DriveDBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("select * from " + DriveDBHelper.DRIVE_TABLE_NAME + " WHERE "
-                            + DriveDBHelper.DRIVE_COLUMN_AREA_ID + "=?",
+            cursor = db.rawQuery("select * from " + DRIVE_TABLE_NAME + " WHERE "
+                            + DRIVE_COLUMN_AREA_ID + "=?",
                     new String[]{aid});
             if (cursor == null) {
                 return allResources;
@@ -149,19 +149,19 @@ public class DriveDBHelper extends SQLiteOpenHelper {
                 while (cursor.isAfterLast() == false) {
                     DriveResource dr = new DriveResource();
 
-                    dr.setUniqueId(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_UNIQUE_ID)));
-                    dr.setAreaId(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_AREA_ID)));
-                    dr.setUserId(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_USER_ID)));
-                    dr.setContainerId(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_CONTAINER_ID)));
-                    dr.setResourceId(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_RESOURCE_ID)));
-                    dr.setName(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_NAME)));
-                    dr.setType(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_TYPE)));
-                    dr.setContentType(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_CONTENT_TYPE)));
-                    dr.setMimeType(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_MIME_TYPE)));
-                    dr.setSize(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_SIZE)));
-                    dr.setLatitude(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_LATITUDE)));
-                    dr.setLongitude(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_LONGITUDE)));
-                    dr.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_CREATED_MILLIS)));
+                    dr.setUniqueId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_UNIQUE_ID)));
+                    dr.setAreaId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_AREA_ID)));
+                    dr.setUserId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_USER_ID)));
+                    dr.setContainerId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CONTAINER_ID)));
+                    dr.setResourceId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_RESOURCE_ID)));
+                    dr.setName(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_NAME)));
+                    dr.setType(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_TYPE)));
+                    dr.setContentType(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CONTENT_TYPE)));
+                    dr.setMimeType(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_MIME_TYPE)));
+                    dr.setSize(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_SIZE)));
+                    dr.setLatitude(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_LATITUDE)));
+                    dr.setLongitude(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_LONGITUDE)));
+                    dr.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CREATED_ON)));
 
                     allResources.add(dr);
                     cursor.moveToNext();
@@ -181,8 +181,8 @@ public class DriveDBHelper extends SQLiteOpenHelper {
         Cursor cursor = null;
         DriveResource resource = new DriveResource();
         try {
-            cursor = db.rawQuery("select * from " + DriveDBHelper.DRIVE_TABLE_NAME + " WHERE "
-                            + DriveDBHelper.DRIVE_COLUMN_RESOURCE_ID + "=?",
+            cursor = db.rawQuery("select * from " + DRIVE_TABLE_NAME + " WHERE "
+                            + DRIVE_COLUMN_RESOURCE_ID + "=?",
                     new String[]{resourceID});
             if (cursor == null) {
                 return null;
@@ -190,19 +190,19 @@ public class DriveDBHelper extends SQLiteOpenHelper {
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 while (cursor.isAfterLast() == false) {
-                    resource.setUniqueId(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_UNIQUE_ID)));
-                    resource.setAreaId(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_AREA_ID)));
-                    resource.setUserId(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_USER_ID)));
-                    resource.setContainerId(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_CONTAINER_ID)));
-                    resource.setResourceId(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_RESOURCE_ID)));
-                    resource.setName(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_NAME)));
-                    resource.setType(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_TYPE)));
-                    resource.setContentType(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_CONTENT_TYPE)));
-                    resource.setMimeType(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_MIME_TYPE)));
-                    resource.setSize(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_SIZE)));
-                    resource.setLatitude(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_LATITUDE)));
-                    resource.setLongitude(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_LONGITUDE)));
-                    resource.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_CREATED_MILLIS)));
+                    resource.setUniqueId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_UNIQUE_ID)));
+                    resource.setAreaId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_AREA_ID)));
+                    resource.setUserId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_USER_ID)));
+                    resource.setContainerId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CONTAINER_ID)));
+                    resource.setResourceId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_RESOURCE_ID)));
+                    resource.setName(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_NAME)));
+                    resource.setType(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_TYPE)));
+                    resource.setContentType(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CONTENT_TYPE)));
+                    resource.setMimeType(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_MIME_TYPE)));
+                    resource.setSize(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_SIZE)));
+                    resource.setLatitude(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_LATITUDE)));
+                    resource.setLongitude(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_LONGITUDE)));
+                    resource.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CREATED_ON)));
                     break;
                 }
             }
@@ -221,9 +221,9 @@ public class DriveDBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("select * from " + DriveDBHelper.DRIVE_TABLE_NAME + " WHERE "
-                            + DriveDBHelper.DRIVE_COLUMN_AREA_ID + "=? AND " + DriveDBHelper.DRIVE_COLUMN_TYPE + "='folder' AND "
-                            + DriveDBHelper.DRIVE_COLUMN_CONTENT_TYPE + "='folder'",
+            cursor = db.rawQuery("select * from " + DRIVE_TABLE_NAME + " WHERE "
+                            + DRIVE_COLUMN_AREA_ID + "=? AND " + DRIVE_COLUMN_TYPE + "='folder' AND "
+                            + DRIVE_COLUMN_CONTENT_TYPE + "='folder'",
                     new String[]{areaElement.getUniqueId()});
             if (cursor == null) {
                 return null;
@@ -232,19 +232,19 @@ public class DriveDBHelper extends SQLiteOpenHelper {
                 cursor.moveToFirst();
                 while (cursor.isAfterLast() == false) {
                     DriveResource resource = new DriveResource();
-                    resource.setUniqueId(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_UNIQUE_ID)));
-                    resource.setAreaId(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_AREA_ID)));
-                    resource.setUserId(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_USER_ID)));
-                    resource.setContainerId(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_CONTAINER_ID)));
-                    resource.setResourceId(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_RESOURCE_ID)));
-                    resource.setName(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_NAME)));
-                    resource.setType(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_TYPE)));
-                    resource.setContentType(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_CONTENT_TYPE)));
-                    resource.setMimeType(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_MIME_TYPE)));
-                    resource.setSize(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_SIZE)));
-                    resource.setLatitude(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_LATITUDE)));
-                    resource.setLongitude(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_LONGITUDE)));
-                    resource.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_CREATED_MILLIS)));
+                    resource.setUniqueId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_UNIQUE_ID)));
+                    resource.setAreaId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_AREA_ID)));
+                    resource.setUserId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_USER_ID)));
+                    resource.setContainerId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CONTAINER_ID)));
+                    resource.setResourceId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_RESOURCE_ID)));
+                    resource.setName(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_NAME)));
+                    resource.setType(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_TYPE)));
+                    resource.setContentType(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CONTENT_TYPE)));
+                    resource.setMimeType(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_MIME_TYPE)));
+                    resource.setSize(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_SIZE)));
+                    resource.setLatitude(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_LATITUDE)));
+                    resource.setLongitude(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_LONGITUDE)));
+                    resource.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CREATED_ON)));
 
                     Map<String, DriveResource> commonResources = this.getCommonResources();
                     DriveResource commonParent = commonResources.get(parentName);
@@ -270,9 +270,9 @@ public class DriveDBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("select * from " + DriveDBHelper.DRIVE_TABLE_NAME + " WHERE "
-                            + DriveDBHelper.DRIVE_COLUMN_CONTENT_TYPE + "=? AND "
-                            + DriveDBHelper.DRIVE_COLUMN_AREA_ID + "=''",
+            cursor = db.rawQuery("select * from " + DRIVE_TABLE_NAME + " WHERE "
+                            + DRIVE_COLUMN_CONTENT_TYPE + "=? AND "
+                            + DRIVE_COLUMN_AREA_ID + "=''",
                     new String[]{"folder"});
             if (cursor == null) {
                 return resources;
@@ -282,19 +282,19 @@ public class DriveDBHelper extends SQLiteOpenHelper {
                 while (cursor.isAfterLast() == false) {
                     DriveResource dr = new DriveResource();
 
-                    dr.setUniqueId(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_UNIQUE_ID)));
-                    dr.setUserId(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_USER_ID)));
-                    dr.setContainerId(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_CONTAINER_ID)));
-                    dr.setResourceId(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_RESOURCE_ID)));
-                    dr.setName(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_NAME)));
-                    dr.setType(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_TYPE)));
+                    dr.setUniqueId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_UNIQUE_ID)));
+                    dr.setUserId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_USER_ID)));
+                    dr.setContainerId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CONTAINER_ID)));
+                    dr.setResourceId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_RESOURCE_ID)));
+                    dr.setName(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_NAME)));
+                    dr.setType(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_TYPE)));
                     dr.setContentType("folder");
                     dr.setMimeType("application/vnd.google-apps.folder");
                     dr.setAreaId("");
                     dr.setSize("0");
                     dr.setLatitude("");
                     dr.setLongitude("");
-                    dr.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_CREATED_MILLIS)));
+                    dr.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CREATED_ON)));
 
                     resources.put(dr.getName(), dr);
                     cursor.moveToNext();
@@ -314,9 +314,9 @@ public class DriveDBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("select * from " + DriveDBHelper.DRIVE_TABLE_NAME + " WHERE "
-                            + DriveDBHelper.DRIVE_COLUMN_AREA_ID + "=? AND " + DriveDBHelper.DRIVE_COLUMN_TYPE + "='file' AND "
-                            + DriveDBHelper.DRIVE_COLUMN_CONTENT_TYPE + "='Image'",
+            cursor = db.rawQuery("select * from " + DRIVE_TABLE_NAME + " WHERE "
+                            + DRIVE_COLUMN_AREA_ID + "=? AND " + DRIVE_COLUMN_TYPE + "='file' AND "
+                            + DRIVE_COLUMN_CONTENT_TYPE + "='Image'",
                     new String[]{areaElement.getUniqueId()});
             if (cursor == null) {
                 return null;
@@ -325,19 +325,19 @@ public class DriveDBHelper extends SQLiteOpenHelper {
                 cursor.moveToFirst();
                 while (cursor.isAfterLast() == false) {
                     DriveResource resource = new DriveResource();
-                    resource.setUniqueId(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_UNIQUE_ID)));
-                    resource.setAreaId(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_AREA_ID)));
-                    resource.setUserId(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_USER_ID)));
-                    resource.setContainerId(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_CONTAINER_ID)));
-                    resource.setResourceId(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_RESOURCE_ID)));
-                    resource.setName(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_NAME)));
-                    resource.setType(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_TYPE)));
-                    resource.setContentType(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_CONTENT_TYPE)));
-                    resource.setMimeType(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_MIME_TYPE)));
-                    resource.setSize(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_SIZE)));
-                    resource.setLatitude(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_LATITUDE)));
-                    resource.setLongitude(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_LONGITUDE)));
-                    resource.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(DriveDBHelper.DRIVE_COLUMN_CREATED_MILLIS)));
+                    resource.setUniqueId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_UNIQUE_ID)));
+                    resource.setAreaId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_AREA_ID)));
+                    resource.setUserId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_USER_ID)));
+                    resource.setContainerId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CONTAINER_ID)));
+                    resource.setResourceId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_RESOURCE_ID)));
+                    resource.setName(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_NAME)));
+                    resource.setType(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_TYPE)));
+                    resource.setContentType(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CONTENT_TYPE)));
+                    resource.setMimeType(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_MIME_TYPE)));
+                    resource.setSize(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_SIZE)));
+                    resource.setLatitude(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_LATITUDE)));
+                    resource.setLongitude(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_LONGITUDE)));
+                    resource.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CREATED_ON)));
 
                     resources.add(resource);
                     cursor.moveToNext();
@@ -358,20 +358,21 @@ public class DriveDBHelper extends SQLiteOpenHelper {
             postParams.put("requestType", "DriveMaster");
             postParams.put("query_type", queryType);
             postParams.put("device_id", AndroidSystemUtil.getDeviceId());
-            postParams.put(DriveDBHelper.DRIVE_COLUMN_AREA_ID, dr.getAreaId());
-            postParams.put(DriveDBHelper.DRIVE_COLUMN_USER_ID, dr.getUserId());
-            postParams.put(DriveDBHelper.DRIVE_COLUMN_UNIQUE_ID, dr.getUniqueId());
-            postParams.put(DriveDBHelper.DRIVE_COLUMN_CONTAINER_ID, dr.getContainerId());
-            postParams.put(DriveDBHelper.DRIVE_COLUMN_RESOURCE_ID, dr.getResourceId());
-            postParams.put(DriveDBHelper.DRIVE_COLUMN_NAME, dr.getName());
-            postParams.put(DriveDBHelper.DRIVE_COLUMN_TYPE, dr.getType());
-            postParams.put(DriveDBHelper.DRIVE_COLUMN_CONTENT_TYPE, dr.getContentType());
-            postParams.put(DriveDBHelper.DRIVE_COLUMN_MIME_TYPE, dr.getMimeType());
-            postParams.put(DriveDBHelper.DRIVE_COLUMN_SIZE, dr.getSize());
-            postParams.put(DriveDBHelper.DRIVE_COLUMN_LATITUDE, dr.getLatitude());
-            postParams.put(DriveDBHelper.DRIVE_COLUMN_LONGITUDE, dr.getLongitude());
-            postParams.put(DriveDBHelper.DRIVE_COLUMN_LONGITUDE, dr.getLongitude());
-            postParams.put(DriveDBHelper.DRIVE_COLUMN_CREATED_MILLIS, dr.getCreatedOnMillis());
+            postParams.put(DRIVE_COLUMN_AREA_ID, dr.getAreaId());
+            postParams.put(DRIVE_COLUMN_USER_ID, dr.getUserId());
+            postParams.put(DRIVE_COLUMN_UNIQUE_ID, dr.getUniqueId());
+            postParams.put(DRIVE_COLUMN_CONTAINER_ID, dr.getContainerId());
+            postParams.put(DRIVE_COLUMN_RESOURCE_ID, dr.getResourceId());
+            postParams.put(DRIVE_COLUMN_NAME, dr.getName());
+            postParams.put(DRIVE_COLUMN_TYPE, dr.getType());
+            postParams.put(DRIVE_COLUMN_CONTENT_TYPE, dr.getContentType());
+            postParams.put(DRIVE_COLUMN_MIME_TYPE, dr.getMimeType());
+            postParams.put(DRIVE_COLUMN_SIZE, dr.getSize());
+            postParams.put(DRIVE_COLUMN_LATITUDE, dr.getLatitude());
+            postParams.put(DRIVE_COLUMN_LONGITUDE, dr.getLongitude());
+            postParams.put(DRIVE_COLUMN_LONGITUDE, dr.getLongitude());
+            postParams.put(DRIVE_COLUMN_CREATED_ON, dr.getCreatedOnMillis());
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -380,15 +381,15 @@ public class DriveDBHelper extends SQLiteOpenHelper {
 
     public void deleteResourcesByAreaId(String areaId) {
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("DELETE FROM " + DriveDBHelper.DRIVE_TABLE_NAME + " WHERE "
-                + DriveDBHelper.DRIVE_COLUMN_AREA_ID + " = '" + areaId + "'");
+        db.execSQL("DELETE FROM " + DRIVE_TABLE_NAME + " WHERE "
+                + DRIVE_COLUMN_AREA_ID + " = '" + areaId + "'");
         db.close();
     }
 
     public void deleteResourceByResourceId(String resourceId) {
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("DELETE FROM " + DriveDBHelper.DRIVE_TABLE_NAME + " WHERE "
-                + DriveDBHelper.DRIVE_COLUMN_RESOURCE_ID + " = '" + resourceId + "'");
+        db.execSQL("DELETE FROM " + DRIVE_TABLE_NAME + " WHERE "
+                + DRIVE_COLUMN_RESOURCE_ID + " = '" + resourceId + "'");
         db.close();
 
         // Delete from server.
@@ -398,18 +399,23 @@ public class DriveDBHelper extends SQLiteOpenHelper {
         new LMSRestAsyncTask().execute(postParams);
     }
 
-    public void deleteResource(DriveResource resource) {
+    public void deleteResourceLocally(DriveResource resource) {
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("DELETE FROM " + DriveDBHelper.DRIVE_TABLE_NAME + " WHERE "
-                + DriveDBHelper.DRIVE_COLUMN_AREA_ID + "='" + resource.getAreaId() + "' and "
-                + DriveDBHelper.DRIVE_COLUMN_NAME + "='" + resource.getName() + "'");
+        db.execSQL("DELETE FROM " + DRIVE_TABLE_NAME + " WHERE "
+                + DRIVE_COLUMN_AREA_ID + "='" + resource.getAreaId() + "' and "
+                + DRIVE_COLUMN_NAME + "='" + resource.getName() + "'");
         db.close();
     }
 
+    public void deleteResourceFromServer(DriveResource resource) {
+        // Delete from server.
+        JSONObject postParams = this.preparePostParams("delete", resource);
+        new LMSRestAsyncTask().execute(postParams);
+    }
 
-    public void deleteDriveElementsLocally() {
+    public void cleanLocalDriveResources() {
         SQLiteDatabase db = getWritableDatabase();
-        db.delete(DriveDBHelper.DRIVE_TABLE_NAME, "1", null);
+        db.delete(DRIVE_TABLE_NAME, "1", null);
         db.close();
     }
 

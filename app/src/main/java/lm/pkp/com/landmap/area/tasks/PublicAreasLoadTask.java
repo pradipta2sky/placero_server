@@ -156,7 +156,7 @@ public class PublicAreasLoadTask extends AsyncTask<JSONObject, Void, String> {
                     pe.setAreaId(permissionObj.getString("area_id"));
                     pe.setFunctionCode(permissionObj.getString("function_code"));
 
-                    this.pmh.insertPermission(pe);
+                    this.pmh.insertPermissionLocally(pe);
                 }
             }
         } catch (Exception e) {

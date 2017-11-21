@@ -8,6 +8,7 @@ import java.util.List;
 
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
+import lm.pkp.com.landmap.permission.PermissionsDBHelper;
 import lm.pkp.com.landmap.position.PositionElement;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.sync.LocalFolderStructureManager;
@@ -37,14 +38,17 @@ public class AreaContext {
 
         PositionsDBHelper pdb = new PositionsDBHelper(context);
         this.currentArea.setPositions(pdb.getAllPositionForArea(this.currentArea));
-        this.loadCenterPosition(this.currentArea);
+        this.reCenter(this.currentArea);
 
         DriveDBHelper ddh = new DriveDBHelper(context);
         this.currentArea.setMediaResources(ddh.getDriveResourcesByAreaId(this.currentArea.getUniqueId()));
         this.currentArea.setCommonResources(ddh.getCommonResources());
+
+        PermissionsDBHelper pdh = new PermissionsDBHelper(context);
+        currentArea.setUserPermissions(pdh.fetchPermissionsByAreaId(currentArea.getUniqueId()));
     }
 
-    private void loadCenterPosition(AreaElement areaElement) {
+    public void reCenter(AreaElement areaElement) {
         double latSum = 0.0;
         double longSum = 0.0;
         String positionId = null;
@@ -86,16 +90,31 @@ public class AreaContext {
         return this.uploadQueue;
     }
 
+    private DriveResource imagesResourceRoot = null;
     public DriveResource getImagesRootDriveResource() {
-        return new DriveDBHelper(this.context).getDriveResourceRoot(FileStorageConstants.IMAGE_ROOT_FOLDER_NAME);
+        if(imagesResourceRoot == null){
+            DriveDBHelper ddh = new DriveDBHelper(context);
+            imagesResourceRoot = ddh.getDriveResourceRoot(FileStorageConstants.IMAGE_ROOT_FOLDER_NAME);
+        }
+        return imagesResourceRoot;
     }
 
+    private DriveResource videosResourceRoot = null;
     public DriveResource getVideosRootDriveResource() {
-        return new DriveDBHelper(this.context).getDriveResourceRoot(FileStorageConstants.VIDEO_ROOT_FOLDER_NAME);
+        if(videosResourceRoot == null){
+            DriveDBHelper ddh = new DriveDBHelper(context);
+            videosResourceRoot = ddh.getDriveResourceRoot(FileStorageConstants.VIDEO_ROOT_FOLDER_NAME);
+        }
+        return videosResourceRoot;
     }
 
+    private DriveResource documentsResourceRoot = null;
     public DriveResource getDocumentRootDriveResource() {
-        return new DriveDBHelper(this.context).getDriveResourceRoot(FileStorageConstants.DOCUMENT_ROOT_FOLDER_NAME);
+        if(documentsResourceRoot == null){
+            DriveDBHelper ddh = new DriveDBHelper(context);
+            documentsResourceRoot = ddh.getDriveResourceRoot(FileStorageConstants.DOCUMENT_ROOT_FOLDER_NAME);
+        }
+        return documentsResourceRoot;
     }
 
     public File getAreaLocalImageRoot(String areaId) {

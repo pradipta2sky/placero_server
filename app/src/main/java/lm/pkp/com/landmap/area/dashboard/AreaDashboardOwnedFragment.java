@@ -54,7 +54,7 @@ public class AreaDashboardOwnedFragment extends Fragment {
         ListView areaListView = (ListView) view.findViewById(id.area_display_list);
 
         if (areas.size() > 0) {
-            view.findViewById(id.owned_area_empty_layout).setVisibility(View.GONE);
+            view.findViewById(R.id.owned_area_empty_layout).setVisibility(View.GONE);
             areaListView.setVisibility(View.VISIBLE);
 
             AreaItemAdaptor adaptor = new AreaItemAdaptor(this.getContext(), layout.area_element_row, areas);

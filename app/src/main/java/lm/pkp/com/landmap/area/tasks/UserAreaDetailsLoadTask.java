@@ -11,8 +11,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -142,9 +140,7 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
                     dr.setContentType(driveObj.getString("content_type"));
                     dr.setLatitude(driveObj.getString("latitude"));
                     dr.setLongitude(driveObj.getString("longitude"));
-
-                    String createdAt = driveObj.getString("created_on");
-                    dr.setCreatedOnMillis(createdAt);
+                    dr.setCreatedOnMillis(driveObj.getString("created_on"));
 
                     this.ddh.insertResourceFromServer(dr);
                 }
@@ -158,7 +154,7 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
                     pe.setAreaId(permissionObj.getString("area_id"));
                     pe.setFunctionCode(permissionObj.getString("function_code"));
 
-                    this.pmh.insertPermission(pe);
+                    this.pmh.insertPermissionLocally(pe);
                 }
             }
 
@@ -177,9 +173,7 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
                 dr.setSize(driveObj.getString("size"));
                 dr.setMimeType(driveObj.getString("mime_type"));
                 dr.setContentType(driveObj.getString("content_type"));
-
-                String createdAt = driveObj.getString("created_on");
-                dr.setCreatedOnMillis(createdAt);
+                dr.setCreatedOnMillis(driveObj.getString("created_on"));
 
                 this.ddh.insertResourceFromServer(dr);
             }

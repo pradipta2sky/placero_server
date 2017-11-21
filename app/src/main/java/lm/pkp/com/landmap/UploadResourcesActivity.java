@@ -88,20 +88,20 @@ public class UploadResourcesActivity extends BaseDriveActivity {
         protected Object doInBackground(Object[] params) {
 
             DriveApi.DriveIdResult idResult
-                    = Drive.DriveApi.fetchDriveId(UploadResourcesActivity.this.getGoogleApiClient(), this.resource.getContainerId()).await();
+                    = Drive.DriveApi.fetchDriveId(getGoogleApiClient(), this.resource.getContainerId()).await();
             DriveFolder folder = idResult.getDriveId().asDriveFolder();
 
             DriveApi.DriveContentsResult contentsResult
-                    = Drive.DriveApi.newDriveContents(UploadResourcesActivity.this.getGoogleApiClient()).await();
+                    = Drive.DriveApi.newDriveContents(getGoogleApiClient()).await();
             DriveContents contents = contentsResult.getDriveContents();
             MetadataChangeSet changeSet = new Builder()
                     .setTitle(this.resource.getName())
                     .setMimeType(this.resource.getMimeType())
                     .build();
-            DriveFolder.DriveFileResult driveFileResult = folder.createFile(UploadResourcesActivity.this.getGoogleApiClient(), changeSet, contents).await();
+            DriveFolder.DriveFileResult driveFileResult = folder.createFile(getGoogleApiClient(), changeSet, contents).await();
 
             DriveFile createdFile = driveFileResult.getDriveFile();
-            createdFile.addChangeListener(UploadResourcesActivity.this.getGoogleApiClient(), new FileMetaChangeListener(this.resource, createdFile));
+            createdFile.addChangeListener(getGoogleApiClient(), new FileMetaChangeListener(this.resource, createdFile));
 
             return null;
         }
@@ -123,14 +123,12 @@ public class UploadResourcesActivity extends BaseDriveActivity {
                 DriveId driveId = changeEvent.getDriveId();
                 this.resource.setResourceId(driveId.getResourceId());
 
-                DriveDBHelper ddh = new DriveDBHelper(UploadResourcesActivity.this.getApplicationContext());
-                ddh.insertResourceLocally(this.resource);
-                ddh.insertResourceToServer(this.resource);
+                DriveDBHelper ddh = new DriveDBHelper(getApplicationContext());
+                ddh.insertResourceLocally(resource);
+                ddh.insertResourceToServer(resource);
 
-                AreaContext.INSTANCE.getAreaElement().getMediaResources().add(resource);
-
-                this.driveFile.removeChangeListener(UploadResourcesActivity.this.getGoogleApiClient(), this);
-                new CopyContentsAsyncTask(UploadResourcesActivity.this.getApplicationContext(), this.resource).execute(this.driveFile);
+                this.driveFile.removeChangeListener(getGoogleApiClient(), this);
+                new CopyContentsAsyncTask(getApplicationContext(), this.resource).execute(this.driveFile);
             }
         }
     }
@@ -168,17 +166,16 @@ public class UploadResourcesActivity extends BaseDriveActivity {
 
         @Override
         protected void onPostExecute(Boolean result) {
-
-            AreaContext.INSTANCE.removeResourceFromQueue(this.resource);
-
-            AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
+            AreaContext areaContext = AreaContext.INSTANCE;
+            AreaElement areaElement = areaContext.getAreaElement();
+            areaContext.removeResourceFromQueue(this.resource);
             areaElement.getMediaResources().add(this.resource);
 
             // Create thumbnails of the uploaded files for display.
             String resourcePath = this.resource.getPath();
             File resourceFile = new File(resourcePath);
 
-            ThumbnailCreator tCreator = new ThumbnailCreator(UploadResourcesActivity.this.getApplicationContext());
+            ThumbnailCreator tCreator = new ThumbnailCreator(getApplicationContext());
             if(FileUtil.isImageFile(resourceFile)){
                 tCreator.createImageThumbnail(resourceFile, areaElement.getUniqueId());
             }else if(FileUtil.isVideoFile(resourceFile)){
@@ -186,8 +183,7 @@ public class UploadResourcesActivity extends BaseDriveActivity {
             }else {
                 tCreator.createDocumentThumbnail(resourceFile, areaElement.getUniqueId());
             }
-
-            UploadResourcesActivity.this.processResources();
+            processResources();
         }
     }
 }

@@ -23,47 +23,57 @@ import lm.pkp.com.landmap.user.UserElement;
 public class PermissionsDBHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "landmap.db";
-    private AsyncTaskCallback callback;
-
     public static final String ACCESS_TABLE_NAME = "area_access";
     public static final String ACCESS_COLUMN_AREA_ID = "area_id";
     public static final String ACCESS_COLUMN_USER_ID = "user_id";
     public static final String ACCESS_COLUMN_FUNCTION_CODE = "function_code";
+    private AsyncTaskCallback callback;
 
     public PermissionsDBHelper(Context context, AsyncTaskCallback callback) {
-        super(context, PermissionsDBHelper.DATABASE_NAME, null, 1);
+        super(context,
+                DATABASE_NAME, null, 1);
         this.callback = callback;
     }
 
     public PermissionsDBHelper(Context context) {
-        super(context, PermissionsDBHelper.DATABASE_NAME, null, 1);
+        super(context,
+                DATABASE_NAME, null, 1);
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(
-                "create table " + PermissionsDBHelper.ACCESS_TABLE_NAME + "(" +
-                        PermissionsDBHelper.ACCESS_COLUMN_AREA_ID + " text," +
-                        PermissionsDBHelper.ACCESS_COLUMN_USER_ID + " text, " +
-                        PermissionsDBHelper.ACCESS_COLUMN_FUNCTION_CODE + " text)"
+                "create table " +
+                        ACCESS_TABLE_NAME + "(" +
+
+                        ACCESS_COLUMN_AREA_ID + " text," +
+
+                        ACCESS_COLUMN_USER_ID + " text, " +
+
+                        ACCESS_COLUMN_FUNCTION_CODE + " text)"
         );
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + PermissionsDBHelper.ACCESS_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " +
+                ACCESS_TABLE_NAME);
         this.onCreate(db);
     }
 
-    public PermissionElement insertPermission(PermissionElement pe) {
+    public PermissionElement insertPermissionLocally(PermissionElement pe) {
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
-        contentValues.put(PermissionsDBHelper.ACCESS_COLUMN_AREA_ID, pe.getAreaId());
-        contentValues.put(PermissionsDBHelper.ACCESS_COLUMN_FUNCTION_CODE, pe.getFunctionCode());
-        contentValues.put(PermissionsDBHelper.ACCESS_COLUMN_USER_ID, pe.getUserId());
+        contentValues.put(
+                ACCESS_COLUMN_AREA_ID, pe.getAreaId());
+        contentValues.put(
+                ACCESS_COLUMN_FUNCTION_CODE, pe.getFunctionCode());
+        contentValues.put(
+                ACCESS_COLUMN_USER_ID, pe.getUserId());
 
-        db.insert(PermissionsDBHelper.ACCESS_TABLE_NAME, null, contentValues);
+        db.insert(
+                ACCESS_TABLE_NAME, null, contentValues);
         db.close();
         return pe;
     }
@@ -92,23 +102,29 @@ public class PermissionsDBHelper extends SQLiteOpenHelper {
 
     public void deletePermissionsByAreaId(String areaId) {
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("DELETE FROM " + PermissionsDBHelper.ACCESS_TABLE_NAME + " WHERE "
-                + PermissionsDBHelper.ACCESS_COLUMN_AREA_ID + " = '" + areaId + "'");
+        db.execSQL("DELETE FROM " +
+                ACCESS_TABLE_NAME + " WHERE "
+                +
+                ACCESS_COLUMN_AREA_ID + " = '" + areaId + "'");
         db.close();
     }
 
     public Map<String, PermissionElement> fetchPermissionsByAreaId(String areaId) {
         SQLiteDatabase db = getWritableDatabase();
         Map<String, PermissionElement> perMap = new HashMap<>();
-        Cursor cursor = db.rawQuery("select * from " + PermissionsDBHelper.ACCESS_TABLE_NAME
-                + " WHERE " + PermissionsDBHelper.ACCESS_COLUMN_AREA_ID + "=?", new String[]{areaId});
+        Cursor cursor = db.rawQuery("select * from " +
+                ACCESS_TABLE_NAME
+                + " WHERE " +
+                ACCESS_COLUMN_AREA_ID + "=?", new String[]{areaId});
         if (cursor != null) {
             cursor.moveToFirst();
             while (cursor.isAfterLast() == false) {
                 PermissionElement pe = new PermissionElement();
-                pe.setUserId(cursor.getString(cursor.getColumnIndex(PermissionsDBHelper.ACCESS_COLUMN_USER_ID)));
+                pe.setUserId(cursor.getString(cursor.getColumnIndex(
+                        ACCESS_COLUMN_USER_ID)));
                 pe.setAreaId(areaId);
-                String functionCode = cursor.getString(cursor.getColumnIndex(PermissionsDBHelper.ACCESS_COLUMN_FUNCTION_CODE));
+                String functionCode = cursor.getString(cursor.getColumnIndex(
+                        ACCESS_COLUMN_FUNCTION_CODE));
                 pe.setFunctionCode(functionCode);
                 perMap.put(functionCode, pe);
                 cursor.moveToNext();

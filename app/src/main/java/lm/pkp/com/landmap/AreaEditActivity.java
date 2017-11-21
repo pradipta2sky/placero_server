@@ -71,19 +71,19 @@ public class AreaEditActivity extends AppCompatActivity {
         saveButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                AreaEditActivity.this.findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
+                findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
 
                 String areaName = nameText.getText().toString();
                 if (areaName.trim().equalsIgnoreCase("")) {
-                    AreaEditActivity.this.showErrorMessage("Area Name is required !!");
-                    AreaEditActivity.this.findViewById(R.id.splash_panel).setVisibility(View.GONE);
+                    showErrorMessage("Area Name is required !!");
+                    findViewById(R.id.splash_panel).setVisibility(View.GONE);
                     return;
                 }
                 ae.setName(areaName);
                 ae.setDescription(descText.getText().toString());
                 ae.setAddress(addressText.getText().toString());
 
-                AreaDBHelper adh = new AreaDBHelper(AreaEditActivity.this.getApplicationContext(), new UpdateAreaToServerCallback());
+                AreaDBHelper adh = new AreaDBHelper(getApplicationContext(), new UpdateAreaToServerCallback());
                 adh.updateAreaAttributes(ae);
                 adh.updateAreaOnServer(ae);
             }
@@ -102,15 +102,15 @@ public class AreaEditActivity extends AppCompatActivity {
         @Override
         public void taskCompleted(Object result) {
             // Work on the make public option.
-            CheckBox makePublicCheckBox = (CheckBox) AreaEditActivity.this.findViewById(R.id.make_area_public);
+            CheckBox makePublicCheckBox = (CheckBox) findViewById(R.id.make_area_public);
             if (makePublicCheckBox.isChecked()) {
-                PermissionsDBHelper pdh = new PermissionsDBHelper(AreaEditActivity.this.getApplicationContext(), new MakeAreaPublicCallback());
+                PermissionsDBHelper pdh = new PermissionsDBHelper(getApplicationContext(), new MakeAreaPublicCallback());
                 pdh.insertPermissionsToServer("any", "view_only");
             } else {
-                AreaEditActivity.this.findViewById(R.id.splash_panel).setVisibility(View.INVISIBLE);
-                Intent areaDetailsIntent = new Intent(AreaEditActivity.this.getApplicationContext(), AreaDetailsActivity.class);
-                AreaEditActivity.this.startActivity(areaDetailsIntent);
-                AreaEditActivity.this.finish();
+                findViewById(R.id.splash_panel).setVisibility(View.INVISIBLE);
+                Intent areaDetailsIntent = new Intent(getApplicationContext(), AreaDetailsActivity.class);
+                startActivity(areaDetailsIntent);
+                finish();
             }
         }
     }
@@ -121,8 +121,8 @@ public class AreaEditActivity extends AppCompatActivity {
         public void taskCompleted(Object result) {
             Intent areaDetailsIntent = new Intent(AreaEditActivity.this, ShareDriveResourcesActivity.class);
             areaDetailsIntent.putExtra("share_to_user", "äny");
-            AreaEditActivity.this.startActivity(areaDetailsIntent);
-            AreaEditActivity.this.finish();
+            startActivity(areaDetailsIntent);
+            finish();
         }
     }
 

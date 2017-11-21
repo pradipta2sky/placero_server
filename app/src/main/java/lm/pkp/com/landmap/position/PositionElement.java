@@ -18,7 +18,8 @@ public class PositionElement implements Serializable {
     private String tags = "";
     private String uniqueAreaId = "";
     private String uniqueId = "";
-    private String createdOnMillis = "";
+    private int sequence = 0;
+    private String createdOnMillis = System.currentTimeMillis() + "";
     private WeatherElement weather;
 
     public String getName() {
@@ -87,6 +88,14 @@ public class PositionElement implements Serializable {
 
     public void setCreatedOnMillis(String createdOnMillis) {
         this.createdOnMillis = createdOnMillis;
+    }
+
+    public int getSequence() {
+        return this.sequence;
+    }
+
+    public void setSequence(int sequence) {
+        this.sequence = sequence;
     }
 
     public WeatherElement getWeather() {

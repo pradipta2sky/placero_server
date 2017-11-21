@@ -20,7 +20,7 @@ public class DriveResource {
     private String mimeType = "";
     private String latitude = "";
     private String longitude = "";
-    private String createdOnMillis = "";
+    private String createdOnMillis = System.currentTimeMillis() + "";
 
     public String getUserId() {
         return this.userId;

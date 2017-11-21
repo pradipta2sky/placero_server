@@ -63,9 +63,11 @@ public class GPSLocationProvider implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-        this.pe.setUniqueId(UUID.randomUUID().toString());
-        this.pe.setLon(location.getLongitude());
-        this.pe.setLat(location.getLatitude());
+        pe.setUniqueId(UUID.randomUUID().toString());
+        pe.setLon(location.getLongitude());
+        pe.setLat(location.getLatitude());
+        pe.setCreatedOnMillis(System.currentTimeMillis() + "");
+
         if (this.receiver != null) {
             this.receiver.receivedLocationPostion(this.pe);
         } else {

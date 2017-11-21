@@ -1,7 +1,6 @@
 package lm.pkp.com.landmap;
 
 import android.R.drawable;
-import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
@@ -29,6 +28,7 @@ import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.permission.PermissionConstants;
 import lm.pkp.com.landmap.permission.PermissionElement;
+import lm.pkp.com.landmap.permission.PermissionsDBHelper;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.util.ColorProvider;
 
@@ -66,6 +66,9 @@ public class AreaDashboardActivity extends AppCompatActivity {
                 pe.setUserId(UserContext.getInstance().getUserElement().getEmail());
                 pe.setAreaId(areaElement.getUniqueId());
                 pe.setFunctionCode(PermissionConstants.FULL_CONTROL);
+
+                PermissionsDBHelper pdh = new PermissionsDBHelper(getApplicationContext());
+                pdh.insertPermissionLocally(pe);
                 areaElement.getUserPermissions().put(PermissionConstants.FULL_CONTROL, pe);
 
                 // Resetting the context for new Area

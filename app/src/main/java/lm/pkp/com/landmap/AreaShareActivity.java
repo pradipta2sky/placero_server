@@ -107,10 +107,10 @@ public class AreaShareActivity extends AppCompatActivity {
         roleGroup.setOnCheckedChangeListener(new OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                ViewStub stub = (ViewStub) AreaShareActivity.this.findViewById(R.id.share_details_stub);
+                ViewStub stub = (ViewStub) findViewById(R.id.share_details_stub);
                 if (stub == null) {
                     // View stub is already inflated
-                    View inflatedStub = AreaShareActivity.this.findViewById(R.id.share_details_stub_restricted);
+                    View inflatedStub = findViewById(R.id.share_details_stub_restricted);
                     if (inflatedStub != null) {
                         if (inflatedStub.getVisibility() == View.VISIBLE) {
                             inflatedStub.setVisibility(View.GONE);
@@ -133,14 +133,14 @@ public class AreaShareActivity extends AppCompatActivity {
         saveButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                AreaShareActivity.this.findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
+                findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
 
-                AutoCompleteTextView userIdView = (AutoCompleteTextView) AreaShareActivity.this.findViewById(R.id.user_search_text);
-                AreaShareActivity.this.targetUser = userIdView.getText().toString();
+                AutoCompleteTextView userIdView = (AutoCompleteTextView) findViewById(R.id.user_search_text);
+                targetUser = userIdView.getText().toString();
                 // target user should be a valid email.
-                if (!GeneralUtil.isValidEmail(AreaShareActivity.this.targetUser)) {
-                    AreaShareActivity.this.showErrorMessage("Please enter a valid email");
-                    AreaShareActivity.this.findViewById(R.id.splash_panel).setVisibility(View.GONE);
+                if (!GeneralUtil.isValidEmail(targetUser)) {
+                    showErrorMessage("Please enter a valid email");
+                    findViewById(R.id.splash_panel).setVisibility(View.GONE);
                     return;
                 }
 
@@ -148,16 +148,16 @@ public class AreaShareActivity extends AppCompatActivity {
                 View radioButton = roleGroup.findViewById(radioButtonID);
                 int idx = roleGroup.indexOfChild(radioButton);
 
-                PermissionsDBHelper pmh = new PermissionsDBHelper(AreaShareActivity.this.getApplicationContext(),
+                PermissionsDBHelper pmh = new PermissionsDBHelper(getApplicationContext(),
                         new DatabaseUpdateCallback());
                 if (idx == 0) {
                     // For view insert view_only permission.
-                    pmh.insertPermissionsToServer(AreaShareActivity.this.targetUser, "view_only");
+                    pmh.insertPermissionsToServer(targetUser, "view_only");
                 } else if (idx == 1) {
                     // For Full control insert full_control permission.
-                    pmh.insertPermissionsToServer(AreaShareActivity.this.targetUser, "full_control");
+                    pmh.insertPermissionsToServer(targetUser, "full_control");
                 } else if (idx == 2) {
-                    View inflatedStub = AreaShareActivity.this.findViewById(R.id.share_details_stub_restricted);
+                    View inflatedStub = findViewById(R.id.share_details_stub_restricted);
                     // For restricted read all the values.
                     ArrayList<View> touchableViews = inflatedStub.getTouchables();
                     List<String> checkedFunctions = new ArrayList<String>();
@@ -171,7 +171,7 @@ public class AreaShareActivity extends AppCompatActivity {
                         }
                     }
                     String joinedFunctions = TextUtils.join(",", checkedFunctions);
-                    pmh.insertPermissionsToServer(AreaShareActivity.this.targetUser, joinedFunctions);
+                    pmh.insertPermissionsToServer(targetUser, joinedFunctions);
                 }
             }
         });
@@ -191,7 +191,7 @@ public class AreaShareActivity extends AppCompatActivity {
             try {
                 String userArray = result.toString();
                 String currUserEmail = UserContext.getInstance().getUserElement().getEmail();
-                AreaShareActivity.this.adapter.clear();
+                adapter.clear();
 
                 if (!userArray.trim().equalsIgnoreCase("[]")) {
                     JSONArray responseArr = new JSONArray(userArray);
@@ -199,10 +199,10 @@ public class AreaShareActivity extends AppCompatActivity {
                         JSONObject responseObj = (JSONObject) responseArr.get(i);
                         String emailStr = responseObj.getString("email");
                         if (!currUserEmail.equalsIgnoreCase(emailStr)) {
-                            AreaShareActivity.this.adapter.add(emailStr);
+                            adapter.add(emailStr);
                         }
                     }
-                    AreaShareActivity.this.adapter.notifyDataSetChanged();
+                    adapter.notifyDataSetChanged();
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -215,10 +215,10 @@ public class AreaShareActivity extends AppCompatActivity {
 
         @Override
         public void taskCompleted(Object result) {
-            Intent shareResourcesIntent = new Intent(AreaShareActivity.this.getApplicationContext(), ShareDriveResourcesActivity.class);
-            shareResourcesIntent.putExtra("share_to_user", AreaShareActivity.this.targetUser);
-            AreaShareActivity.this.startActivity(shareResourcesIntent);
-            AreaShareActivity.this.finish();
+            Intent shareResourcesIntent = new Intent(getApplicationContext(), ShareDriveResourcesActivity.class);
+            shareResourcesIntent.putExtra("share_to_user", targetUser);
+            startActivity(shareResourcesIntent);
+            finish();
         }
     }
 

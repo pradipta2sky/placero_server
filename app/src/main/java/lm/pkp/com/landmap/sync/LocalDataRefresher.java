@@ -38,7 +38,7 @@ public class LocalDataRefresher implements AsyncTaskCallback {
         wdh.deleteWeatherElementsLocally();
 
         DriveDBHelper ddh = new DriveDBHelper(this.ctxt);
-        ddh.deleteDriveElementsLocally();
+        ddh.cleanLocalDriveResources();
 
         UserAreaDetailsLoadTask loadTask = new UserAreaDetailsLoadTask(this.ctxt);
         loadTask.setCompletionCallback(this);

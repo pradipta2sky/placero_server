@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
-import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
@@ -58,7 +57,7 @@ public class PostionListAdaptor extends ArrayAdapter<PositionElement> {
             @Override
             public void onClick(View v) {
                 PostionListAdaptor.this.items.remove(position);
-                PostionListAdaptor.this.pdh.deletePosition(pe);
+                PostionListAdaptor.this.pdh.deletePositionGlobally(pe);
                 AreaContext.INSTANCE.getAreaElement().getPositions().remove(pe);
                 PostionListAdaptor.this.notifyDataSetChanged();
             }
