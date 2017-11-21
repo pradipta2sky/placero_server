@@ -50,19 +50,23 @@ public class AreaContext {
         double longSum = 0.0;
         String positionId = null;
 
+        double latAvg = 0.0;
+        double lonAvg = 0.0;
+
         List<PositionElement> positions = areaElement.getPositions();
         int noOfPositions = positions.size();
-        for (int i = 0; i < noOfPositions; i++) {
-            PositionElement pe = positions.get(i);
-            if(positionId == null){
-                positionId = pe.getUniqueId();
+        if(noOfPositions != 0){
+            for (int i = 0; i < noOfPositions; i++) {
+                PositionElement pe = positions.get(i);
+                if(positionId == null){
+                    positionId = pe.getUniqueId();
+                }
+                latSum += pe.getLat();
+                longSum += pe.getLon();
             }
-            latSum += pe.getLat();
-            longSum += pe.getLon();
+            latAvg = latSum / noOfPositions;
+            lonAvg = longSum / noOfPositions;
         }
-
-        final double latAvg = latSum / noOfPositions;
-        final double lonAvg = longSum / noOfPositions;
 
         PositionElement centerPosition = areaElement.getCenterPosition();
         centerPosition.setLat(latAvg);
