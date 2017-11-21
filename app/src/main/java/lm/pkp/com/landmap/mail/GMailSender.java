@@ -13,6 +13,7 @@ import javax.activation.FileDataSource;
 import javax.mail.Authenticator;
 import javax.mail.BodyPart;
 import javax.mail.Message;
+import javax.mail.Message.RecipientType;
 import javax.mail.Multipart;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
@@ -24,13 +25,13 @@ import javax.mail.internet.MimeMultipart;
 
 public class GMailSender extends Authenticator {
 
-    private String mailhost = "smtp.gmail.com";
-    private String user;
-    private String password;
-    private Session session;
+    private final String mailhost = "smtp.gmail.com";
+    private final String user;
+    private final String password;
+    private final Session session;
 
 
-    private Multipart _multipart = new MimeMultipart();
+    private final Multipart _multipart = new MimeMultipart();
 
     static {
         Security.addProvider(new JSSEProvider());
@@ -43,7 +44,7 @@ public class GMailSender extends Authenticator {
 
         Properties props = new Properties();
         props.setProperty("mail.transport.protocol", "smtp");
-        props.setProperty("mail.host", mailhost);
+        props.setProperty("mail.host", this.mailhost);
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.port", "465");
         props.put("mail.smtp.socketFactory.port", "465");
@@ -51,31 +52,31 @@ public class GMailSender extends Authenticator {
         props.put("mail.smtp.socketFactory.fallback", "false");
         props.setProperty("mail.smtp.quitwait", "false");
 
-        session = Session.getDefaultInstance(props, this);
+        this.session = Session.getDefaultInstance(props, this);
     }
 
 
     protected PasswordAuthentication getPasswordAuthentication() {
-        return new PasswordAuthentication(user, password);
+        return new PasswordAuthentication(this.user, this.password);
     }
 
 
     public synchronized void sendMail(String subject, String body, String sender, String recipients) throws Exception {
         try {
-            MimeMessage message = new MimeMessage(session);
+            MimeMessage message = new MimeMessage(this.session);
             DataHandler handler = new DataHandler(new ByteArrayDataSource(body.getBytes(), "text/plain"));
             message.setSender(new InternetAddress(sender));
             message.setSubject(subject);
             message.setDataHandler(handler);
             BodyPart messageBodyPart = new MimeBodyPart();
             messageBodyPart.setText(body);
-            _multipart.addBodyPart(messageBodyPart);
+            this._multipart.addBodyPart(messageBodyPart);
             // Put parts in message
-            message.setContent(_multipart);
+            message.setContent(this._multipart);
             if (recipients.indexOf(',') > 0) {
-                message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(recipients));
+                message.setRecipients(RecipientType.TO, InternetAddress.parse(recipients));
             } else {
-                message.setRecipient(Message.RecipientType.TO, new InternetAddress(recipients));
+                message.setRecipient(RecipientType.TO, new InternetAddress(recipients));
             }
             Transport.send(message);
         } catch (Exception e) {
@@ -88,22 +89,20 @@ public class GMailSender extends Authenticator {
         DataSource source = new FileDataSource(filename);
         messageBodyPart.setDataHandler(new DataHandler(source));
         messageBodyPart.setFileName("download image");
-        _multipart.addBodyPart(messageBodyPart);
+        this._multipart.addBodyPart(messageBodyPart);
     }
 
 
     public class ByteArrayDataSource implements DataSource {
-        private byte[] data;
+        private final byte[] data;
         private String type;
 
         public ByteArrayDataSource(byte[] data, String type) {
-            super();
             this.data = data;
             this.type = type;
         }
 
         public ByteArrayDataSource(byte[] data) {
-            super();
             this.data = data;
         }
 
@@ -112,14 +111,14 @@ public class GMailSender extends Authenticator {
         }
 
         public String getContentType() {
-            if (type == null)
+            if (this.type == null)
                 return "application/octet-stream";
             else
-                return type;
+                return this.type;
         }
 
         public InputStream getInputStream() throws IOException {
-            return new ByteArrayInputStream(data);
+            return new ByteArrayInputStream(this.data);
         }
 
 

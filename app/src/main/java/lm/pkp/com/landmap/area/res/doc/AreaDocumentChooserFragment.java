@@ -1,19 +1,20 @@
 package lm.pkp.com.landmap.area.res.doc;
 
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore.Files;
-import android.provider.MediaStore.Files.FileColumns;
+import android.provider.MediaStore;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -28,6 +29,9 @@ import java.util.UUID;
 
 import lm.pkp.com.landmap.AreaAddResourcesActivity;
 import lm.pkp.com.landmap.R;
+import lm.pkp.com.landmap.R.drawable;
+import lm.pkp.com.landmap.R.id;
+import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.area.res.disp.DocumentChooserAdaptor;
@@ -42,37 +46,37 @@ public class AreaDocumentChooserFragment extends Fragment {
     private View fragmentView;
     private ListView listView;
     private DocumentChooserAdaptor listAdapter;
-    private PermittedFileArrayList<FileDisplayElement> items = new PermittedFileArrayList<FileDisplayElement>();
+    private final PermittedFileArrayList<FileDisplayElement> items = new PermittedFileArrayList<FileDisplayElement>();
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        if (fragmentView == null) {
-            fragmentView = inflater.inflate(R.layout.document_select_layout, container, false);
+        if (this.fragmentView == null) {
+            this.fragmentView = inflater.inflate(layout.document_select_layout, container, false);
 
-            listAdapter = new DocumentChooserAdaptor(getContext(), items);
-            TextView emptyView = (TextView) fragmentView.findViewById(R.id.searchEmptyView);
-            listView = (ListView) fragmentView.findViewById(R.id.document_list_view);
-            listView.setEmptyView(emptyView);
-            listView.setAdapter(listAdapter);
+            this.listAdapter = new DocumentChooserAdaptor(this.getContext(), this.items);
+            TextView emptyView = (TextView) this.fragmentView.findViewById(id.searchEmptyView);
+            this.listView = (ListView) this.fragmentView.findViewById(id.document_list_view);
+            this.listView.setEmptyView(emptyView);
+            this.listView.setAdapter(this.listAdapter);
 
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            this.listView.setOnItemClickListener(new OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    FileDisplayElement item = items.get(i);
+                    FileDisplayElement item = AreaDocumentChooserFragment.this.items.get(i);
                     File documentFile = new File(item.getPath());
                     if (!documentFile.canRead()) {
-                        showErrorBox("Error: File cannot be read. Probably corrupt / locked.");
+                        AreaDocumentChooserFragment.this.showErrorBox("Error: File cannot be read. Probably corrupt / locked.");
                         return;
                     }
                     if (documentFile.length() == 0) {
-                        showErrorBox("Error: File does not have any contents.");
+                        AreaDocumentChooserFragment.this.showErrorBox("Error: File does not have any contents.");
                         return;
                     }
 
-                    final AreaContext areaContext = AreaContext.INSTANCE;
+                    AreaContext areaContext = AreaContext.INSTANCE;
                     AreaElement ae = areaContext.getAreaElement();
 
                     File loadFile = new File(areaContext.getAreaLocalDocumentRoot(ae.getUniqueId())
@@ -97,52 +101,52 @@ public class AreaDocumentChooserFragment extends Fragment {
 
                     areaContext.addResourceToQueue(resource);
 
-                    getActivity().finish();
+                    AreaDocumentChooserFragment.this.getActivity().finish();
 
-                    Intent intent = new Intent(getActivity(), AreaAddResourcesActivity.class);
-                    startActivity(intent);
+                    Intent intent = new Intent(AreaDocumentChooserFragment.this.getActivity(), AreaAddResourcesActivity.class);
+                    AreaDocumentChooserFragment.this.startActivity(intent);
                 }
             });
 
             PermittedFileArrayList<FileDisplayElement> files = new PermittedFileArrayList<>();
-            files.addAll(findFiles(getContext(), "external", "application/pdf"));
-            files.addAll(findFiles(getContext(), "internal", "application/pdf"));
+            files.addAll(this.findFiles(this.getContext(), "external", "application/pdf"));
+            files.addAll(this.findFiles(this.getContext(), "internal", "application/pdf"));
 
-            items.addAll(files);
-            listAdapter.notifyDataSetChanged();
+            this.items.addAll(files);
+            this.listAdapter.notifyDataSetChanged();
         } else {
-            ViewGroup parent = (ViewGroup) fragmentView.getParent();
+            ViewGroup parent = (ViewGroup) this.fragmentView.getParent();
             if (parent != null) {
-                parent.removeView(fragmentView);
+                parent.removeView(this.fragmentView);
             }
         }
-        return fragmentView;
+        return this.fragmentView;
     }
 
     private PermittedFileArrayList<FileDisplayElement> findFiles(Context context, String location, String mimeType) {
         PermittedFileArrayList<FileDisplayElement> searchedFiles = new PermittedFileArrayList<>();
         ContentResolver cr = context.getContentResolver();
-        Uri uri = Files.getContentUri(location);
+        Uri uri = MediaStore.Files.getContentUri(location);
 
-        String mimeTypeCriteria = FileColumns.MIME_TYPE + "=?";
-        String[] mimeTypeArgs = new String[]{mimeType};
+        String mimeTypeCriteria = MediaStore.Files.FileColumns.MIME_TYPE + "=?";
+        String[] mimeTypeArgs = {mimeType};
 
         Cursor cursor = cr.query(uri, null, mimeTypeCriteria, mimeTypeArgs, null);
 
         if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
             while (cursor.isAfterLast() == false) {
-                String fileTitle = cursor.getString(cursor.getColumnIndex(FileColumns.TITLE));
-                String fileMime = cursor.getString(cursor.getColumnIndex(FileColumns.MIME_TYPE));
-                String fileSize = cursor.getString(cursor.getColumnIndex(FileColumns.SIZE));
-                String filePath = cursor.getString(cursor.getColumnIndex(FileColumns.DATA));
-                String fileLastModifed = cursor.getString(cursor.getColumnIndex(FileColumns.DATE_MODIFIED));
-                String fileCreated = cursor.getString(cursor.getColumnIndex(FileColumns.DATE_ADDED));
+                String fileTitle = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.TITLE));
+                String fileMime = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.MIME_TYPE));
+                String fileSize = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.SIZE));
+                String filePath = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DATA));
+                String fileLastModifed = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DATE_MODIFIED));
+                String fileCreated = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DATE_ADDED));
 
                 FileDisplayElement fileDisplayItem = new FileDisplayElement();
-                fileDisplayItem.setIcon(R.drawable.pdf_icon);
+                fileDisplayItem.setIcon(drawable.pdf_icon);
                 fileDisplayItem.setName(fileTitle);
-                fileDisplayItem.setDesc(createDescriptionText(fileSize, fileLastModifed));
+                fileDisplayItem.setDesc(this.createDescriptionText(fileSize, fileLastModifed));
                 fileDisplayItem.setMimeType(fileMime);
                 fileDisplayItem.setPath(filePath);
                 fileDisplayItem.setCreated(fileCreated);
@@ -160,8 +164,8 @@ public class AreaDocumentChooserFragment extends Fragment {
     private String createDescriptionText(String fileSize, String fileLastModifed) {
         // Prepare the size desc.
         Long size = new Long(fileSize);
-        int sizeKB = (int) (((float) size) / 1024);
-        int sizeMB = (int) (((float) sizeKB) / 1024);
+        int sizeKB = (int) ((float) size / 1024);
+        int sizeMB = (int) ((float) sizeKB / 1024);
         StringBuffer descBuffer = new StringBuffer();
         if (sizeKB > 1024) {
             descBuffer.append("Size " + sizeMB + "MBs, ");
@@ -171,9 +175,9 @@ public class AreaDocumentChooserFragment extends Fragment {
 
         // Prepare the last modified
         SimpleDateFormat format = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");
-        final Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Calcutta"));
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Asia/Calcutta"));
         calendar.setTimeInMillis(new Long(fileLastModifed) * 1000);
-        final String formattedDate = format.format(calendar.getTime());
+        String formattedDate = format.format(calendar.getTime());
         descBuffer.append(formattedDate);
 
         return descBuffer.toString();
@@ -181,10 +185,10 @@ public class AreaDocumentChooserFragment extends Fragment {
 
 
     public void showErrorBox(String error) {
-        if (getActivity() == null) {
+        if (this.getActivity() == null) {
             return;
         }
-        new AlertDialog.Builder(getActivity())
+        new Builder(this.getActivity())
                 .setTitle("Document Chooser Error")
                 .setMessage(error).setPositiveButton("OK", null).show();
     }

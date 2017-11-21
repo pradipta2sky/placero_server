@@ -8,8 +8,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 
+import lm.pkp.com.landmap.R.id;
+import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.area.res.disp.AreaDocumentDisplayFragment;
@@ -28,21 +29,21 @@ public class AreaResourceDisplayActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
 
-        setContentView(R.layout.activity_area_res_display);
-        Bundle extras = getIntent().getExtras();
+        this.setContentView(layout.activity_area_res_display);
+        Bundle extras = this.getIntent().getExtras();
 
         int selectedTab = 0;
-        if(extras != null){
+        if (extras != null) {
             selectedTab = extras.getInt("tab_position");
         }
 
-        final AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
+        AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
 
-        ViewPager viewPager = (ViewPager) findViewById(R.id.area_tab_pager);
+        ViewPager viewPager = (ViewPager) this.findViewById(id.area_tab_pager);
         // Assign created adapter to viewPager
-        viewPager.setAdapter(new DisplayResourcesPagerAdapter(getSupportFragmentManager()));
+        viewPager.setAdapter(new AreaResourceDisplayActivity.DisplayResourcesPagerAdapter(this.getSupportFragmentManager()));
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.tab_layout);
+        TabLayout tabLayout = (TabLayout) this.findViewById(id.tab_layout);
         // This method setup all required method for TabLayout with Viewpager
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.setBackgroundColor(ColorProvider.getAreaToolBarColor(areaElement));
@@ -74,7 +75,7 @@ public class AreaResourceDisplayActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return NUM_ITEMS;
+            return DisplayResourcesPagerAdapter.NUM_ITEMS;
 
         }
 
@@ -95,9 +96,9 @@ public class AreaResourceDisplayActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        finish();
+        this.finish();
 
-        Intent areaDashboardIntent = new Intent(getApplicationContext(), AreaDetailsActivity.class);
-        startActivity(areaDashboardIntent);
+        Intent areaDashboardIntent = new Intent(this.getApplicationContext(), AreaDetailsActivity.class);
+        this.startActivity(areaDashboardIntent);
     }
 }

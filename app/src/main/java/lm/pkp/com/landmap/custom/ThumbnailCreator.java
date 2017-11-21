@@ -2,9 +2,13 @@ package lm.pkp.com.landmap.custom;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
+import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
+import android.graphics.BitmapFactory.Options;
 import android.media.ThumbnailUtils;
 import android.provider.MediaStore;
+import android.provider.MediaStore.Video.Thumbnails;
 
 import com.tom_roush.pdfbox.pdmodel.PDDocument;
 import com.tom_roush.pdfbox.rendering.PDFRenderer;
@@ -14,18 +18,17 @@ import java.io.File;
 import java.io.FileOutputStream;
 
 import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.AreaElement;
 
 public class ThumbnailCreator {
 
-    private Context context;
+    private final Context context;
 
     public ThumbnailCreator(Context context) {
         this.context = context;
     }
 
     public void createImageThumbnail(File resourceFile, String areaId) {
-        BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+        Options bitmapOptions = new Options();
 
         bitmapOptions.inJustDecodeBounds = true; // obtain the size of the image, without loading it in memory
         BitmapFactory.decodeFile(resourceFile.getAbsolutePath(), bitmapOptions);
@@ -56,12 +59,12 @@ public class ThumbnailCreator {
         FileOutputStream fos = null;
         try {
             File thumbnailFile = new File(thumbFilePath);
-            if(thumbnailFile.exists()){
+            if (thumbnailFile.exists()) {
                 thumbnailFile.delete();
             }
             thumbnailFile.createNewFile();
             fos = new FileOutputStream(thumbnailFile);
-            thumbnail.compress(Bitmap.CompressFormat.JPEG, 100, fos);
+            thumbnail.compress(CompressFormat.JPEG, 100, fos);
 
             fos.flush();
             fos.close();
@@ -76,14 +79,14 @@ public class ThumbnailCreator {
 
     public void createVideoThumbnail(File resourceFile, String areaId) {
         Bitmap bMap = ThumbnailUtils.createVideoThumbnail(resourceFile.getAbsolutePath(),
-                MediaStore.Video.Thumbnails.MICRO_KIND);
+                Thumbnails.MICRO_KIND);
         FileOutputStream out = null;
         try {
             File thumbnailRoot = AreaContext.INSTANCE.getAreaLocalVideoThumbnailRoot(areaId);
             String thumbFilePath = thumbnailRoot.getAbsolutePath()
                     + File.separatorChar + resourceFile.getName();
             out = new FileOutputStream(thumbFilePath);
-            bMap.compress(Bitmap.CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
+            bMap.compress(CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
             // PNG is a lossless format, the compression factor (100) is ignored
             out.flush();
             out.close();
@@ -98,13 +101,13 @@ public class ThumbnailCreator {
 
     public void createDocumentThumbnail(File resourceFile, String areaId) {
         try {
-            if(!PDFBoxResourceLoader.isReady()){
-                PDFBoxResourceLoader.init(context);
+            if (!PDFBoxResourceLoader.isReady()) {
+                PDFBoxResourceLoader.init(this.context);
             }
 
             PDDocument document = PDDocument.load(resourceFile);
             PDFRenderer renderer = new PDFRenderer(document);
-            Bitmap pageImage = renderer.renderImage(0, 1, Bitmap.Config.RGB_565);
+            Bitmap pageImage = renderer.renderImage(0, 1, Config.RGB_565);
 
             String thumbRoot = AreaContext.INSTANCE
                     .getAreaLocalDocumentThumbnailRoot(areaId).getAbsolutePath();
@@ -115,7 +118,7 @@ public class ThumbnailCreator {
             }
 
             FileOutputStream fileOut = new FileOutputStream(thumbFile);
-            pageImage.compress(Bitmap.CompressFormat.JPEG, 100, fileOut);
+            pageImage.compress(CompressFormat.JPEG, 100, fileOut);
 
             fileOut.flush();
             fileOut.close();

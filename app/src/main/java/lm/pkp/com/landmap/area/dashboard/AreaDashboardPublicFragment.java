@@ -7,8 +7,10 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -16,6 +18,8 @@ import android.widget.ListView;
 
 import lm.pkp.com.landmap.AreaDetailsActivity;
 import lm.pkp.com.landmap.R;
+import lm.pkp.com.landmap.R.id;
+import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
@@ -32,7 +36,7 @@ public class AreaDashboardPublicFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_public_areas, container, false);
+        return inflater.inflate(layout.fragment_public_areas, container, false);
     }
 
     @Override
@@ -48,48 +52,48 @@ public class AreaDashboardPublicFragment extends Fragment {
     @Override
     public void setUserVisibleHint(boolean visible) {
         super.setUserVisibleHint(visible);
-        if (visible && isResumed()) {
-            loadFragment();
+        if (visible && this.isResumed()) {
+            this.loadFragment();
         }
     }
 
     private void loadFragment() {
-        View view = getView();
-        view.findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
+        View view = this.getView();
+        view.findViewById(id.splash_panel).setVisibility(View.VISIBLE);
 
-        final EditText inputSearch = (EditText) getActivity().findViewById(R.id.dashboard_search_box);
-        final String availableKey = inputSearch.getText().toString();
+        final EditText inputSearch = (EditText) this.getActivity().findViewById(id.dashboard_search_box);
+        String availableKey = inputSearch.getText().toString();
         inputSearch.addTextChangedListener(new UserInputWatcher());
 
         if (availableKey.trim().equalsIgnoreCase("")) {
-            LocalDataRefresher dataRefresher = new LocalDataRefresher(getContext(), new DataReloadCallback());
+            LocalDataRefresher dataRefresher = new LocalDataRefresher(this.getContext(), new DataReloadCallback());
             dataRefresher.refreshPublicAreas();
         } else {
-            LocalDataRefresher dataRefresher = new LocalDataRefresher(getContext(), new DataReloadCallback(availableKey.trim()));
+            LocalDataRefresher dataRefresher = new LocalDataRefresher(this.getContext(), new DataReloadCallback(availableKey.trim()));
             dataRefresher.refreshPublicAreas(availableKey.trim());
         }
 
-        ImageView refreshAreaView = (ImageView) getActivity().findViewById(R.id.action_area_refresh);
-        refreshAreaView.setOnClickListener(new View.OnClickListener() {
+        ImageView refreshAreaView = (ImageView) this.getActivity().findViewById(id.action_area_refresh);
+        refreshAreaView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                getView().findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
-                final String key = inputSearch.getText().toString();
+                AreaDashboardPublicFragment.this.getView().findViewById(id.splash_panel).setVisibility(View.VISIBLE);
+                String key = inputSearch.getText().toString();
                 if (key.trim().equalsIgnoreCase("")) {
-                    LocalDataRefresher dataRefresher = new LocalDataRefresher(getContext(), new DataReloadCallback());
+                    LocalDataRefresher dataRefresher = new LocalDataRefresher(AreaDashboardPublicFragment.this.getContext(), new DataReloadCallback());
                     dataRefresher.refreshPublicAreas();
                 } else {
-                    LocalDataRefresher dataRefresher = new LocalDataRefresher(getContext(), new DataReloadCallback(key.trim()));
+                    LocalDataRefresher dataRefresher = new LocalDataRefresher(AreaDashboardPublicFragment.this.getContext(), new DataReloadCallback(key.trim()));
                     dataRefresher.refreshPublicAreas(key.trim());
                 }
             }
         });
 
-        final Button seachClearButton = (Button) getActivity().findViewById(R.id.dashboard_search_clear);
-        seachClearButton.setOnClickListener(new View.OnClickListener() {
+        Button seachClearButton = (Button) this.getActivity().findViewById(id.dashboard_search_clear);
+        seachClearButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                final EditText inputSearch = (EditText) getActivity().findViewById(R.id.dashboard_search_box);
+                EditText inputSearch = (EditText) AreaDashboardPublicFragment.this.getActivity().findViewById(id.dashboard_search_box);
                 inputSearch.setText("");
             }
         });
@@ -98,44 +102,44 @@ public class AreaDashboardPublicFragment extends Fragment {
 
     private class DataReloadCallback implements AsyncTaskCallback {
 
-        private String filterStr;
+        private final String filterStr;
 
         public DataReloadCallback(String searchKey) {
-            this.filterStr = searchKey;
+            filterStr = searchKey;
         }
 
         public DataReloadCallback() {
-            this.filterStr = "";
+            filterStr = "";
         }
 
         @Override
         public void taskCompleted(Object result) {
-            AreaDBHelper adh = new AreaDBHelper(getContext());
+            AreaDBHelper adh = new AreaDBHelper(AreaDashboardPublicFragment.this.getContext());
 
-            AreaItemAdaptor adaptor = new AreaItemAdaptor(getContext(), R.layout.area_element_row, adh.getAreas("public"));
+            AreaItemAdaptor adaptor = new AreaItemAdaptor(AreaDashboardPublicFragment.this.getContext(), layout.area_element_row, adh.getAreas("public"));
             adaptor.notifyDataSetChanged();
-            ListView areaListView = (ListView) getView().findViewById(R.id.area_display_list);
+            ListView areaListView = (ListView) AreaDashboardPublicFragment.this.getView().findViewById(id.area_display_list);
             areaListView.setAdapter(adaptor);
 
-            if (!filterStr.equalsIgnoreCase("")) {
-                adaptor.getFilter().filter(filterStr);
+            if (!this.filterStr.equalsIgnoreCase("")) {
+                adaptor.getFilter().filter(this.filterStr);
             }
 
             areaListView.setDescendantFocusability(ListView.FOCUS_BLOCK_DESCENDANTS);
-            areaListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            areaListView.setOnItemClickListener(new OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapter, View v, int position,
                                         long arg3) {
-                    getActivity().finish();
+                    AreaDashboardPublicFragment.this.getActivity().finish();
 
                     AreaElement ae = (AreaElement) adapter.getItemAtPosition(position);
-                    AreaContext.INSTANCE.setAreaElement(ae, getContext());
-                    Intent intent = new Intent(getContext(), AreaDetailsActivity.class);
-                    startActivity(intent);
+                    AreaContext.INSTANCE.setAreaElement(ae, AreaDashboardPublicFragment.this.getContext());
+                    Intent intent = new Intent(AreaDashboardPublicFragment.this.getContext(), AreaDetailsActivity.class);
+                    AreaDashboardPublicFragment.this.startActivity(intent);
                 }
             });
 
-            getView().findViewById(R.id.splash_panel).setVisibility(View.INVISIBLE);
+            AreaDashboardPublicFragment.this.getView().findViewById(id.splash_panel).setVisibility(View.INVISIBLE);
         }
     }
 
@@ -150,13 +154,13 @@ public class AreaDashboardPublicFragment extends Fragment {
 
         @Override
         public void afterTextChanged(Editable editable) {
-            getView().findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
+            AreaDashboardPublicFragment.this.getView().findViewById(id.splash_panel).setVisibility(View.VISIBLE);
             String filterStr = editable.toString().trim();
             if (!filterStr.equalsIgnoreCase("")) {
-                LocalDataRefresher dataRefresher = new LocalDataRefresher(getContext(), new DataReloadCallback(filterStr));
+                LocalDataRefresher dataRefresher = new LocalDataRefresher(AreaDashboardPublicFragment.this.getContext(), new DataReloadCallback(filterStr));
                 dataRefresher.refreshPublicAreas(filterStr);
             } else {
-                LocalDataRefresher dataRefresher = new LocalDataRefresher(getContext(), new DataReloadCallback());
+                LocalDataRefresher dataRefresher = new LocalDataRefresher(AreaDashboardPublicFragment.this.getContext(), new DataReloadCallback());
                 dataRefresher.refreshPublicAreas();
             }
         }

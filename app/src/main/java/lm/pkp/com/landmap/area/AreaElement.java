@@ -21,18 +21,18 @@ public class AreaElement implements Serializable {
     private String description;
     private String createdBy;
     private String type;
-    private double measureSqFt = 0.0;
+    private double measureSqFt;
     private String uniqueId;
     private String address;
 
-    private PositionElement centerPosition = new PositionElement();
+    private final PositionElement centerPosition = new PositionElement();
     private List<PositionElement> positions = new ArrayList<>();
     private List<DriveResource> mediaResources = new ArrayList<>();
     private Map<String, DriveResource> commonResources = new HashMap<>();
     private Map<String, PermissionElement> userPermissions = new HashMap<>();
 
     public double getMeasureSqFt() {
-        return measureSqFt;
+        return this.measureSqFt;
     }
 
     public void setMeasureSqFt(double measureSqFt) {
@@ -40,7 +40,7 @@ public class AreaElement implements Serializable {
     }
 
     public String getCreatedBy() {
-        return createdBy;
+        return this.createdBy;
     }
 
     public void setCreatedBy(String createdBy) {
@@ -48,7 +48,7 @@ public class AreaElement implements Serializable {
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName(String name) {
@@ -56,7 +56,7 @@ public class AreaElement implements Serializable {
     }
 
     public String getDescription() {
-        return description;
+        return this.description;
     }
 
     public void setDescription(String description) {
@@ -64,7 +64,7 @@ public class AreaElement implements Serializable {
     }
 
     public List<PositionElement> getPositions() {
-        return positions;
+        return this.positions;
     }
 
     public void setPositions(List<PositionElement> positions) {
@@ -72,7 +72,7 @@ public class AreaElement implements Serializable {
     }
 
     public String getUniqueId() {
-        return uniqueId;
+        return this.uniqueId;
     }
 
     public void setUniqueId(String uniqueId) {
@@ -84,7 +84,7 @@ public class AreaElement implements Serializable {
     }
 
     public List<DriveResource> getMediaResources() {
-        return mediaResources;
+        return this.mediaResources;
     }
 
     public void setMediaResources(List<DriveResource> mediaResources) {
@@ -92,7 +92,7 @@ public class AreaElement implements Serializable {
     }
 
     public String getType() {
-        return this.type;
+        return type;
     }
 
     public void setType(String type) {
@@ -100,7 +100,7 @@ public class AreaElement implements Serializable {
     }
 
     public String getAddress() {
-        return this.address;
+        return address;
     }
 
     public void setAddress(String address) {
@@ -108,7 +108,7 @@ public class AreaElement implements Serializable {
     }
 
     public Map<String, PermissionElement> getUserPermissions() {
-        return this.userPermissions;
+        return userPermissions;
     }
 
     public void setUserPermissions(Map<String, PermissionElement> userPermissions) {
@@ -116,7 +116,7 @@ public class AreaElement implements Serializable {
     }
 
     public Map<String, DriveResource> getCommonResources() {
-        return this.commonResources;
+        return commonResources;
     }
 
     public void setCommonResources(Map<String, DriveResource> commonResources) {
@@ -124,7 +124,7 @@ public class AreaElement implements Serializable {
     }
 
     public PositionElement getCenterPosition() {
-        return this.centerPosition;
+        return centerPosition;
     }
 
 }

@@ -13,7 +13,7 @@ public class LandmapApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        instance = this;
+        LandmapApplication.instance = this;
     }
 
     @Override
@@ -22,6 +22,6 @@ public class LandmapApplication extends Application {
     }
 
     public static LandmapApplication getInstance() {
-        return instance;
+        return LandmapApplication.instance;
     }
 }

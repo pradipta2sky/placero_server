@@ -3,6 +3,7 @@ package lm.pkp.com.landmap.position;
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -11,6 +12,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import lm.pkp.com.landmap.R;
+import lm.pkp.com.landmap.R.id;
+import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
 
 /**
@@ -18,46 +21,46 @@ import lm.pkp.com.landmap.area.AreaContext;
  */
 public class PostionListAdaptor extends ArrayAdapter<PositionElement> {
 
-    private ArrayList<PositionElement> items;
-    private Context context;
-    private PositionsDBHelper pdh = null;
+    private final ArrayList<PositionElement> items;
+    private final Context context;
+    private PositionsDBHelper pdh;
 
     public PostionListAdaptor(Context context, int textViewResourceId, ArrayList<PositionElement> items) {
         super(context, textViewResourceId, items);
         this.context = context;
         this.items = items;
-        pdh = new PositionsDBHelper(context);
+        this.pdh = new PositionsDBHelper(context);
     }
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
         View v = convertView;
         if (v == null) {
-            LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            v = vi.inflate(R.layout.position_element_row, null);
+            LayoutInflater vi = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            v = vi.inflate(layout.position_element_row, null);
         } else {
             return v;
         }
 
-        final PositionElement pe = items.get(position);
-        TextView nameText = (TextView) v.findViewById(R.id.pos_name);
+        final PositionElement pe = this.items.get(position);
+        TextView nameText = (TextView) v.findViewById(id.pos_name);
         String pName = pe.getName();
         if (pName.length() > 25) {
             pName = pName.substring(0, 22).concat("...");
         }
         nameText.setText(pName);
 
-        TextView latLongText = (TextView) v.findViewById(R.id.pos_latlng);
+        TextView latLongText = (TextView) v.findViewById(id.pos_latlng);
         latLongText.setText("Lat: " + pe.getLat() + ", " + "Long: " + pe.getLon());
 
-        ImageView deleteButton = (ImageView) v.findViewById(R.id.del_row);
-        deleteButton.setOnClickListener(new View.OnClickListener() {
+        ImageView deleteButton = (ImageView) v.findViewById(id.del_row);
+        deleteButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                items.remove(position);
-                pdh.deletePosition(pe);
+                PostionListAdaptor.this.items.remove(position);
+                PostionListAdaptor.this.pdh.deletePosition(pe);
                 AreaContext.INSTANCE.getAreaElement().getPositions().remove(pe);
-                notifyDataSetChanged();
+                PostionListAdaptor.this.notifyDataSetChanged();
             }
         });
         return v;

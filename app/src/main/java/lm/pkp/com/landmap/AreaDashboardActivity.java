@@ -1,7 +1,10 @@
 package lm.pkp.com.landmap;
 
+import android.R.drawable;
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
@@ -14,6 +17,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
 
+import lm.pkp.com.landmap.R.id;
+import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.area.dashboard.AreaDashboardOwnedFragment;
@@ -34,27 +39,27 @@ public class AreaDashboardActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
 
-        setContentView(R.layout.activity_area_dashboard);
+        this.setContentView(layout.activity_area_dashboard);
         // Setup Toolbar
-        Toolbar toolbar = (Toolbar) findViewById(R.id.areas_display_toolbar);
-        setSupportActionBar(toolbar);
+        Toolbar toolbar = (Toolbar) this.findViewById(id.areas_display_toolbar);
+        this.setSupportActionBar(toolbar);
         toolbar.setBackgroundColor(ColorProvider.getDefaultToolBarColor());
 
-        ViewPager viewPager = (ViewPager) findViewById(R.id.areas_display_tab_pager);
+        ViewPager viewPager = (ViewPager) this.findViewById(id.areas_display_tab_pager);
         // Assign created adapter to viewPager
-        viewPager.setAdapter(new DisplayAreasPagerAdapter(getSupportFragmentManager()));
+        viewPager.setAdapter(new AreaDashboardActivity.DisplayAreasPagerAdapter(this.getSupportFragmentManager()));
 
-        TabLayout tabLayout = (TabLayout) findViewById(R.id.areas_display_tab_layout);
+        TabLayout tabLayout = (TabLayout) this.findViewById(id.areas_display_tab_layout);
         // This method setup all required method for TabLayout with Viewpager
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.setBackgroundColor(ColorProvider.getDefaultToolBarColor());
 
-        ImageView createAreaView = (ImageView) findViewById(R.id.action_area_create);
+        ImageView createAreaView = (ImageView) this.findViewById(id.action_area_create);
         createAreaView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
-                AreaDBHelper adh = new AreaDBHelper(getApplicationContext());
+                AreaDashboardActivity.this.findViewById(id.splash_panel).setVisibility(View.VISIBLE);
+                AreaDBHelper adh = new AreaDBHelper(AreaDashboardActivity.this.getApplicationContext());
                 AreaElement areaElement = adh.insertAreaLocally();
 
                 PermissionElement pe = new PermissionElement();
@@ -64,8 +69,8 @@ public class AreaDashboardActivity extends AppCompatActivity {
                 areaElement.getUserPermissions().put(PermissionConstants.FULL_CONTROL, pe);
 
                 // Resetting the context for new Area
-                AreaContext.INSTANCE.setAreaElement(areaElement, getApplicationContext());
-                adh = new AreaDBHelper(getApplicationContext(), new DataInsertServerCallback());
+                AreaContext.INSTANCE.setAreaElement(areaElement, AreaDashboardActivity.this.getApplicationContext());
+                adh = new AreaDBHelper(AreaDashboardActivity.this.getApplicationContext(), new DataInsertServerCallback());
                 adh.insertAreaToServer(areaElement);
             }
         });
@@ -97,7 +102,7 @@ public class AreaDashboardActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return NUM_ITEMS;
+            return DisplayAreasPagerAdapter.NUM_ITEMS;
 
         }
 
@@ -118,16 +123,16 @@ public class AreaDashboardActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        new AlertDialog.Builder(this).setIcon(android.R.drawable.ic_dialog_alert).setTitle("Exit")
+        new Builder(this).setIcon(drawable.ic_dialog_alert).setTitle("Exit")
                 .setMessage("Are you sure?")
-                .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                .setPositiveButton("yes", new OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Intent intent = new Intent(Intent.ACTION_MAIN);
                         intent.addCategory(Intent.CATEGORY_HOME);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(intent);
-                        finish();
+                        AreaDashboardActivity.this.startActivity(intent);
+                        AreaDashboardActivity.this.finish();
                     }
                 }).setNegativeButton("no", null).show();
     }
@@ -136,9 +141,9 @@ public class AreaDashboardActivity extends AppCompatActivity {
 
         @Override
         public void taskCompleted(Object result) {
-            finish();
-            Intent intent = new Intent(getApplicationContext(), CreateAreaFolderStructureActivity.class);
-            startActivity(intent);
+            AreaDashboardActivity.this.finish();
+            Intent intent = new Intent(AreaDashboardActivity.this.getApplicationContext(), CreateAreaFolderStructureActivity.class);
+            AreaDashboardActivity.this.startActivity(intent);
         }
     }
 

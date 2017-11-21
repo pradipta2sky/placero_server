@@ -23,7 +23,7 @@
             android:id="@+id/area_default_img"
             android:src="@drawable/app_icon1"
             android:layout_gravity="center_vertical"
-            android:layout_marginLeft="2dp"/>
+            android:layout_marginLeft="2dp" />
     </LinearLayout>
 
 

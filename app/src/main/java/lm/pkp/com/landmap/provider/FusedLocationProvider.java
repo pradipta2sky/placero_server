@@ -16,10 +16,10 @@ import lm.pkp.com.landmap.position.PositionElement;
  */
 public class FusedLocationProvider {
 
-    private Activity mContext;
+    private final Activity mContext;
 
     public FusedLocationProvider(Activity context) {
-        this.mContext = context;
+        mContext = context;
     }
 
     public void getLocation() {
@@ -31,7 +31,7 @@ public class FusedLocationProvider {
         criteria.setBearingRequired(false);
         criteria.setCostAllowed(true);
 
-        final LocationManager manager = (LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
+        LocationManager manager = (LocationManager) this.mContext.getSystemService(Context.LOCATION_SERVICE);
         final PositionElement pe = new PositionElement();
 
         LocationListener listener = new LocationListener() {
@@ -39,7 +39,7 @@ public class FusedLocationProvider {
             public void onLocationChanged(Location location) {
                 pe.setLon(location.getLongitude());
                 pe.setLat(location.getLatitude());
-                ((LocationPositionReceiver) mContext).receivedLocationPostion(pe);
+                ((LocationPositionReceiver) FusedLocationProvider.this.mContext).receivedLocationPostion(pe);
             }
 
             @Override

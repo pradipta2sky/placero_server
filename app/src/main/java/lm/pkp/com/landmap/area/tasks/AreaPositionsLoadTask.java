@@ -22,12 +22,12 @@ import lm.pkp.com.landmap.position.PositionsDBHelper;
 
 public class AreaPositionsLoadTask extends AsyncTask<JSONObject, Void, String> {
 
-    private Context localContext = null;
-    private PositionsDBHelper pdh = null;
+    private Context localContext;
+    private PositionsDBHelper pdh;
 
     public AreaPositionsLoadTask(Context appContext) {
-        this.localContext = appContext;
-        pdh = new PositionsDBHelper(this.localContext);
+        localContext = appContext;
+        this.pdh = new PositionsDBHelper(localContext);
     }
 
     protected void onPreExecute() {
@@ -88,7 +88,7 @@ public class AreaPositionsLoadTask extends AsyncTask<JSONObject, Void, String> {
                 pe.setLon(new Double((String) responseObj.get("lon")));
                 pe.setTags((String) responseObj.get("tags"));
 
-                pdh.insertPositionFromServer(pe);
+                this.pdh.insertPositionFromServer(pe);
             }
         } catch (Exception e) {
             e.printStackTrace();

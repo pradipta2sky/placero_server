@@ -6,14 +6,13 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 
 import com.google.android.gms.drive.Drive;
-import com.google.android.gms.drive.DriveApi.DriveContentsResult;
-import com.google.android.gms.drive.DriveApi.DriveIdResult;
+import com.google.android.gms.drive.DriveApi;
 import com.google.android.gms.drive.DriveContents;
 import com.google.android.gms.drive.DriveFile;
 import com.google.android.gms.drive.DriveFolder;
-import com.google.android.gms.drive.DriveFolder.DriveFileResult;
 import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.MetadataChangeSet;
+import com.google.android.gms.drive.MetadataChangeSet.Builder;
 import com.google.android.gms.drive.events.ChangeEvent;
 import com.google.android.gms.drive.events.ChangeListener;
 
@@ -26,6 +25,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Stack;
 
+import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.custom.ApiClientAsyncTask;
@@ -40,12 +40,12 @@ import lm.pkp.com.landmap.util.FileUtil;
  */
 public class UploadResourcesActivity extends BaseDriveActivity {
 
-    private Stack<DriveResource> processStack = new Stack<>();
+    private final Stack<DriveResource> processStack = new Stack<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_upload_area_resources);
+        this.setContentView(layout.activity_upload_area_resources);
     }
 
     @Override
@@ -55,20 +55,20 @@ public class UploadResourcesActivity extends BaseDriveActivity {
         // Preprocessing of the resources.
         ArrayList<DriveResource> resources = AreaContext.INSTANCE.getUploadedQueue();
         for (int i = 0; i < resources.size(); i++) {
-            processStack.push(resources.get(i));
+            this.processStack.push(resources.get(i));
         }
 
-        processResources();
+        this.processResources();
     }
 
     private void processResources() {
-        if (!processStack.isEmpty()) {
-            processResource(processStack.pop());
+        if (!this.processStack.isEmpty()) {
+            this.processResource(this.processStack.pop());
         } else {
-            finish();
-            getGoogleApiClient().disconnect();
-            Intent addResourcesIntent = new Intent(UploadResourcesActivity.this, AreaAddResourcesActivity.class);
-            startActivity(addResourcesIntent);
+            this.finish();
+            this.getGoogleApiClient().disconnect();
+            Intent addResourcesIntent = new Intent(this, AreaAddResourcesActivity.class);
+            this.startActivity(addResourcesIntent);
         }
     }
 
@@ -78,30 +78,30 @@ public class UploadResourcesActivity extends BaseDriveActivity {
 
     private class FileProcessingTask extends AsyncTask {
 
-        private DriveResource resource = null;
+        private DriveResource resource;
 
         public FileProcessingTask(DriveResource dr) {
-            resource = dr;
+            this.resource = dr;
         }
 
         @Override
         protected Object doInBackground(Object[] params) {
 
-            DriveIdResult idResult
-                    = Drive.DriveApi.fetchDriveId(getGoogleApiClient(), resource.getContainerId()).await();
+            DriveApi.DriveIdResult idResult
+                    = Drive.DriveApi.fetchDriveId(UploadResourcesActivity.this.getGoogleApiClient(), this.resource.getContainerId()).await();
             DriveFolder folder = idResult.getDriveId().asDriveFolder();
 
-            DriveContentsResult contentsResult
-                    = Drive.DriveApi.newDriveContents(getGoogleApiClient()).await();
+            DriveApi.DriveContentsResult contentsResult
+                    = Drive.DriveApi.newDriveContents(UploadResourcesActivity.this.getGoogleApiClient()).await();
             DriveContents contents = contentsResult.getDriveContents();
-            MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
-                    .setTitle(resource.getName())
-                    .setMimeType(resource.getMimeType())
+            MetadataChangeSet changeSet = new Builder()
+                    .setTitle(this.resource.getName())
+                    .setMimeType(this.resource.getMimeType())
                     .build();
-            DriveFileResult driveFileResult = folder.createFile(getGoogleApiClient(), changeSet, contents).await();
+            DriveFolder.DriveFileResult driveFileResult = folder.createFile(UploadResourcesActivity.this.getGoogleApiClient(), changeSet, contents).await();
 
             DriveFile createdFile = driveFileResult.getDriveFile();
-            createdFile.addChangeListener(getGoogleApiClient(), new FileMetaChangeListener(resource, createdFile));
+            createdFile.addChangeListener(UploadResourcesActivity.this.getGoogleApiClient(), new FileMetaChangeListener(this.resource, createdFile));
 
             return null;
         }
@@ -109,32 +109,32 @@ public class UploadResourcesActivity extends BaseDriveActivity {
 
     private class FileMetaChangeListener implements ChangeListener {
 
-        private DriveResource resource = null;
-        private DriveFile driveFile = null;
+        private DriveResource resource;
+        private DriveFile driveFile;
 
         public FileMetaChangeListener(DriveResource res, DriveFile dFile) {
-            resource = res;
-            driveFile = dFile;
+            this.resource = res;
+            this.driveFile = dFile;
         }
 
         @Override
         public void onChange(ChangeEvent changeEvent) {
             if (changeEvent.hasMetadataChanged()) {
                 DriveId driveId = changeEvent.getDriveId();
-                resource.setResourceId(driveId.getResourceId());
+                this.resource.setResourceId(driveId.getResourceId());
 
-                DriveDBHelper ddh = new DriveDBHelper(getApplicationContext());
-                ddh.insertResourceLocally(resource);
-                ddh.insertResourceToServer(resource);
+                DriveDBHelper ddh = new DriveDBHelper(UploadResourcesActivity.this.getApplicationContext());
+                ddh.insertResourceLocally(this.resource);
+                ddh.insertResourceToServer(this.resource);
 
-                driveFile.removeChangeListener(getGoogleApiClient(), this);
-                new CopyContentsAsyncTask(getApplicationContext(), resource).execute(driveFile);
+                this.driveFile.removeChangeListener(UploadResourcesActivity.this.getGoogleApiClient(), this);
+                new CopyContentsAsyncTask(UploadResourcesActivity.this.getApplicationContext(), this.resource).execute(this.driveFile);
             }
         }
     }
 
     public class CopyContentsAsyncTask extends ApiClientAsyncTask<DriveFile, Void, Boolean> {
-        private DriveResource resource = null;
+        private DriveResource resource;
 
         public CopyContentsAsyncTask(Context context, DriveResource resource) {
             super(context);
@@ -143,9 +143,9 @@ public class UploadResourcesActivity extends BaseDriveActivity {
 
         @Override
         protected Boolean doInBackgroundConnected(DriveFile... args) {
-            final DriveFile file = args[0];
-            DriveContentsResult driveContentsResult = file.open(
-                    getGoogleApiClient(), DriveFile.MODE_WRITE_ONLY, null).await();
+            DriveFile file = args[0];
+            DriveApi.DriveContentsResult driveContentsResult = file.open(
+                    this.getGoogleApiClient(), DriveFile.MODE_WRITE_ONLY, null).await();
             if (!driveContentsResult.getStatus().isSuccess()) {
                 return false;
             }
@@ -153,29 +153,29 @@ public class UploadResourcesActivity extends BaseDriveActivity {
             DriveContents driveContents = driveContentsResult.getDriveContents();
             OutputStream outputStream = driveContents.getOutputStream();
             try {
-                File inputFile = new File(resource.getPath());
+                File inputFile = new File(this.resource.getPath());
                 FileInputStream fileInputStream = new FileInputStream(inputFile);
                 IOUtils.copyLarge(fileInputStream, outputStream);
                 IOUtils.closeQuietly(fileInputStream);
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
-            driveContents.commit(getGoogleApiClient(), null).await();
+            driveContents.commit(this.getGoogleApiClient(), null).await();
             return false;
         }
 
         @Override
         protected void onPostExecute(Boolean result) {
 
-            AreaContext.INSTANCE.removeResourceFromQueue(resource);
+            AreaContext.INSTANCE.removeResourceFromQueue(this.resource);
             AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
-            areaElement.getMediaResources().add(resource);
+            areaElement.getMediaResources().add(this.resource);
 
             // Create thumbnails of the uploaded files for display.
-            String resourcePath = resource.getPath();
+            String resourcePath = this.resource.getPath();
             File resourceFile = new File(resourcePath);
 
-            ThumbnailCreator tCreator = new ThumbnailCreator(getApplicationContext());
+            ThumbnailCreator tCreator = new ThumbnailCreator(UploadResourcesActivity.this.getApplicationContext());
             if(FileUtil.isImageFile(resourceFile)){
                 tCreator.createImageThumbnail(resourceFile, areaElement.getUniqueId());
             }else if(FileUtil.isVideoFile(resourceFile)){
@@ -184,7 +184,7 @@ public class UploadResourcesActivity extends BaseDriveActivity {
                 tCreator.createDocumentThumbnail(resourceFile, areaElement.getUniqueId());
             }
 
-            processResources();
+            UploadResourcesActivity.this.processResources();
         }
     }
 }

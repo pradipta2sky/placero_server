@@ -8,6 +8,8 @@ import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
@@ -17,6 +19,8 @@ import java.io.File;
 import java.util.ArrayList;
 
 import lm.pkp.com.landmap.R;
+import lm.pkp.com.landmap.R.drawable;
+import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.RemoveDriveResourcesActivity;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaElement;
@@ -41,31 +45,31 @@ final class AreaVideoDisplayAdaptor extends BaseAdapter {
     public View getView(final int position, View convertView, ViewGroup parent) {
         SquaredImageView view = (SquaredImageView) convertView;
         if (view == null) {
-            view = new SquaredImageView(context);
+            view = new SquaredImageView(this.context);
             view.setScaleType(CENTER_CROP);
         } else {
             return view;
         }
 
         // Get the image URL for the current position.
-        final String url = getItem(position);
-        final VideoDisplayElement displayElement = dataSet.get(position);
+        final String url = this.getItem(position);
+        VideoDisplayElement displayElement = this.dataSet.get(position);
         final File displayFile = new File(displayElement.getAbsPath());
 
         AreaContext ac = AreaContext.INSTANCE;
         AreaElement ae = ac.getAreaElement();
 
-        String thumbPath = ac.INSTANCE.getAreaLocalVideoThumbnailRoot(ae.getUniqueId()).getAbsolutePath();
+        String thumbPath = AreaContext.INSTANCE.getAreaLocalVideoThumbnailRoot(ae.getUniqueId()).getAbsolutePath();
         String thumbnailFilePath = thumbPath + File.separatorChar + displayElement.getName();
         File thumbFile = new File(thumbnailFilePath);
 
-        if(thumbFile.exists()){
+        if (thumbFile.exists()) {
             Bitmap bMap = BitmapFactory.decodeFile(thumbnailFilePath);
             view.setImageBitmap(bMap);
         }
 
         final View referredView = view;
-        view.setOnClickListener(new View.OnClickListener() {
+        view.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
@@ -76,22 +80,22 @@ final class AreaVideoDisplayAdaptor extends BaseAdapter {
             }
         });
 
-        view.setOnLongClickListener(new View.OnLongClickListener() {
+        view.setOnLongClickListener(new OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 ImageView clickedImage = (ImageView) referredView;
-                clickedImage.setBackgroundResource(R.drawable.image_border);
+                clickedImage.setBackgroundResource(drawable.image_border);
 
-                FloatingActionButton deleteButton = (FloatingActionButton) fragment.getView().findViewById(R.id.res_delete);
+                FloatingActionButton deleteButton = (FloatingActionButton) AreaVideoDisplayAdaptor.this.fragment.getView().findViewById(id.res_delete);
                 deleteButton.setVisibility(View.VISIBLE);
-                deleteButton.setOnClickListener(new View.OnClickListener() {
+                deleteButton.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(referredView.getContext(), RemoveDriveResourcesActivity.class);
-                        String resourceId = dataSet.get(position).getResourceId();
+                        String resourceId = AreaVideoDisplayAdaptor.this.dataSet.get(position).getResourceId();
                         if (!resourceId.equalsIgnoreCase("")) {
                             intent.putExtra("resource_ids", resourceId);
-                            intent.putExtra("tab_position", tabPosition);
+                            intent.putExtra("tab_position", AreaVideoDisplayAdaptor.this.tabPosition);
                             referredView.getContext().startActivity(intent);
                         } else {
                             Toast.makeText(referredView.getContext(),
@@ -108,12 +112,12 @@ final class AreaVideoDisplayAdaptor extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return dataSet.size();
+        return this.dataSet.size();
     }
 
     @Override
     public String getItem(int position) {
-        return dataSet.get(position).getAbsPath();
+        return this.dataSet.get(position).getAbsPath();
     }
 
     @Override

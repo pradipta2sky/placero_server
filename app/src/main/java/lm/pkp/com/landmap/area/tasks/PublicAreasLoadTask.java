@@ -30,20 +30,20 @@ import lm.pkp.com.landmap.position.PositionsDBHelper;
 
 public class PublicAreasLoadTask extends AsyncTask<JSONObject, Void, String> {
 
-    private Context localContext = null;
-    private AreaDBHelper adh = null;
-    private PositionsDBHelper pdh = null;
-    private DriveDBHelper ddh = null;
-    private PermissionsDBHelper pmh = null;
+    private Context localContext;
+    private AreaDBHelper adh;
+    private PositionsDBHelper pdh;
+    private DriveDBHelper ddh;
+    private PermissionsDBHelper pmh;
 
-    private AsyncTaskCallback callback = null;
+    private AsyncTaskCallback callback;
 
     public PublicAreasLoadTask(Context appContext) {
-        this.localContext = appContext;
-        adh = new AreaDBHelper(this.localContext);
-        pdh = new PositionsDBHelper(this.localContext);
-        ddh = new DriveDBHelper(this.localContext);
-        pmh = new PermissionsDBHelper(this.localContext, null);
+        localContext = appContext;
+        this.adh = new AreaDBHelper(localContext);
+        this.pdh = new PositionsDBHelper(localContext);
+        this.ddh = new DriveDBHelper(localContext);
+        this.pmh = new PermissionsDBHelper(localContext, null);
     }
 
     protected void onPreExecute() {
@@ -110,7 +110,7 @@ public class PublicAreasLoadTask extends AsyncTask<JSONObject, Void, String> {
                 ae.setAddress(areaObj.getString("address"));
                 ae.setType(areaObj.getString("type"));
 
-                adh.insertAreaFromServer(ae);
+                this.adh.insertAreaFromServer(ae);
 
                 JSONArray positionsArr = (JSONArray) responseObj.get("positions");
                 for (int p = 0; p < positionsArr.length(); p++) {
@@ -125,7 +125,7 @@ public class PublicAreasLoadTask extends AsyncTask<JSONObject, Void, String> {
                     pe.setLon(positionObj.getDouble("lon"));
                     pe.setTags((String) positionObj.get("tags"));
 
-                    pdh.insertPositionFromServer(pe);
+                    this.pdh.insertPositionFromServer(pe);
                 }
 
                 JSONArray driveArr = (JSONArray) responseObj.get("drs");
@@ -144,7 +144,7 @@ public class PublicAreasLoadTask extends AsyncTask<JSONObject, Void, String> {
                     dr.setMimeType(driveObj.getString("mime_type"));
                     dr.setContentType(driveObj.getString("content_type"));
 
-                    ddh.insertResourceFromServer(dr);
+                    this.ddh.insertResourceFromServer(dr);
                 }
 
                 JSONArray permissionsArr = (JSONArray) responseObj.get("permissions");
@@ -156,13 +156,13 @@ public class PublicAreasLoadTask extends AsyncTask<JSONObject, Void, String> {
                     pe.setAreaId(permissionObj.getString("area_id"));
                     pe.setFunctionCode(permissionObj.getString("function_code"));
 
-                    pmh.insertPermission(pe);
+                    this.pmh.insertPermission(pe);
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        finalizeTaskCompletion();
+        this.finalizeTaskCompletion();
     }
 
     public void setCompletionCallback(AsyncTaskCallback callback) {
@@ -170,6 +170,6 @@ public class PublicAreasLoadTask extends AsyncTask<JSONObject, Void, String> {
     }
 
     public void finalizeTaskCompletion() {
-        callback.taskCompleted("");
+        this.callback.taskCompleted("");
     }
 }

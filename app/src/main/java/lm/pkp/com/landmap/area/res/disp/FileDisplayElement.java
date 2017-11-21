@@ -18,7 +18,7 @@ public class FileDisplayElement implements FileItemMarker {
     private String sizeBytes;
 
     public int getIcon() {
-        return this.icon;
+        return icon;
     }
 
     public void setIcon(int icon) {
@@ -26,7 +26,7 @@ public class FileDisplayElement implements FileItemMarker {
     }
 
     public String getName() {
-        return this.name;
+        return name;
     }
 
     public void setName(String name) {
@@ -34,15 +34,15 @@ public class FileDisplayElement implements FileItemMarker {
     }
 
     public String getDesc() {
-        return this.desc;
+        return desc;
     }
 
     public void setDesc(String des) {
-        this.desc = des;
+        desc = des;
     }
 
     public String getThumb() {
-        return this.thumb;
+        return thumb;
     }
 
     public void setThumb(String thumb) {
@@ -50,7 +50,7 @@ public class FileDisplayElement implements FileItemMarker {
     }
 
     public String getMimeType() {
-        return this.mimeType;
+        return mimeType;
     }
 
     public void setMimeType(String mimeType) {
@@ -58,7 +58,7 @@ public class FileDisplayElement implements FileItemMarker {
     }
 
     public String getPath() {
-        return this.path;
+        return path;
     }
 
     public void setPath(String path) {
@@ -66,7 +66,7 @@ public class FileDisplayElement implements FileItemMarker {
     }
 
     public String getCreated() {
-        return this.created;
+        return created;
     }
 
     public void setCreated(String created) {
@@ -74,7 +74,7 @@ public class FileDisplayElement implements FileItemMarker {
     }
 
     public String getLastModified() {
-        return this.lastModified;
+        return lastModified;
     }
 
     public void setLastModified(String lastModified) {
@@ -82,7 +82,7 @@ public class FileDisplayElement implements FileItemMarker {
     }
 
     public String getSizeBytes() {
-        return this.sizeBytes;
+        return sizeBytes;
     }
 
     public void setSizeBytes(String sizeBytes) {

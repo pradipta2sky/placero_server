@@ -21,9 +21,9 @@ import lm.pkp.com.landmap.position.PositionElement;
 public class GPSLocationProvider implements LocationListener {
 
     private final Activity activity;
-    private LocationPositionReceiver receiver = null;
-    private int timeout = 60;
-    private PositionElement pe = new PositionElement();
+    private LocationPositionReceiver receiver;
+    private int timeout = 30;
+    private final PositionElement pe = new PositionElement();
 
     public GPSLocationProvider(Activity activity) {
         this.activity = activity;
@@ -37,25 +37,25 @@ public class GPSLocationProvider implements LocationListener {
     public GPSLocationProvider(Activity activity, LocationPositionReceiver receiver, int timeoutSecs) {
         this.activity = activity;
         this.receiver = receiver;
-        this.timeout = timeoutSecs;
+        timeout = timeoutSecs;
     }
 
     public void getLocation() {
         try {
-            final LocationManager locationManager = (LocationManager) activity.getSystemService(Context.LOCATION_SERVICE);
+            final LocationManager locationManager = (LocationManager) this.activity.getSystemService(Context.LOCATION_SERVICE);
             locationManager.requestSingleUpdate(LocationManager.GPS_PROVIDER, this, null);
 
             Looper looper = Looper.myLooper();
-            final Handler handler = new Handler(looper);
+            Handler handler = new Handler(looper);
             handler.postDelayed(new Runnable() {
                 public void run() {
                     locationManager.removeUpdates(GPSLocationProvider.this);
-                    String uniqueId = pe.getUniqueId();
-                    if(uniqueId == null){
-                        notifyFailureForLocationFix();
+                    String uniqueId = GPSLocationProvider.this.pe.getUniqueId();
+                    if (uniqueId.equalsIgnoreCase("")) {
+                        GPSLocationProvider.this.notifyFailureForLocationFix();
                     }
                 }
-            }, (1000 * timeout));
+            }, 1000 * timeout);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -63,22 +63,22 @@ public class GPSLocationProvider implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-        pe.setUniqueId(UUID.randomUUID().toString());
-        pe.setLon(location.getLongitude());
-        pe.setLat(location.getLatitude());
-        if(receiver != null){
-            receiver.receivedLocationPostion(pe);
-        }else {
-            ((LocationPositionReceiver) activity).receivedLocationPostion(pe);
+        this.pe.setUniqueId(UUID.randomUUID().toString());
+        this.pe.setLon(location.getLongitude());
+        this.pe.setLat(location.getLatitude());
+        if (this.receiver != null) {
+            this.receiver.receivedLocationPostion(this.pe);
+        } else {
+            ((LocationPositionReceiver) this.activity).receivedLocationPostion(this.pe);
         }
     }
 
     @Override
     public void onProviderDisabled(String provider) {
-        if(receiver != null){
-            receiver.providerDisabled();
-        }else {
-            ((LocationPositionReceiver) activity).providerDisabled();
+        if (this.receiver != null) {
+            this.receiver.providerDisabled();
+        } else {
+            ((LocationPositionReceiver) this.activity).providerDisabled();
         }
     }
 
@@ -91,10 +91,10 @@ public class GPSLocationProvider implements LocationListener {
     }
 
     public void notifyFailureForLocationFix() {
-        if(receiver != null){
-            receiver.locationFixTimedOut();
-        }else {
-            ((LocationPositionReceiver) activity).locationFixTimedOut();
+        if (this.receiver != null) {
+            this.receiver.locationFixTimedOut();
+        } else {
+            ((LocationPositionReceiver) this.activity).locationFixTimedOut();
         }
     }
 

@@ -14,11 +14,11 @@ public class PermittedFileArrayList<E> extends ArrayList<E> {
     public boolean add(E object) {
         if (object instanceof FileDisplayElement) {
             FileDisplayElement item = (FileDisplayElement) object;
-            final String itemPath = item.getPath();
-            if(itemPath.contains(FileStorageConstants.DOCUMENT_ROOT_FOLDER_NAME)){
+            String itemPath = item.getPath();
+            if (itemPath.contains(FileStorageConstants.DOCUMENT_ROOT_FOLDER_NAME)) {
                 return false;
             }
-            final String itemName = item.getName();
+            String itemName = item.getName();
             if (!itemName.contains(".")) {
                 return super.add(object);
             }

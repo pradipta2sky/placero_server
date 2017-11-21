@@ -5,7 +5,7 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 /**
  * Created by USER on 10/31/2017.
  */
-public class DriveResource{
+public class DriveResource {
 
     private String uniqueId = "";
     private String userId = "";
@@ -23,7 +23,7 @@ public class DriveResource{
     private String createdOnMillis = "";
 
     public String getUserId() {
-        return userId;
+        return this.userId;
     }
 
     public void setUserId(String userId) {
@@ -31,7 +31,7 @@ public class DriveResource{
     }
 
     public String getUniqueId() {
-        return uniqueId;
+        return this.uniqueId;
     }
 
     public void setUniqueId(String uniqueId) {
@@ -39,7 +39,7 @@ public class DriveResource{
     }
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName(String name) {
@@ -47,7 +47,7 @@ public class DriveResource{
     }
 
     public String getPath() {
-        return path;
+        return this.path;
     }
 
     public void setPath(String path) {
@@ -55,7 +55,7 @@ public class DriveResource{
     }
 
     public String getAreaId() {
-        return areaId;
+        return this.areaId;
     }
 
     public void setAreaId(String areaId) {
@@ -63,7 +63,7 @@ public class DriveResource{
     }
 
     public String getType() {
-        return type;
+        return this.type;
     }
 
     public void setType(String type) {
@@ -71,7 +71,7 @@ public class DriveResource{
     }
 
     public String getSize() {
-        return size;
+        return this.size;
     }
 
     public void setSize(String size) {
@@ -79,7 +79,7 @@ public class DriveResource{
     }
 
     public String getContentType() {
-        return contentType;
+        return this.contentType;
     }
 
     public void setContentType(String contentType) {
@@ -87,7 +87,7 @@ public class DriveResource{
     }
 
     public String getMimeType() {
-        return mimeType;
+        return this.mimeType;
     }
 
     public void setMimeType(String mimeType) {
@@ -95,7 +95,7 @@ public class DriveResource{
     }
 
     public String getResourceId() {
-        return this.resourceId;
+        return resourceId;
     }
 
     public void setResourceId(String resourceId) {
@@ -103,7 +103,7 @@ public class DriveResource{
     }
 
     public String getContainerId() {
-        return this.containerId;
+        return containerId;
     }
 
     public void setContainerId(String containerId) {
@@ -111,7 +111,7 @@ public class DriveResource{
     }
 
     public String getLatitude() {
-        return this.latitude;
+        return latitude;
     }
 
     public void setLatitude(String latitude) {
@@ -119,7 +119,7 @@ public class DriveResource{
     }
 
     public String getLongitude() {
-        return this.longitude;
+        return longitude;
     }
 
     public void setLongitude(String longitude) {
@@ -128,15 +128,15 @@ public class DriveResource{
 
     @Override
     public boolean equals(Object o) {
-        if(o instanceof DriveResource){
-            EqualsBuilder builder = new EqualsBuilder().append(this.getResourceId(), ((DriveResource)o).getResourceId());
+        if (o instanceof DriveResource) {
+            EqualsBuilder builder = new EqualsBuilder().append(getResourceId(), ((DriveResource) o).getResourceId());
             return builder.isEquals();
         }
         return false;
     }
 
     public String getCreatedOnMillis() {
-        return this.createdOnMillis;
+        return createdOnMillis;
     }
 
     public void setCreatedOnMillis(String createdOnMillis) {

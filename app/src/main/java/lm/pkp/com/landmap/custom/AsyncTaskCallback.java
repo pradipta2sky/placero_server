@@ -5,6 +5,6 @@ package lm.pkp.com.landmap.custom;
  */
 public interface AsyncTaskCallback {
 
-    public void taskCompleted(Object result);
+    void taskCompleted(Object result);
 
 }

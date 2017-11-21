@@ -24,25 +24,25 @@ public class ColorProvider {
 
     public static final int getAreaToolBarColor(AreaElement areaElement) {
         if (areaElement.getType().equalsIgnoreCase("shared")) {
-            return BUFF_YELLOW_TOOLBAR;
+            return ColorProvider.BUFF_YELLOW_TOOLBAR;
         } else if (areaElement.getType().equalsIgnoreCase("public")) {
-            return BUFF_ORANGE_TOOLBAR;
+            return ColorProvider.BUFF_ORANGE_TOOLBAR;
         } else {
-            return BUFF_BLUE_TOOLBAR;
+            return ColorProvider.BUFF_BLUE_TOOLBAR;
         }
     }
 
     public static final int getAreaDetailsColor(AreaElement areaElement) {
         if (areaElement.getType().equalsIgnoreCase("shared")) {
-            return BUFF_YELLOW_AREA_DISPLAY;
+            return ColorProvider.BUFF_YELLOW_AREA_DISPLAY;
         } else if (areaElement.getType().equalsIgnoreCase("public")) {
-            return BUFF_ORANGE_AREA_DISPLAY;
+            return ColorProvider.BUFF_ORANGE_AREA_DISPLAY;
         } else {
-            return BUFF_BLUE_AREA_DISPLAY;
+            return ColorProvider.BUFF_BLUE_AREA_DISPLAY;
         }
     }
 
     public static int getDefaultToolBarColor() {
-        return DEFAULT_TOOLBAR_COLOR;
+        return ColorProvider.DEFAULT_TOOLBAR_COLOR;
     }
 }

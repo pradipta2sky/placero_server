@@ -7,22 +7,22 @@ import lm.pkp.com.landmap.custom.UserUnavailableException;
  */
 public class UserContext {
 
-    private static UserContext ourInstance = new UserContext();
+    private static final UserContext ourInstance = new UserContext();
 
     public static UserContext getInstance() {
-        return ourInstance;
+        return UserContext.ourInstance;
     }
 
     private UserContext() {
     }
 
-    private UserElement userElement = null;
+    private UserElement userElement;
 
     public UserElement getUserElement() {
-        if (userElement == null) {
+        if (this.userElement == null) {
             throw new UserUnavailableException();
         }
-        return userElement;
+        return this.userElement;
     }
 
     public void setUserElement(UserElement userElement) {

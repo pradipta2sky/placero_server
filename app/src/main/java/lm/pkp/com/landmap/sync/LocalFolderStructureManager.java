@@ -14,27 +14,27 @@ public class LocalFolderStructureManager {
 
     private static final String TAG = LocalFolderStructureManager.class.getSimpleName();
 
-    private static File tempStorageDir = null;
-    private static File docsStorageDir = null;
-    private static File videoStorageDir = null;
-    private static File imageStorageDir = null;
+    private static File tempStorageDir;
+    private static File docsStorageDir;
+    private static File videoStorageDir;
+    private static File imageStorageDir;
 
     public static void create() {
-        createImagesFolder();
-        createVideosFolder();
-        createDocumentsFolder();
-        createTempFolder();
+        LocalFolderStructureManager.createImagesFolder();
+        LocalFolderStructureManager.createVideosFolder();
+        LocalFolderStructureManager.createDocumentsFolder();
+        LocalFolderStructureManager.createTempFolder();
     }
 
     private static void createTempFolder() {
         // External sdcard location
-        tempStorageDir = new File(
+        LocalFolderStructureManager.tempStorageDir = new File(
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS),
                 FileStorageConstants.TEMP_ROOT_FOLDER_NAME);
         // Create the storage directory if it does not exist
-        if (!tempStorageDir.exists()) {
-            if (!tempStorageDir.mkdirs()) {
-                Log.d(TAG, "Oops! Failed create " + FileStorageConstants.TEMP_ROOT_FOLDER_NAME + " directory");
+        if (!LocalFolderStructureManager.tempStorageDir.exists()) {
+            if (!LocalFolderStructureManager.tempStorageDir.mkdirs()) {
+                Log.d(LocalFolderStructureManager.TAG, "Oops! Failed create " + FileStorageConstants.TEMP_ROOT_FOLDER_NAME + " directory");
             }
         }
 
@@ -42,66 +42,66 @@ public class LocalFolderStructureManager {
 
     private static void createDocumentsFolder() {
         // External sdcard location
-        docsStorageDir = new File(
+        LocalFolderStructureManager.docsStorageDir = new File(
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS),
                 FileStorageConstants.DOCUMENT_ROOT_FOLDER_NAME);
         // Create the storage directory if it does not exist
-        if (!docsStorageDir.exists()) {
-            if (!docsStorageDir.mkdirs()) {
-                Log.d(TAG, "Oops! Failed create " + FileStorageConstants.DOCUMENT_ROOT_FOLDER_NAME + " directory");
+        if (!LocalFolderStructureManager.docsStorageDir.exists()) {
+            if (!LocalFolderStructureManager.docsStorageDir.mkdirs()) {
+                Log.d(LocalFolderStructureManager.TAG, "Oops! Failed create " + FileStorageConstants.DOCUMENT_ROOT_FOLDER_NAME + " directory");
             }
         }
     }
 
     private static void createVideosFolder() {
         // External sdcard location
-        videoStorageDir = new File(
+        LocalFolderStructureManager.videoStorageDir = new File(
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MOVIES),
                 FileStorageConstants.VIDEO_ROOT_FOLDER_NAME);
         // Create the storage directory if it does not exist
-        if (!videoStorageDir.exists()) {
-            if (!videoStorageDir.mkdirs()) {
-                Log.d(TAG, "Oops! Failed create " + FileStorageConstants.VIDEO_ROOT_FOLDER_NAME + " directory");
+        if (!LocalFolderStructureManager.videoStorageDir.exists()) {
+            if (!LocalFolderStructureManager.videoStorageDir.mkdirs()) {
+                Log.d(LocalFolderStructureManager.TAG, "Oops! Failed create " + FileStorageConstants.VIDEO_ROOT_FOLDER_NAME + " directory");
             }
         }
     }
 
     private static void createImagesFolder() {
         // External sdcard location
-        imageStorageDir = new File(
+        LocalFolderStructureManager.imageStorageDir = new File(
                 Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DCIM),
                 FileStorageConstants.IMAGE_ROOT_FOLDER_NAME);
         // Create the storage directory if it does not exist
-        if (!imageStorageDir.exists()) {
-            if (!imageStorageDir.mkdirs()) {
-                Log.d(TAG, "Oops! Failed create " + FileStorageConstants.IMAGE_ROOT_FOLDER_NAME + " directory");
+        if (!LocalFolderStructureManager.imageStorageDir.exists()) {
+            if (!LocalFolderStructureManager.imageStorageDir.mkdirs()) {
+                Log.d(LocalFolderStructureManager.TAG, "Oops! Failed create " + FileStorageConstants.IMAGE_ROOT_FOLDER_NAME + " directory");
             }
         }
     }
 
     public static File getTempStorageDir() {
-        return tempStorageDir;
+        return LocalFolderStructureManager.tempStorageDir;
     }
 
     public static File getDocsStorageDir() {
-        return docsStorageDir;
+        return LocalFolderStructureManager.docsStorageDir;
     }
 
     public static File getVideoStorageDir() {
-        return videoStorageDir;
+        return LocalFolderStructureManager.videoStorageDir;
     }
 
     public static File getImageStorageDir() {
-        return imageStorageDir;
+        return LocalFolderStructureManager.imageStorageDir;
     }
 
     public static File getLocalFolderByMimeType(String mimeType) {
         if (mimeType != null && mimeType.startsWith("image")) {
-            return imageStorageDir;
+            return LocalFolderStructureManager.imageStorageDir;
         } else if (mimeType != null && mimeType.startsWith("video")) {
-            return videoStorageDir;
+            return LocalFolderStructureManager.videoStorageDir;
         } else {
-            return docsStorageDir;
+            return LocalFolderStructureManager.docsStorageDir;
         }
     }
 }

@@ -7,12 +7,13 @@ import android.os.Bundle;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.drive.Drive;
 import com.google.android.gms.drive.DriveApi;
+import com.google.android.gms.drive.DriveApi.MetadataBufferResult;
 import com.google.android.gms.drive.DriveFolder;
-import com.google.android.gms.drive.DriveFolder.DriveFolderResult;
 import com.google.android.gms.drive.DriveId;
 import com.google.android.gms.drive.Metadata;
 import com.google.android.gms.drive.MetadataBuffer;
 import com.google.android.gms.drive.MetadataChangeSet;
+import com.google.android.gms.drive.MetadataChangeSet.Builder;
 import com.google.android.gms.drive.events.ChangeEvent;
 import com.google.android.gms.drive.events.ChangeListener;
 
@@ -23,6 +24,7 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.UUID;
 
+import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.FileStorageConstants;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
@@ -33,7 +35,7 @@ public class CreateCommonFolderStructureActivity extends BaseDriveActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_synchronize_folders);
+        this.setContentView(layout.activity_synchronize_folders);
     }
 
     @Override
@@ -44,11 +46,11 @@ public class CreateCommonFolderStructureActivity extends BaseDriveActivity {
 
     private class FileProcessingTask extends AsyncTask {
 
-        private Stack<DriveResource> createStack = new Stack<>();
+        private final Stack<DriveResource> createStack = new Stack<>();
 
         @Override
         protected Object doInBackground(Object[] params) {
-            fetchStatusAndAct();
+            this.fetchStatusAndAct();
             return null;
         }
 
@@ -59,127 +61,127 @@ public class CreateCommonFolderStructureActivity extends BaseDriveActivity {
 
 
         private void fetchStatusAndAct() {
-            DriveDBHelper ddh = new DriveDBHelper(getApplicationContext());
+            DriveDBHelper ddh = new DriveDBHelper(CreateCommonFolderStructureActivity.this.getApplicationContext());
 
             // Check if there are common folders defined in database. //content_type = folder
-            final Map<String, DriveResource> commonResourceMap = ddh.getCommonResources();
-            if(commonResourceMap.size() == 0){
+            Map<String, DriveResource> commonResourceMap = ddh.getCommonResources();
+            if (commonResourceMap.size() == 0) {
                 // If no create common folders in database.
-                DriveResource commonImageFolder = createCommonFolder(FileStorageConstants.IMAGE_ROOT_FOLDER_NAME);
+                DriveResource commonImageFolder = CreateCommonFolderStructureActivity.this.createCommonFolder(FileStorageConstants.IMAGE_ROOT_FOLDER_NAME);
                 // If no create folder in drive.
-                createStack.push(commonImageFolder);
+                this.createStack.push(commonImageFolder);
 
-                DriveResource commonVideosFolder = createCommonFolder(FileStorageConstants.VIDEO_ROOT_FOLDER_NAME);
+                DriveResource commonVideosFolder = CreateCommonFolderStructureActivity.this.createCommonFolder(FileStorageConstants.VIDEO_ROOT_FOLDER_NAME);
                 // If no create folder in drive.
-                createStack.push(commonVideosFolder);
+                this.createStack.push(commonVideosFolder);
 
-                DriveResource commonDocsFolder = createCommonFolder(FileStorageConstants.DOCUMENT_ROOT_FOLDER_NAME);
+                DriveResource commonDocsFolder = CreateCommonFolderStructureActivity.this.createCommonFolder(FileStorageConstants.DOCUMENT_ROOT_FOLDER_NAME);
                 // If no create folder in drive.
-                createStack.push(commonDocsFolder);
-            }else {
+                this.createStack.push(commonDocsFolder);
+            } else {
                 // Check for title and resourceID match between database information and drive folder.
                 // Prepare the query for drive folder list.
                 Map<String, Boolean> commonResourceStatusMap = new HashMap<>();
                 Map<String, Metadata> commonMetadataMap = new HashMap<>();
                 Map<String, Metadata> commonDefunctMetadataMap = new HashMap<>();
 
-                final Collection<DriveResource> commonResources = commonResourceMap.values();
-                final Iterator<DriveResource> commonResourcesIter = commonResources.iterator();
-                while (commonResourcesIter.hasNext()){
-                    final DriveResource commonResource = commonResourcesIter.next();
+                Collection<DriveResource> commonResources = commonResourceMap.values();
+                Iterator<DriveResource> commonResourcesIter = commonResources.iterator();
+                while (commonResourcesIter.hasNext()) {
+                    DriveResource commonResource = commonResourcesIter.next();
                     commonResourceStatusMap.put(commonResource.getName(), false);
                 }
 
-                final DriveApi.MetadataBufferResult bufferResult = Drive.DriveApi.getRootFolder(getGoogleApiClient())
-                        .listChildren(getGoogleApiClient()).await();
+                MetadataBufferResult bufferResult = Drive.DriveApi.getRootFolder(CreateCommonFolderStructureActivity.this.getGoogleApiClient())
+                        .listChildren(CreateCommonFolderStructureActivity.this.getGoogleApiClient()).await();
                 // Match the obtained results with that stored in database.
-                final MetadataBuffer metadataBuffer = bufferResult.getMetadataBuffer();
-                final Iterator<Metadata> bufferIter = metadataBuffer.iterator();
-                while (bufferIter.hasNext()){
-                    final Metadata metadata = bufferIter.next();
-                    final DriveResource resource = commonResourceMap.get(metadata.getTitle());
+                MetadataBuffer metadataBuffer = bufferResult.getMetadataBuffer();
+                Iterator<Metadata> bufferIter = metadataBuffer.iterator();
+                while (bufferIter.hasNext()) {
+                    Metadata metadata = bufferIter.next();
+                    DriveResource resource = commonResourceMap.get(metadata.getTitle());
                     // Got a common resource with same name.
-                    if(resource == null){
+                    if (resource == null) {
                         continue;
                     }
-                    if(resource.getResourceId().equals(metadata.getDriveId().getResourceId())){
+                    if (resource.getResourceId().equals(metadata.getDriveId().getResourceId())) {
                         // Both match
                         commonResourceStatusMap.put(resource.getName(), true);
                         commonMetadataMap.put(resource.getName(), metadata);
-                    }else {
+                    } else {
                         // Title matches but resourceIds do not match
                         commonDefunctMetadataMap.put(resource.getName(), metadata);
                     }
                 }
                 // Check the status and push it to the stack
-                final Iterator<String> commonResourceIter = commonResourceStatusMap.keySet().iterator();
-                while(commonResourceIter.hasNext()){
-                    final String resourceKey = commonResourceIter.next();
-                    final DriveResource resource = commonResourceMap.get(resourceKey);
-                    final Boolean resourceStatus = commonResourceStatusMap.get(resourceKey);
-                    if(!resourceStatus){
-                        final Metadata metadata = commonDefunctMetadataMap.get(resourceKey);
-                        if(metadata != null){
+                Iterator<String> commonResourceIter = commonResourceStatusMap.keySet().iterator();
+                while (commonResourceIter.hasNext()) {
+                    String resourceKey = commonResourceIter.next();
+                    DriveResource resource = commonResourceMap.get(resourceKey);
+                    Boolean resourceStatus = commonResourceStatusMap.get(resourceKey);
+                    if (!resourceStatus) {
+                        Metadata metadata = commonDefunctMetadataMap.get(resourceKey);
+                        if (metadata != null) {
                             // A different folder with same name exists.
                             // Use it for this application.
                             resource.setResourceId(metadata.getDriveId().getResourceId());
                             ddh.deleteResourceByResourceId(resource.getResourceId());
                             ddh.insertResourceLocally(resource);
                             ddh.updateResourceOnServer(resource);
-                        }else {
+                        } else {
                             // Folder does not exist. Create one.
-                            createStack.push(resource);
+                            this.createStack.push(resource);
                         }
-                    }else {
+                    } else {
                         // Resource is available. Do nothing.
                     }
                 }
             }
 
             // Start processing.
-            processCreateStack();
+            this.processCreateStack();
         }
 
         public void processCreateStack() {
-            if (createStack.isEmpty()) {
-                getGoogleApiClient().disconnect();
+            if (this.createStack.isEmpty()) {
+                CreateCommonFolderStructureActivity.this.getGoogleApiClient().disconnect();
                 Intent i = new Intent(CreateCommonFolderStructureActivity.this, AreaDashboardActivity.class);
-                startActivity(i);
-                finish();
+                CreateCommonFolderStructureActivity.this.startActivity(i);
+                CreateCommonFolderStructureActivity.this.finish();
             } else {
-                DriveResource res = createStack.pop();
+                DriveResource res = this.createStack.pop();
                 MetadataChangeSet changeSet
-                        = new MetadataChangeSet.Builder().setTitle(res.getName()).setMimeType(res.getMimeType()).build();
-                Drive.DriveApi.getRootFolder(getGoogleApiClient())
-                        .createFolder(getGoogleApiClient(), changeSet).setResultCallback(new CreateFolderCallback(res));
+                        = new Builder().setTitle(res.getName()).setMimeType(res.getMimeType()).build();
+                Drive.DriveApi.getRootFolder(CreateCommonFolderStructureActivity.this.getGoogleApiClient())
+                        .createFolder(CreateCommonFolderStructureActivity.this.getGoogleApiClient(), changeSet).setResultCallback(new CreateFolderCallback(res));
             }
         }
 
-        private class CreateFolderCallback implements ResultCallback<DriveFolderResult> {
+        private class CreateFolderCallback implements ResultCallback<DriveFolder.DriveFolderResult> {
 
-            private DriveResource resource = null;
+            private DriveResource resource;
 
             public CreateFolderCallback(DriveResource resource) {
                 this.resource = resource;
             }
 
             @Override
-            public void onResult(DriveFolderResult folderResult) {
+            public void onResult(DriveFolder.DriveFolderResult folderResult) {
                 DriveFolder driveFolder = folderResult.getDriveFolder();
-                driveFolder.addChangeListener(getGoogleApiClient(), new FolderMetaChangeListener(resource));
-                MetadataChangeSet changeSet = new MetadataChangeSet.Builder()
+                driveFolder.addChangeListener(CreateCommonFolderStructureActivity.this.getGoogleApiClient(), new FolderMetaChangeListener(this.resource));
+                MetadataChangeSet changeSet = new Builder()
                         .setStarred(true)
                         .build();
-                driveFolder.updateMetadata(getGoogleApiClient(), changeSet);
+                driveFolder.updateMetadata(CreateCommonFolderStructureActivity.this.getGoogleApiClient(), changeSet);
             }
         }
 
         private class FolderMetaChangeListener implements ChangeListener {
 
-            private DriveResource resource = null;
+            private DriveResource resource;
 
             public FolderMetaChangeListener(DriveResource res) {
-                resource = res;
+                this.resource = res;
             }
 
             @Override
@@ -187,15 +189,15 @@ public class CreateCommonFolderStructureActivity extends BaseDriveActivity {
                 DriveFolder eventFolder = changeEvent.getDriveId().asDriveFolder();
                 DriveId driveId = eventFolder.getDriveId();
                 String resourceId = driveId.getResourceId();
-                if ((resourceId != null) && (resource.getResourceId() == null)) {
-                    eventFolder.removeChangeListener(getGoogleApiClient(), this);
-                    DriveDBHelper ddh = new DriveDBHelper(getApplicationContext());
+                if (resourceId != null && resource.getResourceId() == null) {
+                    eventFolder.removeChangeListener(CreateCommonFolderStructureActivity.this.getGoogleApiClient(), this);
+                    DriveDBHelper ddh = new DriveDBHelper(CreateCommonFolderStructureActivity.this.getApplicationContext());
 
-                    resource.setResourceId(resourceId);
-                    ddh.insertResourceLocally(resource);
-                    ddh.insertResourceToServer(resource);
+                    this.resource.setResourceId(resourceId);
+                    ddh.insertResourceLocally(this.resource);
+                    ddh.insertResourceToServer(this.resource);
 
-                    processCreateStack();
+                    FileProcessingTask.this.processCreateStack();
                 }
             }
         }

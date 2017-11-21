@@ -5,7 +5,6 @@ import android.content.Context;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
@@ -25,24 +24,24 @@ public class AreaContext {
 
     private AreaElement currentArea;
     private Context context;
-    private ArrayList<DriveResource> uploadQueue = new ArrayList<>();
+    private final ArrayList<DriveResource> uploadQueue = new ArrayList<>();
 
     public AreaElement getAreaElement() {
-        return currentArea;
+        return this.currentArea;
     }
 
     public void setAreaElement(AreaElement areaElement, Context context) {
-        currentArea = areaElement;
+        this.currentArea = areaElement;
         this.context = context;
-        uploadQueue.clear();
+        this.uploadQueue.clear();
 
         PositionsDBHelper pdb = new PositionsDBHelper(context);
-        currentArea.setPositions(pdb.getAllPositionForArea(currentArea));
-        loadCenterPosition(currentArea);
+        this.currentArea.setPositions(pdb.getAllPositionForArea(this.currentArea));
+        this.loadCenterPosition(this.currentArea);
 
         DriveDBHelper ddh = new DriveDBHelper(context);
-        currentArea.setMediaResources(ddh.getDriveResourcesByAreaId(currentArea.getUniqueId()));
-        currentArea.setCommonResources(ddh.getCommonResources());
+        this.currentArea.setMediaResources(ddh.getDriveResourcesByAreaId(this.currentArea.getUniqueId()));
+        this.currentArea.setCommonResources(ddh.getCommonResources());
     }
 
     private void loadCenterPosition(AreaElement areaElement) {
@@ -55,10 +54,10 @@ public class AreaContext {
 
         List<PositionElement> positions = areaElement.getPositions();
         int noOfPositions = positions.size();
-        if(noOfPositions != 0){
+        if (noOfPositions != 0) {
             for (int i = 0; i < noOfPositions; i++) {
                 PositionElement pe = positions.get(i);
-                if(positionId == null){
+                if (positionId == null) {
                     positionId = pe.getUniqueId();
                 }
                 latSum += pe.getLat();
@@ -76,111 +75,111 @@ public class AreaContext {
 
     // Drive specific resources.
     public void addResourceToQueue(DriveResource dr) {
-        uploadQueue.add(dr);
+        this.uploadQueue.add(dr);
     }
 
     public void removeResourceFromQueue(DriveResource dr) {
-        uploadQueue.remove(dr);
+        this.uploadQueue.remove(dr);
     }
 
     public ArrayList<DriveResource> getUploadedQueue() {
-        return uploadQueue;
+        return this.uploadQueue;
     }
 
     public DriveResource getImagesRootDriveResource() {
-        return new DriveDBHelper(context).getDriveResourceRoot(FileStorageConstants.IMAGE_ROOT_FOLDER_NAME);
+        return new DriveDBHelper(this.context).getDriveResourceRoot(FileStorageConstants.IMAGE_ROOT_FOLDER_NAME);
     }
 
     public DriveResource getVideosRootDriveResource() {
-        return new DriveDBHelper(context).getDriveResourceRoot(FileStorageConstants.VIDEO_ROOT_FOLDER_NAME);
+        return new DriveDBHelper(this.context).getDriveResourceRoot(FileStorageConstants.VIDEO_ROOT_FOLDER_NAME);
     }
 
     public DriveResource getDocumentRootDriveResource() {
-        return new DriveDBHelper(context).getDriveResourceRoot(FileStorageConstants.DOCUMENT_ROOT_FOLDER_NAME);
+        return new DriveDBHelper(this.context).getDriveResourceRoot(FileStorageConstants.DOCUMENT_ROOT_FOLDER_NAME);
     }
 
-    public File getAreaLocalImageRoot(String areaId){
+    public File getAreaLocalImageRoot(String areaId) {
         String areaImageRoot = LocalFolderStructureManager.getImageStorageDir().getAbsolutePath()
                 + File.separatorChar + areaId;
-        final File areaImageFolder = new File(areaImageRoot);
-        if(areaImageFolder.exists()){
+        File areaImageFolder = new File(areaImageRoot);
+        if (areaImageFolder.exists()) {
             return areaImageFolder;
-        }else {
+        } else {
             areaImageFolder.mkdirs();
         }
         return areaImageFolder;
     }
 
-    public File getAreaLocalVideoRoot(String areaId){
+    public File getAreaLocalVideoRoot(String areaId) {
         String areaVideosRoot = LocalFolderStructureManager.getVideoStorageDir().getAbsolutePath()
                 + File.separatorChar + areaId;
-        final File areaVideosFolder = new File(areaVideosRoot);
-        if(areaVideosFolder.exists()){
+        File areaVideosFolder = new File(areaVideosRoot);
+        if (areaVideosFolder.exists()) {
             return areaVideosFolder;
-        }else {
+        } else {
             areaVideosFolder.mkdirs();
         }
         return areaVideosFolder;
     }
 
-    public File getAreaLocalDocumentRoot(String areaId){
+    public File getAreaLocalDocumentRoot(String areaId) {
         String areaDocumentsRoot = LocalFolderStructureManager.getDocsStorageDir().getAbsolutePath()
                 + File.separatorChar + areaId;
-        final File areaDocumentsFolder = new File(areaDocumentsRoot);
-        if(areaDocumentsFolder.exists()){
+        File areaDocumentsFolder = new File(areaDocumentsRoot);
+        if (areaDocumentsFolder.exists()) {
             return areaDocumentsFolder;
-        }else {
+        } else {
             areaDocumentsFolder.mkdirs();
         }
         return areaDocumentsFolder;
     }
 
-    public File getAreaLocalPictureThumbnailRoot(String areaId){
-        final String localImageRootPath = getAreaLocalImageRoot(areaId).getAbsolutePath();
-        final String pictureThumbnailRoot = localImageRootPath + File.separatorChar + "thumb" + File.separatorChar;
-        final File pictureThumbnailFolder = new File(pictureThumbnailRoot);
-        if(pictureThumbnailFolder.exists()){
+    public File getAreaLocalPictureThumbnailRoot(String areaId) {
+        String localImageRootPath = this.getAreaLocalImageRoot(areaId).getAbsolutePath();
+        String pictureThumbnailRoot = localImageRootPath + File.separatorChar + "thumb" + File.separatorChar;
+        File pictureThumbnailFolder = new File(pictureThumbnailRoot);
+        if (pictureThumbnailFolder.exists()) {
             return pictureThumbnailFolder;
-        }else {
+        } else {
             pictureThumbnailFolder.mkdirs();
         }
         return pictureThumbnailFolder;
     }
 
-    public File getAreaLocalVideoThumbnailRoot(String areaId){
-        final String localVideoRootPath = getAreaLocalVideoRoot(areaId).getAbsolutePath();
-        final String videoThumbnailRoot = localVideoRootPath + File.separatorChar + "thumb" + File.separatorChar;
-        final File videoThumbnailFolder = new File(videoThumbnailRoot);
-        if(videoThumbnailFolder.exists()){
+    public File getAreaLocalVideoThumbnailRoot(String areaId) {
+        String localVideoRootPath = this.getAreaLocalVideoRoot(areaId).getAbsolutePath();
+        String videoThumbnailRoot = localVideoRootPath + File.separatorChar + "thumb" + File.separatorChar;
+        File videoThumbnailFolder = new File(videoThumbnailRoot);
+        if (videoThumbnailFolder.exists()) {
             return videoThumbnailFolder;
-        }else {
+        } else {
             videoThumbnailFolder.mkdirs();
         }
         return videoThumbnailFolder;
     }
 
-    public File getAreaLocalDocumentThumbnailRoot(String areaId){
-        final String localDocumentRootPath = getAreaLocalDocumentRoot(areaId).getAbsolutePath();
-        final String documentThumbnailRoot = localDocumentRootPath + File.separatorChar + "thumb" + File.separatorChar;
-        final File documentThumbnailFolder = new File(documentThumbnailRoot);
-        if(documentThumbnailFolder.exists()){
+    public File getAreaLocalDocumentThumbnailRoot(String areaId) {
+        String localDocumentRootPath = this.getAreaLocalDocumentRoot(areaId).getAbsolutePath();
+        String documentThumbnailRoot = localDocumentRootPath + File.separatorChar + "thumb" + File.separatorChar;
+        File documentThumbnailFolder = new File(documentThumbnailRoot);
+        if (documentThumbnailFolder.exists()) {
             return documentThumbnailFolder;
-        }else {
+        } else {
             documentThumbnailFolder.mkdirs();
         }
         return documentThumbnailFolder;
     }
 
-    public File getLocalStoreLocationForDriveResource(DriveResource resource){
+    public File getLocalStoreLocationForDriveResource(DriveResource resource) {
         // Assuming that folders will not be passed.
         File dumpRoot = null;
         String contentType = resource.getContentType();
-        if(contentType.equalsIgnoreCase("Image")){
-            dumpRoot = getAreaLocalImageRoot(resource.getAreaId());
-        }else if(contentType.equalsIgnoreCase("Video")){
-            dumpRoot = getAreaLocalVideoRoot(resource.getAreaId());
-        }else if(contentType.equalsIgnoreCase("Document")){
-            dumpRoot = getAreaLocalDocumentRoot(resource.getAreaId());
+        if (contentType.equalsIgnoreCase("Image")) {
+            dumpRoot = this.getAreaLocalImageRoot(resource.getAreaId());
+        } else if (contentType.equalsIgnoreCase("Video")) {
+            dumpRoot = this.getAreaLocalVideoRoot(resource.getAreaId());
+        } else if (contentType.equalsIgnoreCase("Document")) {
+            dumpRoot = this.getAreaLocalDocumentRoot(resource.getAreaId());
         }
         return dumpRoot;
     }

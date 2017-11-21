@@ -3,6 +3,7 @@ package lm.pkp.com.landmap;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Bitmap.CompressFormat;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -20,6 +21,10 @@ import android.widget.TextView;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
+import com.google.android.gms.maps.GoogleMap.OnMapLoadedCallback;
+import com.google.android.gms.maps.GoogleMap.OnMarkerDragListener;
+import com.google.android.gms.maps.GoogleMap.SnapshotReadyCallback;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
@@ -39,6 +44,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
+import lm.pkp.com.landmap.R.drawable;
+import lm.pkp.com.landmap.R.id;
+import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
@@ -60,17 +68,17 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
 
     private GoogleMap googleMap;
     private LinkedHashMap<Marker, PositionElement> areaMarkers = new LinkedHashMap<>();
-    private LinkedHashMap<Marker, DriveResource> resourceMarkers = new LinkedHashMap<>();
-    private Polygon polygon = null;
-    private Marker centerMarker = null;
+    private final LinkedHashMap<Marker, DriveResource> resourceMarkers = new LinkedHashMap<>();
+    private Polygon polygon;
+    private Marker centerMarker;
 
-    private MapWrapperLayout mapWrapperLayout = null;
+    private MapWrapperLayout mapWrapperLayout;
     private ViewGroup infoWindow;
     private TextView infoTitle;
     private TextView infoSnippet;
     private ImageView infoImage;
     private OnInfoWindowElemTouchListener infoButtonListener;
-    private SupportMapFragment mapFragment = null;
+    private SupportMapFragment mapFragment;
 
     private Button infoButton;
 
@@ -79,10 +87,10 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
 
-        setContentView(R.layout.activity_area_plotter);
-        mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.googleMap);
-        mapFragment.getMapAsync(this);
+        this.setContentView(layout.activity_area_plotter);
+        this.mapFragment = (SupportMapFragment) this.getSupportFragmentManager()
+                .findFragmentById(id.googleMap);
+        this.mapFragment.getMapAsync(this);
     }
 
     @Override
@@ -92,7 +100,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
         googleMap.setIndoorEnabled(true);
         googleMap.setMyLocationEnabled(true);
         googleMap.setBuildingsEnabled(true);
-        googleMap.setOnMapLoadedCallback(new GoogleMap.OnMapLoadedCallback() {
+        googleMap.setOnMapLoadedCallback(new OnMapLoadedCallback() {
             @Override
             public void onMapLoaded() {
                 googleMap.snapshot(new MapSnapshotTaker());
@@ -106,21 +114,21 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
         settings.setZoomControlsEnabled(true);
         settings.setZoomGesturesEnabled(true);
 
-        mapWrapperLayout = (MapWrapperLayout) findViewById(R.id.map_relative_layout);
-        mapWrapperLayout.init(googleMap, getPixelsFromDp(getApplicationContext(), 50));
+        this.mapWrapperLayout = (MapWrapperLayout) this.findViewById(id.map_relative_layout);
+        this.mapWrapperLayout.init(googleMap, AreaMapPlotterActivity.getPixelsFromDp(this.getApplicationContext(), 50));
 
-        infoWindow = (ViewGroup) getLayoutInflater().inflate(R.layout.info_window, null);
-        infoTitle = (TextView) infoWindow.findViewById(R.id.title);
-        infoSnippet = (TextView) infoWindow.findViewById(R.id.snippet);
-        infoImage = (ImageView) infoWindow.findViewById(R.id.info_element_img);
-        infoButton = (Button) infoWindow.findViewById(R.id.map_info_action);
+        this.infoWindow = (ViewGroup) this.getLayoutInflater().inflate(layout.info_window, null);
+        this.infoTitle = (TextView) this.infoWindow.findViewById(id.title);
+        this.infoSnippet = (TextView) this.infoWindow.findViewById(id.snippet);
+        this.infoImage = (ImageView) this.infoWindow.findViewById(id.info_element_img);
+        this.infoButton = (Button) this.infoWindow.findViewById(id.map_info_action);
 
         final AreaContext ac = AreaContext.INSTANCE;
-        infoButtonListener = new OnInfoWindowElemTouchListener(infoButton) {
+        this.infoButtonListener = new OnInfoWindowElemTouchListener(AreaMapPlotterActivity.this.infoButton) {
 
             @Override
             protected void onClickConfirmed(View v, Marker marker) {
-                PositionElement position = areaMarkers.get(marker);
+                PositionElement position = AreaMapPlotterActivity.this.areaMarkers.get(marker);
                 AreaContext areaContext = ac;
                 AreaElement areaElement = areaContext.getAreaElement();
 
@@ -130,37 +138,37 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                 String videoRootPath = areaLocalVideoRoot.getAbsolutePath();
 
                 Intent intent = new Intent();
-                intent.setAction(android.content.Intent.ACTION_VIEW);
+                intent.setAction(Intent.ACTION_VIEW);
 
                 if (position != null) {
                     // Do something for non position item.
                     // Implementation for remove button
-                    PositionsDBHelper pdh = new PositionsDBHelper(getApplicationContext());
-                    PositionElement markedPosition = areaMarkers.get(marker);
+                    PositionsDBHelper pdh = new PositionsDBHelper(AreaMapPlotterActivity.this.getApplicationContext());
+                    PositionElement markedPosition = AreaMapPlotterActivity.this.areaMarkers.get(marker);
                     pdh.deletePosition(markedPosition);
-                    areaMarkers.remove(markedPosition);
-                    polygon.remove();
-                    plotPolygonUsingPositions();
+                    AreaMapPlotterActivity.this.areaMarkers.remove(markedPosition);
+                    AreaMapPlotterActivity.this.polygon.remove();
+                    AreaMapPlotterActivity.this.plotPolygonUsingPositions();
 
                 }else {
-                    DriveResource resource = resourceMarkers.get(marker);
+                    DriveResource resource = AreaMapPlotterActivity.this.resourceMarkers.get(marker);
                     String contentType = resource.getContentType();
                     if(contentType.equalsIgnoreCase("Image")){
                         File file = new File(imageRootPath + File.separatorChar + resource.getName());
                         intent.setDataAndType(Uri.fromFile(file), "image/*");
-                        startActivity(intent);
+                        AreaMapPlotterActivity.this.startActivity(intent);
                     }else {
                         File file = new File(videoRootPath + File.separatorChar + resource.getName());
                         intent.setDataAndType(Uri.fromFile(file), "video/*");
-                        startActivity(intent);
+                        AreaMapPlotterActivity.this.startActivity(intent);
                     }
                 }
             }
         };
-        infoButton.setOnTouchListener(infoButtonListener);
+        this.infoButton.setOnTouchListener(this.infoButtonListener);
 
         final AreaElement ae = ac.getAreaElement();
-        googleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
+        googleMap.setInfoWindowAdapter(new InfoWindowAdapter() {
             @Override
             public View getInfoWindow(Marker marker) {
                 return null;
@@ -169,19 +177,19 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
             @Override
             public View getInfoContents(Marker marker) {
 
-                PositionElement position = areaMarkers.get(marker);
-                DriveResource resource = resourceMarkers.get(marker);
+                PositionElement position = AreaMapPlotterActivity.this.areaMarkers.get(marker);
+                DriveResource resource = AreaMapPlotterActivity.this.resourceMarkers.get(marker);
 
                 if(position == null && resource == null){
                     // Center Marker.
-                    infoTitle.setText("Center");
+                    AreaMapPlotterActivity.this.infoTitle.setText("Center");
                     LatLng markerPosition = marker.getPosition();
                     String snippetText = "Lat: " + markerPosition.latitude + ", Long: " + markerPosition.longitude;
-                    infoSnippet.setText(snippetText);
-                    infoImage.setImageResource(R.drawable.marker_image);
-                    infoButton.setVisibility(View.GONE);
+                    AreaMapPlotterActivity.this.infoSnippet.setText(snippetText);
+                    AreaMapPlotterActivity.this.infoImage.setImageResource(drawable.marker_image);
+                    AreaMapPlotterActivity.this.infoButton.setVisibility(View.GONE);
                 }else {
-                    infoButton.setVisibility(View.VISIBLE);
+                    AreaMapPlotterActivity.this.infoButton.setVisibility(View.VISIBLE);
                     if (position == null) {
                         String thumbRootPath = "";
                         if(resource.getContentType().equalsIgnoreCase("Video")){
@@ -193,30 +201,30 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                         File thumbFile = new File(thumbnailPath);
                         if(thumbFile.exists()){
                             Bitmap bMap = BitmapFactory.decodeFile(thumbnailPath);
-                            infoImage.setImageBitmap(bMap);
+                            AreaMapPlotterActivity.this.infoImage.setImageBitmap(bMap);
                         }
-                        infoTitle.setText(resource.getName());
+                        AreaMapPlotterActivity.this.infoTitle.setText(resource.getName());
                         CharSequence timeSpan = DateUtils.getRelativeTimeSpanString(new Long(resource.getCreatedOnMillis()),
                                 System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS);
-                        infoSnippet.setText(timeSpan.toString());
-                        infoButton.setText("Open");
+                        AreaMapPlotterActivity.this.infoSnippet.setText(timeSpan.toString());
+                        AreaMapPlotterActivity.this.infoButton.setText("Open");
                     }else {
-                        infoImage.setImageResource(R.drawable.marker_image);
-                        infoTitle.setText(position.getName());
+                        AreaMapPlotterActivity.this.infoImage.setImageResource(drawable.marker_image);
+                        AreaMapPlotterActivity.this.infoTitle.setText(position.getName());
                         CharSequence timeSpan = DateUtils.getRelativeTimeSpanString(new Long(position.getCreatedOnMillis()),
                                 System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS);
-                        infoSnippet.setText(timeSpan.toString());
-                        infoButton.setText("Remove");
+                        AreaMapPlotterActivity.this.infoSnippet.setText(timeSpan.toString());
+                        AreaMapPlotterActivity.this.infoButton.setText("Remove");
                     }
                 }
-                infoButtonListener.setMarker(marker);
-                mapWrapperLayout.setMarkerWithInfoWindow(marker, infoWindow);
-                return infoWindow;
+                AreaMapPlotterActivity.this.infoButtonListener.setMarker(marker);
+                AreaMapPlotterActivity.this.mapWrapperLayout.setMarkerWithInfoWindow(marker, AreaMapPlotterActivity.this.infoWindow);
+                return AreaMapPlotterActivity.this.infoWindow;
             }
         });
 
-        plotPolygonUsingPositions();
-        plotMediaPoints();
+        this.plotPolygonUsingPositions();
+        this.plotMediaPoints();
     }
 
     private void plotMediaPoints() {
@@ -233,15 +241,19 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                     Double longitude = new Double(resource.getLongitude());
                     LatLng position = new LatLng(latitude, longitude);
 
-                    MarkerOptions markerOptions = new MarkerOptions()
-                            .icon(BitmapDescriptorFactory.fromResource(R.drawable.camera1));
+                    MarkerOptions markerOptions = new MarkerOptions();
+                    if(resource.getContentType().equalsIgnoreCase("Video")){
+                        markerOptions.icon(BitmapDescriptorFactory.fromResource(drawable.video));
+                    }else {
+                        markerOptions.icon(BitmapDescriptorFactory.fromResource(drawable.camera1));
+                    }
                     markerOptions.position(position);
 
-                    Marker marker = googleMap.addMarker((markerOptions));
+                    Marker marker = this.googleMap.addMarker(markerOptions);
                     marker.setTitle(resource.getName());
                     marker.setDraggable(false);
                     marker.setVisible(true);
-                    resourceMarkers.put(marker, resource);
+                    this.resourceMarkers.put(marker, resource);
                 }
             }
         }
@@ -253,49 +265,49 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
         List<PositionElement> positionElements = areaElement.getPositions();
         int noOfPositions = positionElements.size();
 
-        Set<Marker> markers = areaMarkers.keySet();
+        Set<Marker> markers = this.areaMarkers.keySet();
         for (Marker m : markers) {
             m.remove();
         }
-        if (centerMarker != null) {
-            centerMarker.remove();
+        if (this.centerMarker != null) {
+            this.centerMarker.remove();
         }
 
-        areaMarkers.clear();
-        areaMarkers = new LinkedHashMap<>();
+        this.areaMarkers.clear();
+        this.areaMarkers = new LinkedHashMap<>();
         for (int i = 0; i < noOfPositions; i++) {
             PositionElement pe = positionElements.get(i);
-            Marker m = drawMarkerUsingPosition(pe);
-            areaMarkers.put(m, pe);
+            Marker m = this.drawMarkerUsingPosition(pe);
+            this.areaMarkers.put(m, pe);
         }
         PositionElement centerPosition = areaElement.getCenterPosition();
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(new LatLng(centerPosition.getLat(), centerPosition.getLon()));
-        centerMarker = googleMap.addMarker(markerOptions);
-        centerMarker.setVisible(true);
-        centerMarker.setAlpha((float) 0.5);
-        centerMarker.setTitle("Center");
-        zoomCameraToPosition(centerMarker);
+        this.centerMarker = this.googleMap.addMarker(markerOptions);
+        this.centerMarker.setVisible(true);
+        this.centerMarker.setAlpha((float) 0.5);
+        this.centerMarker.setTitle("Center");
+        this.zoomCameraToPosition(this.centerMarker);
 
         PolygonOptions polyOptions = new PolygonOptions();
         polyOptions = polyOptions.strokeColor(Color.RED).fillColor(Color.DKGRAY);
-        markers = areaMarkers.keySet();
+        markers = this.areaMarkers.keySet();
 
         List<Marker> markerList = new ArrayList<>(markers);
-        MarkerSorter.sortMarkers(markerList,centerMarker);
+        MarkerSorter.sortMarkers(markerList, this.centerMarker);
         for (Marker m : markerList) {
             polyOptions.add(m.getPosition());
         }
-        polygon = googleMap.addPolygon(polyOptions);
+        this.polygon = this.googleMap.addPolygon(polyOptions);
 
-        double polygonAreaSqMt = SphericalUtil.computeArea(polygon.getPoints());
+        double polygonAreaSqMt = SphericalUtil.computeArea(this.polygon.getPoints());
         double polygonAreaSqFt = polygonAreaSqMt * 10.7639;
 
         final AreaElement ae = areaElement;
         ae.setMeasureSqFt(polygonAreaSqFt);
 
         if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.UPDATE_AREA)) {
-            final AreaDBHelper adh = new AreaDBHelper(getApplicationContext());
+            final AreaDBHelper adh = new AreaDBHelper(this.getApplicationContext());
             adh.updateArea(ae);
             new Thread(new Runnable() {
                 public void run() {
@@ -306,14 +318,14 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
 
     }
 
-    public Marker drawMarkerUsingPosition(final PositionElement pe) {
+    public Marker drawMarkerUsingPosition(PositionElement pe) {
         LatLng position = new LatLng(pe.getLat(), pe.getLon());
-        Marker marker = googleMap.addMarker((new MarkerOptions().position(position)));
+        Marker marker = this.googleMap.addMarker(new MarkerOptions().position(position));
         marker.setTitle(pe.getUniqueId());
         marker.setDraggable(false);
         if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.UPDATE_AREA)) {
             marker.setDraggable(true);
-            googleMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
+            this.googleMap.setOnMarkerDragListener(new OnMarkerDragListener() {
                 @Override
                 public void onMarkerDragStart(Marker marker) {
                 }
@@ -321,7 +333,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                 @SuppressWarnings("unchecked")
                 @Override
                 public void onMarkerDragEnd(Marker marker) {
-                    googleMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
+                    AreaMapPlotterActivity.this.googleMap.animateCamera(CameraUpdateFactory.newLatLng(marker.getPosition()));
 
                     PositionElement newPositionElem = new PositionElement();
                     String pid = UUID.randomUUID().toString();
@@ -333,19 +345,19 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                     newPositionElem.setLat(marker.getPosition().latitude);
                     newPositionElem.setLon(marker.getPosition().longitude);
 
-                    PositionsDBHelper pdh = new PositionsDBHelper(getApplicationContext());
+                    PositionsDBHelper pdh = new PositionsDBHelper(AreaMapPlotterActivity.this.getApplicationContext());
                     pdh.insertPositionLocally(newPositionElem);
                     pdh.insertPositionToServer(newPositionElem);
 
-                    final List<PositionElement> areaPositions
+                    List<PositionElement> areaPositions
                             = AreaContext.INSTANCE.getAreaElement().getPositions();
                     areaPositions.add(newPositionElem);
 
-                    pdh.deletePosition(areaMarkers.get(marker));
-                    areaPositions.remove(areaMarkers.get(marker));
+                    pdh.deletePosition(AreaMapPlotterActivity.this.areaMarkers.get(marker));
+                    areaPositions.remove(AreaMapPlotterActivity.this.areaMarkers.get(marker));
 
-                    polygon.remove();
-                    plotPolygonUsingPositions();
+                    AreaMapPlotterActivity.this.polygon.remove();
+                    AreaMapPlotterActivity.this.plotPolygonUsingPositions();
                 }
 
                 @Override
@@ -360,33 +372,33 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
     private void zoomCameraToPosition(Marker marker) {
         LatLng position = marker.getPosition();
         CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(position, 21f);
-        googleMap.animateCamera(cameraUpdate);
-        googleMap.moveCamera(cameraUpdate);
+        this.googleMap.animateCamera(cameraUpdate);
+        this.googleMap.moveCamera(cameraUpdate);
     }
 
     public static int getPixelsFromDp(Context context, float dp) {
-        final float scale = context.getResources().getDisplayMetrics().density;
+        float scale = context.getResources().getDisplayMetrics().density;
         return (int) (dp * scale + 0.5f);
     }
 
     @Override
     public void onBackPressed() {
-        googleMap.clear();
-        googleMap = null;
+        this.googleMap.clear();
+        this.googleMap = null;
 
-        finish();
-        Intent positionMarkerIntent = new Intent(AreaMapPlotterActivity.this, AreaDetailsActivity.class);
-        startActivity(positionMarkerIntent);
+        this.finish();
+        Intent positionMarkerIntent = new Intent(this, AreaDetailsActivity.class);
+        this.startActivity(positionMarkerIntent);
     }
 
-    private class MapSnapshotTaker implements GoogleMap.SnapshotReadyCallback {
+    private class MapSnapshotTaker implements SnapshotReadyCallback {
 
         @Override
         public void onSnapshotReady(Bitmap snapshot) {
             try {
-                final AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
-                final File imageStorageDir = AreaContext.INSTANCE.getAreaLocalImageRoot(areaElement.getUniqueId());
-                final String dirPath = imageStorageDir.getAbsolutePath();
+                AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
+                File imageStorageDir = AreaContext.INSTANCE.getAreaLocalImageRoot(areaElement.getUniqueId());
+                String dirPath = imageStorageDir.getAbsolutePath();
 
                 String screenshotFileName = "plot_screenshot.png";
                 String screenShotFilePath = dirPath + File.separatorChar + screenshotFileName;
@@ -396,7 +408,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                 }
                 screenShotFile.createNewFile();
 
-                View rootView = mapFragment.getView();
+                View rootView = AreaMapPlotterActivity.this.mapFragment.getView();
                 rootView.setDrawingCacheEnabled(true);
                 Bitmap backBitmap = rootView.getDrawingCache();
                 Bitmap bmOverlay = Bitmap.createBitmap(
@@ -407,7 +419,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                 canvas.drawBitmap(backBitmap, 0, 0, null);
 
                 FileOutputStream fos = new FileOutputStream(screenShotFile);
-                bmOverlay.compress(Bitmap.CompressFormat.PNG, 90, fos);
+                bmOverlay.compress(CompressFormat.PNG, 90, fos);
                 fos.flush();
                 fos.close();
 
@@ -442,7 +454,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                 resource.setLongitude(areaElement.getCenterPosition().getLon() + "");
                 resource.setPath(screenShotFilePath);
 
-                DriveDBHelper ddh = new DriveDBHelper(getApplicationContext());
+                DriveDBHelper ddh = new DriveDBHelper(AreaMapPlotterActivity.this.getApplicationContext());
                 if (screenShotResource == null) {
                     ddh.insertResourceLocally(resource);
                     ddh.insertResourceToServer(resource);
@@ -454,7 +466,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                 }
                 driveResources.add(resource);
 
-                ThumbnailCreator creator = new ThumbnailCreator(getApplicationContext());
+                ThumbnailCreator creator = new ThumbnailCreator(AreaMapPlotterActivity.this.getApplicationContext());
                 creator.createImageThumbnail(screenShotFile, areaElement.getUniqueId());
 
             } catch (Exception e) {

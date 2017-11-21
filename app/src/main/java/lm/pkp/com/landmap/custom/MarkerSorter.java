@@ -1,14 +1,11 @@
 package lm.pkp.com.landmap.custom;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.maps.android.SphericalUtil;
 
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import lm.pkp.com.landmap.position.PositionElement;
 
 /**
  * Created by USER on 11/19/2017.

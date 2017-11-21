@@ -7,9 +7,9 @@ import lm.pkp.com.landmap.position.PositionElement;
  */
 public interface LocationPositionReceiver {
 
-    public void receivedLocationPostion(PositionElement pe);
+    void receivedLocationPostion(PositionElement pe);
 
-    public void locationFixTimedOut();
+    void locationFixTimedOut();
 
-    public void providerDisabled();
+    void providerDisabled();
 }

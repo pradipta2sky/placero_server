@@ -5,17 +5,20 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.support.design.R.id;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.area.res.disp.AreaAddResourceAdaptor;
@@ -26,72 +29,72 @@ import lm.pkp.com.landmap.util.ColorProvider;
 
 public class AreaAddResourcesActivity extends AppCompatActivity {
 
-    private AreaAddResourceAdaptor adaptor = null;
-    private ArrayList<DriveResource> areaResourcesDisplayList = new ArrayList<>();
+    private AreaAddResourceAdaptor adaptor;
+    private final ArrayList<DriveResource> areaResourcesDisplayList = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
 
-        setContentView(R.layout.activity_area_resource_main);
+        this.setContentView(layout.activity_area_resource_main);
 
-        ActionBar ab = getSupportActionBar();
+        ActionBar ab = this.getSupportActionBar();
         ab.setHomeButtonEnabled(true);
         ab.setDisplayHomeAsUpEnabled(true);
-        final AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
+        AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
         ab.setBackgroundDrawable(new ColorDrawable(ColorProvider.getAreaToolBarColor(areaElement)));
         ab.show();
 
-        View includedView = findViewById(R.id.selected_area_include);
+        View includedView = this.findViewById(R.id.selected_area_include);
         AreaPopulationUtil.INSTANCE.populateAreaElement(includedView);
 
-        ListView resourceFileList = (ListView) findViewById(R.id.file_display_list);
-        adaptor = new AreaAddResourceAdaptor(getApplicationContext(), R.id.file_display_list, areaResourcesDisplayList);
-        resourceFileList.setAdapter(adaptor);
+        ListView resourceFileList = (ListView) this.findViewById(R.id.file_display_list);
+        this.adaptor = new AreaAddResourceAdaptor(this.getApplicationContext(), R.id.file_display_list, this.areaResourcesDisplayList);
+        resourceFileList.setAdapter(this.adaptor);
 
         ArrayList<DriveResource> driveResources = AreaContext.INSTANCE.getUploadedQueue();
-        areaResourcesDisplayList.clear();
-        areaResourcesDisplayList.addAll(driveResources);
-        adaptor.notifyDataSetChanged();
+        this.areaResourcesDisplayList.clear();
+        this.areaResourcesDisplayList.addAll(driveResources);
+        this.adaptor.notifyDataSetChanged();
 
-        Button takeSnapButton = (Button) findViewById(R.id.take_snap_button);
-        takeSnapButton.setOnClickListener(new View.OnClickListener() {
+        Button takeSnapButton = (Button) this.findViewById(R.id.take_snap_button);
+        takeSnapButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(AreaAddResourcesActivity.this, AreaCameraPictureActivity.class);
-                startActivity(i);
+                AreaAddResourcesActivity.this.startActivity(i);
             }
         });
 
-        Button captureVideoButton = (Button) findViewById(R.id.shoot_video_button);
-        captureVideoButton.setOnClickListener(new View.OnClickListener() {
+        Button captureVideoButton = (Button) this.findViewById(R.id.shoot_video_button);
+        captureVideoButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(AreaAddResourcesActivity.this, AreaCameraVideoActivity.class);
-                startActivity(i);
+                AreaAddResourcesActivity.this.startActivity(i);
             }
         });
 
-        Button chooseDocumentButton = (Button) findViewById(R.id.add_document_button);
-        chooseDocumentButton.setOnClickListener(new View.OnClickListener() {
+        Button chooseDocumentButton = (Button) this.findViewById(R.id.add_document_button);
+        chooseDocumentButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(AreaAddResourcesActivity.this, AreaDocumentChooserActivity.class);
-                startActivity(i);
+                AreaAddResourcesActivity.this.startActivity(i);
             }
         });
 
-        Button driveUploadButton = (Button) findViewById(R.id.upload_to_drive_button);
-        driveUploadButton.setOnClickListener(new View.OnClickListener() {
+        Button driveUploadButton = (Button) this.findViewById(R.id.upload_to_drive_button);
+        driveUploadButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(adaptor.getCount() == 0){
-                    showErrorMessage("Nothing to upload.", "error");
+                if(AreaAddResourcesActivity.this.adaptor.getCount() == 0){
+                    AreaAddResourcesActivity.this.showErrorMessage("Nothing to upload.", "error");
                     return;
                 }
                 Intent i = new Intent(AreaAddResourcesActivity.this, UploadResourcesActivity.class);
-                startActivity(i);
+                AreaAddResourcesActivity.this.startActivity(i);
             }
         });
     }
@@ -100,7 +103,7 @@ public class AreaAddResourcesActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                finish();
+                this.finish();
                 return false;
             default:
                 return super.onOptionsItemSelected(item);
@@ -109,18 +112,18 @@ public class AreaAddResourcesActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        finish();
-        Intent i = new Intent(AreaAddResourcesActivity.this, AreaDetailsActivity.class);
-        startActivity(i);
+        this.finish();
+        Intent i = new Intent(this, AreaDetailsActivity.class);
+        this.startActivity(i);
     }
 
     private void showErrorMessage(String message, String type) {
-        final Snackbar snackbar = Snackbar.make(getWindow().getDecorView(), message, Snackbar.LENGTH_INDEFINITE);
+        final Snackbar snackbar = Snackbar.make(this.getWindow().getDecorView(), message, Snackbar.LENGTH_INDEFINITE);
 
         View sbView = snackbar.getView();
         snackbar.getView().setBackgroundColor(Color.WHITE);
 
-        TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+        TextView textView = (TextView) sbView.findViewById(id.snackbar_text);
         if(type.equalsIgnoreCase("info")){
             textView.setTextColor(Color.GREEN);
         } else if(type.equalsIgnoreCase("error")) {
@@ -132,7 +135,7 @@ public class AreaAddResourcesActivity extends AppCompatActivity {
         textView.setTextSize(15);
         textView.setMaxLines(3);
 
-        snackbar.setAction("Dismiss", new View.OnClickListener() {
+        snackbar.setAction("Dismiss", new OnClickListener() {
             @Override
             public void onClick(View v) {
                 snackbar.dismiss();

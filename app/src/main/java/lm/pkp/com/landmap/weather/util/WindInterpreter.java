@@ -21,7 +21,7 @@ public class WindInterpreter {
                 "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW",
                 "N"};
 
-        return directions[(int) Math.floor(((bearing + 11.25) % 360) / 22.5)];
+        return directions[(int) Math.floor((bearing + 11.25) % 360 / 22.5)];
     }
 
 }

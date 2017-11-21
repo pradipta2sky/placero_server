@@ -5,8 +5,10 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
+import lm.pkp.com.landmap.R.id;
+import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.res.doc.AreaDocumentChooserFragment;
+import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 
 public class AreaDocumentChooserActivity extends AppCompatActivity {
 
@@ -16,16 +18,16 @@ public class AreaDocumentChooserActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
 
-        setContentView(R.layout.activity_area_doc_chooser);
+        this.setContentView(layout.activity_area_doc_chooser);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.fc_toolbar);
+        Toolbar toolbar = (Toolbar) this.findViewById(id.fc_toolbar);
         toolbar.setTitle("Choose Document PDF");
 
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        this.setSupportActionBar(toolbar);
+        this.getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.add(R.id.fragment_container, new AreaDocumentChooserFragment(),
+        FragmentTransaction fragmentTransaction = this.getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.add(id.fragment_container, new AreaDocumentChooserFragment(),
                 AreaDocumentChooserFragment.class.getSimpleName());
         fragmentTransaction.commit();
     }
@@ -38,7 +40,7 @@ public class AreaDocumentChooserActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        finish();
+        this.finish();
     }
 
 }

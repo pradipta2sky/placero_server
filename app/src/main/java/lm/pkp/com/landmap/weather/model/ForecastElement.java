@@ -12,7 +12,7 @@ public class ForecastElement {
     private String temperatureLow = "";
 
     public String getMessage() {
-        return this.message;
+        return message;
     }
 
     public void setMessage(String message) {
@@ -20,7 +20,7 @@ public class ForecastElement {
     }
 
     public String getDate() {
-        return this.date;
+        return date;
     }
 
     public void setDate(String date) {
@@ -28,7 +28,7 @@ public class ForecastElement {
     }
 
     public String getDay() {
-        return this.day;
+        return day;
     }
 
     public void setDay(String day) {
@@ -36,7 +36,7 @@ public class ForecastElement {
     }
 
     public String getTemperatureHigh() {
-        return this.temperatureHigh;
+        return temperatureHigh;
     }
 
     public void setTemperatureHigh(String temperatureHigh) {
@@ -44,7 +44,7 @@ public class ForecastElement {
     }
 
     public String getTemperatureLow() {
-        return this.temperatureLow;
+        return temperatureLow;
     }
 
     public void setTemperatureLow(String temperatureLow) {

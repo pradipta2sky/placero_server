@@ -26,7 +26,7 @@ import lm.pkp.com.landmap.util.AndroidSystemUtil;
 public class AreaDBHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "landmap.db";
-    private Context localContext = null;
+    private Context localContext;
 
     public static final String AREA_TABLE_NAME = "area_master";
     public static final String AREA_COLUMN_NAME = "name";
@@ -42,172 +42,172 @@ public class AreaDBHelper extends SQLiteOpenHelper {
     private AsyncTaskCallback callback;
 
     public AreaDBHelper(Context context) {
-        super(context, DATABASE_NAME, null, 1);
-        localContext = context;
+        super(context, AreaDBHelper.DATABASE_NAME, null, 1);
+        this.localContext = context;
     }
 
     public AreaDBHelper(Context context, AsyncTaskCallback callback) {
-        super(context, DATABASE_NAME, null, 1);
-        localContext = context;
+        super(context, AreaDBHelper.DATABASE_NAME, null, 1);
+        this.localContext = context;
         this.callback = callback;
     }
 
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(
-                "create table " + AREA_TABLE_NAME + "(" +
-                        AREA_COLUMN_NAME + " text," +
-                        AREA_COLUMN_DESCRIPTION + " text," +
-                        AREA_COLUMN_CREATED_BY + " text," +
-                        AREA_COLUMN_CENTER_LAT + " text, " +
-                        AREA_COLUMN_CENTER_LON + " text, " +
-                        AREA_COLUMN_MEASURE_SQ_FT + " text, " +
-                        AREA_COLUMN_UNIQUE_ID + " text, " +
-                        AREA_COLUMN_ADDRESS + " text, " +
-                        AREA_COLUMN_TYPE + " text )"
+                "create table " + AreaDBHelper.AREA_TABLE_NAME + "(" +
+                        AreaDBHelper.AREA_COLUMN_NAME + " text," +
+                        AreaDBHelper.AREA_COLUMN_DESCRIPTION + " text," +
+                        AreaDBHelper.AREA_COLUMN_CREATED_BY + " text," +
+                        AreaDBHelper.AREA_COLUMN_CENTER_LAT + " text, " +
+                        AreaDBHelper.AREA_COLUMN_CENTER_LON + " text, " +
+                        AreaDBHelper.AREA_COLUMN_MEASURE_SQ_FT + " text, " +
+                        AreaDBHelper.AREA_COLUMN_UNIQUE_ID + " text, " +
+                        AreaDBHelper.AREA_COLUMN_ADDRESS + " text, " +
+                        AreaDBHelper.AREA_COLUMN_TYPE + " text )"
         );
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + AREA_TABLE_NAME);
-        onCreate(db);
+        db.execSQL("DROP TABLE IF EXISTS " + AreaDBHelper.AREA_TABLE_NAME);
+        this.onCreate(db);
     }
 
     public AreaElement insertAreaLocally() {
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = getWritableDatabase();
 
         AreaElement ae = new AreaElement();
         String uniqueId = UUID.randomUUID().toString();
         ae.setName("AR_" + uniqueId);
 
         ContentValues contentValues = new ContentValues();
-        contentValues.put(AREA_COLUMN_NAME, ae.getName());
+        contentValues.put(AreaDBHelper.AREA_COLUMN_NAME, ae.getName());
 
         ae.setDescription("Not Available");
-        contentValues.put(AREA_COLUMN_DESCRIPTION, ae.getDescription());
+        contentValues.put(AreaDBHelper.AREA_COLUMN_DESCRIPTION, ae.getDescription());
 
         String createdBy = UserContext.getInstance().getUserElement().getEmail();
-        contentValues.put(AREA_COLUMN_CREATED_BY, createdBy);
+        contentValues.put(AreaDBHelper.AREA_COLUMN_CREATED_BY, createdBy);
         ae.setCreatedBy(createdBy);
 
-        contentValues.put(AREA_COLUMN_UNIQUE_ID, uniqueId);
+        contentValues.put(AreaDBHelper.AREA_COLUMN_UNIQUE_ID, uniqueId);
         ae.setUniqueId(uniqueId);
 
-        contentValues.put(AREA_COLUMN_CENTER_LAT, "0.0");
+        contentValues.put(AreaDBHelper.AREA_COLUMN_CENTER_LAT, "0.0");
         ae.getCenterPosition().setLat(0.0);
 
-        contentValues.put(AREA_COLUMN_CENTER_LON, "0.0");
+        contentValues.put(AreaDBHelper.AREA_COLUMN_CENTER_LON, "0.0");
         ae.getCenterPosition().setLon(0.0);
 
-        contentValues.put(AREA_COLUMN_MEASURE_SQ_FT, "0");
+        contentValues.put(AreaDBHelper.AREA_COLUMN_MEASURE_SQ_FT, "0");
         ae.setMeasureSqFt(0);
 
-        contentValues.put(AREA_COLUMN_ADDRESS, "");
+        contentValues.put(AreaDBHelper.AREA_COLUMN_ADDRESS, "");
         ae.setAddress("");
 
-        contentValues.put(AREA_COLUMN_TYPE, "self");
+        contentValues.put(AreaDBHelper.AREA_COLUMN_TYPE, "self");
         ae.setType("self");
 
-        db.insert(AREA_TABLE_NAME, null, contentValues);
+        db.insert(AreaDBHelper.AREA_TABLE_NAME, null, contentValues);
 
         db.close();
 
-        if (callback != null) {
-            callback.taskCompleted(ae);
+        if (this.callback != null) {
+            this.callback.taskCompleted(ae);
         }
         return ae;
     }
 
     public void insertAreaToServer(AreaElement ae) {
-        LMSRestAsyncTask insertTask = new LMSRestAsyncTask(callback);
-        insertTask.execute(preparePostParams("insert", ae));
+        LMSRestAsyncTask insertTask = new LMSRestAsyncTask(this.callback);
+        insertTask.execute(this.preparePostParams("insert", ae));
     }
 
     public AreaElement insertAreaFromServer(AreaElement ae) {
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
-        contentValues.put(AREA_COLUMN_UNIQUE_ID, ae.getUniqueId());
-        contentValues.put(AREA_COLUMN_NAME, ae.getName());
-        contentValues.put(AREA_COLUMN_DESCRIPTION, ae.getDescription());
-        contentValues.put(AREA_COLUMN_CREATED_BY, ae.getCreatedBy());
-        contentValues.put(AREA_COLUMN_CENTER_LAT, ae.getCenterPosition().getLat() + "");
-        contentValues.put(AREA_COLUMN_CENTER_LON, ae.getCenterPosition().getLon() + "");
-        contentValues.put(AREA_COLUMN_MEASURE_SQ_FT, ae.getMeasureSqFt() + "");
-        contentValues.put(AREA_COLUMN_ADDRESS, ae.getAddress());
-        contentValues.put(AREA_COLUMN_TYPE, ae.getType());
+        contentValues.put(AreaDBHelper.AREA_COLUMN_UNIQUE_ID, ae.getUniqueId());
+        contentValues.put(AreaDBHelper.AREA_COLUMN_NAME, ae.getName());
+        contentValues.put(AreaDBHelper.AREA_COLUMN_DESCRIPTION, ae.getDescription());
+        contentValues.put(AreaDBHelper.AREA_COLUMN_CREATED_BY, ae.getCreatedBy());
+        contentValues.put(AreaDBHelper.AREA_COLUMN_CENTER_LAT, ae.getCenterPosition().getLat() + "");
+        contentValues.put(AreaDBHelper.AREA_COLUMN_CENTER_LON, ae.getCenterPosition().getLon() + "");
+        contentValues.put(AreaDBHelper.AREA_COLUMN_MEASURE_SQ_FT, ae.getMeasureSqFt() + "");
+        contentValues.put(AreaDBHelper.AREA_COLUMN_ADDRESS, ae.getAddress());
+        contentValues.put(AreaDBHelper.AREA_COLUMN_TYPE, ae.getType());
 
-        db.insert(AREA_TABLE_NAME, null, contentValues);
+        db.insert(AreaDBHelper.AREA_TABLE_NAME, null, contentValues);
         db.close();
 
         return ae;
     }
 
     public void updateArea(AreaElement ae) {
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
-        contentValues.put(AREA_COLUMN_UNIQUE_ID, ae.getUniqueId());
-        contentValues.put(AREA_COLUMN_NAME, ae.getName());
-        contentValues.put(AREA_COLUMN_DESCRIPTION, ae.getDescription());
-        contentValues.put(AREA_COLUMN_CENTER_LAT, ae.getCenterPosition().getLat());
-        contentValues.put(AREA_COLUMN_CENTER_LON, ae.getCenterPosition().getLon());
-        contentValues.put(AREA_COLUMN_MEASURE_SQ_FT, ae.getMeasureSqFt() + "");
-        contentValues.put(AREA_COLUMN_CREATED_BY, ae.getCreatedBy());
-        contentValues.put(AREA_COLUMN_TYPE, ae.getType());
+        contentValues.put(AreaDBHelper.AREA_COLUMN_UNIQUE_ID, ae.getUniqueId());
+        contentValues.put(AreaDBHelper.AREA_COLUMN_NAME, ae.getName());
+        contentValues.put(AreaDBHelper.AREA_COLUMN_DESCRIPTION, ae.getDescription());
+        contentValues.put(AreaDBHelper.AREA_COLUMN_CENTER_LAT, ae.getCenterPosition().getLat());
+        contentValues.put(AreaDBHelper.AREA_COLUMN_CENTER_LON, ae.getCenterPosition().getLon());
+        contentValues.put(AreaDBHelper.AREA_COLUMN_MEASURE_SQ_FT, ae.getMeasureSqFt() + "");
+        contentValues.put(AreaDBHelper.AREA_COLUMN_CREATED_BY, ae.getCreatedBy());
+        contentValues.put(AreaDBHelper.AREA_COLUMN_TYPE, ae.getType());
 
-        final String areaTags = ae.getAddress();
+        String areaTags = ae.getAddress();
         if (areaTags != null && !areaTags.trim().equals("")) {
-            contentValues.put(AREA_COLUMN_ADDRESS, ae.getAddress());
+            contentValues.put(AreaDBHelper.AREA_COLUMN_ADDRESS, ae.getAddress());
         } else {
             String address
-                    = CommonGeoHelper.INSTANCE.getAddressByGeoLocation(localContext,
-                        ae.getCenterPosition().getLat(), ae.getCenterPosition().getLon());
-            contentValues.put(AREA_COLUMN_ADDRESS, address);
+                    = CommonGeoHelper.INSTANCE.getAddressByGeoLocation(this.localContext,
+                    ae.getCenterPosition().getLat(), ae.getCenterPosition().getLon());
+            contentValues.put(AreaDBHelper.AREA_COLUMN_ADDRESS, address);
         }
-        db.update(AREA_TABLE_NAME, contentValues, AREA_COLUMN_UNIQUE_ID + " = ? ", new String[]{ae.getUniqueId()});
+        db.update(AreaDBHelper.AREA_TABLE_NAME, contentValues, AreaDBHelper.AREA_COLUMN_UNIQUE_ID + " = ? ", new String[]{ae.getUniqueId()});
         db.close();
     }
 
     public void updateAreaAttributes(AreaElement ae) {
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
-        contentValues.put(AREA_COLUMN_NAME, ae.getName());
-        contentValues.put(AREA_COLUMN_DESCRIPTION, ae.getDescription());
-        contentValues.put(AREA_COLUMN_ADDRESS, ae.getAddress());
+        contentValues.put(AreaDBHelper.AREA_COLUMN_NAME, ae.getName());
+        contentValues.put(AreaDBHelper.AREA_COLUMN_DESCRIPTION, ae.getDescription());
+        contentValues.put(AreaDBHelper.AREA_COLUMN_ADDRESS, ae.getAddress());
 
-        db.update(AREA_TABLE_NAME, contentValues, AREA_COLUMN_UNIQUE_ID + " = ? ", new String[]{ae.getUniqueId()});
+        db.update(AreaDBHelper.AREA_TABLE_NAME, contentValues, AreaDBHelper.AREA_COLUMN_UNIQUE_ID + " = ? ", new String[]{ae.getUniqueId()});
         db.close();
     }
 
     public void updateAreaOnServer(AreaElement ae) {
-        LMSRestAsyncTask updateTask = new LMSRestAsyncTask(callback);
-        updateTask.execute(preparePostParams("update", ae));
+        LMSRestAsyncTask updateTask = new LMSRestAsyncTask(this.callback);
+        updateTask.execute(this.preparePostParams("update", ae));
     }
 
     public void deleteArea(AreaElement ae) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(AREA_TABLE_NAME, AREA_COLUMN_UNIQUE_ID + " = ? ", new String[]{ae.getUniqueId()});
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(AreaDBHelper.AREA_TABLE_NAME, AreaDBHelper.AREA_COLUMN_UNIQUE_ID + " = ? ", new String[]{ae.getUniqueId()});
         db.close();
-        PositionsDBHelper pdb = new PositionsDBHelper(localContext);
+        PositionsDBHelper pdb = new PositionsDBHelper(this.localContext);
         pdb.deletePositionByAreaId(ae.getUniqueId());
     }
 
     public void deleteAreaFromServer(AreaElement ae) {
-        final LMSRestAsyncTask deleteTask = new LMSRestAsyncTask(callback);
-        deleteTask.execute(preparePostParams("delete", ae));
+        LMSRestAsyncTask deleteTask = new LMSRestAsyncTask(this.callback);
+        deleteTask.execute(this.preparePostParams("delete", ae));
     }
 
     public ArrayList<AreaElement> getAreas(String type) {
         ArrayList<AreaElement> allAreas = new ArrayList<AreaElement>();
-        SQLiteDatabase db = this.getReadableDatabase();
-        final DriveDBHelper ddh = new DriveDBHelper(localContext);
-        final PermissionsDBHelper pdh = new PermissionsDBHelper(localContext);
+        SQLiteDatabase db = getReadableDatabase();
+        DriveDBHelper ddh = new DriveDBHelper(this.localContext);
+        PermissionsDBHelper pdh = new PermissionsDBHelper(this.localContext);
         Cursor cursor = null;
         try {
-            cursor = db.rawQuery("select * from " + AREA_TABLE_NAME + " WHERE " + AREA_COLUMN_TYPE + "=?",
+            cursor = db.rawQuery("select * from " + AreaDBHelper.AREA_TABLE_NAME + " WHERE " + AreaDBHelper.AREA_COLUMN_TYPE + "=?",
                     new String[]{type});
             if (cursor == null) {
                 return allAreas;
@@ -216,15 +216,15 @@ public class AreaDBHelper extends SQLiteOpenHelper {
                 cursor.moveToFirst();
                 while (cursor.isAfterLast() == false) {
                     AreaElement ae = new AreaElement();
-                    ae.setName(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_NAME)));
-                    ae.setDescription(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_DESCRIPTION)));
-                    ae.setCreatedBy(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_CREATED_BY)));
-                    ae.setUniqueId(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_UNIQUE_ID)));
-                    ae.getCenterPosition().setLat(new Double(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_CENTER_LAT))));
-                    ae.getCenterPosition().setLon(new Double(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_CENTER_LON))));
-                    ae.setMeasureSqFt(new Double(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_MEASURE_SQ_FT))));
-                    ae.setAddress(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_ADDRESS)));
-                    ae.setType(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_TYPE)));
+                    ae.setName(cursor.getString(cursor.getColumnIndex(AreaDBHelper.AREA_COLUMN_NAME)));
+                    ae.setDescription(cursor.getString(cursor.getColumnIndex(AreaDBHelper.AREA_COLUMN_DESCRIPTION)));
+                    ae.setCreatedBy(cursor.getString(cursor.getColumnIndex(AreaDBHelper.AREA_COLUMN_CREATED_BY)));
+                    ae.setUniqueId(cursor.getString(cursor.getColumnIndex(AreaDBHelper.AREA_COLUMN_UNIQUE_ID)));
+                    ae.getCenterPosition().setLat(new Double(cursor.getString(cursor.getColumnIndex(AreaDBHelper.AREA_COLUMN_CENTER_LAT))));
+                    ae.getCenterPosition().setLon(new Double(cursor.getString(cursor.getColumnIndex(AreaDBHelper.AREA_COLUMN_CENTER_LON))));
+                    ae.setMeasureSqFt(new Double(cursor.getString(cursor.getColumnIndex(AreaDBHelper.AREA_COLUMN_MEASURE_SQ_FT))));
+                    ae.setAddress(cursor.getString(cursor.getColumnIndex(AreaDBHelper.AREA_COLUMN_ADDRESS)));
+                    ae.setType(cursor.getString(cursor.getColumnIndex(AreaDBHelper.AREA_COLUMN_TYPE)));
 
                     ae.getMediaResources().addAll(ddh.getDriveResourcesByAreaId(ae.getUniqueId()));
                     allAreas.add(ae);
@@ -263,23 +263,23 @@ public class AreaDBHelper extends SQLiteOpenHelper {
     }
 
     public void deleteAreasLocally() {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(AREA_TABLE_NAME, "1", null);
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(AreaDBHelper.AREA_TABLE_NAME, "1", null);
         db.close();
     }
 
     public void deletePublicAreas() {
-        ArrayList<AreaElement> publicAreas = getAreas("public");
+        ArrayList<AreaElement> publicAreas = this.getAreas("public");
 
-        PositionsDBHelper pdh = new PositionsDBHelper(localContext);
-        DriveDBHelper ddh = new DriveDBHelper(localContext);
-        PermissionsDBHelper pmh = new PermissionsDBHelper(localContext);
+        PositionsDBHelper pdh = new PositionsDBHelper(this.localContext);
+        DriveDBHelper ddh = new DriveDBHelper(this.localContext);
+        PermissionsDBHelper pmh = new PermissionsDBHelper(this.localContext);
 
-        SQLiteDatabase db = this.getWritableDatabase();
+        SQLiteDatabase db = getWritableDatabase();
         for (int i = 0; i < publicAreas.size(); i++) {
-            final String areaId = publicAreas.get(i).getUniqueId();
-            db.delete(AREA_TABLE_NAME, AREA_COLUMN_UNIQUE_ID + "=? AND "
-                    + AREA_COLUMN_TYPE + "=?", new String[]{areaId, "public"});
+            String areaId = publicAreas.get(i).getUniqueId();
+            db.delete(AreaDBHelper.AREA_TABLE_NAME, AreaDBHelper.AREA_COLUMN_UNIQUE_ID + "=? AND "
+                    + AreaDBHelper.AREA_COLUMN_TYPE + "=?", new String[]{areaId, "public"});
             pdh.deletePositionByAreaId(areaId);
             ddh.deleteResourcesByAreaId(areaId);
             pmh.deletePermissionsByAreaId(areaId);

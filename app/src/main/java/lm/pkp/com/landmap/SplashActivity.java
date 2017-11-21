@@ -8,6 +8,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
+import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.sync.LocalDataRefresher;
@@ -20,9 +21,9 @@ public class SplashActivity extends Activity {
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
 
-        setContentView(R.layout.activity_splash);
+        this.setContentView(layout.activity_splash);
 
-        new LocalDataRefresher(getApplicationContext(), new DataReloadCallback()).refreshLocalData();
+        new LocalDataRefresher(this.getApplicationContext(), new DataReloadCallback()).refreshLocalData();
         LocalFolderStructureManager.create();
     }
 
@@ -32,8 +33,8 @@ public class SplashActivity extends Activity {
         public void taskCompleted(Object result) {
             Intent commonFoldersIntent = new Intent(SplashActivity.this,
                     CreateCommonFolderStructureActivity.class);
-            startActivity(commonFoldersIntent);
-            finish();
+            SplashActivity.this.startActivity(commonFoldersIntent);
+            SplashActivity.this.finish();
         }
     }
 

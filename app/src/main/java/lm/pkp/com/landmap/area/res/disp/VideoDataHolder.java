@@ -17,17 +17,17 @@ final class VideoDataHolder {
     public static final VideoDataHolder INSTANCE = new VideoDataHolder();
 
     public ArrayList<VideoDisplayElement> getData() {
-        final ArrayList<VideoDisplayElement> videoItems = new ArrayList<>();
+        ArrayList<VideoDisplayElement> videoItems = new ArrayList<>();
         AreaContext ac = AreaContext.INSTANCE;
 
-        final AreaElement ae = ac.getAreaElement();
+        AreaElement ae = ac.getAreaElement();
         List<DriveResource> driveResources = ae.getMediaResources();
         String imgRootPath = ac.getAreaLocalVideoRoot(ae.getUniqueId()).getAbsolutePath() + File.separatorChar;
         for (int i = 0; i < driveResources.size(); i++) {
-            final DriveResource resource = driveResources.get(i);
+            DriveResource resource = driveResources.get(i);
             if (resource.getType().equals("file")) {
                 if (resource.getContentType().equals("Video")) {
-                    final VideoDisplayElement videoDisplayElement = new VideoDisplayElement();
+                    VideoDisplayElement videoDisplayElement = new VideoDisplayElement();
                     videoDisplayElement.setName(resource.getName());
                     videoDisplayElement.setAbsPath(imgRootPath + resource.getName());
                     videoDisplayElement.setResourceId(resource.getResourceId());

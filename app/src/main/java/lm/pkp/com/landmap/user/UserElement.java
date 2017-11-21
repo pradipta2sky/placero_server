@@ -13,7 +13,7 @@ public class UserElement {
     private String authSystemId;
 
     public String getDisplayName() {
-        return displayName;
+        return this.displayName;
     }
 
     public void setDisplayName(String displayName) {
@@ -21,7 +21,7 @@ public class UserElement {
     }
 
     public String getEmail() {
-        return email;
+        return this.email;
     }
 
     public void setEmail(String email) {
@@ -29,7 +29,7 @@ public class UserElement {
     }
 
     public String getFamilyName() {
-        return familyName;
+        return this.familyName;
     }
 
     public void setFamilyName(String familyName) {
@@ -37,7 +37,7 @@ public class UserElement {
     }
 
     public String getGivenName() {
-        return givenName;
+        return this.givenName;
     }
 
     public void setGivenName(String givenName) {
@@ -45,7 +45,7 @@ public class UserElement {
     }
 
     public String getPhotoUrl() {
-        return photoUrl;
+        return this.photoUrl;
     }
 
     public void setPhotoUrl(String photoUrl) {
@@ -53,7 +53,7 @@ public class UserElement {
     }
 
     public String getAuthSystemId() {
-        return authSystemId;
+        return this.authSystemId;
     }
 
     public void setAuthSystemId(String authSystemId) {

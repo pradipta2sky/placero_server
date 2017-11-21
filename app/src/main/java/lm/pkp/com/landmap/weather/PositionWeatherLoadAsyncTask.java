@@ -15,20 +15,17 @@ import javax.net.ssl.HttpsURLConnection;
 
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.position.PositionElement;
-import lm.pkp.com.landmap.weather.db.WeatherDBHelper;
-import lm.pkp.com.landmap.weather.model.WeatherElement;
 
 /**
  * Created by USER on 11/19/2017.
  */
-public class PositionWeatherLoadAsyncTask extends AsyncTask<JSONObject, Void, String>{
+public class PositionWeatherLoadAsyncTask extends AsyncTask<JSONObject, Void, String> {
 
-    private AsyncTaskCallback callback = null;
-    private PositionElement position = null;
-    private Context context = null;
+    private AsyncTaskCallback callback;
+    private PositionElement position;
+    private Context context;
 
     public PositionWeatherLoadAsyncTask(Context context, PositionElement position, AsyncTaskCallback callback) {
-        super();
         this.position = position;
         this.callback = callback;
         this.context = context;
@@ -75,8 +72,8 @@ public class PositionWeatherLoadAsyncTask extends AsyncTask<JSONObject, Void, St
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
-        if (callback != null) {
-            callback.taskCompleted(s);
+        if (this.callback != null) {
+            this.callback.taskCompleted(s);
         }
     }
 }

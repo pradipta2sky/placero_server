@@ -7,19 +7,19 @@
         android:layout_height="fill_parent"
         android:fillViewport="true">
 
-    <ListView
-        android:id="@+id/document_list_view"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:cacheColorHint="#ffffffff"
-        android:clipToPadding="false"
-        android:layout_gravity="top"
-        android:layout_margin="10dp"
-        android:divider="@android:color/transparent"
-        android:dividerHeight="10.0sp"
-        android:fadingEdge="none"
-        android:fadingEdgeLength="0dp"
-        android:scrollbars="none" />
+        <ListView
+            android:id="@+id/document_list_view"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:cacheColorHint="#ffffffff"
+            android:clipToPadding="false"
+            android:layout_gravity="top"
+            android:layout_margin="10dp"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="10.0sp"
+            android:fadingEdge="none"
+            android:fadingEdgeLength="0dp"
+            android:scrollbars="none" />
 
     </ScrollView>
 

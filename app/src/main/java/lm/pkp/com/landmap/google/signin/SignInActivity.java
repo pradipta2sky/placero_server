@@ -7,6 +7,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.TextView;
 
 import com.google.android.gms.auth.api.Auth;
@@ -16,6 +17,8 @@ import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.Builder;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
@@ -23,6 +26,9 @@ import com.google.android.gms.common.api.Status;
 import org.json.JSONObject;
 
 import lm.pkp.com.landmap.R;
+import lm.pkp.com.landmap.R.id;
+import lm.pkp.com.landmap.R.layout;
+import lm.pkp.com.landmap.R.string;
 import lm.pkp.com.landmap.SplashActivity;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.user.UserContext;
@@ -36,8 +42,8 @@ import lm.pkp.com.landmap.util.UserMappingUtil;
  * profile.
  */
 public class SignInActivity extends AppCompatActivity implements
-        GoogleApiClient.OnConnectionFailedListener,
-        View.OnClickListener, AsyncTaskCallback {
+        OnConnectionFailedListener,
+        OnClickListener, AsyncTaskCallback {
 
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
@@ -45,30 +51,30 @@ public class SignInActivity extends AppCompatActivity implements
     private GoogleApiClient mGoogleApiClient;
     private TextView mStatusTextView;
     private ProgressDialog mProgressDialog;
-    private UserElement signedUser = null;
+    private UserElement signedUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_google_signin_main);
+        this.setContentView(layout.activity_google_signin_main);
 
-        ActionBar ab = this.getSupportActionBar();
+        ActionBar ab = getSupportActionBar();
         ab.hide();
 
-        mStatusTextView = (TextView) findViewById(R.id.status);
+        this.mStatusTextView = (TextView) this.findViewById(id.status);
 
-        findViewById(R.id.sign_in_button).setOnClickListener(this);
-        findViewById(R.id.sign_out_button).setOnClickListener(this);
-        findViewById(R.id.disconnect_button).setOnClickListener(this);
+        this.findViewById(id.sign_in_button).setOnClickListener(this);
+        this.findViewById(id.sign_out_button).setOnClickListener(this);
+        this.findViewById(id.disconnect_button).setOnClickListener(this);
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
+        this.mGoogleApiClient = new Builder(this)
                 .enableAutoManage(this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
-        SignInButton signInButton = (SignInButton) findViewById(R.id.sign_in_button);
+        SignInButton signInButton = (SignInButton) this.findViewById(id.sign_in_button);
         signInButton.setSize(SignInButton.SIZE_STANDARD);
     }
 
@@ -76,18 +82,18 @@ public class SignInActivity extends AppCompatActivity implements
     public void onStart() {
         super.onStart();
 
-        OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
+        OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(this.mGoogleApiClient);
         if (opr.isDone()) {
-            Log.d(TAG, "Got cached sign-in");
+            Log.d(SignInActivity.TAG, "Got cached sign-in");
             GoogleSignInResult result = opr.get();
-            handleSignInResult(result);
+            this.handleSignInResult(result);
         } else {
-            showProgressDialog();
+            this.showProgressDialog();
             opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
                 @Override
                 public void onResult(GoogleSignInResult googleSignInResult) {
-                    hideProgressDialog();
-                    handleSignInResult(googleSignInResult);
+                    SignInActivity.this.hideProgressDialog();
+                    SignInActivity.this.handleSignInResult(googleSignInResult);
                 }
             });
         }
@@ -96,43 +102,43 @@ public class SignInActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        hideProgressDialog();
+        this.hideProgressDialog();
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        TextView debugText = ((TextView) findViewById(R.id.debug_text));
+        TextView debugText = (TextView) findViewById(R.id.debug_text);
         debugText.setVisibility(View.VISIBLE);
         debugText.setText("Signin Result:[ ReqC - " + requestCode + ", ResC - " + resultCode + " ]");
 
-        if (requestCode == RC_SIGN_IN) {
+        if (requestCode == SignInActivity.RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            handleSignInResult(result);
+            this.handleSignInResult(result);
         }
     }
 
     private void handleSignInResult(GoogleSignInResult result) {
-        Log.d(TAG, "handleSignInResult:" + result.isSuccess());
+        Log.d(SignInActivity.TAG, "handleSignInResult:" + result.isSuccess());
         if (result.isSuccess()) {
             GoogleSignInAccount acct = result.getSignInAccount();
-            signedUser = UserMappingUtil.convertGoogleAccountToLocalAccount(acct);
+            this.signedUser = UserMappingUtil.convertGoogleAccountToLocalAccount(acct);
 
-            UserDBHelper udh = new UserDBHelper(getApplicationContext());
-            UserElement localUser = udh.getUserByEmail(signedUser.getEmail());
+            UserDBHelper udh = new UserDBHelper(this.getApplicationContext());
+            UserElement localUser = udh.getUserByEmail(this.signedUser.getEmail());
             if (localUser == null) {
-                udh.insertUserLocally(signedUser);
+                udh.insertUserLocally(this.signedUser);
             }
-            UserContext.getInstance().setUserElement(signedUser);
-            searchOnRemoteAndUpdate(signedUser);
+            UserContext.getInstance().setUserElement(this.signedUser);
+            this.searchOnRemoteAndUpdate(this.signedUser);
 
-            finish();
+            this.finish();
 
-            Intent spashIntent = new Intent(SignInActivity.this, SplashActivity.class);
-            startActivity(spashIntent);
+            Intent spashIntent = new Intent(this, SplashActivity.class);
+            this.startActivity(spashIntent);
         } else {
-            updateUI(false);
+            this.updateUI(false);
         }
     }
 
@@ -153,9 +159,9 @@ public class SignInActivity extends AppCompatActivity implements
     public void taskCompleted(Object result) {
         try {
             String userDetails = result.toString();
-            UserDBHelper udh = new UserDBHelper(getApplicationContext());
+            UserDBHelper udh = new UserDBHelper(this.getApplicationContext());
             if (userDetails.trim().equalsIgnoreCase("[]")) {
-                udh.insertUserToServer(signedUser);
+                udh.insertUserToServer(this.signedUser);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -163,34 +169,34 @@ public class SignInActivity extends AppCompatActivity implements
     }
 
     private void signIn() {
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(this.mGoogleApiClient);
+        this.startActivityForResult(signInIntent, SignInActivity.RC_SIGN_IN);
     }
 
     private void signOut() {
-        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
+        Auth.GoogleSignInApi.signOut(this.mGoogleApiClient).setResultCallback(
                 new ResultCallback<Status>() {
                     @Override
                     public void onResult(Status status) {
-                        updateUI(false);
+                        SignInActivity.this.updateUI(false);
                     }
                 });
     }
 
     private void revokeAccess() {
-        Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(
+        Auth.GoogleSignInApi.revokeAccess(this.mGoogleApiClient).setResultCallback(
                 new ResultCallback<Status>() {
                     @Override
                     public void onResult(Status status) {
-                        updateUI(false);
+                        SignInActivity.this.updateUI(false);
                     }
                 });
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.d(TAG, "onConnectionFailed:" + connectionResult);
-        TextView debugText = ((TextView) findViewById(R.id.debug_text));
+        Log.d(SignInActivity.TAG, "onConnectionFailed:" + connectionResult);
+        TextView debugText = (TextView) findViewById(R.id.debug_text);
         debugText.setVisibility(View.VISIBLE);
         debugText.setText("onConnectionFailed:" + connectionResult);
     }
@@ -198,50 +204,50 @@ public class SignInActivity extends AppCompatActivity implements
     @Override
     protected void onStop() {
         super.onStop();
-        if (mProgressDialog != null) {
-            mProgressDialog.dismiss();
+        if (this.mProgressDialog != null) {
+            this.mProgressDialog.dismiss();
         }
     }
 
     private void showProgressDialog() {
-        if (mProgressDialog == null) {
-            mProgressDialog = new ProgressDialog(this);
-            mProgressDialog.setMessage(getString(R.string.loading));
-            mProgressDialog.setIndeterminate(true);
+        if (this.mProgressDialog == null) {
+            this.mProgressDialog = new ProgressDialog(this);
+            this.mProgressDialog.setMessage(this.getString(string.loading));
+            this.mProgressDialog.setIndeterminate(true);
         }
 
-        mProgressDialog.show();
+        this.mProgressDialog.show();
     }
 
     private void hideProgressDialog() {
-        if (mProgressDialog != null && mProgressDialog.isShowing()) {
-            mProgressDialog.hide();
+        if (this.mProgressDialog != null && this.mProgressDialog.isShowing()) {
+            this.mProgressDialog.hide();
         }
     }
 
     private void updateUI(boolean signedIn) {
         if (signedIn) {
-            findViewById(R.id.sign_in_button).setVisibility(View.GONE);
-            findViewById(R.id.sign_out_and_disconnect).setVisibility(View.VISIBLE);
+            this.findViewById(id.sign_in_button).setVisibility(View.GONE);
+            this.findViewById(id.sign_out_and_disconnect).setVisibility(View.VISIBLE);
         } else {
-            mStatusTextView.setText(R.string.signed_out);
+            this.mStatusTextView.setText(string.signed_out);
 
-            findViewById(R.id.sign_in_button).setVisibility(View.VISIBLE);
-            findViewById(R.id.sign_out_and_disconnect).setVisibility(View.GONE);
+            this.findViewById(id.sign_in_button).setVisibility(View.VISIBLE);
+            this.findViewById(id.sign_out_and_disconnect).setVisibility(View.GONE);
         }
     }
 
     @Override
     public void onClick(View v) {
         switch (v.getId()) {
-            case R.id.sign_in_button:
-                signIn();
+            case id.sign_in_button:
+                this.signIn();
                 break;
-            case R.id.sign_out_button:
-                signOut();
+            case id.sign_out_button:
+                this.signOut();
                 break;
-            case R.id.disconnect_button:
-                revokeAccess();
+            case id.disconnect_button:
+                this.revokeAccess();
                 break;
         }
     }

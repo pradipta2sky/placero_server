@@ -5,11 +5,11 @@ package lm.pkp.com.landmap.area;
  */
 public interface FileStorageConstants {
 
-    public static final String IMAGE_ROOT_FOLDER_NAME = "app.lms.images";
+    String IMAGE_ROOT_FOLDER_NAME = "app.lms.images";
 
-    public static final String VIDEO_ROOT_FOLDER_NAME = "app.lms.videos";
+    String VIDEO_ROOT_FOLDER_NAME = "app.lms.videos";
 
-    public static final String DOCUMENT_ROOT_FOLDER_NAME = "app.lms.documents";
+    String DOCUMENT_ROOT_FOLDER_NAME = "app.lms.documents";
 
-    public static final String TEMP_ROOT_FOLDER_NAME = "app.lms.temp";
+    String TEMP_ROOT_FOLDER_NAME = "app.lms.temp";
 }

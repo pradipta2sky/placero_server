@@ -44,8 +44,7 @@
                     android:layout_gravity="top"
                     android:layout_weight="0.6"
                     android:minWidth="100dp"
-                    android:inputType="textPhonetic"
-                    />
+                    android:inputType="textPhonetic" />
             </LinearLayout>
 
             <LinearLayout

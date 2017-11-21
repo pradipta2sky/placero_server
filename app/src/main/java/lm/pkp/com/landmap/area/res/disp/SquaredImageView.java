@@ -24,15 +24,15 @@ public class SquaredImageView extends ImageView {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        setMeasuredDimension(getMeasuredWidth(), getMeasuredWidth());
-        setAdjustViewBounds(false);
+        this.setMeasuredDimension(this.getMeasuredWidth(), this.getMeasuredWidth());
+        this.setAdjustViewBounds(false);
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        setPadding(5, 5, 5, 5);
-        setElevation(5);
+        this.setPadding(5, 5, 5, 5);
+        this.setElevation(5);
     }
 
     @Override

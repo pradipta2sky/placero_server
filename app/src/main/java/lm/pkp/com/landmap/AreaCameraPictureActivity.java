@@ -3,7 +3,6 @@ package lm.pkp.com.landmap;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 
@@ -31,7 +30,7 @@ import lm.pkp.com.landmap.util.FileUtil;
 /**
  * Created by USER on 11/1/2017.
  */
-public class AreaCameraPictureActivity extends Activity implements LocationPositionReceiver{
+public class AreaCameraPictureActivity extends Activity implements LocationPositionReceiver {
 
     // LogCat tag
     private static final String TAG = AreaCameraPictureActivity.class.getSimpleName();
@@ -42,18 +41,18 @@ public class AreaCameraPictureActivity extends Activity implements LocationPosit
     public static final int MEDIA_TYPE_IMAGE = 1;
 
     private Uri fileUri; // file url to store image/video
-    private DriveResource pictureResource = new DriveResource();
+    private final DriveResource pictureResource = new DriveResource();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
-        startPositioning();
-        captureImage();
+        this.startPositioning();
+        this.captureImage();
     }
 
     private void startPositioning() {
-        new GPSLocationProvider(AreaCameraPictureActivity.this, this, 30).getLocation();
+        new GPSLocationProvider(this, this, 30).getLocation();
     }
 
     /**
@@ -61,38 +60,38 @@ public class AreaCameraPictureActivity extends Activity implements LocationPosit
      */
     private void captureImage() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        fileUri = getOutputMediaFileUri(MEDIA_TYPE_IMAGE);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri);
-        startActivityForResult(intent, CAMERA_CAPTURE_IMAGE_REQUEST_CODE);
+        this.fileUri = this.getOutputMediaFileUri(AreaCameraPictureActivity.MEDIA_TYPE_IMAGE);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, this.fileUri);
+        this.startActivityForResult(intent, AreaCameraPictureActivity.CAMERA_CAPTURE_IMAGE_REQUEST_CODE);
     }
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelable("file_uri", fileUri);
+        outState.putParcelable("file_uri", this.fileUri);
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        fileUri = savedInstanceState.getParcelable("file_uri");
+        this.fileUri = savedInstanceState.getParcelable("file_uri");
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // if the result is capturing Image
-        if (requestCode == CAMERA_CAPTURE_IMAGE_REQUEST_CODE) {
-            if (resultCode == RESULT_OK) {
-                File imageFile = new File(fileUri.getPath());
-                final AreaContext areaContext = AreaContext.INSTANCE;
+        if (requestCode == AreaCameraPictureActivity.CAMERA_CAPTURE_IMAGE_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                File imageFile = new File(this.fileUri.getPath());
+                AreaContext areaContext = AreaContext.INSTANCE;
                 AreaElement ae = areaContext.getAreaElement();
 
-                final SiliCompressor compressor = SiliCompressor.with(getApplicationContext());
-                final String compressedFilePath = compressor.compress(imageFile.getAbsolutePath(),
+                SiliCompressor compressor = SiliCompressor.with(this.getApplicationContext());
+                String compressedFilePath = compressor.compress(imageFile.getAbsolutePath(),
                         areaContext.getAreaLocalPictureThumbnailRoot(ae.getUniqueId()), true);
 
                 File compressedFile = new File(compressedFilePath);
-                final File loadableFile = getOutputMediaFile();
+                File loadableFile = AreaCameraPictureActivity.getOutputMediaFile();
                 try {
                     FileUtils.copyFile(compressedFile, loadableFile);
                     compressedFile.delete();
@@ -100,34 +99,34 @@ public class AreaCameraPictureActivity extends Activity implements LocationPosit
                     e.printStackTrace();
                 }
 
-                pictureResource.setName(loadableFile.getName());
-                pictureResource.setPath(loadableFile.getAbsolutePath());
-                pictureResource.setType("file");
-                pictureResource.setUserId(UserContext.getInstance().getUserElement().getEmail());
-                pictureResource.setSize(loadableFile.length() + "");
-                pictureResource.setUniqueId(UUID.randomUUID().toString());
-                pictureResource.setAreaId(ae.getUniqueId());
-                pictureResource.setMimeType(FileUtil.getMimeType(loadableFile));
-                pictureResource.setContentType("Image");
-                pictureResource.setContainerId(areaContext.getImagesRootDriveResource().getResourceId());
+                this.pictureResource.setName(loadableFile.getName());
+                this.pictureResource.setPath(loadableFile.getAbsolutePath());
+                this.pictureResource.setType("file");
+                this.pictureResource.setUserId(UserContext.getInstance().getUserElement().getEmail());
+                this.pictureResource.setSize(loadableFile.length() + "");
+                this.pictureResource.setUniqueId(UUID.randomUUID().toString());
+                this.pictureResource.setAreaId(ae.getUniqueId());
+                this.pictureResource.setMimeType(FileUtil.getMimeType(loadableFile));
+                this.pictureResource.setContentType("Image");
+                this.pictureResource.setContainerId(areaContext.getImagesRootDriveResource().getResourceId());
 
-                areaContext.addResourceToQueue(pictureResource);
+                areaContext.addResourceToQueue(this.pictureResource);
 
-                Intent i = new Intent(AreaCameraPictureActivity.this, AreaAddResourcesActivity.class);
-                startActivity(i);
+                Intent i = new Intent(this, AreaAddResourcesActivity.class);
+                this.startActivity(i);
 
-            } else if (resultCode == RESULT_CANCELED) {
+            } else if (resultCode == Activity.RESULT_CANCELED) {
                 // Cancelled case
-                finish();
+                this.finish();
             } else {
                 // Error case
-                finish();
+                this.finish();
             }
         }
     }
 
     public Uri getOutputMediaFileUri(int type) {
-        return Uri.fromFile(getOutputMediaFile());
+        return Uri.fromFile(AreaCameraPictureActivity.getOutputMediaFile());
     }
 
     /**
@@ -142,8 +141,8 @@ public class AreaCameraPictureActivity extends Activity implements LocationPosit
 
     @Override
     public void receivedLocationPostion(PositionElement pe) {
-        pictureResource.setLatitude(pe.getLat() + "");
-        pictureResource.setLongitude(pe.getLon() + "");
+        this.pictureResource.setLatitude(pe.getLat() + "");
+        this.pictureResource.setLongitude(pe.getLon() + "");
     }
 
     @Override

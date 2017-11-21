@@ -7,8 +7,10 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -19,6 +21,8 @@ import java.util.ArrayList;
 
 import lm.pkp.com.landmap.AreaDetailsActivity;
 import lm.pkp.com.landmap.R;
+import lm.pkp.com.landmap.R.id;
+import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
@@ -34,7 +38,7 @@ public class AreaDashboardOwnedFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_owned_areas, container, false);
+        return inflater.inflate(layout.fragment_owned_areas, container, false);
     }
 
     @Override
@@ -43,56 +47,56 @@ public class AreaDashboardOwnedFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(final View view, Bundle savedInstanceState) {
+    public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        final ArrayList<AreaElement> areas = new AreaDBHelper(view.getContext()).getAreas("self");
-        ListView areaListView = (ListView) view.findViewById(R.id.area_display_list);
+        ArrayList<AreaElement> areas = new AreaDBHelper(view.getContext()).getAreas("self");
+        ListView areaListView = (ListView) view.findViewById(id.area_display_list);
 
-        if(areas.size() > 0){
-            view.findViewById(R.id.owned_area_empty_layout).setVisibility(View.GONE);
+        if (areas.size() > 0) {
+            view.findViewById(id.owned_area_empty_layout).setVisibility(View.GONE);
             areaListView.setVisibility(View.VISIBLE);
 
-            AreaItemAdaptor adaptor = new AreaItemAdaptor(getContext(), R.layout.area_element_row, areas);
+            AreaItemAdaptor adaptor = new AreaItemAdaptor(this.getContext(), layout.area_element_row, areas);
 
             areaListView.setAdapter(adaptor);
             areaListView.setDescendantFocusability(ListView.FOCUS_BLOCK_DESCENDANTS);
-            areaListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            areaListView.setOnItemClickListener(new OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapter, View v, int position,
                                         long arg3) {
-                    getActivity().finish();
+                    AreaDashboardOwnedFragment.this.getActivity().finish();
 
                     AreaElement ae = (AreaElement) adapter.getItemAtPosition(position);
-                    AreaContext.INSTANCE.setAreaElement(ae, getContext());
-                    Intent intent = new Intent(getContext(), AreaDetailsActivity.class);
-                    startActivity(intent);
+                    AreaContext.INSTANCE.setAreaElement(ae, AreaDashboardOwnedFragment.this.getContext());
+                    Intent intent = new Intent(AreaDashboardOwnedFragment.this.getContext(), AreaDetailsActivity.class);
+                    AreaDashboardOwnedFragment.this.startActivity(intent);
                 }
             });
 
-        }else {
+        } else {
             areaListView.setVisibility(View.GONE);
-            view.findViewById(R.id.owned_area_empty_layout).setVisibility(View.VISIBLE);
+            view.findViewById(id.owned_area_empty_layout).setVisibility(View.VISIBLE);
         }
 
-        final EditText inputSearch = (EditText) getActivity().findViewById(R.id.dashboard_search_box);
+        EditText inputSearch = (EditText) this.getActivity().findViewById(id.dashboard_search_box);
         inputSearch.addTextChangedListener(new UserInputWatcher());
 
-        final Button seachClearButton = (Button) getActivity().findViewById(R.id.dashboard_search_clear);
-        seachClearButton.setOnClickListener(new View.OnClickListener() {
+        Button seachClearButton = (Button) this.getActivity().findViewById(id.dashboard_search_clear);
+        seachClearButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                final EditText inputSearch = (EditText) getActivity().findViewById(R.id.dashboard_search_box);
+                EditText inputSearch = (EditText) AreaDashboardOwnedFragment.this.getActivity().findViewById(id.dashboard_search_box);
                 inputSearch.setText("");
             }
         });
 
-        ImageView refreshAreaView = (ImageView) getActivity().findViewById(R.id.action_area_refresh);
-        refreshAreaView.setOnClickListener(new View.OnClickListener() {
+        ImageView refreshAreaView = (ImageView) this.getActivity().findViewById(id.action_area_refresh);
+        refreshAreaView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                getActivity().findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
-                new LocalDataRefresher(getContext(), new DataReloadCallback()).refreshLocalData();
+                AreaDashboardOwnedFragment.this.getActivity().findViewById(id.splash_panel).setVisibility(View.VISIBLE);
+                new LocalDataRefresher(AreaDashboardOwnedFragment.this.getContext(), new DataReloadCallback()).refreshLocalData();
             }
         });
     }
@@ -101,82 +105,82 @@ public class AreaDashboardOwnedFragment extends Fragment {
 
         @Override
         public void taskCompleted(Object result) {
-            final ArrayList<AreaElement> areas = new AreaDBHelper(getView().getContext()).getAreas("self");
-            ListView areaListView = (ListView) getView().findViewById(R.id.area_display_list);
+            ArrayList<AreaElement> areas = new AreaDBHelper(AreaDashboardOwnedFragment.this.getView().getContext()).getAreas("self");
+            ListView areaListView = (ListView) AreaDashboardOwnedFragment.this.getView().findViewById(id.area_display_list);
 
-            if(areas.size() > 0){
-                getView().findViewById(R.id.owned_area_empty_layout).setVisibility(View.GONE);
+            if (areas.size() > 0) {
+                AreaDashboardOwnedFragment.this.getView().findViewById(id.owned_area_empty_layout).setVisibility(View.GONE);
                 areaListView.setVisibility(View.VISIBLE);
 
-                AreaItemAdaptor adaptor = new AreaItemAdaptor(getContext(), R.layout.area_element_row, areas);
+                AreaItemAdaptor adaptor = new AreaItemAdaptor(AreaDashboardOwnedFragment.this.getContext(), layout.area_element_row, areas);
 
                 areaListView.setAdapter(adaptor);
                 areaListView.setDescendantFocusability(ListView.FOCUS_BLOCK_DESCENDANTS);
-                areaListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                areaListView.setOnItemClickListener(new OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> adapter, View v, int position,
                                             long arg3) {
-                        getActivity().finish();
+                        AreaDashboardOwnedFragment.this.getActivity().finish();
 
                         AreaElement ae = (AreaElement) adapter.getItemAtPosition(position);
-                        AreaContext.INSTANCE.setAreaElement(ae, getContext());
-                        Intent intent = new Intent(getContext(), AreaDetailsActivity.class);
-                        startActivity(intent);
+                        AreaContext.INSTANCE.setAreaElement(ae, AreaDashboardOwnedFragment.this.getContext());
+                        Intent intent = new Intent(AreaDashboardOwnedFragment.this.getContext(), AreaDetailsActivity.class);
+                        AreaDashboardOwnedFragment.this.startActivity(intent);
                     }
                 });
 
-            }else {
+            } else {
                 areaListView.setVisibility(View.GONE);
-                getView().findViewById(R.id.owned_area_empty_layout).setVisibility(View.VISIBLE);
+                AreaDashboardOwnedFragment.this.getView().findViewById(id.owned_area_empty_layout).setVisibility(View.VISIBLE);
             }
 
-            AreaItemAdaptor adaptor = new AreaItemAdaptor(getContext(), R.layout.area_element_row, areas);
+            AreaItemAdaptor adaptor = new AreaItemAdaptor(AreaDashboardOwnedFragment.this.getContext(), layout.area_element_row, areas);
             areaListView.setAdapter(adaptor);
 
-            final EditText inputSearch = (EditText) getActivity().findViewById(R.id.dashboard_search_box);
+            EditText inputSearch = (EditText) AreaDashboardOwnedFragment.this.getActivity().findViewById(id.dashboard_search_box);
             String filterStr = inputSearch.getText().toString().trim();
             if (!filterStr.equalsIgnoreCase("")) {
                 adaptor.getFilter().filter(filterStr);
             }
 
-            getView().findViewById(R.id.splash_panel).setVisibility(View.INVISIBLE);
+            AreaDashboardOwnedFragment.this.getView().findViewById(id.splash_panel).setVisibility(View.INVISIBLE);
         }
     }
 
     @Override
     public void setUserVisibleHint(boolean visible) {
         super.setUserVisibleHint(visible);
-        if (visible && isResumed()) {
-            loadFragment();
+        if (visible && this.isResumed()) {
+            this.loadFragment();
         }
     }
 
     private void loadFragment() {
-        View view = getView();
-        view.findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
+        View view = this.getView();
+        view.findViewById(id.splash_panel).setVisibility(View.VISIBLE);
 
-        ImageView refreshAreaView = (ImageView) getActivity().findViewById(R.id.action_area_refresh);
-        refreshAreaView.setOnClickListener(new View.OnClickListener() {
+        ImageView refreshAreaView = (ImageView) this.getActivity().findViewById(id.action_area_refresh);
+        refreshAreaView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                getView().findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
-                new LocalDataRefresher(getContext(), new DataReloadCallback()).refreshLocalData();
+                AreaDashboardOwnedFragment.this.getView().findViewById(id.splash_panel).setVisibility(View.VISIBLE);
+                new LocalDataRefresher(AreaDashboardOwnedFragment.this.getContext(), new DataReloadCallback()).refreshLocalData();
             }
         });
 
-        Button seachClearButton = (Button) getActivity().findViewById(R.id.dashboard_search_clear);
-        seachClearButton.setOnClickListener(new View.OnClickListener() {
+        Button seachClearButton = (Button) this.getActivity().findViewById(id.dashboard_search_clear);
+        seachClearButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                final EditText inputSearch = (EditText) getActivity().findViewById(R.id.dashboard_search_box);
+                EditText inputSearch = (EditText) AreaDashboardOwnedFragment.this.getActivity().findViewById(id.dashboard_search_box);
                 inputSearch.setText("");
             }
         });
 
-        final EditText inputSearch = (EditText) getActivity().findViewById(R.id.dashboard_search_box);
+        EditText inputSearch = (EditText) this.getActivity().findViewById(id.dashboard_search_box);
         inputSearch.addTextChangedListener(new UserInputWatcher());
 
-        view.findViewById(R.id.splash_panel).setVisibility(View.GONE);
+        view.findViewById(id.splash_panel).setVisibility(View.GONE);
     }
 
     private class UserInputWatcher implements TextWatcher {
@@ -190,13 +194,13 @@ public class AreaDashboardOwnedFragment extends Fragment {
 
         @Override
         public void afterTextChanged(Editable editable) {
-            getView().findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
+            AreaDashboardOwnedFragment.this.getView().findViewById(id.splash_panel).setVisibility(View.VISIBLE);
 
-            ListView areaListView = (ListView) getView().findViewById(R.id.area_display_list);
-            final ArrayAdapter<AreaElement> adapter = (ArrayAdapter<AreaElement>) areaListView.getAdapter();
+            ListView areaListView = (ListView) AreaDashboardOwnedFragment.this.getView().findViewById(id.area_display_list);
+            ArrayAdapter<AreaElement> adapter = (ArrayAdapter<AreaElement>) areaListView.getAdapter();
             adapter.getFilter().filter(editable.toString());
 
-            getView().findViewById(R.id.splash_panel).setVisibility(View.GONE);
+            AreaDashboardOwnedFragment.this.getView().findViewById(id.splash_panel).setVisibility(View.GONE);
         }
     }
 }

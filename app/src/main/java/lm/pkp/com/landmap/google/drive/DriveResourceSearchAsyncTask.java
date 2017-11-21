@@ -19,7 +19,7 @@ import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 
 public class DriveResourceSearchAsyncTask extends AsyncTask<JSONObject, Void, String> {
 
-    private AsyncTaskCallback callback = null;
+    private AsyncTaskCallback callback;
 
     protected void onPreExecute() {
     }
@@ -66,7 +66,7 @@ public class DriveResourceSearchAsyncTask extends AsyncTask<JSONObject, Void, St
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
-        callback.taskCompleted(s);
+        this.callback.taskCompleted(s);
     }
 
     public void setCompletionCallback(AsyncTaskCallback callback) {

@@ -1,6 +1,9 @@
 package lm.pkp.com.landmap;
 
+import android.Manifest.permission;
+import android.R.string;
 import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -16,6 +19,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -24,6 +28,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import lm.pkp.com.landmap.R.id;
+import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
@@ -46,7 +52,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
     private PositionsDBHelper pdb;
     private AreaElement ae;
 
-    private ArrayList<PositionElement> positionList = new ArrayList<PositionElement>();
+    private final ArrayList<PositionElement> positionList = new ArrayList<PositionElement>();
     private PostionListAdaptor adaptor;
 
     @Override
@@ -54,255 +60,251 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
 
-        setContentView(R.layout.activity_area_details);
-        getSupportActionBar().hide();
+        this.setContentView(layout.activity_area_details);
+        this.getSupportActionBar().hide();
 
-        ae = AreaContext.INSTANCE.getAreaElement();
-        WeatherManager weatherManager = new WeatherManager(getApplicationContext(), new WeatherDataCallback());
-        weatherManager.loadWeatherInfoForPosition(ae.getCenterPosition());
+        this.ae = AreaContext.INSTANCE.getAreaElement();
+        WeatherManager weatherManager = new WeatherManager(this.getApplicationContext(), new WeatherDataCallback());
+        weatherManager.loadWeatherInfoForPosition(this.ae.getCenterPosition());
 
-        Toolbar topTB = (Toolbar) findViewById(R.id.toolbar_top);
-        final ColorDrawable topDrawable = (ColorDrawable) topTB.getBackground().getCurrent();
-        topDrawable.setColor(ColorProvider.getAreaToolBarColor(ae));
+        Toolbar topTB = (Toolbar) this.findViewById(id.toolbar_top);
+        ColorDrawable topDrawable = (ColorDrawable) topTB.getBackground().getCurrent();
+        topDrawable.setColor(ColorProvider.getAreaToolBarColor(this.ae));
 
-        Toolbar bottomTB = (Toolbar) findViewById(R.id.toolbar_bottom);
-        final ColorDrawable bottomDrawable = (ColorDrawable) bottomTB.getBackground().getCurrent();
-        bottomDrawable.setColor(ColorProvider.getAreaToolBarColor(ae));
+        Toolbar bottomTB = (Toolbar) this.findViewById(id.toolbar_bottom);
+        ColorDrawable bottomDrawable = (ColorDrawable) bottomTB.getBackground().getCurrent();
+        bottomDrawable.setColor(ColorProvider.getAreaToolBarColor(this.ae));
 
-        if (!askForLocationPermission()) {
-            showErrorMessage("No permission given for location fix !!", "error");
-            finish();
+        if (!this.askForLocationPermission()) {
+            this.showErrorMessage("No permission given for location fix !!", "error");
+            this.finish();
         }
 
-        pdb = new PositionsDBHelper(getApplicationContext());
-        ListView posListView = (ListView) findViewById(R.id.positionList);
-        positionList.addAll(ae.getPositions());
+        this.pdb = new PositionsDBHelper(this.getApplicationContext());
+        ListView posListView = (ListView) this.findViewById(id.positionList);
+        this.positionList.addAll(this.ae.getPositions());
 
-        adaptor = new PostionListAdaptor(getApplicationContext(), R.id.positionList, positionList);
-        posListView.setAdapter(adaptor);
-        adaptor.notifyDataSetChanged();
+        this.adaptor = new PostionListAdaptor(this.getApplicationContext(), id.positionList, this.positionList);
+        posListView.setAdapter(this.adaptor);
+        this.adaptor.notifyDataSetChanged();
 
-        TextView areaNameView = (TextView) findViewById(R.id.area_name_text);
-        String areaName = ae.getName();
+        TextView areaNameView = (TextView) this.findViewById(id.area_name_text);
+        String areaName = this.ae.getName();
         if (areaName.length() > 20) {
             areaName = areaName.substring(0, 19).concat("...");
         }
         areaNameView.setText(areaName);
 
-        findViewById(R.id.splash_panel).setVisibility(View.GONE);
-        if (positionList.size() == 0) {
-            findViewById(R.id.positions_view_master).setVisibility(View.GONE);
-            findViewById(R.id.position_list_empty_img).setVisibility(View.VISIBLE);
+        this.findViewById(id.splash_panel).setVisibility(View.GONE);
+        if (this.positionList.size() == 0) {
+            this.findViewById(id.positions_view_master).setVisibility(View.GONE);
+            this.findViewById(id.position_list_empty_img).setVisibility(View.VISIBLE);
         } else {
-            findViewById(R.id.positions_view_master).setVisibility(View.VISIBLE);
-            findViewById(R.id.position_list_empty_img).setVisibility(View.GONE);
+            this.findViewById(id.positions_view_master).setVisibility(View.VISIBLE);
+            this.findViewById(id.position_list_empty_img).setVisibility(View.GONE);
             // Render the weather data here.
 
         }
 
-        ImageView areaEditItem = (ImageView) findViewById(R.id.action_area_edit);
-        areaEditItem.setOnClickListener(new View.OnClickListener() {
+        ImageView areaEditItem = (ImageView) this.findViewById(id.action_area_edit);
+        areaEditItem.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent areaEditIntent = new Intent(AreaDetailsActivity.this, AreaEditActivity.class);
-                startActivity(areaEditIntent);
+                AreaDetailsActivity.this.startActivity(areaEditIntent);
             }
         });
 
-        ImageView deleteAreaItem = (ImageView) findViewById(R.id.action_delete_area);
-        deleteAreaItem.setOnClickListener(new View.OnClickListener() {
+        ImageView deleteAreaItem = (ImageView) this.findViewById(id.action_delete_area);
+        deleteAreaItem.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.REMOVE_AREA)) {
-                    final AreaDBHelper adh = new AreaDBHelper(getApplicationContext(), new DeleteAreaCallback());
-                    adh.deleteArea(ae);
-                    adh.deleteAreaFromServer(ae);
+                    AreaDBHelper adh = new AreaDBHelper(AreaDetailsActivity.this.getApplicationContext(), new DeleteAreaCallback());
+                    adh.deleteArea(AreaDetailsActivity.this.ae);
+                    adh.deleteAreaFromServer(AreaDetailsActivity.this.ae);
                 } else {
-                    showErrorMessage("You do not have removal rights !!", "error");
+                    AreaDetailsActivity.this.showErrorMessage("You do not have removal rights !!", "error");
                 }
             }
         });
 
-        ImageView markLocationItem = (ImageView) findViewById(R.id.action_mark_location);
-        markLocationItem.setOnClickListener(new View.OnClickListener() {
+        ImageView markLocationItem = (ImageView) this.findViewById(id.action_mark_location);
+        markLocationItem.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.MARK_POSITION)) {
-                    findViewById(R.id.position_list_empty_img).setVisibility(View.GONE);
-                    findViewById(R.id.positions_view_master).setVisibility(View.GONE);
-                    findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
+                    AreaDetailsActivity.this.findViewById(id.position_list_empty_img).setVisibility(View.GONE);
+                    AreaDetailsActivity.this.findViewById(id.positions_view_master).setVisibility(View.GONE);
+                    AreaDetailsActivity.this.findViewById(id.splash_panel).setVisibility(View.VISIBLE);
                     new GPSLocationProvider(AreaDetailsActivity.this).getLocation();
                 } else {
-                    showErrorMessage("You do not have Plotting rights !!", "error");
+                    AreaDetailsActivity.this.showErrorMessage("You do not have Plotting rights !!", "error");
                 }
             }
         });
 
-        ImageView plotItem = (ImageView) findViewById(R.id.action_plot_area);
-        plotItem.setOnClickListener(new View.OnClickListener() {
+        ImageView plotItem = (ImageView) this.findViewById(id.action_plot_area);
+        plotItem.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                final List<PositionElement> positions = ae.getPositions();
+                List<PositionElement> positions = AreaDetailsActivity.this.ae.getPositions();
                 if (positions.size() >= 1) {
                     Intent intent = new Intent(AreaDetailsActivity.this, AreaMapPlotterActivity.class);
-                    startActivity(intent);
+                    AreaDetailsActivity.this.startActivity(intent);
                 } else {
-                    showErrorMessage("You need atleast 1 points to plot.!!!", "error");
+                    AreaDetailsActivity.this.showErrorMessage("You need atleast 1 points to plot.!!!", "error");
                 }
             }
         });
 
-        ImageView navigateItem = (ImageView) findViewById(R.id.action_navigate_area);
-        navigateItem.setOnClickListener(new View.OnClickListener() {
+        ImageView navigateItem = (ImageView) this.findViewById(id.action_navigate_area);
+        navigateItem.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                final List<PositionElement> positions = ae.getPositions();
+                List<PositionElement> positions = AreaDetailsActivity.this.ae.getPositions();
                 if (positions.size() > 0) {
-                    final PositionElement pe = positions.get(0);
+                    PositionElement pe = positions.get(0);
                     Uri gmmIntentUri = Uri.parse("google.navigation:q=" + pe.getLat() + "," + pe.getLon());
                     Intent navigationIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
                     navigationIntent.setPackage("com.google.android.apps.maps");
-                    startActivity(navigationIntent);
+                    AreaDetailsActivity.this.startActivity(navigationIntent);
                 } else {
-                    showErrorMessage("No positions available for navigation", "error");
+                    AreaDetailsActivity.this.showErrorMessage("No positions available for navigation", "error");
                 }
             }
         });
 
-        ImageView shareAreaItem = (ImageView) findViewById(R.id.action_share_area);
-        shareAreaItem.setOnClickListener(new View.OnClickListener() {
+        ImageView shareAreaItem = (ImageView) this.findViewById(id.action_share_area);
+        shareAreaItem.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.SHARE_READ_ONLY)) {
                     Intent areaShareIntent = new Intent(AreaDetailsActivity.this, AreaShareActivity.class);
-                    startActivity(areaShareIntent);
+                    AreaDetailsActivity.this.startActivity(areaShareIntent);
                 } else {
-                    showErrorMessage("You do not have area sharing rights !!", "error");
+                    AreaDetailsActivity.this.showErrorMessage("You do not have area sharing rights !!", "error");
                 }
             }
         });
 
-        ImageView addResourcesItem = (ImageView) findViewById(R.id.action_drive_area);
-        addResourcesItem.setOnClickListener(new View.OnClickListener() {
+        ImageView addResourcesItem = (ImageView) this.findViewById(id.action_drive_area);
+        addResourcesItem.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.ADD_RESOURCES)) {
                     Intent intent = new Intent(AreaDetailsActivity.this, AreaAddResourcesActivity.class);
-                    startActivity(intent);
+                    AreaDetailsActivity.this.startActivity(intent);
                 } else {
-                    showErrorMessage("You do not have resource modification rights !!", "error");
+                    AreaDetailsActivity.this.showErrorMessage("You do not have resource modification rights !!", "error");
                 }
             }
         });
 
-        ImageView displayResItem = (ImageView) findViewById(R.id.action_display_res);
-        displayResItem.setOnClickListener(new View.OnClickListener() {
+        ImageView displayResItem = (ImageView) this.findViewById(id.action_display_res);
+        displayResItem.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(AreaDetailsActivity.this, DownloadDriveResourcesActivity.class);
-                startActivity(intent);
+                AreaDetailsActivity.this.startActivity(intent);
             }
         });
 
-        showErrorsIfAny();
+        this.showErrorsIfAny();
     }
 
     private void showErrorsIfAny() {
-        Bundle intentBundle = getIntent().getExtras();
+        Bundle intentBundle = this.getIntent().getExtras();
         if (intentBundle != null) {
             String action = intentBundle.getString("action");
             String outcome = intentBundle.getString("outcome");
             String outcomeType = intentBundle.getString("outcome_type");
-            showErrorMessage(action + " " + outcomeType + ". " + outcome, "error");
+            this.showErrorMessage(action + " " + outcomeType + ". " + outcome, "error");
         }
     }
 
     @Override
     public void receivedLocationPostion(PositionElement pe) {
-        pe.setName("P_" + UUID.randomUUID().toString());
-        pe.setUniqueAreaId(ae.getUniqueId());
+        pe.setName("P_" + UUID.randomUUID());
+        pe.setUniqueAreaId(this.ae.getUniqueId());
 
-        final AreaElement ae = AreaContext.INSTANCE.getAreaElement();
+        AreaElement ae = AreaContext.INSTANCE.getAreaElement();
         ae.getPositions().add(pe);
-        AreaContext.INSTANCE.setAreaElement(ae, getApplicationContext());
+        AreaContext.INSTANCE.setAreaElement(ae, this.getApplicationContext());
 
-        pe = pdb.insertPositionLocally(pe);
-        pdb.insertPositionToServer(pe);
+        pe = this.pdb.insertPositionLocally(pe);
+        this.pdb.insertPositionToServer(pe);
 
-        findViewById(R.id.positions_view_master).setVisibility(View.VISIBLE);
-        findViewById(R.id.position_list_empty_img).setVisibility(View.GONE);
-        findViewById(R.id.splash_panel).setVisibility(View.GONE);
+        this.findViewById(id.positions_view_master).setVisibility(View.VISIBLE);
+        this.findViewById(id.position_list_empty_img).setVisibility(View.GONE);
+        this.findViewById(id.splash_panel).setVisibility(View.GONE);
 
-        positionList.add(pe);
-        adaptor.notifyDataSetChanged();
+        this.positionList.add(pe);
+        this.adaptor.notifyDataSetChanged();
     }
 
     @Override
     public void locationFixTimedOut() {
-        findViewById(R.id.splash_panel).setVisibility(View.GONE);
-        if (positionList.size() == 0) {
-            findViewById(R.id.positions_view_master).setVisibility(View.GONE);
-            findViewById(R.id.position_list_empty_img).setVisibility(View.VISIBLE);
+        this.findViewById(id.splash_panel).setVisibility(View.GONE);
+        if (this.positionList.size() == 0) {
+            this.findViewById(id.positions_view_master).setVisibility(View.GONE);
+            this.findViewById(id.position_list_empty_img).setVisibility(View.VISIBLE);
         } else {
-            findViewById(R.id.positions_view_master).setVisibility(View.VISIBLE);
-            findViewById(R.id.position_list_empty_img).setVisibility(View.GONE);
+            this.findViewById(id.positions_view_master).setVisibility(View.VISIBLE);
+            this.findViewById(id.position_list_empty_img).setVisibility(View.GONE);
         }
-        showLocationFixFailureDialog();
+        this.showLocationFixFailureDialog();
     }
 
     @Override
     public void providerDisabled() {
-        findViewById(R.id.splash_panel).setVisibility(View.GONE);
-        if (positionList.size() == 0) {
-            findViewById(R.id.positions_view_master).setVisibility(View.GONE);
-            findViewById(R.id.position_list_empty_img).setVisibility(View.VISIBLE);
+        this.findViewById(id.splash_panel).setVisibility(View.GONE);
+        if (this.positionList.size() == 0) {
+            this.findViewById(id.positions_view_master).setVisibility(View.GONE);
+            this.findViewById(id.position_list_empty_img).setVisibility(View.VISIBLE);
         } else {
-            findViewById(R.id.position_list_empty_img).setVisibility(View.GONE);
-            findViewById(R.id.positions_view_master).setVisibility(View.VISIBLE);
+            this.findViewById(id.position_list_empty_img).setVisibility(View.GONE);
+            this.findViewById(id.positions_view_master).setVisibility(View.VISIBLE);
         }
-        showEnableGPSDialog();
+        this.showEnableGPSDialog();
     }
 
     @Override
     public void onBackPressed() {
-        Intent areaDashboardIntent = new Intent(getApplicationContext(), AreaDashboardActivity.class);
-        startActivity(areaDashboardIntent);
-        finish();
+        Intent areaDashboardIntent = new Intent(this.getApplicationContext(), AreaDashboardActivity.class);
+        this.startActivity(areaDashboardIntent);
+        this.finish();
     }
 
     private boolean askForLocationPermission() {
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
+        if (ContextCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION) ==
                 PackageManager.PERMISSION_GRANTED &&
-                ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                ContextCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION) ==
                         PackageManager.PERMISSION_GRANTED) {
             return true;
         } else {
             ActivityCompat.requestPermissions(this, new String[]{
-                    android.Manifest.permission.ACCESS_FINE_LOCATION,
-                    android.Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
-            if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
+                    permission.ACCESS_FINE_LOCATION,
+                    permission.ACCESS_COARSE_LOCATION}, 1);
+            return ContextCompat.checkSelfPermission(this, permission.ACCESS_FINE_LOCATION) ==
                     PackageManager.PERMISSION_GRANTED &&
-                    ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
-                            PackageManager.PERMISSION_GRANTED) {
-                return true;
-            } else {
-                return false;
-            }
+                    ContextCompat.checkSelfPermission(this, permission.ACCESS_COARSE_LOCATION) ==
+                            PackageManager.PERMISSION_GRANTED;
         }
     }
 
     private void showEnableGPSDialog() {
-        new AlertDialog.Builder(this)
+        new Builder(this)
                 .setTitle("GPS Location disabled.")
                 .setMessage("Do you want to enable GPS ?")
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                .setPositiveButton(string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         // Add some marker in the context saying that GPS is not enabled.
                         Intent myIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                        startActivity(myIntent);
+                        AreaDetailsActivity.this.startActivity(myIntent);
                     }
                 })
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                .setNegativeButton(string.no, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         // Add some marker in the context saying that GPS is not enabled.
                     }
@@ -311,18 +313,18 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
     }
 
     private void showLocationFixFailureDialog() {
-        new AlertDialog.Builder(this)
+        new Builder(this)
                 .setTitle("Location Fix failed. Please stay outdoors !!")
                 .setMessage("Do you want to try again ?")
-                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                .setPositiveButton(string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
-                        findViewById(R.id.positions_view_master).setVisibility(View.GONE);
-                        findViewById(R.id.position_list_empty_img).setVisibility(View.GONE);
-                        findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
+                        AreaDetailsActivity.this.findViewById(id.positions_view_master).setVisibility(View.GONE);
+                        AreaDetailsActivity.this.findViewById(id.position_list_empty_img).setVisibility(View.GONE);
+                        AreaDetailsActivity.this.findViewById(id.splash_panel).setVisibility(View.VISIBLE);
                         new GPSLocationProvider(AreaDetailsActivity.this).getLocation();
                     }
                 })
-                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                .setNegativeButton(string.no, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         // Add some marker in the context saying that GPS is not enabled.
                     }
@@ -331,7 +333,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
     }
 
     private void showErrorMessage(String message, String type) {
-        final Snackbar snackbar = Snackbar.make(getWindow().getDecorView(), message, Snackbar.LENGTH_INDEFINITE);
+        final Snackbar snackbar = Snackbar.make(this.getWindow().getDecorView(), message, Snackbar.LENGTH_INDEFINITE);
 
         View sbView = snackbar.getView();
         snackbar.getView().setBackgroundColor(Color.WHITE);
@@ -348,7 +350,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         textView.setTextSize(15);
         textView.setMaxLines(3);
 
-        snackbar.setAction("Dismiss", new View.OnClickListener() {
+        snackbar.setAction("Dismiss", new OnClickListener() {
             @Override
             public void onClick(View v) {
                 snackbar.dismiss();
@@ -360,9 +362,9 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
     private class DeleteAreaCallback implements AsyncTaskCallback {
         @Override
         public void taskCompleted(Object result) {
-            finish();
+            AreaDetailsActivity.this.finish();
             Intent areaDashboardIntent = new Intent(AreaDetailsActivity.this, RemoveDriveResourcesActivity.class);
-            startActivity(areaDashboardIntent);
+            AreaDetailsActivity.this.startActivity(areaDashboardIntent);
         }
     }
 
@@ -370,8 +372,8 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         @Override
         public void taskCompleted(Object result) {
             if (result instanceof WeatherElement) {
-                getSupportFragmentManager().beginTransaction()
-                        .add(R.id.weather_container, new WeatherDisplayFragment())
+                AreaDetailsActivity.this.getSupportFragmentManager().beginTransaction()
+                        .add(id.weather_container, new WeatherDisplayFragment())
                         .commit();
             }
         }

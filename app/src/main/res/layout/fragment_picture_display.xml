@@ -8,6 +8,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#f0f0f0">
+
         <GridView
             android:id="@+id/gridView"
             android:layout_width="fill_parent"
@@ -23,16 +24,14 @@
             android:clickable="true" />
     </RelativeLayout>
 
-    <android.support.design.widget.CoordinatorLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:fitsSystemWindows="false"
         android:id="@+id/res_delete_layout"
         android:visibility="gone">
 
-        <android.support.design.widget.FloatingActionButton
-            xmlns:app="http://schemas.android.com/apk/res-auto"
+        <android.support.design.widget.FloatingActionButton xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/res_delete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -41,8 +40,7 @@
             android:layout_marginRight="15dp"
             android:src="@drawable/delete"
             android:visibility="visible"
-            app:backgroundTint="#F97464"
-            />
+            app:backgroundTint="#F97464" />
 
     </android.support.design.widget.CoordinatorLayout>
 

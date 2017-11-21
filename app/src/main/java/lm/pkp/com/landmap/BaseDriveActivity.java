@@ -2,7 +2,7 @@ package lm.pkp.com.landmap;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.IntentSender.SendIntentException;
+import android.content.IntentSender;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
@@ -10,33 +10,37 @@ import android.widget.TextView;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.GoogleApiClient.Builder;
+import com.google.android.gms.common.api.GoogleApiClient.ConnectionCallbacks;
+import com.google.android.gms.common.api.GoogleApiClient.OnConnectionFailedListener;
 import com.google.android.gms.drive.Drive;
 
+import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 
 public abstract class BaseDriveActivity extends Activity implements
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+        ConnectionCallbacks,
+        OnConnectionFailedListener {
 
     private static final String TAG = "BaseDriveActivity";
     protected static final int REQUEST_CODE_RESOLUTION = 1;
     private GoogleApiClient mGoogleApiClient;
 
-    protected TextView statusText = null;
+    protected TextView statusText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
 
-        setContentView(R.layout.activity_generic_wait);
+        this.setContentView(layout.activity_generic_wait);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (mGoogleApiClient == null) {
-            mGoogleApiClient = new GoogleApiClient.Builder(this)
+        if (this.mGoogleApiClient == null) {
+            this.mGoogleApiClient = new Builder(this)
                     .addApi(Drive.API)
                     .addScope(Drive.SCOPE_FILE)
                     .addScope(Drive.SCOPE_APPFOLDER)
@@ -44,57 +48,57 @@ public abstract class BaseDriveActivity extends Activity implements
                     .addOnConnectionFailedListener(this)
                     .build();
         }
-        mGoogleApiClient.connect();
+        this.mGoogleApiClient.connect();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode,
                                     Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_RESOLUTION && resultCode == RESULT_OK) {
-            mGoogleApiClient.connect();
+        if (requestCode == BaseDriveActivity.REQUEST_CODE_RESOLUTION && resultCode == Activity.RESULT_OK) {
+            this.mGoogleApiClient.connect();
         }
     }
 
     @Override
     protected void onPause() {
-        if (mGoogleApiClient != null) {
-            mGoogleApiClient.disconnect();
+        if (this.mGoogleApiClient != null) {
+            this.mGoogleApiClient.disconnect();
         }
         super.onPause();
     }
 
     @Override
     public void onConnected(Bundle connectionHint) {
-        Log.i(TAG, "GoogleApiClient connected");
+        Log.i(BaseDriveActivity.TAG, "GoogleApiClient connected");
     }
 
     @Override
     public void onConnectionSuspended(int cause) {
-        Log.i(TAG, "GoogleApiClient connection suspended");
+        Log.i(BaseDriveActivity.TAG, "GoogleApiClient connection suspended");
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult result) {
-        Log.i(TAG, "GoogleApiClient connection failed: " + result.toString());
+        Log.i(BaseDriveActivity.TAG, "GoogleApiClient connection failed: " + result);
         if (!result.hasResolution()) {
             // show the localized error dialog.
             GoogleApiAvailability.getInstance().getErrorDialog(this, result.getErrorCode(), 0).show();
             return;
         }
         try {
-            result.startResolutionForResult(this, REQUEST_CODE_RESOLUTION);
-        } catch (SendIntentException e) {
-            Log.e(TAG, "Exception while starting resolution activity", e);
+            result.startResolutionForResult(this, BaseDriveActivity.REQUEST_CODE_RESOLUTION);
+        } catch (IntentSender.SendIntentException e) {
+            Log.e(BaseDriveActivity.TAG, "Exception while starting resolution activity", e);
         }
     }
 
     public void showMessage(String message) {
-        statusText.setText(message);
+        this.statusText.setText(message);
     }
 
     public GoogleApiClient getGoogleApiClient() {
-        return mGoogleApiClient;
+        return this.mGoogleApiClient;
     }
 
     @Override

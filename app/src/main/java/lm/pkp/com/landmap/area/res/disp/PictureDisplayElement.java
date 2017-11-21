@@ -10,7 +10,7 @@ public class PictureDisplayElement {
     private String resourceId = "";
 
     public String getName() {
-        return this.name;
+        return name;
     }
 
     public void setName(String name) {
@@ -18,7 +18,7 @@ public class PictureDisplayElement {
     }
 
     public String getAbsPath() {
-        return this.absPath;
+        return absPath;
     }
 
     public void setAbsPath(String absPath) {
@@ -26,7 +26,7 @@ public class PictureDisplayElement {
     }
 
     public String getResourceId() {
-        return this.resourceId;
+        return resourceId;
     }
 
     public void setResourceId(String resourceId) {

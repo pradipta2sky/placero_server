@@ -3,8 +3,6 @@ package lm.pkp.com.landmap.weather.model;
 import java.util.ArrayList;
 import java.util.List;
 
-import lm.pkp.com.landmap.weather.model.ForecastElement;
-
 /**
  * Created by USER on 11/19/2017.
  */
@@ -25,7 +23,7 @@ public class WeatherElement {
     private List<ForecastElement> forecast = new ArrayList<>();
 
     public String getPositionId() {
-        return positionId;
+        return this.positionId;
     }
 
     public void setPositionId(String positionId) {
@@ -33,7 +31,7 @@ public class WeatherElement {
     }
 
     public String getTemperature() {
-        return temperature;
+        return this.temperature;
     }
 
     public void setTemperature(String temperature) {
@@ -41,7 +39,7 @@ public class WeatherElement {
     }
 
     public String getConditionText() {
-        return this.conditionText;
+        return conditionText;
     }
 
     public void setConditionText(String conditionText) {
@@ -49,7 +47,7 @@ public class WeatherElement {
     }
 
     public String getConditionCode() {
-        return this.conditionCode;
+        return conditionCode;
     }
 
     public void setConditionCode(String conditionCode) {
@@ -57,7 +55,7 @@ public class WeatherElement {
     }
 
     public String getAddress() {
-        return address;
+        return this.address;
     }
 
     public void setAddress(String address) {
@@ -65,7 +63,7 @@ public class WeatherElement {
     }
 
     public String getWindChill() {
-        return windChill;
+        return this.windChill;
     }
 
     public void setWindChill(String windChill) {
@@ -73,7 +71,7 @@ public class WeatherElement {
     }
 
     public String getWindDirection() {
-        return windDirection;
+        return this.windDirection;
     }
 
     public void setWindDirection(String windDirection) {
@@ -81,7 +79,7 @@ public class WeatherElement {
     }
 
     public String getWindSpeed() {
-        return windSpeed;
+        return this.windSpeed;
     }
 
     public void setWindSpeed(String windSpeed) {
@@ -89,7 +87,7 @@ public class WeatherElement {
     }
 
     public String getHumidity() {
-        return humidity;
+        return this.humidity;
     }
 
     public void setHumidity(String humidity) {
@@ -97,7 +95,7 @@ public class WeatherElement {
     }
 
     public String getVisibility() {
-        return visibility;
+        return this.visibility;
     }
 
     public void setVisibility(String visibility) {
@@ -105,7 +103,7 @@ public class WeatherElement {
     }
 
     public List<ForecastElement> getForecast() {
-        return this.forecast;
+        return forecast;
     }
 
     public void setForecast(List<ForecastElement> forecast) {
@@ -113,7 +111,7 @@ public class WeatherElement {
     }
 
     public String getCreatedOn() {
-        return this.createdOn;
+        return createdOn;
     }
 
     public void setCreatedOn(String createdOn) {
@@ -121,7 +119,7 @@ public class WeatherElement {
     }
 
     public String getUniqueId() {
-        return this.uniqueId;
+        return uniqueId;
     }
 
     public void setUniqueId(String uniqueId) {

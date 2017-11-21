@@ -10,7 +10,7 @@ public class PermissionElement {
     private String functionCode;
 
     public String getAreaId() {
-        return this.areaId;
+        return areaId;
     }
 
     public void setAreaId(String areaId) {
@@ -18,7 +18,7 @@ public class PermissionElement {
     }
 
     public String getFunctionCode() {
-        return this.functionCode;
+        return functionCode;
     }
 
     public void setFunctionCode(String functionCode) {
@@ -26,7 +26,7 @@ public class PermissionElement {
     }
 
     public String getUserId() {
-        return this.userId;
+        return userId;
     }
 
     public void setUserId(String userId) {

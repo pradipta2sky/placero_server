@@ -6,7 +6,6 @@ package lm.pkp.com.landmap.custom;
 public class UserUnavailableException extends RuntimeException {
 
     public UserUnavailableException() {
-        super();
     }
 
     public UserUnavailableException(Exception e) {

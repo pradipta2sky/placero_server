@@ -17,17 +17,17 @@ final class DocumentDataHolder {
     public static final DocumentDataHolder INSTANCE = new DocumentDataHolder();
 
     public ArrayList<DocumentDisplayElement> getData() {
-        final ArrayList<DocumentDisplayElement> docItems = new ArrayList<>();
+        ArrayList<DocumentDisplayElement> docItems = new ArrayList<>();
         AreaContext ac = AreaContext.INSTANCE;
 
-        final AreaElement ae = ac.getAreaElement();
+        AreaElement ae = ac.getAreaElement();
         List<DriveResource> driveResources = ae.getMediaResources();
         String rootPath = ac.getAreaLocalDocumentRoot(ae.getUniqueId()).getAbsolutePath() + File.separatorChar;
         for (int i = 0; i < driveResources.size(); i++) {
-            final DriveResource resource = driveResources.get(i);
+            DriveResource resource = driveResources.get(i);
             if (resource.getType().equals("file")) {
                 if (resource.getContentType().equals("Document")) {
-                    final DocumentDisplayElement docDisplayElement = new DocumentDisplayElement();
+                    DocumentDisplayElement docDisplayElement = new DocumentDisplayElement();
                     docDisplayElement.setName(resource.getName());
                     docDisplayElement.setAbsPath(rootPath + resource.getName());
                     docDisplayElement.setResourceId(resource.getResourceId());

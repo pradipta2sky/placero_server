@@ -25,15 +25,13 @@ import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 
 public class LMSRestAsyncTask extends AsyncTask<JSONObject, Void, String> {
 
-    private AsyncTaskCallback callback = null;
+    private AsyncTaskCallback callback;
 
     public LMSRestAsyncTask() {
-        super();
     }
 
     public LMSRestAsyncTask(AsyncTaskCallback asyncTaskCallback) {
-        super();
-        this.callback = asyncTaskCallback;
+        callback = asyncTaskCallback;
     }
 
     protected void onPreExecute() {
@@ -57,7 +55,7 @@ public class LMSRestAsyncTask extends AsyncTask<JSONObject, Void, String> {
             OutputStream os = conn.getOutputStream();
             BufferedWriter writer = new BufferedWriter(
                     new OutputStreamWriter(os, "UTF-8"));
-            String postDataString = getPostDataString(postDataParam);
+            String postDataString = this.getPostDataString(postDataParam);
             writer.write(postDataString);
 
             writer.flush();
@@ -110,8 +108,8 @@ public class LMSRestAsyncTask extends AsyncTask<JSONObject, Void, String> {
     @Override
     protected void onPostExecute(String s) {
         super.onPostExecute(s);
-        if (callback != null) {
-            callback.taskCompleted(s);
+        if (this.callback != null) {
+            this.callback.taskCompleted(s);
         }
     }
 }

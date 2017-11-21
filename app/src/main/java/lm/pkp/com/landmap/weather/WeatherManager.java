@@ -17,9 +17,9 @@ import lm.pkp.com.landmap.weather.model.WeatherElement;
  */
 public class WeatherManager implements AsyncTaskCallback {
 
-    private AsyncTaskCallback callback = null;
-    private Context context = null;
-    private PositionElement position = null;
+    private AsyncTaskCallback callback;
+    private Context context;
+    private PositionElement position;
 
     public WeatherManager(Context context, AsyncTaskCallback callback) {
         this.callback = callback;
@@ -31,20 +31,20 @@ public class WeatherManager implements AsyncTaskCallback {
     }
 
     public void loadWeatherInfoForPosition(PositionElement pe) {
-        if(pe.getUniqueId() == null){
+        if (pe.getUniqueId() == null) {
             return;
         }
-        if ((pe.getLat() == 0.0) && (pe.getLon() == 0.0)) {
+        if (pe.getLat() == 0.0 && pe.getLon() == 0.0) {
             return;
         }
-        this.position = pe;
-        WeatherDBHelper wdh = new WeatherDBHelper(context);
+        position = pe;
+        WeatherDBHelper wdh = new WeatherDBHelper(this.context);
         WeatherElement wbp = wdh.getWeatherByPosition(pe);
-        if(wbp != null){
-            position.setWeather(wbp);
-            callback.taskCompleted(wbp);
-        }else {
-            PositionWeatherLoadAsyncTask task = new PositionWeatherLoadAsyncTask(context, pe, this);
+        if (wbp != null) {
+            this.position.setWeather(wbp);
+            this.callback.taskCompleted(wbp);
+        } else {
+            PositionWeatherLoadAsyncTask task = new PositionWeatherLoadAsyncTask(this.context, pe, this);
             try {
                 JSONObject queryObj = new JSONObject();
                 queryObj.put("latitude", pe.getLat() + "");
@@ -94,19 +94,19 @@ public class WeatherManager implements AsyncTaskCallback {
                     weatherElement.setTemperature(conditionObj.getString("temp"));
                     weatherElement.setCreatedOn(System.currentTimeMillis() + "");
 
-                    weatherElement.setPositionId(position.getUniqueId());
+                    weatherElement.setPositionId(this.position.getUniqueId());
                     weatherElement.setUniqueId(UUID.randomUUID().toString());
 
-                    WeatherDBHelper wdh = new WeatherDBHelper(context);
+                    WeatherDBHelper wdh = new WeatherDBHelper(this.context);
                     wdh.insertWeatherLocally(weatherElement);
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
             }
         }
-        position.setWeather(weatherElement);
-        if (callback != null) {
-            callback.taskCompleted(weatherElement);
+        this.position.setWeather(weatherElement);
+        if (this.callback != null) {
+            this.callback.taskCompleted(weatherElement);
         }
     }
 }

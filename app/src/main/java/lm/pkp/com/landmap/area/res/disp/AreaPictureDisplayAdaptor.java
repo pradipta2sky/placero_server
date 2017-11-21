@@ -8,6 +8,8 @@ import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
@@ -18,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lm.pkp.com.landmap.R;
+import lm.pkp.com.landmap.R.drawable;
+import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.RemoveDriveResourcesActivity;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaElement;
@@ -41,58 +45,58 @@ final class AreaPictureDisplayAdaptor extends BaseAdapter {
     }
 
     @Override
-    public View getView(final int position, View convertView, final ViewGroup parent) {
+    public View getView(final int position, View convertView, ViewGroup parent) {
         SquaredImageView view = (SquaredImageView) convertView;
         if (view == null) {
-            view = new SquaredImageView(context);
+            view = new SquaredImageView(this.context);
             view.setScaleType(CENTER_CROP);
         } else {
             return view;
         }
 
         // Get the image URL for the current position.
-        final String url = getItem(position);
+        final String url = this.getItem(position);
         AreaContext ac = AreaContext.INSTANCE;
         AreaElement ae = ac.getAreaElement();
         String thumbnailRoot = ac.getAreaLocalPictureThumbnailRoot(ae.getUniqueId()).getAbsolutePath();
-        String thumbnailFilePath = thumbnailRoot + File.separatorChar + dataSet.get(position).getName();
+        String thumbnailFilePath = thumbnailRoot + File.separatorChar + this.dataSet.get(position).getName();
         File thumbFile = new File(thumbnailFilePath);
 
-        if(thumbFile.exists()){
+        if (thumbFile.exists()) {
             Bitmap bMap = BitmapFactory.decodeFile(thumbnailFilePath);
             view.setImageBitmap(bMap);
         }
 
         final View referredView = view;
-        view.setOnClickListener(new View.OnClickListener() {
+        view.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
-                intent.setAction(android.content.Intent.ACTION_VIEW);
+                intent.setAction(Intent.ACTION_VIEW);
                 File file = new File(url);
                 intent.setDataAndType(Uri.fromFile(file), "image/*");
                 referredView.getContext().startActivity(intent);
             }
         });
 
-        view.setOnLongClickListener(new View.OnLongClickListener() {
+        view.setOnLongClickListener(new OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
                 ImageView clickedImage = (ImageView) referredView;
-                clickedImage.setBackgroundResource(R.drawable.image_border);
+                clickedImage.setBackgroundResource(drawable.image_border);
 
-                fragment.getView().findViewById(R.id.res_delete_layout).setVisibility(View.VISIBLE);
-                final String resourceId = dataSet.get(position).getResourceId();
-                FloatingActionButton deleteButton = (FloatingActionButton) fragment.getView().findViewById(R.id.res_delete);
-                deleteButton.setOnClickListener(new View.OnClickListener() {
+                AreaPictureDisplayAdaptor.this.fragment.getView().findViewById(id.res_delete_layout).setVisibility(View.VISIBLE);
+                final String resourceId = AreaPictureDisplayAdaptor.this.dataSet.get(position).getResourceId();
+                FloatingActionButton deleteButton = (FloatingActionButton) AreaPictureDisplayAdaptor.this.fragment.getView().findViewById(id.res_delete);
+                deleteButton.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(referredView.getContext(), RemoveDriveResourcesActivity.class);
-                        if(!resourceId.equalsIgnoreCase("1")){
+                        if (!resourceId.equalsIgnoreCase("1")) {
                             intent.putExtra("resource_ids", resourceId);
-                            intent.putExtra("tab_position", tabPosition);
+                            intent.putExtra("tab_position", AreaPictureDisplayAdaptor.this.tabPosition);
                             referredView.getContext().startActivity(intent);
-                        }else {
+                        } else {
                             Toast.makeText(referredView.getContext(),
                                     "Plot Image is auto generated. It will be recreated on Map plot.", Toast.LENGTH_LONG).show();
 
@@ -103,7 +107,7 @@ final class AreaPictureDisplayAdaptor extends BaseAdapter {
                             driveResource.setResourceId(resourceId);
                             driveResources.remove(driveResource);
 
-                            DriveDBHelper ddh = new DriveDBHelper(fragment.getContext());
+                            DriveDBHelper ddh = new DriveDBHelper(AreaPictureDisplayAdaptor.this.fragment.getContext());
                             ddh.deleteResourceByResourceId(resourceId);
                         }
                     }
@@ -116,12 +120,12 @@ final class AreaPictureDisplayAdaptor extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return dataSet.size();
+        return this.dataSet.size();
     }
 
     @Override
     public String getItem(int position) {
-        return dataSet.get(position).getAbsPath();
+        return this.dataSet.get(position).getAbsPath();
     }
 
     @Override

@@ -17,17 +17,17 @@ final class PictureDataHolder {
     public static final PictureDataHolder INSTANCE = new PictureDataHolder();
 
     public ArrayList<PictureDisplayElement> getData() {
-        final ArrayList<PictureDisplayElement> imageItems = new ArrayList<>();
+        ArrayList<PictureDisplayElement> imageItems = new ArrayList<>();
         AreaContext ac = AreaContext.INSTANCE;
 
-        final AreaElement ae = ac.getAreaElement();
+        AreaElement ae = ac.getAreaElement();
         List<DriveResource> driveResources = ae.getMediaResources();
         String imgRootPath = ac.getAreaLocalImageRoot(ae.getUniqueId()).getAbsolutePath() + File.separatorChar;
         for (int i = 0; i < driveResources.size(); i++) {
-            final DriveResource resource = driveResources.get(i);
+            DriveResource resource = driveResources.get(i);
             if (resource.getType().equals("file")) {
                 if (resource.getContentType().equals("Image")) {
-                    final PictureDisplayElement imageDisplayElement = new PictureDisplayElement();
+                    PictureDisplayElement imageDisplayElement = new PictureDisplayElement();
                     imageDisplayElement.setName(resource.getName());
                     imageDisplayElement.setAbsPath(imgRootPath + resource.getName());
                     imageDisplayElement.setResourceId(resource.getResourceId());

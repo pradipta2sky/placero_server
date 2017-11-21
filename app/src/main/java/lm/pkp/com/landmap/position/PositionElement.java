@@ -1,9 +1,5 @@
 package lm.pkp.com.landmap.position;
 
-import android.location.Location;
-
-import com.google.android.gms.maps.model.LatLng;
-
 import org.apache.commons.lang3.SerializationUtils;
 
 import java.io.Serializable;
@@ -17,16 +13,16 @@ public class PositionElement implements Serializable {
 
     private String name = "";
     private String description = "";
-    private double lat = 0;
-    private double lon = 0;
+    private double lat;
+    private double lon;
     private String tags = "";
     private String uniqueAreaId = "";
     private String uniqueId = "";
     private String createdOnMillis = "";
-    private WeatherElement weather = null;
+    private WeatherElement weather;
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName(String name) {
@@ -34,7 +30,7 @@ public class PositionElement implements Serializable {
     }
 
     public String getDescription() {
-        return description;
+        return this.description;
     }
 
     public void setDescription(String description) {
@@ -42,7 +38,7 @@ public class PositionElement implements Serializable {
     }
 
     public double getLat() {
-        return lat;
+        return this.lat;
     }
 
     public void setLat(double lat) {
@@ -50,7 +46,7 @@ public class PositionElement implements Serializable {
     }
 
     public double getLon() {
-        return lon;
+        return this.lon;
     }
 
     public void setLon(double lon) {
@@ -58,7 +54,7 @@ public class PositionElement implements Serializable {
     }
 
     public String getTags() {
-        return tags;
+        return this.tags;
     }
 
     public void setTags(String tags) {
@@ -66,7 +62,7 @@ public class PositionElement implements Serializable {
     }
 
     public String getUniqueAreaId() {
-        return uniqueAreaId;
+        return this.uniqueAreaId;
     }
 
     public void setUniqueAreaId(String uniqueAreaId) {
@@ -74,7 +70,7 @@ public class PositionElement implements Serializable {
     }
 
     public String getUniqueId() {
-        return uniqueId;
+        return this.uniqueId;
     }
 
     public void setUniqueId(String uniqueId) {
@@ -86,7 +82,7 @@ public class PositionElement implements Serializable {
     }
 
     public String getCreatedOnMillis() {
-        return this.createdOnMillis;
+        return createdOnMillis;
     }
 
     public void setCreatedOnMillis(String createdOnMillis) {
@@ -94,7 +90,7 @@ public class PositionElement implements Serializable {
     }
 
     public WeatherElement getWeather() {
-        return this.weather;
+        return weather;
     }
 
     public void setWeather(WeatherElement weather) {
