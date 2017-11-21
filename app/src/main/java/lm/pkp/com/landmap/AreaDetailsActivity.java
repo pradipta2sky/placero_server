@@ -129,8 +129,8 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
             }
         });
 
-        ImageView markLocationItem = (ImageView) findViewById(id.action_mark_location);
-        markLocationItem.setOnClickListener(new OnClickListener() {
+
+        OnClickListener markLocationOnClickListener = new OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.MARK_POSITION)) {
@@ -142,7 +142,15 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
                     showErrorMessage("You do not have Plotting rights !!", "error");
                 }
             }
-        });
+        };
+
+        ImageView markLocationItem = (ImageView) findViewById(id.action_mark_location);
+        markLocationItem.setOnClickListener(markLocationOnClickListener);
+
+        ImageView markLocationEmptyItem = (ImageView) findViewById(id.action_mark_location_empty);
+        if(markLocationEmptyItem != null){
+            markLocationEmptyItem.setOnClickListener(markLocationOnClickListener);
+        }
 
         ImageView plotItem = (ImageView) findViewById(id.action_plot_area);
         plotItem.setOnClickListener(new OnClickListener() {
