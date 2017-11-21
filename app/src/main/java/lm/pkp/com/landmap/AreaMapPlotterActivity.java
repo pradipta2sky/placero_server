@@ -128,18 +128,16 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
 
             @Override
             protected void onClickConfirmed(View v, Marker marker) {
-                PositionElement position = AreaMapPlotterActivity.this.areaMarkers.get(marker);
-                AreaContext areaContext = ac;
-                AreaElement areaElement = areaContext.getAreaElement();
-
-                File areaLocalImageRoot = areaContext.getAreaLocalImageRoot(areaElement.getUniqueId());
-                File areaLocalVideoRoot = areaContext.getAreaLocalVideoRoot(areaElement.getUniqueId());
+                AreaElement ae = ac.getAreaElement();
+                File areaLocalImageRoot = ac.getAreaLocalImageRoot(ae.getUniqueId());
+                File areaLocalVideoRoot = ac.getAreaLocalVideoRoot(ae.getUniqueId());
                 String imageRootPath = areaLocalImageRoot.getAbsolutePath();
                 String videoRootPath = areaLocalVideoRoot.getAbsolutePath();
 
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_VIEW);
 
+                PositionElement position = AreaMapPlotterActivity.this.areaMarkers.get(marker);
                 if (position != null) {
                     // Do something for non position item.
                     // Implementation for remove button
@@ -152,14 +150,15 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
 
                 }else {
                     DriveResource resource = AreaMapPlotterActivity.this.resourceMarkers.get(marker);
-                    String contentType = resource.getContentType();
-                    if(contentType.equalsIgnoreCase("Image")){
-                        File file = new File(imageRootPath + File.separatorChar + resource.getName());
-                        intent.setDataAndType(Uri.fromFile(file), "image/*");
-                        AreaMapPlotterActivity.this.startActivity(intent);
-                    }else {
-                        File file = new File(videoRootPath + File.separatorChar + resource.getName());
-                        intent.setDataAndType(Uri.fromFile(file), "video/*");
+                    if(resource != null){
+                        String contentType = resource.getContentType();
+                        if(contentType.equalsIgnoreCase("Image")){
+                            File file = new File(imageRootPath + File.separatorChar + resource.getName());
+                            intent.setDataAndType(Uri.fromFile(file), "image/*");
+                        }else {
+                            File file = new File(videoRootPath + File.separatorChar + resource.getName());
+                            intent.setDataAndType(Uri.fromFile(file), "video/*");
+                        }
                         AreaMapPlotterActivity.this.startActivity(intent);
                     }
                 }
@@ -190,7 +189,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                     AreaMapPlotterActivity.this.infoButton.setVisibility(View.GONE);
                 }else {
                     AreaMapPlotterActivity.this.infoButton.setVisibility(View.VISIBLE);
-                    if (position == null) {
+                    if (resource != null) {
                         String thumbRootPath = "";
                         if(resource.getContentType().equalsIgnoreCase("Video")){
                             thumbRootPath = ac.getAreaLocalVideoThumbnailRoot(ae.getUniqueId()).getAbsolutePath();
@@ -208,7 +207,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                                 System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS);
                         AreaMapPlotterActivity.this.infoSnippet.setText(timeSpan.toString());
                         AreaMapPlotterActivity.this.infoButton.setText("Open");
-                    }else {
+                    }else if(position != null){
                         AreaMapPlotterActivity.this.infoImage.setImageResource(drawable.marker_image);
                         AreaMapPlotterActivity.this.infoTitle.setText(position.getName());
                         CharSequence timeSpan = DateUtils.getRelativeTimeSpanString(new Long(position.getCreatedOnMillis()),
