@@ -54,12 +54,11 @@ public class AreaDashboardActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.setBackgroundColor(ColorProvider.getDefaultToolBarColor());
 
-        ImageView createAreaView = (ImageView) this.findViewById(id.action_area_create);
-        createAreaView.setOnClickListener(new View.OnClickListener() {
+        View.OnClickListener createListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AreaDashboardActivity.this.findViewById(id.splash_panel).setVisibility(View.VISIBLE);
-                AreaDBHelper adh = new AreaDBHelper(AreaDashboardActivity.this.getApplicationContext());
+                findViewById(id.splash_panel).setVisibility(View.VISIBLE);
+                AreaDBHelper adh = new AreaDBHelper(getApplicationContext(), new DataInsertServerCallback());
                 AreaElement areaElement = adh.insertAreaLocally();
 
                 PermissionElement pe = new PermissionElement();
@@ -72,11 +71,12 @@ public class AreaDashboardActivity extends AppCompatActivity {
                 areaElement.getUserPermissions().put(PermissionConstants.FULL_CONTROL, pe);
 
                 // Resetting the context for new Area
-                AreaContext.INSTANCE.setAreaElement(areaElement, AreaDashboardActivity.this.getApplicationContext());
-                adh = new AreaDBHelper(AreaDashboardActivity.this.getApplicationContext(), new DataInsertServerCallback());
+                AreaContext.INSTANCE.setAreaElement(areaElement, getApplicationContext());
                 adh.insertAreaToServer(areaElement);
             }
-        });
+        };
+        ImageView createAreaView = (ImageView) this.findViewById(id.action_area_create);
+        createAreaView.setOnClickListener(createListener);
 
     }
 
@@ -134,19 +134,18 @@ public class AreaDashboardActivity extends AppCompatActivity {
                         Intent intent = new Intent(Intent.ACTION_MAIN);
                         intent.addCategory(Intent.CATEGORY_HOME);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        AreaDashboardActivity.this.startActivity(intent);
-                        AreaDashboardActivity.this.finish();
+                        startActivity(intent);
+                        finish();
                     }
                 }).setNegativeButton("no", null).show();
     }
 
     private class DataInsertServerCallback implements AsyncTaskCallback {
-
         @Override
         public void taskCompleted(Object result) {
-            AreaDashboardActivity.this.finish();
-            Intent intent = new Intent(AreaDashboardActivity.this.getApplicationContext(), CreateAreaFolderStructureActivity.class);
-            AreaDashboardActivity.this.startActivity(intent);
+            finish();
+            Intent intent = new Intent(getApplicationContext(), CreateAreaFolderStructureActivity.class);
+            startActivity(intent);
         }
     }
 
