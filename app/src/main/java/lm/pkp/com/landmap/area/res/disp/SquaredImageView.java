@@ -31,7 +31,8 @@ public class SquaredImageView extends ImageView {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        setPadding(10, 10, 10, 10);
+        setPadding(5, 5, 5, 5);
+        setElevation(5);
     }
 
     @Override
@@ -43,4 +44,5 @@ public class SquaredImageView extends ImageView {
     public void setAdjustViewBounds(boolean adjustViewBounds) {
         super.setAdjustViewBounds(adjustViewBounds);
     }
+
 }

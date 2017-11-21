@@ -33,7 +33,7 @@ public class AreaDocumentDisplayFragment extends Fragment {
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         gridView = (GridView) getView().findViewById(R.id.gridView);
-        adaptor = new AreaDocumentDisplayAdaptor(getContext());
+        adaptor = new AreaDocumentDisplayAdaptor(getContext(), this, 2);
         gridView.setAdapter(adaptor);
     }
 

@@ -7,6 +7,7 @@ public class DocumentDisplayElement {
 
     private String name = "";
     private String absPath = "";
+    private String resourceId = "";
 
     public String getName() {
         return this.name;
@@ -22,5 +23,13 @@ public class DocumentDisplayElement {
 
     public void setAbsPath(String absPath) {
         this.absPath = absPath;
+    }
+
+    public String getResourceId() {
+        return this.resourceId;
+    }
+
+    public void setResourceId(String resourceId) {
+        this.resourceId = resourceId;
     }
 }

@@ -30,6 +30,7 @@ final class DocumentDataHolder {
                     final DocumentDisplayElement docDisplayElement = new DocumentDisplayElement();
                     docDisplayElement.setName(resource.getName());
                     docDisplayElement.setAbsPath(rootPath + resource.getName());
+                    docDisplayElement.setResourceId(resource.getResourceId());
                     docItems.add(docDisplayElement);
                 }
             }

@@ -63,7 +63,7 @@ public class AreaDashboardSharedFragment extends Fragment {
         refreshAreaView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getView().findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
+                getActivity().findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
                 new LocalDataRefresher(getContext(), new DataReloadCallback()).refreshLocalData();
             }
         });
@@ -75,7 +75,7 @@ public class AreaDashboardSharedFragment extends Fragment {
         seachClearButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final EditText inputSearch = (EditText) getView().findViewById(R.id.dashboard_search_box);
+                final EditText inputSearch = (EditText) getActivity().findViewById(R.id.dashboard_search_box);
                 inputSearch.setText("");
             }
         });
