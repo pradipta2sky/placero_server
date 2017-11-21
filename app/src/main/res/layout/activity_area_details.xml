@@ -50,7 +50,7 @@
             android:layout_width="fill_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
-            android:layout_weight="0.8">
+            android:layout_weight="0.9">
 
             <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
                 android:id="@+id/position_list_scroll"
@@ -73,7 +73,7 @@
             android:layout_width="fill_parent"
             android:layout_height="match_parent"
             android:orientation="horizontal"
-            android:layout_weight="1.2">
+            android:layout_weight="1.1">
 
             <FrameLayout
                 android:id="@+id/weather_container"

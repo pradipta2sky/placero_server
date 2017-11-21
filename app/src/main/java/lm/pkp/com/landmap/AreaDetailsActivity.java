@@ -90,8 +90,8 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
 
         TextView areaNameView = (TextView) this.findViewById(id.area_name_text);
         String areaName = this.ae.getName();
-        if (areaName.length() > 20) {
-            areaName = areaName.substring(0, 19).concat("...");
+        if (areaName.length() > 16) {
+            areaName = areaName.substring(0, 15).concat("...");
         }
         areaNameView.setText(areaName);
 
