@@ -109,6 +109,7 @@ public class AreaCameraPictureActivity extends Activity implements LocationPosit
                 this.pictureResource.setMimeType(FileUtil.getMimeType(loadableFile));
                 this.pictureResource.setContentType("Image");
                 this.pictureResource.setContainerId(areaContext.getImagesRootDriveResource().getResourceId());
+                this.pictureResource.setCreatedOnMillis(System.currentTimeMillis() + "");
 
                 areaContext.addResourceToQueue(this.pictureResource);
 

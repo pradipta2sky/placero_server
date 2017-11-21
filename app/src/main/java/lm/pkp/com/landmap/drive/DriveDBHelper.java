@@ -370,6 +370,8 @@ public class DriveDBHelper extends SQLiteOpenHelper {
             postParams.put(DriveDBHelper.DRIVE_COLUMN_SIZE, dr.getSize());
             postParams.put(DriveDBHelper.DRIVE_COLUMN_LATITUDE, dr.getLatitude());
             postParams.put(DriveDBHelper.DRIVE_COLUMN_LONGITUDE, dr.getLongitude());
+            postParams.put(DriveDBHelper.DRIVE_COLUMN_LONGITUDE, dr.getLongitude());
+            postParams.put(DriveDBHelper.DRIVE_COLUMN_CREATED_MILLIS, dr.getCreatedOnMillis());
         } catch (JSONException e) {
             e.printStackTrace();
         }

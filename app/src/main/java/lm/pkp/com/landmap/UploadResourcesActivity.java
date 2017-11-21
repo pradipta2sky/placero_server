@@ -170,6 +170,7 @@ public class UploadResourcesActivity extends BaseDriveActivity {
         protected void onPostExecute(Boolean result) {
 
             AreaContext.INSTANCE.removeResourceFromQueue(this.resource);
+
             AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
             areaElement.getMediaResources().add(this.resource);
 

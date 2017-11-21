@@ -52,9 +52,6 @@ public class AreaPopulationUtil {
         desc = "<b>Description: </b>" + desc;
         descText.setText(Html.fromHtml(desc));
 
-        TextView creatorText = (TextView) view.findViewById(id.area_creator_text);
-        creatorText.setText(Html.fromHtml("<b>Creator: </b>" + ae.getCreatedBy()));
-
         TextView tagsText = (TextView) view.findViewById(id.area_tags_text);
         String areaTags = ae.getAddress();
         String tagsContent = "<b>Address: </b>" + areaTags;

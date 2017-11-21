@@ -99,21 +99,19 @@ public class AreaCameraVideoActivity extends Activity implements LocationPositio
                 AreaContext areaContext = AreaContext.INSTANCE;
                 AreaElement ae = areaContext.getAreaElement();
 
-                DriveResource resource = new DriveResource();
-                resource.setName(videoFile.getName());
-                resource.setPath(videoFile.getAbsolutePath());
-                resource.setType("file");
-                resource.setUserId(UserContext.getInstance().getUserElement().getEmail());
-                resource.setSize(videoFile.length() + "");
-                resource.setUniqueId(UUID.randomUUID().toString());
-                resource.setAreaId(ae.getUniqueId());
-                resource.setMimeType(FileUtil.getMimeType(videoFile));
-                resource.setContentType("Video");
-                resource.setContainerId(areaContext.getVideosRootDriveResource().getResourceId());
-                resource.setLatitude(this.videoResource.getLatitude());
-                resource.setLongitude(this.videoResource.getLongitude());
+                videoResource.setName(videoFile.getName());
+                videoResource.setPath(videoFile.getAbsolutePath());
+                videoResource.setType("file");
+                videoResource.setUserId(UserContext.getInstance().getUserElement().getEmail());
+                videoResource.setSize(videoFile.length() + "");
+                videoResource.setUniqueId(UUID.randomUUID().toString());
+                videoResource.setAreaId(ae.getUniqueId());
+                videoResource.setMimeType(FileUtil.getMimeType(videoFile));
+                videoResource.setContentType("Video");
+                videoResource.setContainerId(areaContext.getVideosRootDriveResource().getResourceId());
+                videoResource.setCreatedOnMillis(System.currentTimeMillis() + "");
 
-                AreaContext.INSTANCE.addResourceToQueue(resource);
+                areaContext.addResourceToQueue(videoResource);
 
                 Intent i = new Intent(this, AreaAddResourcesActivity.class);
                 this.startActivity(i);

@@ -119,10 +119,8 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
                     pe.setLon(positionObj.getDouble("lon"));
                     pe.setTags((String) positionObj.get("tags"));
 
-                    String createdAt = positionObj.getString("created_at");
-                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    Date parsedDate = format.parse(createdAt);
-                    pe.setCreatedOnMillis(parsedDate.getTime() + "");
+                    String createdAt = positionObj.getString("created_on");
+                    pe.setCreatedOnMillis(createdAt);
 
                     this.pdh.insertPositionFromServer(pe);
                 }
@@ -145,10 +143,8 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
                     dr.setLatitude(driveObj.getString("latitude"));
                     dr.setLongitude(driveObj.getString("longitude"));
 
-                    String createdAt = driveObj.getString("created_at");
-                    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                    Date parsedDate = format.parse(createdAt);
-                    dr.setCreatedOnMillis(parsedDate.getTime() + "");
+                    String createdAt = driveObj.getString("created_on");
+                    dr.setCreatedOnMillis(createdAt);
 
                     this.ddh.insertResourceFromServer(dr);
                 }
@@ -182,10 +178,8 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
                 dr.setMimeType(driveObj.getString("mime_type"));
                 dr.setContentType(driveObj.getString("content_type"));
 
-                String createdAt = driveObj.getString("created_at");
-                SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-                Date parsedDate = format.parse(createdAt);
-                dr.setCreatedOnMillis(parsedDate.getTime() + "");
+                String createdAt = driveObj.getString("created_on");
+                dr.setCreatedOnMillis(createdAt);
 
                 this.ddh.insertResourceFromServer(dr);
             }
