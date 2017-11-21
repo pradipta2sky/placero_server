@@ -25,7 +25,7 @@ public class AreaElement implements Serializable {
     private String uniqueId;
     private String address;
 
-    private final PositionElement centerPosition = new PositionElement();
+    private PositionElement centerPosition = new PositionElement();
     private List<PositionElement> positions = new ArrayList<>();
     private List<DriveResource> mediaResources = new ArrayList<>();
     private Map<String, DriveResource> commonResources = new HashMap<>();
@@ -127,4 +127,7 @@ public class AreaElement implements Serializable {
         return centerPosition;
     }
 
+    public void setCenterPosition(PositionElement centerPosition) {
+        this.centerPosition = centerPosition;
+    }
 }

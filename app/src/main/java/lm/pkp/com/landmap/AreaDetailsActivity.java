@@ -229,8 +229,14 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         pe.setUniqueAreaId(this.ae.getUniqueId());
 
         AreaElement ae = AreaContext.INSTANCE.getAreaElement();
-        ae.getPositions().add(pe);
+        List<PositionElement> positions = ae.getPositions();
+        positions.add(pe);
         AreaContext.INSTANCE.setAreaElement(ae, this.getApplicationContext());
+
+        if(positions.size() == 1){
+            WeatherManager weatherManager = new WeatherManager(this.getApplicationContext(), new WeatherDataCallback());
+            weatherManager.loadWeatherInfoForPosition(ae.getCenterPosition());
+        }
 
         pe = this.pdb.insertPositionLocally(pe);
         this.pdb.insertPositionToServer(pe);
