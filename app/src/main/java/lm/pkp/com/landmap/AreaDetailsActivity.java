@@ -233,7 +233,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         positions.add(pe);
         AreaContext.INSTANCE.setAreaElement(ae, this.getApplicationContext());
 
-        if(positions.size() == 1){
+        if(positions.size() > 0){
             WeatherManager weatherManager = new WeatherManager(this.getApplicationContext(), new WeatherDataCallback());
             weatherManager.loadWeatherInfoForPosition(ae.getCenterPosition());
         }

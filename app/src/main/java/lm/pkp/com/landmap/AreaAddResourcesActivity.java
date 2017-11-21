@@ -40,8 +40,9 @@ public class AreaAddResourcesActivity extends AppCompatActivity {
         this.setContentView(layout.activity_area_resource_main);
 
         ActionBar ab = this.getSupportActionBar();
-        ab.setHomeButtonEnabled(true);
-        ab.setDisplayHomeAsUpEnabled(true);
+        ab.setHomeButtonEnabled(false);
+        ab.setDisplayHomeAsUpEnabled(false);
+
         AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
         ab.setBackgroundDrawable(new ColorDrawable(ColorProvider.getAreaToolBarColor(areaElement)));
         ab.show();

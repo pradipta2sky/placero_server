@@ -127,6 +127,8 @@ public class UploadResourcesActivity extends BaseDriveActivity {
                 ddh.insertResourceLocally(this.resource);
                 ddh.insertResourceToServer(this.resource);
 
+                AreaContext.INSTANCE.getAreaElement().getMediaResources().add(resource);
+
                 this.driveFile.removeChangeListener(UploadResourcesActivity.this.getGoogleApiClient(), this);
                 new CopyContentsAsyncTask(UploadResourcesActivity.this.getApplicationContext(), this.resource).execute(this.driveFile);
             }

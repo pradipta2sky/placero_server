@@ -57,8 +57,8 @@ public class AreaShareActivity extends AppCompatActivity {
 
         AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
         ActionBar ab = this.getSupportActionBar();
-        ab.setHomeButtonEnabled(true);
-        ab.setDisplayHomeAsUpEnabled(true);
+        ab.setHomeButtonEnabled(false);
+        ab.setDisplayHomeAsUpEnabled(false);
         ab.setBackgroundDrawable(new ColorDrawable(ColorProvider.getAreaToolBarColor(areaElement)));
         ab.show();
 
