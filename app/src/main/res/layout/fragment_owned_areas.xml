@@ -20,14 +20,14 @@
             android:visibility="gone" />
 
         <LinearLayout
+            android:id="@+id/owned_area_empty_layout"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:id="@+id/owned_area_empty_layout"
             android:background="@color/white"
             android:visibility="gone">
 
             <ImageView
-                android:id="@+id/action_create_area_empty"
+                android:id="@+id/owned_area_empty_layout_action"
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:layout_gravity="center_vertical|center_horizontal"

@@ -30,14 +30,12 @@ public class PermissionsDBHelper extends SQLiteOpenHelper {
     private AsyncTaskCallback callback;
 
     public PermissionsDBHelper(Context context, AsyncTaskCallback callback) {
-        super(context,
-                DATABASE_NAME, null, 1);
+        super(context, DATABASE_NAME, null, 1);
         this.callback = callback;
     }
 
     public PermissionsDBHelper(Context context) {
-        super(context,
-                DATABASE_NAME, null, 1);
+        super(context, DATABASE_NAME, null, 1);
     }
 
     @Override
@@ -45,19 +43,15 @@ public class PermissionsDBHelper extends SQLiteOpenHelper {
         db.execSQL(
                 "create table " +
                         ACCESS_TABLE_NAME + "(" +
-
                         ACCESS_COLUMN_AREA_ID + " text," +
-
                         ACCESS_COLUMN_USER_ID + " text, " +
-
                         ACCESS_COLUMN_FUNCTION_CODE + " text)"
         );
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " +
-                ACCESS_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + ACCESS_TABLE_NAME);
         this.onCreate(db);
     }
 
@@ -65,15 +59,11 @@ public class PermissionsDBHelper extends SQLiteOpenHelper {
         SQLiteDatabase db = getWritableDatabase();
 
         ContentValues contentValues = new ContentValues();
-        contentValues.put(
-                ACCESS_COLUMN_AREA_ID, pe.getAreaId());
-        contentValues.put(
-                ACCESS_COLUMN_FUNCTION_CODE, pe.getFunctionCode());
-        contentValues.put(
-                ACCESS_COLUMN_USER_ID, pe.getUserId());
+        contentValues.put(ACCESS_COLUMN_AREA_ID, pe.getAreaId());
+        contentValues.put(ACCESS_COLUMN_FUNCTION_CODE, pe.getFunctionCode());
+        contentValues.put(ACCESS_COLUMN_USER_ID, pe.getUserId());
 
-        db.insert(
-                ACCESS_TABLE_NAME, null, contentValues);
+        db.insert(ACCESS_TABLE_NAME, null, contentValues);
         db.close();
         return pe;
     }
@@ -102,37 +92,38 @@ public class PermissionsDBHelper extends SQLiteOpenHelper {
 
     public void deletePermissionsByAreaId(String areaId) {
         SQLiteDatabase db = getWritableDatabase();
-        db.execSQL("DELETE FROM " +
-                ACCESS_TABLE_NAME + " WHERE "
-                +
-                ACCESS_COLUMN_AREA_ID + " = '" + areaId + "'");
+        db.execSQL("DELETE FROM " + ACCESS_TABLE_NAME + " WHERE " + ACCESS_COLUMN_AREA_ID + " = '" + areaId + "'");
         db.close();
     }
 
     public Map<String, PermissionElement> fetchPermissionsByAreaId(String areaId) {
         SQLiteDatabase db = getWritableDatabase();
         Map<String, PermissionElement> perMap = new HashMap<>();
-        Cursor cursor = db.rawQuery("select * from " +
-                ACCESS_TABLE_NAME
-                + " WHERE " +
-                ACCESS_COLUMN_AREA_ID + "=?", new String[]{areaId});
+        Cursor cursor = db.rawQuery("select * from " + ACCESS_TABLE_NAME + " WHERE " + ACCESS_COLUMN_AREA_ID + "=?", new String[]{areaId});
         if (cursor != null) {
             cursor.moveToFirst();
             while (cursor.isAfterLast() == false) {
                 PermissionElement pe = new PermissionElement();
-                pe.setUserId(cursor.getString(cursor.getColumnIndex(
-                        ACCESS_COLUMN_USER_ID)));
+
+                pe.setUserId(cursor.getString(cursor.getColumnIndex(ACCESS_COLUMN_USER_ID)));
                 pe.setAreaId(areaId);
-                String functionCode = cursor.getString(cursor.getColumnIndex(
-                        ACCESS_COLUMN_FUNCTION_CODE));
+
+                String functionCode = cursor.getString(cursor.getColumnIndex(ACCESS_COLUMN_FUNCTION_CODE));
                 pe.setFunctionCode(functionCode);
                 perMap.put(functionCode, pe);
+
                 cursor.moveToNext();
             }
             cursor.close();
         }
         db.close();
         return perMap;
+    }
+
+    public void deletePermissionsLocally() {
+        SQLiteDatabase db = getWritableDatabase();
+        db.delete(ACCESS_TABLE_NAME, "1", null);
+        db.close();
     }
 
     public void setCompletionCallback(AsyncTaskCallback callback) {

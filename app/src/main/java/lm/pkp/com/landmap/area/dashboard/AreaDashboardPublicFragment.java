@@ -17,7 +17,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 
 import lm.pkp.com.landmap.AreaDetailsActivity;
-import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
@@ -31,8 +30,6 @@ import lm.pkp.com.landmap.sync.LocalDataRefresher;
  * Created by USER on 11/4/2017.
  */
 public class AreaDashboardPublicFragment extends Fragment {
-
-    private AreaItemAdaptor areaDisplayAdapter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -77,13 +74,13 @@ public class AreaDashboardPublicFragment extends Fragment {
         refreshAreaView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                AreaDashboardPublicFragment.this.getView().findViewById(id.splash_panel).setVisibility(View.VISIBLE);
+                getView().findViewById(id.splash_panel).setVisibility(View.VISIBLE);
                 String key = inputSearch.getText().toString();
                 if (key.trim().equalsIgnoreCase("")) {
-                    LocalDataRefresher dataRefresher = new LocalDataRefresher(AreaDashboardPublicFragment.this.getContext(), new DataReloadCallback());
+                    LocalDataRefresher dataRefresher = new LocalDataRefresher(getContext(), new DataReloadCallback());
                     dataRefresher.refreshPublicAreas();
                 } else {
-                    LocalDataRefresher dataRefresher = new LocalDataRefresher(AreaDashboardPublicFragment.this.getContext(), new DataReloadCallback(key.trim()));
+                    LocalDataRefresher dataRefresher = new LocalDataRefresher(getContext(), new DataReloadCallback(key.trim()));
                     dataRefresher.refreshPublicAreas(key.trim());
                 }
             }
@@ -93,7 +90,7 @@ public class AreaDashboardPublicFragment extends Fragment {
         seachClearButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                EditText inputSearch = (EditText) AreaDashboardPublicFragment.this.getActivity().findViewById(id.dashboard_search_box);
+                EditText inputSearch = (EditText) getActivity().findViewById(id.dashboard_search_box);
                 inputSearch.setText("");
             }
         });
@@ -114,11 +111,11 @@ public class AreaDashboardPublicFragment extends Fragment {
 
         @Override
         public void taskCompleted(Object result) {
-            AreaDBHelper adh = new AreaDBHelper(AreaDashboardPublicFragment.this.getContext());
+            AreaDBHelper adh = new AreaDBHelper(getContext());
 
-            AreaItemAdaptor adaptor = new AreaItemAdaptor(AreaDashboardPublicFragment.this.getContext(), layout.area_element_row, adh.getAreas("public"));
+            AreaItemAdaptor adaptor = new AreaItemAdaptor(getContext(), layout.area_element_row, adh.getAreas("public"));
             adaptor.notifyDataSetChanged();
-            ListView areaListView = (ListView) AreaDashboardPublicFragment.this.getView().findViewById(id.area_display_list);
+            ListView areaListView = (ListView) getView().findViewById(id.area_display_list);
             areaListView.setAdapter(adaptor);
 
             if (!this.filterStr.equalsIgnoreCase("")) {
@@ -130,16 +127,16 @@ public class AreaDashboardPublicFragment extends Fragment {
                 @Override
                 public void onItemClick(AdapterView<?> adapter, View v, int position,
                                         long arg3) {
-                    AreaDashboardPublicFragment.this.getActivity().finish();
+                    getActivity().finish();
 
                     AreaElement ae = (AreaElement) adapter.getItemAtPosition(position);
-                    AreaContext.INSTANCE.setAreaElement(ae, AreaDashboardPublicFragment.this.getContext());
-                    Intent intent = new Intent(AreaDashboardPublicFragment.this.getContext(), AreaDetailsActivity.class);
-                    AreaDashboardPublicFragment.this.startActivity(intent);
+                    AreaContext.INSTANCE.setAreaElement(ae, getContext());
+                    Intent intent = new Intent(getContext(), AreaDetailsActivity.class);
+                    startActivity(intent);
                 }
             });
 
-            AreaDashboardPublicFragment.this.getView().findViewById(id.splash_panel).setVisibility(View.INVISIBLE);
+            getView().findViewById(id.splash_panel).setVisibility(View.INVISIBLE);
         }
     }
 
@@ -154,13 +151,14 @@ public class AreaDashboardPublicFragment extends Fragment {
 
         @Override
         public void afterTextChanged(Editable editable) {
-            AreaDashboardPublicFragment.this.getView().findViewById(id.splash_panel).setVisibility(View.VISIBLE);
+            View view = getView();
+            view.findViewById(id.splash_panel).setVisibility(View.VISIBLE);
             String filterStr = editable.toString().trim();
             if (!filterStr.equalsIgnoreCase("")) {
-                LocalDataRefresher dataRefresher = new LocalDataRefresher(AreaDashboardPublicFragment.this.getContext(), new DataReloadCallback(filterStr));
+                LocalDataRefresher dataRefresher = new LocalDataRefresher(getContext(), new DataReloadCallback(filterStr));
                 dataRefresher.refreshPublicAreas(filterStr);
             } else {
-                LocalDataRefresher dataRefresher = new LocalDataRefresher(AreaDashboardPublicFragment.this.getContext(), new DataReloadCallback());
+                LocalDataRefresher dataRefresher = new LocalDataRefresher(getContext(), new DataReloadCallback());
                 dataRefresher.refreshPublicAreas();
             }
         }

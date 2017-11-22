@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
+import lm.pkp.com.landmap.permission.PermissionConstants;
+import lm.pkp.com.landmap.permission.PermissionManager;
 
 /**
  * Created by USER on 10/16/2017.
@@ -56,10 +58,12 @@ public class PostionListAdaptor extends ArrayAdapter<PositionElement> {
         deleteButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                PostionListAdaptor.this.items.remove(position);
-                PostionListAdaptor.this.pdh.deletePositionGlobally(pe);
-                AreaContext.INSTANCE.getAreaElement().getPositions().remove(pe);
-                PostionListAdaptor.this.notifyDataSetChanged();
+                if(PermissionManager.INSTANCE.hasAccess(PermissionConstants.UPDATE_AREA)){
+                    items.remove(position);
+                    pdh.deletePositionGlobally(pe);
+                    AreaContext.INSTANCE.getAreaElement().getPositions().remove(pe);
+                    notifyDataSetChanged();
+                }
             }
         });
         return v;

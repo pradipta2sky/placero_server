@@ -20,26 +20,23 @@
             android:visibility="gone" />
 
         <LinearLayout
+            android:id="@+id/shared_area_empty_layout"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:layout_gravity="top"
             android:layout_margin="10dp"
             android:orientation="vertical"
-            android:id="@+id/shared_area_empty_layout"
             android:background="@color/white"
             android:visibility="visible">
 
-            <TextView
-                android:layout_width="fill_parent"
-                android:layout_height="fill_parent"
-                android:text="No shared areas."
-                android:textColor="@color/blue_grey_900"
-                android:background="@color/white"
-                android:textAppearance="?android:attr/textAppearanceMedium"
-                android:textSize="25sp"
-                android:fontFamily="sans-serif"
-                android:textStyle="bold"
-                android:gravity="center_vertical|center_horizontal" />
+            <ImageView
+                android:id="@+id/shared_area_empty_layout_action"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center_vertical|center_horizontal"
+                android:src="@drawable/sad_face"
+                android:layout_weight="1"
+                android:padding="5dp" />
 
         </LinearLayout>
 

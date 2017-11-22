@@ -2,7 +2,6 @@ package lm.pkp.com.landmap;
 
 import android.Manifest.permission;
 import android.R.string;
-import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -148,7 +147,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         markLocationItem.setOnClickListener(markLocationOnClickListener);
 
         ImageView markLocationEmptyItem = (ImageView) findViewById(id.action_mark_location_empty);
-        if(markLocationEmptyItem != null){
+        if (markLocationEmptyItem != null) {
             markLocationEmptyItem.setOnClickListener(markLocationOnClickListener);
         }
 
@@ -161,7 +160,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
                     Intent intent = new Intent(getApplicationContext(), AreaMapPlotterActivity.class);
                     startActivity(intent);
                 } else {
-                    showErrorMessage("You need atleast 1 points to plot.!!!", "error");
+                    showErrorMessage("You need atleast 1 points to plot!!!", "error");
                 }
             }
         });
@@ -204,7 +203,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
                     Intent intent = new Intent(getApplicationContext(), AreaAddResourcesActivity.class);
                     startActivity(intent);
                 } else {
-                    showErrorMessage("You do not have resource modification rights !!", "error");
+                    showErrorMessage("You do not have resource addition rights !!", "error");
                 }
             }
         });
@@ -227,7 +226,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
             String action = intentBundle.getString("action");
             String outcome = intentBundle.getString("outcome");
             String outcomeType = intentBundle.getString("outcome_type");
-            showErrorMessage(action + " " + outcomeType + ". " + outcome, "error");
+            showErrorMessage(action + " " + outcomeType + ". " + outcome, outcomeType);
         }
     }
 
@@ -243,7 +242,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         pdb.insertPositionToServer(pe);
 
         AreaContext.INSTANCE.setAreaElement(ae, getApplicationContext());
-        if(ae.getPositions().size() > 0){
+        if (ae.getPositions().size() > 0) {
             WeatherManager weatherManager = new WeatherManager(getApplicationContext(), new WeatherDataCallback());
             weatherManager.loadWeatherInfoForPosition(ae.getCenterPosition());
         }
@@ -346,14 +345,15 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
     }
 
     private void showErrorMessage(String message, String type) {
-        final Snackbar snackbar = Snackbar.make(getWindow().getDecorView(), message, Snackbar.LENGTH_INDEFINITE);
+        final Snackbar snackbar = Snackbar.make(getWindow().getDecorView(),
+                message + ".", Snackbar.LENGTH_INDEFINITE);
 
         View sbView = snackbar.getView();
-        snackbar.getView().setBackgroundColor(Color.WHITE);
+        snackbar.getView().setBackgroundColor(Color.parseColor("#FAF7F6"));
 
         TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
         if (type.equalsIgnoreCase("info")) {
-            textView.setTextColor(Color.GREEN);
+            textView.setTextColor(Color.parseColor("#30601F"));
         } else if (type.equalsIgnoreCase("error")) {
             textView.setTextColor(Color.RED);
         } else {

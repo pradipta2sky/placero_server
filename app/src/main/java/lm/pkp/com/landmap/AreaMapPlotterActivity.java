@@ -138,16 +138,18 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
 
                 PositionElement position = positionMarkers.get(marker);
                 if (position != null) {
-                    // Do something for non position item.
-                    // Implementation for remove button
-                    PositionsDBHelper pdh = new PositionsDBHelper(getApplicationContext());
-                    PositionElement markedPosition = positionMarkers.get(marker);
-                    pdh.deletePositionGlobally(markedPosition);
-                    ae.getPositions().remove(markedPosition);
-                    ac.reCenter(ae);
+                    if(PermissionManager.INSTANCE.hasAccess(PermissionConstants.UPDATE_AREA)){
+                        // Do something for non position item.
+                        // Implementation for remove button
+                        PositionsDBHelper pdh = new PositionsDBHelper(getApplicationContext());
+                        PositionElement markedPosition = positionMarkers.get(marker);
+                        pdh.deletePositionGlobally(markedPosition);
+                        ae.getPositions().remove(markedPosition);
+                        ac.reCenter(ae);
 
-                    polygon.remove();
-                    plotPolygonUsingPositions();
+                        polygon.remove();
+                        plotPolygonUsingPositions();
+                    }
                 }else {
                     DriveResource resource = resourceMarkers.get(marker);
                     if(resource != null){

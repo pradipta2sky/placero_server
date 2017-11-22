@@ -103,7 +103,7 @@ public class AreaDashboardOwnedFragment extends Fragment {
                 }
             };
 
-            ImageView createAreaView = (ImageView) getView().findViewById(id.action_create_area_empty);
+            ImageView createAreaView = (ImageView) getView().findViewById(id.owned_area_empty_layout_action);
             createAreaView.setOnClickListener(createListener);
         }
 
@@ -221,11 +221,18 @@ public class AreaDashboardOwnedFragment extends Fragment {
 
         @Override
         public void afterTextChanged(Editable editable) {
-            getView().findViewById(id.splash_panel).setVisibility(View.VISIBLE);
-            ListView areaListView = (ListView) getView().findViewById(id.area_display_list);
-            ArrayAdapter<AreaElement> adapter = (ArrayAdapter<AreaElement>) areaListView.getAdapter();
-            adapter.getFilter().filter(editable.toString());
-            getView().findViewById(id.splash_panel).setVisibility(View.GONE);
+            if(editable.toString().equalsIgnoreCase("")){
+                return;
+            }else {
+                View view = getView();
+                view.findViewById(id.splash_panel).setVisibility(View.VISIBLE);
+
+                ListView areaListView = (ListView) view.findViewById(id.area_display_list);
+                ArrayAdapter<AreaElement> adapter = (ArrayAdapter<AreaElement>) areaListView.getAdapter();
+                adapter.getFilter().filter(editable.toString());
+
+                view.findViewById(id.splash_panel).setVisibility(View.GONE);
+            }
         }
     }
 

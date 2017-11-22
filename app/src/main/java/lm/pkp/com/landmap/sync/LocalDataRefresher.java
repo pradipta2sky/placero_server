@@ -9,6 +9,7 @@ import lm.pkp.com.landmap.area.tasks.PublicAreasLoadTask;
 import lm.pkp.com.landmap.area.tasks.UserAreaDetailsLoadTask;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
+import lm.pkp.com.landmap.permission.PermissionsDBHelper;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.weather.db.WeatherDBHelper;
@@ -39,6 +40,9 @@ public class LocalDataRefresher implements AsyncTaskCallback {
 
         DriveDBHelper ddh = new DriveDBHelper(this.ctxt);
         ddh.cleanLocalDriveResources();
+
+        PermissionsDBHelper pmh = new PermissionsDBHelper(this.ctxt);
+        pmh.deletePermissionsLocally();
 
         UserAreaDetailsLoadTask loadTask = new UserAreaDetailsLoadTask(this.ctxt);
         loadTask.setCompletionCallback(this);

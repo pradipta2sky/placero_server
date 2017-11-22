@@ -67,8 +67,8 @@ public class AreaDashboardSharedFragment extends Fragment {
         refreshAreaView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                AreaDashboardSharedFragment.this.getActivity().findViewById(id.splash_panel).setVisibility(View.VISIBLE);
-                new LocalDataRefresher(AreaDashboardSharedFragment.this.getContext(), new DataReloadCallback()).refreshLocalData();
+                getActivity().findViewById(id.splash_panel).setVisibility(View.VISIBLE);
+                new LocalDataRefresher(getContext(), new DataReloadCallback()).refreshLocalData();
             }
         });
 
@@ -79,7 +79,7 @@ public class AreaDashboardSharedFragment extends Fragment {
         seachClearButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                EditText inputSearch = (EditText) AreaDashboardSharedFragment.this.getActivity().findViewById(id.dashboard_search_box);
+                EditText inputSearch = (EditText) getActivity().findViewById(id.dashboard_search_box);
                 inputSearch.setText("");
             }
         });
@@ -99,19 +99,18 @@ public class AreaDashboardSharedFragment extends Fragment {
                 @Override
                 public void onItemClick(AdapterView<?> adapter, View v, int position,
                                         long arg3) {
-                    AreaDashboardSharedFragment.this.getActivity().finish();
+                    getActivity().finish();
 
                     AreaElement ae = (AreaElement) adapter.getItemAtPosition(position);
-                    AreaContext.INSTANCE.setAreaElement(ae, AreaDashboardSharedFragment.this.getContext());
-                    Intent intent = new Intent(AreaDashboardSharedFragment.this.getContext(), AreaDetailsActivity.class);
-                    AreaDashboardSharedFragment.this.startActivity(intent);
+                    AreaContext.INSTANCE.setAreaElement(ae, getContext());
+                    Intent intent = new Intent(getContext(), AreaDetailsActivity.class);
+                    startActivity(intent);
                 }
             });
         } else {
             areaListView.setVisibility(View.GONE);
             view.findViewById(id.shared_area_empty_layout).setVisibility(View.VISIBLE);
         }
-
         view.findViewById(id.splash_panel).setVisibility(View.GONE);
     }
 
@@ -119,19 +118,19 @@ public class AreaDashboardSharedFragment extends Fragment {
 
         @Override
         public void taskCompleted(Object result) {
-            ArrayList<AreaElement> areas = new AreaDBHelper(AreaDashboardSharedFragment.this.getView().getContext()).getAreas("shared");
+            ArrayList<AreaElement> areas = new AreaDBHelper(getView().getContext()).getAreas("shared");
 
-            ListView areaListView = (ListView) AreaDashboardSharedFragment.this.getView().findViewById(id.area_display_list);
-            AreaItemAdaptor adaptor = new AreaItemAdaptor(AreaDashboardSharedFragment.this.getContext(), layout.area_element_row, areas);
+            ListView areaListView = (ListView) getView().findViewById(id.area_display_list);
+            AreaItemAdaptor adaptor = new AreaItemAdaptor(getContext(), layout.area_element_row, areas);
             areaListView.setAdapter(adaptor);
 
-            EditText inputSearch = (EditText) AreaDashboardSharedFragment.this.getActivity().findViewById(id.dashboard_search_box);
+            EditText inputSearch = (EditText) getActivity().findViewById(id.dashboard_search_box);
             String filterStr = inputSearch.getText().toString().trim();
             if (!filterStr.equalsIgnoreCase("")) {
                 adaptor.getFilter().filter(filterStr);
             }
 
-            AreaDashboardSharedFragment.this.getView().findViewById(id.splash_panel).setVisibility(View.INVISIBLE);
+            getView().findViewById(id.splash_panel).setVisibility(View.INVISIBLE);
         }
     }
 
@@ -146,13 +145,19 @@ public class AreaDashboardSharedFragment extends Fragment {
 
         @Override
         public void afterTextChanged(Editable editable) {
-            AreaDashboardSharedFragment.this.getView().findViewById(id.splash_panel).setVisibility(View.VISIBLE);
+            if(editable.toString().equalsIgnoreCase("")){
+                return;
+            }else {
+                View view = getView();
+                view.findViewById(id.splash_panel).setVisibility(View.VISIBLE);
 
-            ListView areaListView = (ListView) AreaDashboardSharedFragment.this.getView().findViewById(id.area_display_list);
-            ArrayAdapter<AreaElement> adapter = (ArrayAdapter<AreaElement>) areaListView.getAdapter();
-            adapter.getFilter().filter(editable.toString());
+                ListView areaListView = (ListView) view.findViewById(id.area_display_list);
+                ArrayAdapter<AreaElement> adapter = (ArrayAdapter<AreaElement>) areaListView.getAdapter();
+                adapter.getFilter().filter(editable.toString());
 
-            AreaDashboardSharedFragment.this.getView().findViewById(id.splash_panel).setVisibility(View.GONE);
+                view.findViewById(id.splash_panel).setVisibility(View.GONE);
+            }
+
         }
 
     }

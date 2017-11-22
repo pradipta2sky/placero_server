@@ -18,6 +18,27 @@
             android:divider="@android:color/transparent"
             android:dividerHeight="10.0sp" />
 
+        <LinearLayout
+            android:id="@+id/public_area_empty_layout"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_gravity="top"
+            android:layout_margin="10dp"
+            android:orientation="vertical"
+            android:background="@color/white"
+            android:visibility="visible">
+
+            <ImageView
+                android:id="@+id/public_area_empty_layout_action"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center_vertical|center_horizontal"
+                android:src="@drawable/sad_face"
+                android:layout_weight="1"
+                android:padding="5dp" />
+
+        </LinearLayout>
+
         <RelativeLayout
             android:id="@+id/splash_panel"
             android:layout_width="match_parent"
