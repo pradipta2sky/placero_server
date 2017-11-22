@@ -1,6 +1,5 @@
 package lm.pkp.com.landmap;
 
-import android.Manifest;
 import android.Manifest.permission;
 import android.accounts.AccountManager;
 import android.app.Activity;
@@ -222,7 +221,7 @@ public class RemoveDriveResourcesActivity extends Activity implements Permission
                     String[] resourceArr = this.resourceIds.split(",");
                     for (int i = 0; i < resourceArr.length; i++) {
                         String resourceID = resourceArr[i];
-                        DriveResource fetchedResource = ddh.getDriveResourcesByResourceId(resourceID);
+                        DriveResource fetchedResource = ddh.getDriveResourceByResourceId(resourceID);
                         ddh.deleteResourceByResourceId(resourceID);
                         ae.getMediaResources().remove(fetchedResource);
 

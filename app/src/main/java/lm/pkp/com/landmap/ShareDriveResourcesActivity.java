@@ -67,54 +67,54 @@ public class ShareDriveResourcesActivity extends Activity implements PermissionC
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
 
-        this.setContentView(layout.activity_share_area_resources);
+        setContentView(layout.activity_share_area_resources);
 
-        Bundle extras = this.getIntent().getExtras();
+        Bundle extras = getIntent().getExtras();
         if (extras != null) {
-            this.shareToUser = extras.getString("share_to_user");
-            if (this.shareToUser.equalsIgnoreCase("any")) {
-                this.shareType = "anyone";
+            shareToUser = extras.getString("share_to_user");
+            if (shareToUser.equalsIgnoreCase("any")) {
+                shareType = "anyone";
             } else {
-                this.shareType = "user";
+                shareType = "user";
             }
         }
 
-        this.mProgress = new ProgressDialog(this);
-        this.mProgress.setMessage("Sharing Area ...");
-        this.mCredential = GoogleAccountCredential.usingOAuth2(this.getApplicationContext(), Arrays.asList(ShareDriveResourcesActivity.SCOPES)).setBackOff(new ExponentialBackOff());
-        this.shareResources();
+        mProgress = new ProgressDialog(this);
+        mProgress.setMessage("Sharing Area ...");
+        mCredential = GoogleAccountCredential.usingOAuth2(getApplicationContext(), Arrays.asList(SCOPES)).setBackOff(new ExponentialBackOff());
+        shareResources();
     }
 
 
     private void shareResources() {
-        if (!this.isGooglePlayServicesAvailable()) {
-            this.acquireGooglePlayServices();
-        } else if (this.mCredential.getSelectedAccountName() == null) {
-            this.chooseAccount();
+        if (!isGooglePlayServicesAvailable()) {
+            acquireGooglePlayServices();
+        } else if (mCredential.getSelectedAccountName() == null) {
+            chooseAccount();
         } else {
-            new MakeRequestTask(this.mCredential).execute();
+            new MakeRequestTask(mCredential).execute();
         }
     }
 
-    @AfterPermissionGranted(ShareDriveResourcesActivity.REQUEST_PERMISSION_GET_ACCOUNTS)
+    @AfterPermissionGranted(REQUEST_PERMISSION_GET_ACCOUNTS)
     private void chooseAccount() {
         if (EasyPermissions.hasPermissions(
                 this, permission.GET_ACCOUNTS)) {
-            String accountName = this.getPreferences(Context.MODE_PRIVATE)
-                    .getString(ShareDriveResourcesActivity.PREF_ACCOUNT_NAME, null);
+            String accountName = getPreferences(Context.MODE_PRIVATE)
+                    .getString(PREF_ACCOUNT_NAME, null);
             if (accountName != null) {
-                this.mCredential.setSelectedAccountName(accountName);
-                this.shareResources();
+                mCredential.setSelectedAccountName(accountName);
+                shareResources();
             } else {
                 // Start a dialog from which the user can choose an account
-                this.startActivityForResult(this.mCredential.newChooseAccountIntent(), ShareDriveResourcesActivity.REQUEST_ACCOUNT_PICKER);
+                startActivityForResult(mCredential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
             }
         } else {
             // Request the GET_ACCOUNTS permission via a user dialog
             EasyPermissions.requestPermissions(
                     this,
                     "This app needs to access your Google account (via Contacts).",
-                    ShareDriveResourcesActivity.REQUEST_PERMISSION_GET_ACCOUNTS,
+                    REQUEST_PERMISSION_GET_ACCOUNTS,
                     permission.GET_ACCOUNTS);
         }
     }
@@ -124,29 +124,29 @@ public class ShareDriveResourcesActivity extends Activity implements PermissionC
             int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
-            case ShareDriveResourcesActivity.REQUEST_GOOGLE_PLAY_SERVICES:
+            case REQUEST_GOOGLE_PLAY_SERVICES:
                 if (resultCode == Activity.RESULT_OK) {
-                    this.shareResources();
+                    shareResources();
                 } else {
                     // TODO Share the error with the user
                 }
                 break;
-            case ShareDriveResourcesActivity.REQUEST_ACCOUNT_PICKER:
+            case REQUEST_ACCOUNT_PICKER:
                 if (resultCode == Activity.RESULT_OK && data != null && data.getExtras() != null) {
                     String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
                     if (accountName != null) {
-                        SharedPreferences settings = this.getPreferences(Context.MODE_PRIVATE);
+                        SharedPreferences settings = getPreferences(Context.MODE_PRIVATE);
                         Editor editor = settings.edit();
-                        editor.putString(ShareDriveResourcesActivity.PREF_ACCOUNT_NAME, accountName);
+                        editor.putString(PREF_ACCOUNT_NAME, accountName);
                         editor.apply();
-                        this.mCredential.setSelectedAccountName(accountName);
-                        this.shareResources();
+                        mCredential.setSelectedAccountName(accountName);
+                        shareResources();
                     }
                 }
                 break;
-            case ShareDriveResourcesActivity.REQUEST_AUTHORIZATION:
+            case REQUEST_AUTHORIZATION:
                 if (resultCode == Activity.RESULT_OK) {
-                    this.shareResources();
+                    shareResources();
                 }
                 break;
         }
@@ -178,7 +178,7 @@ public class ShareDriveResourcesActivity extends Activity implements PermissionC
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
         int connectionStatusCode = apiAvailability.isGooglePlayServicesAvailable(this);
         if (apiAvailability.isUserResolvableError(connectionStatusCode)) {
-            this.showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode);
+            showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode);
         }
     }
 
@@ -186,7 +186,7 @@ public class ShareDriveResourcesActivity extends Activity implements PermissionC
     void showGooglePlayServicesAvailabilityErrorDialog(
             int connectionStatusCode) {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
-        Dialog dialog = apiAvailability.getErrorDialog(this, connectionStatusCode, ShareDriveResourcesActivity.REQUEST_GOOGLE_PLAY_SERVICES);
+        Dialog dialog = apiAvailability.getErrorDialog(this, connectionStatusCode, REQUEST_GOOGLE_PLAY_SERVICES);
         dialog.show();
     }
 
@@ -197,80 +197,79 @@ public class ShareDriveResourcesActivity extends Activity implements PermissionC
         MakeRequestTask(GoogleAccountCredential credential) {
             HttpTransport transport = AndroidHttp.newCompatibleTransport();
             JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-            this.mService = new Builder(transport, jsonFactory, credential).setApplicationName("LMS").build();
+            mService = new Builder(transport, jsonFactory, credential).setApplicationName("LMS").build();
         }
 
         @Override
         protected List<String> doInBackground(Void... params) {
             try {
-                final List<String> fileInfo = new ArrayList<String>();
+                final List<String> shareStatusInfo = new ArrayList<String>();
                 List<DriveResource> drs = AreaContext.INSTANCE.getAreaElement().getMediaResources();
                 for (final DriveResource dr : drs) {
-                    BatchRequest batch = this.mService.batch();
+                    if(!dr.getType().equalsIgnoreCase("file")){
+                        continue;
+                    }
+                    BatchRequest batch = mService.batch();
 
                     Permission userPermission = new Permission();
-                    userPermission.setType(ShareDriveResourcesActivity.this.shareType);
-                    userPermission.setRole(ShareDriveResourcesActivity.this.shareRole);
-                    if (!ShareDriveResourcesActivity.this.shareType.equalsIgnoreCase("anyone")) {
-                        userPermission.setEmailAddress(ShareDriveResourcesActivity.this.shareToUser);
+                    userPermission.setType(shareType);
+                    userPermission.setRole(shareRole);
+                    if (!shareType.equalsIgnoreCase("anyone")) {
+                        userPermission.setEmailAddress(shareToUser);
                     }
-                    userPermission.setAllowFileDiscovery(true);
-
-                    this.mService.permissions().create(dr.getResourceId(), userPermission)
+                    mService.permissions().create(dr.getResourceId(), userPermission)
                             .setFields("id")
                             .queue(batch, new JsonBatchCallback<Permission>() {
                                 @Override
                                 public void onFailure(GoogleJsonError e, HttpHeaders responseHeaders) {
-                                    fileInfo.add("Failure : " + dr.getName());
+                                    shareStatusInfo.add("Failure [" + dr.getName() + "] " + "message [" + e.getMessage() + "]");
                                 }
-
                                 @Override
                                 public void onSuccess(Permission permission, HttpHeaders responseHeaders) {
-                                    fileInfo.add("Success : " + dr.getName());
+                                    shareStatusInfo.add("Success [" + dr.getName() + "] " + "message [" + permission.getDisplayName() + "]");
                                 }
                             });
-
                     batch.execute();
                 }
-                return fileInfo;
-
+                return shareStatusInfo;
             } catch (Exception e) {
-                this.mLastError = e;
-                this.cancel(true);
+                mLastError = e;
+                cancel(true);
                 return null;
             }
         }
 
         @Override
         protected void onPreExecute() {
-            ShareDriveResourcesActivity.this.mProgress.show();
+            mProgress.show();
         }
 
         @Override
         protected void onPostExecute(List<String> output) {
-            ShareDriveResourcesActivity.this.mProgress.hide();
-            ShareDriveResourcesActivity.this.finish();
-            Intent areaDetailsIntent = new Intent(ShareDriveResourcesActivity.this.getApplicationContext(), AreaDetailsActivity.class);
-            areaDetailsIntent.putExtra("load_type", "Return");
-            areaDetailsIntent.putExtra("load_result", "Area edited successfully.");
-            ShareDriveResourcesActivity.this.startActivity(areaDetailsIntent);
+            mProgress.hide();
+            finish();
+            Intent areaDetailsIntent = new Intent(getApplicationContext(), AreaDetailsActivity.class);
+            areaDetailsIntent.putExtra("action", "Share");
+            areaDetailsIntent.putExtra("outcome_type", "info");
+            areaDetailsIntent.putExtra("outcome", "Completed sharing");
+            startActivity(areaDetailsIntent);
         }
 
         @Override
         protected void onCancelled() {
-            ShareDriveResourcesActivity.this.mProgress.hide();
-            if (this.mLastError != null) {
-                if (this.mLastError instanceof GooglePlayServicesAvailabilityIOException) {
-                    ShareDriveResourcesActivity.this.showGooglePlayServicesAvailabilityErrorDialog(
-                            ((GooglePlayServicesAvailabilityIOException) this.mLastError)
+            mProgress.hide();
+            if (mLastError != null) {
+                if (mLastError instanceof GooglePlayServicesAvailabilityIOException) {
+                    showGooglePlayServicesAvailabilityErrorDialog(
+                            ((GooglePlayServicesAvailabilityIOException) mLastError)
                                     .getConnectionStatusCode());
-                } else if (this.mLastError instanceof UserRecoverableAuthIOException) {
-                    ShareDriveResourcesActivity.this.startActivityForResult(
-                            ((UserRecoverableAuthIOException) this.mLastError).getIntent(),
+                } else if (mLastError instanceof UserRecoverableAuthIOException) {
+                    startActivityForResult(
+                            ((UserRecoverableAuthIOException) mLastError).getIntent(),
                             REQUEST_AUTHORIZATION);
                 }
             }
-            ShareDriveResourcesActivity.this.finish();
+            finish();
         }
     }
 }

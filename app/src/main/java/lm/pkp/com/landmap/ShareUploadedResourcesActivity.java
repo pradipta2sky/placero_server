@@ -1,6 +1,5 @@
 package lm.pkp.com.landmap;
 
-import android.Manifest;
 import android.Manifest.permission;
 import android.accounts.AccountManager;
 import android.app.Activity;
@@ -17,9 +16,13 @@ import android.support.annotation.NonNull;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.api.client.extensions.android.http.AndroidHttp;
+import com.google.api.client.googleapis.batch.BatchRequest;
+import com.google.api.client.googleapis.batch.json.JsonBatchCallback;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential;
 import com.google.api.client.googleapis.extensions.android.gms.auth.GooglePlayServicesAvailabilityIOException;
 import com.google.api.client.googleapis.extensions.android.gms.auth.UserRecoverableAuthIOException;
+import com.google.api.client.googleapis.json.GoogleJsonError;
+import com.google.api.client.http.HttpHeaders;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.jackson2.JacksonFactory;
@@ -27,27 +30,27 @@ import com.google.api.client.util.ExponentialBackOff;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.Drive.Builder;
 import com.google.api.services.drive.DriveScopes;
+import com.google.api.services.drive.model.Permission;
 
-import org.apache.commons.io.IOUtils;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.area.db.AreaDBHelper;
+import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
-import lm.pkp.com.landmap.custom.ThumbnailCreator;
 import lm.pkp.com.landmap.drive.DriveResource;
 import pub.devrel.easypermissions.AfterPermissionGranted;
 import pub.devrel.easypermissions.EasyPermissions;
 import pub.devrel.easypermissions.EasyPermissions.PermissionCallbacks;
 
-public class DownloadDriveResourcesActivity extends Activity implements PermissionCallbacks {
+public class ShareUploadedResourcesActivity extends Activity implements PermissionCallbacks {
 
     GoogleAccountCredential mCredential;
     ProgressDialog mProgress;
@@ -58,25 +61,65 @@ public class DownloadDriveResourcesActivity extends Activity implements Permissi
     static final int REQUEST_PERMISSION_GET_ACCOUNTS = 1003;
 
     private static final String PREF_ACCOUNT_NAME = "accountName";
-    private static final String[] SCOPES = {DriveScopes.DRIVE_METADATA_READONLY,
-            DriveScopes.DRIVE, DriveScopes.DRIVE_FILE, DriveScopes.DRIVE_APPDATA};
+    private static final String[] SCOPES = {DriveScopes.DRIVE_METADATA_READONLY};
+
+    private final String shareRole = "reader";
+    private List<String> usersToShare = new ArrayList<>();
+    private List<String> resourceIdsToShare = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
 
-        setContentView(layout.activity_generic_wait);
+        setContentView(layout.activity_share_area_resources);
+
+        Bundle extras = getIntent().getExtras();
+        if(extras != null){
+            Object[] uploaded_resource_ids = (Object[]) extras.get("uploaded_resource_ids");
+            for (int i = 0; i < uploaded_resource_ids.length; i++) {
+                resourceIdsToShare.add(uploaded_resource_ids[i].toString());
+            }
+        }
+        AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
+        AreaDBHelper adh = new AreaDBHelper(getApplicationContext(), new ShareHistoryCallback());
+        adh.fetchShareHistory(areaElement);
 
         mProgress = new ProgressDialog(this);
-        mProgress.setMessage("Downloading shared files ...");
-        mCredential = GoogleAccountCredential.usingOAuth2(getApplicationContext(),
-                Arrays.asList(SCOPES)).setBackOff(new ExponentialBackOff());
-        downloadResources();
+        mProgress.setMessage("Sharing Area ...");
+        mCredential = GoogleAccountCredential.usingOAuth2(getApplicationContext(), Arrays.asList(SCOPES)).setBackOff(new ExponentialBackOff());
     }
 
+    private class ShareHistoryCallback implements AsyncTaskCallback{
 
-    private void downloadResources() {
+        @Override
+        public void taskCompleted(Object result) {
+            String response = result.toString();
+            try {
+                JSONArray responseArr = new JSONArray(response);
+                for (int i = 0; i < responseArr.length(); i++) {
+                    JSONObject shareObj = responseArr.getJSONObject(i);
+                    String targetUser = shareObj.getString("target_user");
+                    // TODO get restricted share permissions and set on resource.
+                    // TODO for now going with read_only
+                    usersToShare.add(targetUser);
+                }
+                if(usersToShare.size() > 0){
+                    shareResources();
+                }else {
+                    Intent areaDetailsIntent = new Intent(getApplicationContext(), AreaDetailsActivity.class);
+                    areaDetailsIntent.putExtra("action", "Share");
+                    areaDetailsIntent.putExtra("outcome_type", "info");
+                    areaDetailsIntent.putExtra("outcome", "Completed upload and share");
+                }
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+    private void shareResources() {
         if (!isGooglePlayServicesAvailable()) {
             acquireGooglePlayServices();
         } else if (mCredential.getSelectedAccountName() == null) {
@@ -94,7 +137,7 @@ public class DownloadDriveResourcesActivity extends Activity implements Permissi
                     .getString(PREF_ACCOUNT_NAME, null);
             if (accountName != null) {
                 mCredential.setSelectedAccountName(accountName);
-                downloadResources();
+                shareResources();
             } else {
                 // Start a dialog from which the user can choose an account
                 startActivityForResult(mCredential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
@@ -103,7 +146,7 @@ public class DownloadDriveResourcesActivity extends Activity implements Permissi
             // Request the GET_ACCOUNTS permission via a user dialog
             EasyPermissions.requestPermissions(
                     this,
-                    "This app needs to access your Google account.",
+                    "This app needs to access your Google account (via Contacts).",
                     REQUEST_PERMISSION_GET_ACCOUNTS,
                     permission.GET_ACCOUNTS);
         }
@@ -116,9 +159,9 @@ public class DownloadDriveResourcesActivity extends Activity implements Permissi
         switch (requestCode) {
             case REQUEST_GOOGLE_PLAY_SERVICES:
                 if (resultCode == Activity.RESULT_OK) {
-                    downloadResources();
+                    shareResources();
                 } else {
-                    backToDetails("error", "Play services unavailable.");
+                    // TODO Share the error with the user
                 }
                 break;
             case REQUEST_ACCOUNT_PICKER:
@@ -130,17 +173,13 @@ public class DownloadDriveResourcesActivity extends Activity implements Permissi
                         editor.putString(PREF_ACCOUNT_NAME, accountName);
                         editor.apply();
                         mCredential.setSelectedAccountName(accountName);
-                        downloadResources();
+                        shareResources();
                     }
-                } else {
-                    backToDetails("error", "Could not choose account.");
                 }
                 break;
             case REQUEST_AUTHORIZATION:
                 if (resultCode == Activity.RESULT_OK) {
-                    downloadResources();
-                } else {
-                    backToDetails("error", "Authorization failed.");
+                    shareResources();
                 }
                 break;
         }
@@ -184,92 +223,65 @@ public class DownloadDriveResourcesActivity extends Activity implements Permissi
         dialog.show();
     }
 
-    private class MakeRequestTask extends AsyncTask<Void, Void, Boolean> {
+    private class MakeRequestTask extends AsyncTask<Void, Void, List<String>> {
         private Drive mService;
         private Exception mLastError;
 
         MakeRequestTask(GoogleAccountCredential credential) {
             HttpTransport transport = AndroidHttp.newCompatibleTransport();
             JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-            mService = new Builder(transport, jsonFactory, credential)
-                    .setApplicationName("LMS").build();
+            mService = new Builder(transport, jsonFactory, credential).setApplicationName("LMS").build();
         }
 
         @Override
-        protected Boolean doInBackground(Void... params) {
+        protected List<String> doInBackground(Void... params) {
             try {
-                AreaContext ac = AreaContext.INSTANCE;
-                AreaElement ae = ac.getAreaElement();
-                List<DriveResource> resources = ae.getMediaResources();
-                for (int j = 0; j < resources.size(); j++) {
-                    DriveResource resource = resources.get(j);
-                    String contentType = resource.getContentType();
-                    if (!resource.getType().equalsIgnoreCase("folder")) {
-                        File storeRoot = ac.getLocalStoreLocationForDriveResource(resource);
-                        if (!storeRoot.exists()) {
-                            storeRoot.mkdirs();
-                        }
+                final List<String> shareStatusInfo = new ArrayList<String>();
+                for (int i = 0; i < usersToShare.size(); i++) {
+                    String targetUser = usersToShare.get(i);
+                    for (int j = 0; j < resourceIdsToShare.size(); j++) {
+                        String resourceId = resourceIdsToShare.get(j);
+                        BatchRequest batch = mService.batch();
 
-                        String resourceId = resource.getResourceId();
-                        if (resourceId.equalsIgnoreCase("")
-                                || resourceId.equalsIgnoreCase("1")
-                                || resourceId.equalsIgnoreCase("2")) {
-                            continue;
-                        }
-
-                        File storeFile = new File(storeRoot.getAbsolutePath() + File.separatorChar + resource.getName());
-                        if (storeFile.exists()) {
-                            long storeFileSize = storeFile.length();
-                            if(!(storeFileSize == Long.parseLong(resource.getSize()))){
-                                storeFile.delete();
-                            }else {
-                                continue;
-                            }
-                        }
-                        storeFile.createNewFile();
-
-                        OutputStream outputStream = new FileOutputStream(storeFile);
-                        InputStream remoteStream = null;
-                        try {
-                            Drive.Files.Get get = mService.files().get(resourceId);
-                            remoteStream = get.executeMediaAsInputStream();
-                        }catch (Exception e){
-                            e.printStackTrace();
-                        }
-
-                        if(remoteStream == null){
-                            outputStream.close();
-                            continue;
-                        }
-
-                        IOUtils.copyLarge(remoteStream, outputStream);
-                        outputStream.flush();
-                        outputStream.close();
-
-                        ThumbnailCreator tCreator = new ThumbnailCreator(getApplicationContext());
-                        if (contentType.equalsIgnoreCase("Image")) {
-                            tCreator.createImageThumbnail(storeFile, ae.getUniqueId());
-                        } else if (contentType.equalsIgnoreCase("Video")) {
-                            tCreator.createVideoThumbnail(storeFile, ae.getUniqueId());
-                        } else {
-                            tCreator.createDocumentThumbnail(storeFile, ae.getUniqueId());
-                        }
+                        Permission userPermission = new Permission();
+                        userPermission.setType("user");
+                        userPermission.setRole(shareRole);
+                        userPermission.setEmailAddress(targetUser);
+                        mService.permissions().create(resourceId, userPermission)
+                                .setFields("id")
+                                .queue(batch, new JsonBatchCallback<Permission>() {
+                                    @Override
+                                    public void onFailure(GoogleJsonError e, HttpHeaders responseHeaders) {
+                                    }
+                                    @Override
+                                    public void onSuccess(Permission permission, HttpHeaders responseHeaders) {
+                                    }
+                                });
+                        batch.execute();
                     }
                 }
+                return shareStatusInfo;
             } catch (Exception e) {
                 mLastError = e;
                 cancel(true);
                 return null;
             }
-            return false;
         }
 
         @Override
-        protected void onPostExecute(Boolean aBoolean) {
-            super.onPostExecute(aBoolean);
-            Intent displayIntent = new Intent(getApplicationContext(), AreaResourceDisplayActivity.class);
-            startActivity(displayIntent);
+        protected void onPreExecute() {
+            mProgress.show();
+        }
+
+        @Override
+        protected void onPostExecute(List<String> output) {
+            mProgress.hide();
             finish();
+            Intent areaDetailsIntent = new Intent(getApplicationContext(), AreaDetailsActivity.class);
+            areaDetailsIntent.putExtra("action", "Share");
+            areaDetailsIntent.putExtra("outcome_type", "info");
+            areaDetailsIntent.putExtra("outcome", "Completed sharing");
+            startActivity(areaDetailsIntent);
         }
 
         @Override
@@ -288,14 +300,5 @@ public class DownloadDriveResourcesActivity extends Activity implements Permissi
             }
             finish();
         }
-    }
-
-    private void backToDetails(String code, String message) {
-        Intent detailsIntent = new Intent(getApplicationContext(), AreaDetailsActivity.class);
-        detailsIntent.putExtra("outcome_type", code);
-        detailsIntent.putExtra("outcome", message);
-        detailsIntent.putExtra("action", "Download Resources");
-        startActivity(detailsIntent);
-        finish();
     }
 }

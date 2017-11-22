@@ -128,11 +128,8 @@ public class DriveResource {
 
     @Override
     public boolean equals(Object o) {
-        if (o instanceof DriveResource) {
-            EqualsBuilder builder = new EqualsBuilder().append(getResourceId(), ((DriveResource) o).getResourceId());
-            return builder.isEquals();
-        }
-        return false;
+        EqualsBuilder builder = new EqualsBuilder().append(getResourceId(), ((DriveResource) o).getResourceId());
+        return builder.isEquals();
     }
 
     public String getCreatedOnMillis() {

@@ -113,7 +113,12 @@
             android:screenOrientation="portrait"></activity>
         <activity
             android:name=".ShareDriveResourcesActivity"
-            android:label="@string/choose_document"
+            android:label="@string/area_resources"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"></activity>
+        <activity
+            android:name=".ShareUploadedResourcesActivity"
+            android:label="@string/area_resources"
             android:configChanges="orientation"
             android:screenOrientation="portrait"></activity>
         <activity

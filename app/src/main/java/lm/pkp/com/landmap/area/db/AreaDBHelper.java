@@ -290,4 +290,8 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    public void fetchShareHistory(AreaElement ae) {
+        LMSRestAsyncTask deleteTask = new LMSRestAsyncTask(this.callback);
+        deleteTask.execute(this.preparePostParams("findShareHistory", ae));
+    }
 }

@@ -22,15 +22,19 @@ final class VideoDataHolder {
 
         AreaElement ae = ac.getAreaElement();
         List<DriveResource> driveResources = ae.getMediaResources();
-        String imgRootPath = ac.getAreaLocalVideoRoot(ae.getUniqueId()).getAbsolutePath() + File.separatorChar;
+        String videoRootPath = ac.getAreaLocalVideoRoot(ae.getUniqueId()).getAbsolutePath() + File.separatorChar;
+        String thumbnailRoot = ac.getAreaLocalVideoThumbnailRoot(ae.getUniqueId()).getAbsolutePath();
+
         for (int i = 0; i < driveResources.size(); i++) {
             DriveResource resource = driveResources.get(i);
             if (resource.getType().equals("file")) {
                 if (resource.getContentType().equals("Video")) {
                     VideoDisplayElement videoDisplayElement = new VideoDisplayElement();
                     videoDisplayElement.setName(resource.getName());
-                    videoDisplayElement.setAbsPath(imgRootPath + resource.getName());
+                    videoDisplayElement.setAbsPath(videoRootPath + resource.getName());
                     videoDisplayElement.setResourceId(resource.getResourceId());
+                    videoDisplayElement.setThumbnailFile(new File(thumbnailRoot + File.separatorChar + resource.getName()));
+                    videoDisplayElement.setVideoFile(new File(videoRootPath + File.separatorChar + resource.getName()));
                     videoItems.add(videoDisplayElement);
                 }
             }

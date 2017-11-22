@@ -23,6 +23,8 @@ public class PermissionConstants {
 
     public static final String ADD_RESOURCES = "add_resources";
 
+    public static final String REMOVE_RESOURCES = "remove_resources";
+
     public static final String MAKE_PUBLIC = "make_public";
 
     public static final String CHANGE_NAME = "change_name";

@@ -23,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Stack;
 
 import lm.pkp.com.landmap.R.layout;
@@ -41,6 +42,7 @@ import lm.pkp.com.landmap.util.FileUtil;
 public class UploadResourcesActivity extends BaseDriveActivity {
 
     private final Stack<DriveResource> processStack = new Stack<>();
+    private List<String> uploadedResources = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,7 +69,9 @@ public class UploadResourcesActivity extends BaseDriveActivity {
         } else {
             this.finish();
             this.getGoogleApiClient().disconnect();
-            Intent addResourcesIntent = new Intent(this, AreaAddResourcesActivity.class);
+
+            Intent addResourcesIntent = new Intent(this, ShareUploadedResourcesActivity.class);
+            addResourcesIntent.putExtra("uploaded_resource_ids", uploadedResources.toArray());
             this.startActivity(addResourcesIntent);
         }
     }
@@ -183,6 +187,7 @@ public class UploadResourcesActivity extends BaseDriveActivity {
             }else {
                 tCreator.createDocumentThumbnail(resourceFile, areaElement.getUniqueId());
             }
+            uploadedResources.add(resource.getResourceId());
             processResources();
         }
     }

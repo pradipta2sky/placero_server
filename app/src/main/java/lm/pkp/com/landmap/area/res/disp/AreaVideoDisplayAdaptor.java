@@ -13,7 +13,6 @@ import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -23,7 +22,8 @@ import lm.pkp.com.landmap.R.drawable;
 import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.RemoveDriveResourcesActivity;
 import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.drive.DriveDBHelper;
+import lm.pkp.com.landmap.drive.DriveResource;
 
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
 
@@ -51,31 +51,25 @@ final class AreaVideoDisplayAdaptor extends BaseAdapter {
             return view;
         }
 
-        // Get the image URL for the current position.
-        final String url = this.getItem(position);
-        VideoDisplayElement displayElement = this.dataSet.get(position);
-        final File displayFile = new File(displayElement.getAbsPath());
+        final File thumbFile = dataSet.get(position).getThumbnailFile();
+        final File videoFile = dataSet.get(position).getVideoFile();
 
-        AreaContext ac = AreaContext.INSTANCE;
-        AreaElement ae = ac.getAreaElement();
-
-        String thumbPath = AreaContext.INSTANCE.getAreaLocalVideoThumbnailRoot(ae.getUniqueId()).getAbsolutePath();
-        String thumbnailFilePath = thumbPath + File.separatorChar + displayElement.getName();
-        File thumbFile = new File(thumbnailFilePath);
-
+        Bitmap bMap = null;
         if (thumbFile.exists()) {
-            Bitmap bMap = BitmapFactory.decodeFile(thumbnailFilePath);
-            view.setImageBitmap(bMap);
+            bMap = BitmapFactory.decodeFile(thumbFile.getAbsolutePath());
+        }else {
+            bMap = BitmapFactory.decodeResource(context.getResources(), R.drawable.error);
         }
+        view.setImageBitmap(bMap);
 
         final View referredView = view;
+
         view.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_VIEW);
-                File file = new File(url);
-                intent.setDataAndType(Uri.fromFile(displayFile), "video/*");
+                intent.setDataAndType(Uri.fromFile(videoFile), "video/*");
                 referredView.getContext().startActivity(intent);
             }
         });
@@ -86,20 +80,24 @@ final class AreaVideoDisplayAdaptor extends BaseAdapter {
                 ImageView clickedImage = (ImageView) referredView;
                 clickedImage.setBackgroundResource(drawable.image_border);
 
-                FloatingActionButton deleteButton = (FloatingActionButton) AreaVideoDisplayAdaptor.this.fragment.getView().findViewById(id.res_delete);
+                FloatingActionButton deleteButton = (FloatingActionButton) fragment.getView().findViewById(id.res_delete);
                 deleteButton.setVisibility(View.VISIBLE);
                 deleteButton.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(referredView.getContext(), RemoveDriveResourcesActivity.class);
-                        String resourceId = AreaVideoDisplayAdaptor.this.dataSet.get(position).getResourceId();
-                        if (!resourceId.equalsIgnoreCase("")) {
+                        String resourceId = dataSet.get(position).getResourceId();
+                        if (!resourceId.equalsIgnoreCase("2")) {
                             intent.putExtra("resource_ids", resourceId);
-                            intent.putExtra("tab_position", AreaVideoDisplayAdaptor.this.tabPosition);
+                            intent.putExtra("tab_position", tabPosition);
                             referredView.getContext().startActivity(intent);
                         } else {
-                            Toast.makeText(referredView.getContext(),
-                                    "This image is auto generated. It cannot be removed.", Toast.LENGTH_LONG).show();
+                            DriveDBHelper ddh = new DriveDBHelper(fragment.getContext());
+                            DriveResource driveResource = ddh.getDriveResourceByResourceId(resourceId);
+                            AreaContext.INSTANCE.getAreaElement().getMediaResources().remove(driveResource);
+                            ddh.deleteResourceLocally(driveResource);
+                            ddh.deleteResourceFromServer(driveResource);
+                            notifyDataSetChanged();
                         }
                     }
                 });

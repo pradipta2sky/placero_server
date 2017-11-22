@@ -176,7 +176,7 @@ public class DriveDBHelper extends SQLiteOpenHelper {
         return allResources;
     }
 
-    public DriveResource getDriveResourcesByResourceId(String resourceID) {
+    public DriveResource getDriveResourceByResourceId(String resourceID) {
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = null;
         DriveResource resource = new DriveResource();

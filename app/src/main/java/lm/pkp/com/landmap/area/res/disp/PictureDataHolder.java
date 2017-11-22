@@ -23,6 +23,8 @@ final class PictureDataHolder {
 
         List<DriveResource> driveResources = ae.getMediaResources();
         String imgRootPath = ac.getAreaLocalImageRoot(ae.getUniqueId()).getAbsolutePath() + File.separatorChar;
+        String thumbnailRoot = ac.getAreaLocalPictureThumbnailRoot(ae.getUniqueId()).getAbsolutePath();
+
         for (int i = 0; i < driveResources.size(); i++) {
             DriveResource resource = driveResources.get(i);
             if (resource.getType().equals("file")) {
@@ -31,6 +33,8 @@ final class PictureDataHolder {
                     imageDisplayElement.setName(resource.getName());
                     imageDisplayElement.setAbsPath(imgRootPath + resource.getName());
                     imageDisplayElement.setResourceId(resource.getResourceId());
+                    imageDisplayElement.setThumbnailFile(new File(thumbnailRoot + File.separatorChar + resource.getName()));
+                    imageDisplayElement.setImageFile(new File(imgRootPath + File.separatorChar + resource.getName()));
                     imageItems.add(imageDisplayElement);
                 }
             }

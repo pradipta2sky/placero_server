@@ -23,14 +23,15 @@ import lm.pkp.com.landmap.R.drawable;
 import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.RemoveDriveResourcesActivity;
 import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.drive.DriveDBHelper;
+import lm.pkp.com.landmap.drive.DriveResource;
 
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
 
 final class AreaDocumentDisplayAdaptor extends BaseAdapter {
 
     private final Context context;
-    private final List<DocumentDisplayElement> docElems = DocumentDataHolder.INSTANCE.getData();
+    private final List<DocumentDisplayElement> dataSet = DocumentDataHolder.INSTANCE.getData();
     private final Fragment fragment;
     private final int tabPosition;
 
@@ -50,30 +51,25 @@ final class AreaDocumentDisplayAdaptor extends BaseAdapter {
             return view;
         }
 
-        AreaContext areaContext = AreaContext.INSTANCE;
-        AreaElement areaElement = areaContext.getAreaElement();
-        // Get the image URL for the current position.
-        DocumentDisplayElement currElem = this.docElems.get(position);
-        String thumbnailRoot = areaContext
-                .getAreaLocalDocumentThumbnailRoot(areaElement.getUniqueId()).getAbsolutePath();
-        String thumbnailFilePath = thumbnailRoot + File.separatorChar + currElem.getName();
-        File thumbFile = new File(thumbnailFilePath);
+        final File thumbFile = dataSet.get(position).getThumbnailFile();
+        final File documentFile = dataSet.get(position).getDocumentFile();
 
+        Bitmap bMap = null;
         if (thumbFile.exists()) {
-            Bitmap bMap = BitmapFactory.decodeFile(thumbnailFilePath);
-            view.setImageBitmap(bMap);
+            bMap = BitmapFactory.decodeFile(thumbFile.getAbsolutePath());
+        }else {
+            bMap = BitmapFactory.decodeResource(context.getResources(), R.drawable.error);
         }
+        view.setImageBitmap(bMap);
 
         final View referredView = view;
-        final String url = this.getItem(position);
 
         view.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_VIEW);
-                File file = new File(url);
-                intent.setDataAndType(Uri.fromFile(file), "application/pdf");
+                intent.setDataAndType(Uri.fromFile(documentFile), "application/pdf");
                 referredView.getContext().startActivity(intent);
             }
         });
@@ -84,20 +80,24 @@ final class AreaDocumentDisplayAdaptor extends BaseAdapter {
                 ImageView clickedImage = (ImageView) referredView;
                 clickedImage.setBackgroundResource(drawable.image_border);
 
-                FloatingActionButton deleteButton = (FloatingActionButton) AreaDocumentDisplayAdaptor.this.fragment.getView().findViewById(id.res_delete);
+                FloatingActionButton deleteButton = (FloatingActionButton) fragment.getView().findViewById(id.res_delete);
                 deleteButton.setVisibility(View.VISIBLE);
                 deleteButton.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(referredView.getContext(), RemoveDriveResourcesActivity.class);
-                        String resourceId = AreaDocumentDisplayAdaptor.this.docElems.get(position).getResourceId();
-                        if (!resourceId.equalsIgnoreCase("")) {
+                        String resourceId = dataSet.get(position).getResourceId();
+                        if (!resourceId.equalsIgnoreCase("3")) {
                             intent.putExtra("resource_ids", resourceId);
-                            intent.putExtra("tab_position", AreaDocumentDisplayAdaptor.this.tabPosition);
+                            intent.putExtra("tab_position", tabPosition);
                             referredView.getContext().startActivity(intent);
-                        } else {
-                            Toast.makeText(referredView.getContext(),
-                                    "This image is auto generated. It cannot be removed.", Toast.LENGTH_LONG).show();
+                        }  else {
+                            DriveDBHelper ddh = new DriveDBHelper(fragment.getContext());
+                            DriveResource driveResource = ddh.getDriveResourceByResourceId(resourceId);
+                            AreaContext.INSTANCE.getAreaElement().getMediaResources().remove(driveResource);
+                            ddh.deleteResourceLocally(driveResource);
+                            ddh.deleteResourceFromServer(driveResource);
+                            notifyDataSetChanged();
                         }
                     }
                 });
@@ -110,12 +110,12 @@ final class AreaDocumentDisplayAdaptor extends BaseAdapter {
 
     @Override
     public int getCount() {
-        return this.docElems.size();
+        return this.dataSet.size();
     }
 
     @Override
     public String getItem(int position) {
-        return this.docElems.get(position).getAbsPath();
+        return this.dataSet.get(position).getAbsPath();
     }
 
     @Override
