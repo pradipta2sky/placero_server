@@ -20,13 +20,13 @@ import lm.pkp.com.landmap.permission.PermissionManager;
 /**
  * Created by USER on 10/16/2017.
  */
-public class PostionListAdaptor extends ArrayAdapter<PositionElement> {
+public class PositionListAdaptor extends ArrayAdapter<PositionElement> {
 
     private final ArrayList<PositionElement> items;
     private final Context context;
     private PositionsDBHelper pdh;
 
-    public PostionListAdaptor(Context context, int textViewResourceId, ArrayList<PositionElement> items) {
+    public PositionListAdaptor(Context context, int textViewResourceId, ArrayList<PositionElement> items) {
         super(context, textViewResourceId, items);
         this.context = context;
         this.items = items;
@@ -39,17 +39,13 @@ public class PostionListAdaptor extends ArrayAdapter<PositionElement> {
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             v = vi.inflate(layout.position_element_row, null);
-        } else {
-            return v;
         }
 
         final PositionElement pe = this.items.get(position);
         TextView nameText = (TextView) v.findViewById(id.pos_name);
-        String pName = pe.getName();
-        if (pName.length() > 25) {
-            pName = pName.substring(0, 22).concat("...");
-        }
-        nameText.setText(pName);
+        String positionDisplayName = "Position_" + (position + 1);
+        pe.setDisplayName(positionDisplayName);
+        nameText.setText(positionDisplayName);
 
         TextView latLongText = (TextView) v.findViewById(id.pos_latlng);
         latLongText.setText("Lat: " + pe.getLat() + ", " + "Long: " + pe.getLon());

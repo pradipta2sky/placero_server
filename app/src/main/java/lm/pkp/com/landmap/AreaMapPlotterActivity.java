@@ -113,8 +113,8 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
         settings.setZoomControlsEnabled(true);
         settings.setZoomGesturesEnabled(true);
 
-        mapWrapperLayout = (MapWrapperLayout) findViewById(id.map_relative_layout);
-        mapWrapperLayout.init(googleMap, getPixelsFromDp(getApplicationContext(), 50));
+        mapWrapperLayout = (MapWrapperLayout) findViewById(R.id.map_relative_layout);
+        mapWrapperLayout.init(googleMap, getPixelsFromDp(getApplicationContext(), 40));
 
         infoWindow = (ViewGroup) getLayoutInflater().inflate(layout.info_window, null);
         infoTitle = (TextView) infoWindow.findViewById(id.title);
@@ -211,7 +211,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                         infoButton.setText("Open");
                     }else if(position != null){
                         infoImage.setImageResource(drawable.marker_image);
-                        infoTitle.setText(position.getName());
+                        infoTitle.setText(position.getDisplayName());
                         CharSequence timeSpan = DateUtils.getRelativeTimeSpanString(new Long(position.getCreatedOnMillis()),
                                 System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS);
                         infoSnippet.setText(timeSpan.toString());

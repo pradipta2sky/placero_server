@@ -39,7 +39,7 @@ import lm.pkp.com.landmap.permission.PermissionConstants;
 import lm.pkp.com.landmap.permission.PermissionManager;
 import lm.pkp.com.landmap.position.PositionElement;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
-import lm.pkp.com.landmap.position.PostionListAdaptor;
+import lm.pkp.com.landmap.position.PositionListAdaptor;
 import lm.pkp.com.landmap.provider.GPSLocationProvider;
 import lm.pkp.com.landmap.util.ColorProvider;
 import lm.pkp.com.landmap.weather.WeatherDisplayFragment;
@@ -52,7 +52,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
     private AreaElement ae;
 
     private final ArrayList<PositionElement> positionList = new ArrayList<PositionElement>();
-    private PostionListAdaptor adaptor;
+    private PositionListAdaptor adaptor;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,7 +83,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         ListView posListView = (ListView) findViewById(id.positionList);
         positionList.addAll(ae.getPositions());
 
-        adaptor = new PostionListAdaptor(getApplicationContext(), id.positionList, positionList);
+        adaptor = new PositionListAdaptor(getApplicationContext(), id.positionList, positionList);
         posListView.setAdapter(adaptor);
         adaptor.notifyDataSetChanged();
 

@@ -1,6 +1,7 @@
 package lm.pkp.com.landmap.area;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -25,6 +26,8 @@ public class AreaContext {
 
     private AreaElement currentArea;
     private Context context;
+    private Bitmap displayBMap;
+
     private final ArrayList<DriveResource> uploadQueue = new ArrayList<>();
 
     public AreaElement getAreaElement() {
@@ -46,6 +49,10 @@ public class AreaContext {
 
         PermissionsDBHelper pdh = new PermissionsDBHelper(context);
         currentArea.setUserPermissions(pdh.fetchPermissionsByAreaId(currentArea.getUniqueId()));
+
+        if(displayBMap != null){
+            displayBMap.recycle();
+        }
     }
 
     public void reCenter(AreaElement areaElement) {
@@ -203,4 +210,11 @@ public class AreaContext {
         return dumpRoot;
     }
 
+    public Bitmap getDisplayBMap() {
+        return this.displayBMap;
+    }
+
+    public void setDisplayBMap(Bitmap displayBMap) {
+        this.displayBMap = displayBMap;
+    }
 }

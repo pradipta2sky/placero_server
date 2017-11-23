@@ -12,13 +12,13 @@ import lm.pkp.com.landmap.weather.model.WeatherElement;
 public class PositionElement implements Serializable {
 
     private String name = "";
+    private String displayName = "";
     private String description = "";
     private double lat;
     private double lon;
     private String tags = "";
     private String uniqueAreaId = "";
     private String uniqueId = "";
-    private int sequence = 0;
     private String createdOnMillis = System.currentTimeMillis() + "";
     private WeatherElement weather;
 
@@ -90,12 +90,12 @@ public class PositionElement implements Serializable {
         this.createdOnMillis = createdOnMillis;
     }
 
-    public int getSequence() {
-        return this.sequence;
+    public String getDisplayName() {
+        return this.displayName;
     }
 
-    public void setSequence(int sequence) {
-        this.sequence = sequence;
+    public void setDisplayName(String displayName) {
+        this.displayName = displayName;
     }
 
     public WeatherElement getWeather() {

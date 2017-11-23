@@ -4,26 +4,28 @@
     android:layout_height="wrap_content"
     android:gravity="center_vertical"
     android:weightSum="1"
-    android:background="@drawable/rounded_corner">
+    android:layout_margin="10dp">
 
     <LinearLayout
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:orientation="vertical"
-        android:layout_weight="0.4">
+        android:layout_gravity="left"
+        android:layout_weight="0.2">
 
         <ImageView
-            android:layout_width="80dp"
-            android:layout_height="60dp"
+            android:layout_width="45dp"
+            android:layout_height="45dp"
+            android:layout_gravity="left"
             android:id="@+id/info_element_img"
             android:src="@drawable/marker_image" />
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:orientation="vertical"
-        android:layout_weight="0.22"
+        android:layout_weight="0.7"
         android:weightSum="2"
         android:layout_marginLeft="5dp">
 
@@ -31,6 +33,7 @@
             android:id="@+id/title"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
             android:textSize="14sp"
             android:text="Title"
             android:layout_weight="0.8"
@@ -45,23 +48,26 @@
             android:id="@+id/snippet"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
             android:text="snippet"
             android:layout_weight="1.2" />
 
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:orientation="vertical"
-        android:layout_weight="0.38"
-        android:gravity="center">
+        android:layout_weight="0.1"
+        android:gravity="right">
 
         <Button
             android:id="@+id/map_info_action"
-            android:layout_width="wrap_content"
+            android:layout_width="75dp"
             android:layout_height="fill_parent"
-            android:text="Sample" />
+            android:layout_gravity="right"
+            android:text="Sample Button"
+            />
 
     </LinearLayout>
 

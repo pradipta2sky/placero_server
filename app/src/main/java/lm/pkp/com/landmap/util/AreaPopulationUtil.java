@@ -28,7 +28,6 @@ import lm.pkp.com.landmap.drive.DriveResource;
 public class AreaPopulationUtil {
 
     public static final AreaPopulationUtil INSTANCE = new AreaPopulationUtil();
-    private static Bitmap bmap = null;
 
     private AreaPopulationUtil() {
     }
@@ -89,11 +88,11 @@ public class AreaPopulationUtil {
             String thumbnailPath = thumbRootPath + File.separatorChar + imageName;
             File thumbFile = new File(thumbnailPath);
             if (thumbFile.exists()) {
-                if(bmap != null){
-                    bmap.recycle();
+                Bitmap displayBMap = AreaContext.INSTANCE.getDisplayBMap();
+                if(displayBMap == null){
+                    displayBMap = BitmapFactory.decodeFile(thumbnailPath);
                 }
-                bmap = BitmapFactory.decodeFile(thumbnailPath);
-                areaImg.setImageBitmap(bmap);
+                areaImg.setImageBitmap(displayBMap);
             }
             break;
         }
