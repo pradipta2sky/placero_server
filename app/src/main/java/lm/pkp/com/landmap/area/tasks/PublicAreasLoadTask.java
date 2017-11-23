@@ -124,6 +124,7 @@ public class PublicAreasLoadTask extends AsyncTask<JSONObject, Void, String> {
                     pe.setLat(positionObj.getDouble("lat"));
                     pe.setLon(positionObj.getDouble("lon"));
                     pe.setTags((String) positionObj.get("tags"));
+                    pe.setCreatedOnMillis(positionObj.getString("created_on"));
 
                     this.pdh.insertPositionFromServer(pe);
                 }
@@ -143,6 +144,9 @@ public class PublicAreasLoadTask extends AsyncTask<JSONObject, Void, String> {
                     dr.setSize(driveObj.getString("size"));
                     dr.setMimeType(driveObj.getString("mime_type"));
                     dr.setContentType(driveObj.getString("content_type"));
+                    dr.setLatitude(driveObj.getString("latitude"));
+                    dr.setLongitude(driveObj.getString("longitude"));
+                    dr.setCreatedOnMillis(driveObj.getString("created_on"));
 
                     this.ddh.insertResourceFromServer(dr);
                 }

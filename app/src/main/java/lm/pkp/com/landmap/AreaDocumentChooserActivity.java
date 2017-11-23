@@ -18,7 +18,7 @@ public class AreaDocumentChooserActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
 
-        this.setContentView(layout.activity_area_doc_chooser);
+        this.setContentView(R.layout.activity_area_doc_chooser);
 
         Toolbar toolbar = (Toolbar) this.findViewById(id.fc_toolbar);
         toolbar.setTitle("Choose Document PDF");
@@ -27,7 +27,7 @@ public class AreaDocumentChooserActivity extends AppCompatActivity {
         this.getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
         FragmentTransaction fragmentTransaction = this.getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.add(id.fragment_container, new AreaDocumentChooserFragment(),
+        fragmentTransaction.add(R.id.fragment_container, new AreaDocumentChooserFragment(),
                 AreaDocumentChooserFragment.class.getSimpleName());
         fragmentTransaction.commit();
     }

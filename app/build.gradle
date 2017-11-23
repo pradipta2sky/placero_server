@@ -8,8 +8,8 @@ android {
         applicationId "lm.pkp.com.landmap"
         minSdkVersion 20
         targetSdkVersion 17
-        versionCode 7
-        versionName "2.0"
+        versionCode 9
+        versionName "2.2"
         multiDexEnabled true
     }
     buildTypes {

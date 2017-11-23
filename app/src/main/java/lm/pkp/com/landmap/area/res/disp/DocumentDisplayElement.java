@@ -1,5 +1,7 @@
 package lm.pkp.com.landmap.area.res.disp;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+
 import java.io.File;
 
 /**
@@ -51,5 +53,11 @@ public class DocumentDisplayElement {
 
     public void setDocumentFile(File documentFile) {
         this.documentFile = documentFile;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        EqualsBuilder builder = new EqualsBuilder().append(getResourceId(), ((DocumentDisplayElement) o).getResourceId());
+        return builder.isEquals();
     }
 }

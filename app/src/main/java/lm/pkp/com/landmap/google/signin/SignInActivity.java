@@ -56,25 +56,25 @@ public class SignInActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setContentView(layout.activity_google_signin_main);
+        setContentView(layout.activity_google_signin_main);
 
         ActionBar ab = getSupportActionBar();
         ab.hide();
 
-        this.mStatusTextView = (TextView) this.findViewById(id.status);
+        mStatusTextView = (TextView) findViewById(id.status);
 
-        this.findViewById(id.sign_in_button).setOnClickListener(this);
-        this.findViewById(id.sign_out_button).setOnClickListener(this);
-        this.findViewById(id.disconnect_button).setOnClickListener(this);
+        findViewById(id.sign_in_button).setOnClickListener(this);
+        findViewById(id.sign_out_button).setOnClickListener(this);
+        findViewById(id.disconnect_button).setOnClickListener(this);
 
         GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
-        this.mGoogleApiClient = new Builder(this)
+        mGoogleApiClient = new Builder(this)
                 .enableAutoManage(this, this)
                 .addApi(Auth.GOOGLE_SIGN_IN_API, gso)
                 .build();
-        SignInButton signInButton = (SignInButton) this.findViewById(id.sign_in_button);
+        SignInButton signInButton = (SignInButton) findViewById(id.sign_in_button);
         signInButton.setSize(SignInButton.SIZE_STANDARD);
     }
 
@@ -82,18 +82,18 @@ public class SignInActivity extends AppCompatActivity implements
     public void onStart() {
         super.onStart();
 
-        OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(this.mGoogleApiClient);
+        OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
         if (opr.isDone()) {
-            Log.d(SignInActivity.TAG, "Got cached sign-in");
+            Log.d(TAG, "Got cached sign-in");
             GoogleSignInResult result = opr.get();
-            this.handleSignInResult(result);
+            handleSignInResult(result);
         } else {
-            this.showProgressDialog();
+            showProgressDialog();
             opr.setResultCallback(new ResultCallback<GoogleSignInResult>() {
                 @Override
                 public void onResult(GoogleSignInResult googleSignInResult) {
-                    SignInActivity.this.hideProgressDialog();
-                    SignInActivity.this.handleSignInResult(googleSignInResult);
+                    hideProgressDialog();
+                    handleSignInResult(googleSignInResult);
                 }
             });
         }
@@ -102,7 +102,7 @@ public class SignInActivity extends AppCompatActivity implements
     @Override
     protected void onResume() {
         super.onResume();
-        this.hideProgressDialog();
+        hideProgressDialog();
     }
 
     @Override
@@ -113,32 +113,31 @@ public class SignInActivity extends AppCompatActivity implements
         debugText.setVisibility(View.VISIBLE);
         debugText.setText("Signin Result:[ ReqC - " + requestCode + ", ResC - " + resultCode + " ]");
 
-        if (requestCode == SignInActivity.RC_SIGN_IN) {
+        if (requestCode == RC_SIGN_IN) {
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
-            this.handleSignInResult(result);
+            handleSignInResult(result);
         }
     }
 
     private void handleSignInResult(GoogleSignInResult result) {
-        Log.d(SignInActivity.TAG, "handleSignInResult:" + result.isSuccess());
+        Log.d(TAG, "handleSignInResult:" + result.isSuccess());
         if (result.isSuccess()) {
             GoogleSignInAccount acct = result.getSignInAccount();
-            this.signedUser = UserMappingUtil.convertGoogleAccountToLocalAccount(acct);
+            signedUser = UserMappingUtil.convertGoogleAccountToLocalAccount(acct);
 
-            UserDBHelper udh = new UserDBHelper(this.getApplicationContext());
-            UserElement localUser = udh.getUserByEmail(this.signedUser.getEmail());
+            UserDBHelper udh = new UserDBHelper(getApplicationContext());
+            UserElement localUser = udh.getUserByEmail(signedUser.getEmail());
             if (localUser == null) {
-                udh.insertUserLocally(this.signedUser);
+                udh.insertUserLocally(signedUser);
             }
-            UserContext.getInstance().setUserElement(this.signedUser);
-            this.searchOnRemoteAndUpdate(this.signedUser);
-
-            this.finish();
+            UserContext.getInstance().setUserElement(signedUser);
+            searchOnRemoteAndUpdate(signedUser);
 
             Intent spashIntent = new Intent(this, SplashActivity.class);
-            this.startActivity(spashIntent);
+            startActivity(spashIntent);
+            finish();
         } else {
-            this.updateUI(false);
+            updateUI(false);
         }
     }
 
@@ -159,9 +158,9 @@ public class SignInActivity extends AppCompatActivity implements
     public void taskCompleted(Object result) {
         try {
             String userDetails = result.toString();
-            UserDBHelper udh = new UserDBHelper(this.getApplicationContext());
+            UserDBHelper udh = new UserDBHelper(getApplicationContext());
             if (userDetails.trim().equalsIgnoreCase("[]")) {
-                udh.insertUserToServer(this.signedUser);
+                udh.insertUserToServer(signedUser);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -169,33 +168,33 @@ public class SignInActivity extends AppCompatActivity implements
     }
 
     private void signIn() {
-        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(this.mGoogleApiClient);
-        this.startActivityForResult(signInIntent, SignInActivity.RC_SIGN_IN);
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        startActivityForResult(signInIntent, RC_SIGN_IN);
     }
 
     private void signOut() {
-        Auth.GoogleSignInApi.signOut(this.mGoogleApiClient).setResultCallback(
+        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(
                 new ResultCallback<Status>() {
                     @Override
                     public void onResult(Status status) {
-                        SignInActivity.this.updateUI(false);
+                        updateUI(false);
                     }
                 });
     }
 
     private void revokeAccess() {
-        Auth.GoogleSignInApi.revokeAccess(this.mGoogleApiClient).setResultCallback(
+        Auth.GoogleSignInApi.revokeAccess(mGoogleApiClient).setResultCallback(
                 new ResultCallback<Status>() {
                     @Override
                     public void onResult(Status status) {
-                        SignInActivity.this.updateUI(false);
+                        updateUI(false);
                     }
                 });
     }
 
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
-        Log.d(SignInActivity.TAG, "onConnectionFailed:" + connectionResult);
+        Log.d(TAG, "onConnectionFailed:" + connectionResult);
         TextView debugText = (TextView) findViewById(R.id.debug_text);
         debugText.setVisibility(View.VISIBLE);
         debugText.setText("onConnectionFailed:" + connectionResult);
@@ -204,36 +203,36 @@ public class SignInActivity extends AppCompatActivity implements
     @Override
     protected void onStop() {
         super.onStop();
-        if (this.mProgressDialog != null) {
-            this.mProgressDialog.dismiss();
+        if (mProgressDialog != null) {
+            mProgressDialog.dismiss();
         }
     }
 
     private void showProgressDialog() {
-        if (this.mProgressDialog == null) {
-            this.mProgressDialog = new ProgressDialog(this);
-            this.mProgressDialog.setMessage(this.getString(string.loading));
-            this.mProgressDialog.setIndeterminate(true);
+        if (mProgressDialog == null) {
+            mProgressDialog = new ProgressDialog(this);
+            mProgressDialog.setMessage(getString(string.loading));
+            mProgressDialog.setIndeterminate(true);
         }
 
-        this.mProgressDialog.show();
+        mProgressDialog.show();
     }
 
     private void hideProgressDialog() {
-        if (this.mProgressDialog != null && this.mProgressDialog.isShowing()) {
-            this.mProgressDialog.hide();
+        if (mProgressDialog != null && mProgressDialog.isShowing()) {
+            mProgressDialog.hide();
         }
     }
 
     private void updateUI(boolean signedIn) {
         if (signedIn) {
-            this.findViewById(id.sign_in_button).setVisibility(View.GONE);
-            this.findViewById(id.sign_out_and_disconnect).setVisibility(View.VISIBLE);
+            findViewById(id.sign_in_button).setVisibility(View.GONE);
+            findViewById(id.sign_out_and_disconnect).setVisibility(View.VISIBLE);
         } else {
-            this.mStatusTextView.setText(string.signed_out);
+            mStatusTextView.setText(string.signed_out);
 
-            this.findViewById(id.sign_in_button).setVisibility(View.VISIBLE);
-            this.findViewById(id.sign_out_and_disconnect).setVisibility(View.GONE);
+            findViewById(id.sign_in_button).setVisibility(View.VISIBLE);
+            findViewById(id.sign_out_and_disconnect).setVisibility(View.GONE);
         }
     }
 
@@ -241,13 +240,13 @@ public class SignInActivity extends AppCompatActivity implements
     public void onClick(View v) {
         switch (v.getId()) {
             case id.sign_in_button:
-                this.signIn();
+                signIn();
                 break;
             case id.sign_out_button:
-                this.signOut();
+                signOut();
                 break;
             case id.disconnect_button:
-                this.revokeAccess();
+                revokeAccess();
                 break;
         }
     }

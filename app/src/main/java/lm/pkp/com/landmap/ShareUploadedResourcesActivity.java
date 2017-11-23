@@ -108,9 +108,10 @@ public class ShareUploadedResourcesActivity extends Activity implements Permissi
                     shareResources();
                 }else {
                     Intent areaDetailsIntent = new Intent(getApplicationContext(), AreaDetailsActivity.class);
-                    areaDetailsIntent.putExtra("action", "Share");
+                    areaDetailsIntent.putExtra("action", "Upload");
                     areaDetailsIntent.putExtra("outcome_type", "info");
-                    areaDetailsIntent.putExtra("outcome", "Completed upload and share");
+                    areaDetailsIntent.putExtra("outcome", "Completed upload");
+                    startActivity(areaDetailsIntent);
                 }
             }catch (Exception e){
                 e.printStackTrace();
@@ -278,9 +279,9 @@ public class ShareUploadedResourcesActivity extends Activity implements Permissi
             mProgress.hide();
             finish();
             Intent areaDetailsIntent = new Intent(getApplicationContext(), AreaDetailsActivity.class);
-            areaDetailsIntent.putExtra("action", "Share");
+            areaDetailsIntent.putExtra("action", "Upload");
             areaDetailsIntent.putExtra("outcome_type", "info");
-            areaDetailsIntent.putExtra("outcome", "Completed sharing");
+            areaDetailsIntent.putExtra("outcome", "Completed Upload and Share.");
             startActivity(areaDetailsIntent);
         }
 

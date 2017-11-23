@@ -116,9 +116,7 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
                     pe.setLat(positionObj.getDouble("lat"));
                     pe.setLon(positionObj.getDouble("lon"));
                     pe.setTags((String) positionObj.get("tags"));
-
-                    String createdAt = positionObj.getString("created_on");
-                    pe.setCreatedOnMillis(createdAt);
+                    pe.setCreatedOnMillis(positionObj.getString("created_on"));
 
                     this.pdh.insertPositionFromServer(pe);
                 }

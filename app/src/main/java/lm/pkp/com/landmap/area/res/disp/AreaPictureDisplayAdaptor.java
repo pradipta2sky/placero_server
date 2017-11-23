@@ -6,6 +6,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -58,6 +60,17 @@ final class AreaPictureDisplayAdaptor extends BaseAdapter {
             return view;
         }
 
+        Drawable drawable = view.getDrawable();
+        if(drawable == null){
+            drawable = view.getBackground();
+        }
+        if(drawable != null){
+            Bitmap previousBitmap = ((BitmapDrawable) drawable).getBitmap();
+            if(previousBitmap != null){
+                previousBitmap.recycle();
+            }
+        }
+
         final File thumbFile = dataSet.get(position).getThumbnailFile();
         final File imageFile = dataSet.get(position).getImageFile();
 
@@ -85,10 +98,12 @@ final class AreaPictureDisplayAdaptor extends BaseAdapter {
             @Override
             public boolean onLongClick(View v) {
                 ImageView clickedImage = (ImageView) referredView;
-                clickedImage.setBackgroundResource(drawable.image_border);
+                clickedImage.setBackgroundResource(R.drawable.image_border);
 
                 fragment.getView().findViewById(id.res_delete_layout).setVisibility(View.VISIBLE);
-                final String resourceId = dataSet.get(position).getResourceId();
+                final PictureDisplayElement pictureDisplayElement = dataSet.get(position);
+                final String resourceId = pictureDisplayElement.getResourceId();
+
                 FloatingActionButton deleteButton = (FloatingActionButton) fragment.getView().findViewById(id.res_delete);
                 deleteButton.setOnClickListener(new OnClickListener() {
                     @Override
@@ -102,9 +117,12 @@ final class AreaPictureDisplayAdaptor extends BaseAdapter {
                             } else {
                                 DriveDBHelper ddh = new DriveDBHelper(fragment.getContext());
                                 DriveResource driveResource = ddh.getDriveResourceByResourceId(resourceId);
+
                                 AreaContext.INSTANCE.getAreaElement().getMediaResources().remove(driveResource);
                                 ddh.deleteResourceLocally(driveResource);
                                 ddh.deleteResourceFromServer(driveResource);
+
+                                dataSet.remove(pictureDisplayElement);
                                 notifyDataSetChanged();
                             }
                         }else {

@@ -29,6 +29,7 @@ import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.res.disp.AreaItemAdaptor;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
+import lm.pkp.com.landmap.custom.FragmentIdentificationHandler;
 import lm.pkp.com.landmap.permission.PermissionConstants;
 import lm.pkp.com.landmap.permission.PermissionElement;
 import lm.pkp.com.landmap.permission.PermissionsDBHelper;
@@ -38,7 +39,7 @@ import lm.pkp.com.landmap.user.UserContext;
 /**
  * Created by USER on 11/4/2017.
  */
-public class AreaDashboardOwnedFragment extends Fragment {
+public class AreaDashboardOwnedFragment extends Fragment implements FragmentIdentificationHandler{
 
 
     @Override
@@ -130,6 +131,11 @@ public class AreaDashboardOwnedFragment extends Fragment {
                         getContext(), new DataReloadCallback()).refreshLocalData();
             }
         });
+    }
+
+    @Override
+    public String getFragmentTitle() {
+        return "Owned";
     }
 
     private class DataReloadCallback implements AsyncTaskCallback {

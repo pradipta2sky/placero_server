@@ -1,5 +1,7 @@
 package lm.pkp.com.landmap.area.res.disp;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+
 import java.io.File;
 
 /**
@@ -51,5 +53,11 @@ public class VideoDisplayElement {
 
     public void setVideoFile(File videoFile) {
         this.videoFile = videoFile;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        EqualsBuilder builder = new EqualsBuilder().append(getResourceId(), ((VideoDisplayElement) o).getResourceId());
+        return builder.isEquals();
     }
 }

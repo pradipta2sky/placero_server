@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -51,6 +53,17 @@ final class AreaDocumentDisplayAdaptor extends BaseAdapter {
             return view;
         }
 
+        Drawable drawable = view.getDrawable();
+        if(drawable == null){
+            drawable = view.getBackground();
+        }
+        if(drawable != null){
+            Bitmap previousBitmap = ((BitmapDrawable) drawable).getBitmap();
+            if(previousBitmap != null){
+                previousBitmap.recycle();
+            }
+        }
+
         final File thumbFile = dataSet.get(position).getThumbnailFile();
         final File documentFile = dataSet.get(position).getDocumentFile();
 
@@ -78,15 +91,17 @@ final class AreaDocumentDisplayAdaptor extends BaseAdapter {
             @Override
             public boolean onLongClick(View v) {
                 ImageView clickedImage = (ImageView) referredView;
-                clickedImage.setBackgroundResource(drawable.image_border);
+                clickedImage.setBackgroundResource(R.drawable.image_border);
 
                 FloatingActionButton deleteButton = (FloatingActionButton) fragment.getView().findViewById(id.res_delete);
                 deleteButton.setVisibility(View.VISIBLE);
+
+                final DocumentDisplayElement documentDisplayElement = dataSet.get(position);
                 deleteButton.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(referredView.getContext(), RemoveDriveResourcesActivity.class);
-                        String resourceId = dataSet.get(position).getResourceId();
+                        String resourceId = documentDisplayElement.getResourceId();
                         if (!resourceId.equalsIgnoreCase("3")) {
                             intent.putExtra("resource_ids", resourceId);
                             intent.putExtra("tab_position", tabPosition);
@@ -94,9 +109,12 @@ final class AreaDocumentDisplayAdaptor extends BaseAdapter {
                         }  else {
                             DriveDBHelper ddh = new DriveDBHelper(fragment.getContext());
                             DriveResource driveResource = ddh.getDriveResourceByResourceId(resourceId);
+
                             AreaContext.INSTANCE.getAreaElement().getMediaResources().remove(driveResource);
                             ddh.deleteResourceLocally(driveResource);
                             ddh.deleteResourceFromServer(driveResource);
+
+                            dataSet.remove(documentDisplayElement);
                             notifyDataSetChanged();
                         }
                     }

@@ -7,17 +7,20 @@ import android.graphics.Bitmap.Config;
 import android.graphics.BitmapFactory;
 import android.graphics.BitmapFactory.Options;
 import android.media.ThumbnailUtils;
-import android.provider.MediaStore;
 import android.provider.MediaStore.Video.Thumbnails;
 
+import com.iceteck.silicompressorr.SiliCompressor;
 import com.tom_roush.pdfbox.pdmodel.PDDocument;
 import com.tom_roush.pdfbox.rendering.PDFRenderer;
 import com.tom_roush.pdfbox.util.PDFBoxResourceLoader;
+
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
 
 import lm.pkp.com.landmap.area.AreaContext;
+import lm.pkp.com.landmap.sync.LocalFolderStructureManager;
 
 public class ThumbnailCreator {
 
@@ -48,14 +51,14 @@ public class ThumbnailCreator {
         // this is why you can not have an image scaled as you would like
         bitmapOptions.inJustDecodeBounds = false; // now we want to load the image
 
-        // Let's load just the part of the image necessary for creating the thumbnail, not the whole image
-        Bitmap thumbnail = BitmapFactory.decodeFile(resourceFile.getAbsolutePath(), bitmapOptions);
+        // Let's load just the part of the image necessary for creating the thumbBmap, not the whole image
+        Bitmap thumbBmap = BitmapFactory.decodeFile(resourceFile.getAbsolutePath(), bitmapOptions);
 
         File thumbnailRoot = AreaContext.INSTANCE
                 .getAreaLocalPictureThumbnailRoot(areaId);
         String thumbFilePath = thumbnailRoot.getAbsolutePath()
                 + File.separatorChar + resourceFile.getName();
-        // Save the thumbnail
+        // Save the thumbBmap
         FileOutputStream fos = null;
         try {
             File thumbnailFile = new File(thumbFilePath);
@@ -64,13 +67,20 @@ public class ThumbnailCreator {
             }
             thumbnailFile.createNewFile();
             fos = new FileOutputStream(thumbnailFile);
-            thumbnail.compress(CompressFormat.JPEG, 100, fos);
+            thumbBmap.compress(CompressFormat.JPEG, 100, fos);
 
             fos.flush();
             fos.close();
 
-            thumbnail.recycle();
-            thumbnail = null;
+            thumbBmap.recycle();
+            thumbBmap = null;
+
+            SiliCompressor compressor = SiliCompressor.with(context);
+            String compressedFilePath = compressor.compress(thumbnailFile.getAbsolutePath(),
+                    LocalFolderStructureManager.getTempStorageDir(), true);
+            File compressedFile = new File(compressedFilePath);
+            FileUtils.copyFile(compressedFile, thumbnailFile);
+            compressedFile.delete();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -85,6 +95,13 @@ public class ThumbnailCreator {
             File thumbnailRoot = AreaContext.INSTANCE.getAreaLocalVideoThumbnailRoot(areaId);
             String thumbFilePath = thumbnailRoot.getAbsolutePath()
                     + File.separatorChar + resourceFile.getName();
+
+            File thumbnailFile = new File(thumbFilePath);
+            if (thumbnailFile.exists()) {
+                thumbnailFile.delete();
+            }
+            thumbnailFile.createNewFile();
+
             out = new FileOutputStream(thumbFilePath);
             bMap.compress(CompressFormat.PNG, 100, out); // bmp is your Bitmap instance
             // PNG is a lossless format, the compression factor (100) is ignored
@@ -93,6 +110,13 @@ public class ThumbnailCreator {
 
             bMap.recycle();
             bMap = null;
+
+            SiliCompressor compressor = SiliCompressor.with(context);
+            String compressedFilePath = compressor.compress(thumbnailFile.getAbsolutePath(),
+                    LocalFolderStructureManager.getTempStorageDir(), true);
+            File compressedFile = new File(compressedFilePath);
+            FileUtils.copyFile(compressedFile, thumbnailFile);
+            compressedFile.delete();
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -126,7 +150,14 @@ public class ThumbnailCreator {
             renderer = null;
             document.close();
             document = null;
+
             pageImage.recycle();
+            SiliCompressor compressor = SiliCompressor.with(context);
+            String compressedFilePath = compressor.compress(thumbFile.getAbsolutePath(),
+                    LocalFolderStructureManager.getTempStorageDir(), true);
+            File compressedFile = new File(compressedFilePath);
+            FileUtils.copyFile(compressedFile, thumbFile);
+            compressedFile.delete();
 
         } catch (Exception e) {
             e.printStackTrace();

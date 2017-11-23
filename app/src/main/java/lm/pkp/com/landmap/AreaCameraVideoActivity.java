@@ -27,10 +27,6 @@ import lm.pkp.com.landmap.util.FileUtil;
  */
 public class AreaCameraVideoActivity extends Activity implements LocationPositionReceiver {
 
-    // LogCat tag
-    private static final String TAG = AreaCameraVideoActivity.class.getSimpleName();
-
-
     // Camera activity request codes
     private static final int CAMERA_CAPTURE_VIDEO_REQUEST_CODE = 200;
     public static final int MEDIA_TYPE_VIDEO = 2;
@@ -42,8 +38,8 @@ public class AreaCameraVideoActivity extends Activity implements LocationPositio
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
-        this.startPositioning();
-        this.recordVideo();
+        startPositioning();
+        recordVideo();
     }
 
     private void startPositioning() {
@@ -55,15 +51,15 @@ public class AreaCameraVideoActivity extends Activity implements LocationPositio
      */
     private void recordVideo() {
         Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-        this.fileUri = this.getOutputMediaFileUri(AreaCameraVideoActivity.MEDIA_TYPE_VIDEO);
+        fileUri = getOutputMediaFileUri(MEDIA_TYPE_VIDEO);
 
         // set video quality
         intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 0);
-        intent.putExtra(MediaStore.EXTRA_OUTPUT, this.fileUri); // set the image file
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the image file
         // name
 
         // start the video capture Intent
-        this.startActivityForResult(intent, AreaCameraVideoActivity.CAMERA_CAPTURE_VIDEO_REQUEST_CODE);
+        startActivityForResult(intent, CAMERA_CAPTURE_VIDEO_REQUEST_CODE);
     }
 
     /**
@@ -76,7 +72,7 @@ public class AreaCameraVideoActivity extends Activity implements LocationPositio
 
         // save file url in bundle as it will be null on screen orientation
         // changes
-        outState.putParcelable("file_uri", this.fileUri);
+        outState.putParcelable("file_uri", fileUri);
     }
 
     @Override
@@ -84,7 +80,7 @@ public class AreaCameraVideoActivity extends Activity implements LocationPositio
         super.onRestoreInstanceState(savedInstanceState);
 
         // get the file url
-        this.fileUri = savedInstanceState.getParcelable("file_uri");
+        fileUri = savedInstanceState.getParcelable("file_uri");
     }
 
     /**
@@ -93,9 +89,9 @@ public class AreaCameraVideoActivity extends Activity implements LocationPositio
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // if the result is capturing Image
-        if (requestCode == AreaCameraVideoActivity.CAMERA_CAPTURE_VIDEO_REQUEST_CODE) {
+        if (requestCode == CAMERA_CAPTURE_VIDEO_REQUEST_CODE) {
             if (resultCode == Activity.RESULT_OK) {
-                File videoFile = new File(this.fileUri.getPath());
+                File videoFile = new File(fileUri.getPath());
                 AreaContext areaContext = AreaContext.INSTANCE;
                 AreaElement ae = areaContext.getAreaElement();
 
@@ -114,14 +110,14 @@ public class AreaCameraVideoActivity extends Activity implements LocationPositio
                 areaContext.addResourceToQueue(videoResource);
 
                 Intent i = new Intent(this, AreaAddResourcesActivity.class);
-                this.startActivity(i);
+                startActivity(i);
 
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 // Cancelled case
-                this.finish();
+                finish();
             } else {
                 // Failed case
-                this.finish();
+                finish();
             }
         }
     }
@@ -130,7 +126,7 @@ public class AreaCameraVideoActivity extends Activity implements LocationPositio
      * Creating file uri to store image/video
      */
     public Uri getOutputMediaFileUri(int type) {
-        return Uri.fromFile(AreaCameraVideoActivity.getOutputMediaFile());
+        return Uri.fromFile(getOutputMediaFile());
     }
 
     /**
@@ -145,8 +141,8 @@ public class AreaCameraVideoActivity extends Activity implements LocationPositio
 
     @Override
     public void receivedLocationPostion(PositionElement pe) {
-        this.videoResource.setLatitude(pe.getLat() + "");
-        this.videoResource.setLongitude(pe.getLon() + "");
+        videoResource.setLatitude(pe.getLat() + "");
+        videoResource.setLongitude(pe.getLon() + "");
     }
 
     @Override

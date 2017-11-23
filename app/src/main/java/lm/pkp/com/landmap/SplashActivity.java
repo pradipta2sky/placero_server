@@ -21,9 +21,9 @@ public class SplashActivity extends Activity {
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
 
-        this.setContentView(layout.activity_splash);
+        setContentView(layout.activity_splash);
 
-        new LocalDataRefresher(this.getApplicationContext(), new DataReloadCallback()).refreshLocalData();
+        new LocalDataRefresher(getApplicationContext(), new DataReloadCallback()).refreshLocalData();
         LocalFolderStructureManager.create();
     }
 
@@ -33,8 +33,8 @@ public class SplashActivity extends Activity {
         public void taskCompleted(Object result) {
             Intent commonFoldersIntent = new Intent(SplashActivity.this,
                     CreateCommonFolderStructureActivity.class);
-            SplashActivity.this.startActivity(commonFoldersIntent);
-            SplashActivity.this.finish();
+            startActivity(commonFoldersIntent);
+            finish();
         }
     }
 
