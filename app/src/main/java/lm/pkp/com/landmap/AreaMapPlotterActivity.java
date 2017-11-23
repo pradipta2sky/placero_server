@@ -114,7 +114,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
         settings.setZoomGesturesEnabled(true);
 
         mapWrapperLayout = (MapWrapperLayout) findViewById(R.id.map_relative_layout);
-        mapWrapperLayout.init(googleMap, getPixelsFromDp(getApplicationContext(), 40));
+        mapWrapperLayout.init(googleMap, getPixelsFromDp(getApplicationContext(), 35));
 
         infoWindow = (ViewGroup) getLayoutInflater().inflate(layout.info_window, null);
         infoTitle = (TextView) infoWindow.findViewById(id.title);
