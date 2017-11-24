@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import lm.pkp.com.landmap.drive.DriveDBHelper;
@@ -27,7 +28,7 @@ public class AreaContext {
     private AreaElement currentArea;
     private Context context;
     private Bitmap displayBMap;
-
+    private List<Bitmap> viewBitmaps = new ArrayList<>();
     private final ArrayList<DriveResource> uploadQueue = new ArrayList<>();
 
     public AreaElement getAreaElement() {
@@ -35,23 +36,45 @@ public class AreaContext {
     }
 
     public void setAreaElement(AreaElement areaElement, Context context) {
+        clearContext();
+
         this.currentArea = areaElement;
         this.context = context;
         this.uploadQueue.clear();
 
         PositionsDBHelper pdb = new PositionsDBHelper(context);
-        this.currentArea.setPositions(pdb.getAllPositionForArea(this.currentArea));
+        this.currentArea.setPositions(pdb.getPositionsForArea(this.currentArea));
         this.reCenter(this.currentArea);
 
         DriveDBHelper ddh = new DriveDBHelper(context);
         this.currentArea.setMediaResources(ddh.getDriveResourcesByAreaId(this.currentArea.getUniqueId()));
-        this.currentArea.setCommonResources(ddh.getCommonResources());
 
         PermissionsDBHelper pdh = new PermissionsDBHelper(context);
         currentArea.setUserPermissions(pdh.fetchPermissionsByAreaId(currentArea.getUniqueId()));
+    }
 
-        if(displayBMap != null){
-            displayBMap.recycle();
+    public void clearContext(){
+        if(currentArea != null){
+            currentArea.getPositions().clear();
+            currentArea.getMediaResources().clear();
+            currentArea.getUserPermissions().clear();
+
+            currentArea = null;
+            context = null;
+            uploadQueue.clear();
+
+            if(displayBMap != null){
+                displayBMap.recycle();
+            }
+            Iterator<Bitmap> iterator = viewBitmaps.iterator();
+            while (iterator.hasNext()){
+                Bitmap bitmap = iterator.next();
+                if(bitmap != null){
+                    bitmap.recycle();
+                }
+            }
+            displayBMap = null;
+            System.gc();
         }
     }
 
@@ -216,5 +239,13 @@ public class AreaContext {
 
     public void setDisplayBMap(Bitmap displayBMap) {
         this.displayBMap = displayBMap;
+    }
+
+    public List<Bitmap> getViewBitmaps() {
+        return this.viewBitmaps;
+    }
+
+    public void setViewBitmaps(List<Bitmap> viewBitmaps) {
+        this.viewBitmaps = viewBitmaps;
     }
 }

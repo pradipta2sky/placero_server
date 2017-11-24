@@ -1,6 +1,5 @@
 package lm.pkp.com.landmap;
 
-import android.Manifest;
 import android.Manifest.permission;
 import android.accounts.AccountManager;
 import android.app.Activity;

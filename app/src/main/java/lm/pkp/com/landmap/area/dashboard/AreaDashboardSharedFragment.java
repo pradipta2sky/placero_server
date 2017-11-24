@@ -21,10 +21,10 @@ import android.widget.ListView;
 import java.util.ArrayList;
 
 import lm.pkp.com.landmap.AreaDetailsActivity;
-import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
+import lm.pkp.com.landmap.area.AreaDashboardDisplayMetaStore;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.res.disp.AreaItemAdaptor;
@@ -65,18 +65,20 @@ public class AreaDashboardSharedFragment extends Fragment implements FragmentIde
     public void setUserVisibleHint(boolean visible) {
         super.setUserVisibleHint(visible);
         if (visible && (mView != null) && (mActivity != null)) {
+            AreaDashboardDisplayMetaStore.INSTANCE.setActiveTab(AreaDashboardDisplayMetaStore.TAB_SHARED_SEQ);
             this.loadFragment();
         }
     }
 
     private void loadFragment() {
+        AreaContext.INSTANCE.setDisplayBMap(null);
         mView.findViewById(id.splash_panel).setVisibility(View.VISIBLE);
 
         ImageView refreshAreaView = (ImageView) mActivity.findViewById(id.action_area_refresh);
         refreshAreaView.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                mActivity.findViewById(id.splash_panel).setVisibility(View.VISIBLE);
+                mView.findViewById(id.splash_panel).setVisibility(View.VISIBLE);
                 new LocalDataRefresher(mActivity, new DataReloadCallback()).refreshLocalData();
             }
         });
@@ -158,18 +160,19 @@ public class AreaDashboardSharedFragment extends Fragment implements FragmentIde
 
         @Override
         public void afterTextChanged(Editable editable) {
-            if(editable.toString().equalsIgnoreCase("")){
-                return;
-            }else {
-                mView.findViewById(id.splash_panel).setVisibility(View.VISIBLE);
+            if(AreaDashboardDisplayMetaStore.INSTANCE.getActiveTab() == AreaDashboardDisplayMetaStore.TAB_SHARED_SEQ){
+                if(editable.toString().equalsIgnoreCase("")){
+                    return;
+                }else {
+                    mView.findViewById(id.splash_panel).setVisibility(View.VISIBLE);
 
-                ListView areaListView = (ListView) mView.findViewById(id.area_display_list);
-                ArrayAdapter<AreaElement> adapter = (ArrayAdapter<AreaElement>) areaListView.getAdapter();
-                adapter.getFilter().filter(editable.toString());
+                    ListView areaListView = (ListView) mView.findViewById(id.area_display_list);
+                    ArrayAdapter<AreaElement> adapter = (ArrayAdapter<AreaElement>) areaListView.getAdapter();
+                    adapter.getFilter().filter(editable.toString());
 
-                mView.findViewById(id.splash_panel).setVisibility(View.GONE);
+                    mView.findViewById(id.splash_panel).setVisibility(View.GONE);
+                }
             }
-
         }
 
     }

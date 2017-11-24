@@ -1,6 +1,5 @@
 package lm.pkp.com.landmap;
 
-import android.Manifest;
 import android.Manifest.permission;
 import android.accounts.AccountManager;
 import android.app.Activity;
@@ -33,7 +32,6 @@ import com.google.api.services.drive.Drive.Builder;
 import com.google.api.services.drive.DriveScopes;
 import com.google.api.services.drive.model.Permission;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

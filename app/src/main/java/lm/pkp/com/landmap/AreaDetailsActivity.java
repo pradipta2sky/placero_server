@@ -38,8 +38,8 @@ import lm.pkp.com.landmap.custom.LocationPositionReceiver;
 import lm.pkp.com.landmap.permission.PermissionConstants;
 import lm.pkp.com.landmap.permission.PermissionManager;
 import lm.pkp.com.landmap.position.PositionElement;
-import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.position.PositionListAdaptor;
+import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.provider.GPSLocationProvider;
 import lm.pkp.com.landmap.util.ColorProvider;
 import lm.pkp.com.landmap.weather.WeatherDisplayFragment;
@@ -236,23 +236,26 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         pe.setUniqueAreaId(ae.getUniqueId());
 
         AreaElement ae = AreaContext.INSTANCE.getAreaElement();
-        ae.getPositions().add(pe);
+        List<PositionElement> positions = ae.getPositions();
+        if(!positions.contains(pe)){
+            positions.add(pe);
+            pe = pdb.insertPositionLocally(pe);
+            pdb.insertPositionToServer(pe);
 
-        pe = pdb.insertPositionLocally(pe);
-        pdb.insertPositionToServer(pe);
+            AreaContext.INSTANCE.setAreaElement(ae, getApplicationContext());
+            positionList.add(pe);
+            adaptor.notifyDataSetChanged();
+        }else{
+            showErrorMessage("Position already exists. Ignoring.", "info");
+        }
 
-        AreaContext.INSTANCE.setAreaElement(ae, getApplicationContext());
-        if (ae.getPositions().size() > 0) {
+        if (positions.size() > 0) {
             WeatherManager weatherManager = new WeatherManager(getApplicationContext(), new WeatherDataCallback());
             weatherManager.loadWeatherInfoForPosition(ae.getCenterPosition());
         }
-
         findViewById(id.positions_view_master).setVisibility(View.VISIBLE);
         findViewById(id.position_list_empty_img).setVisibility(View.GONE);
         findViewById(id.splash_panel).setVisibility(View.GONE);
-
-        positionList.add(pe);
-        adaptor.notifyDataSetChanged();
     }
 
     @Override

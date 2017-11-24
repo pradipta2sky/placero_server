@@ -6,7 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
 import lm.pkp.com.landmap.R.id;
-import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.res.doc.AreaDocumentChooserFragment;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 

@@ -28,7 +28,6 @@ public class AreaElement implements Serializable {
     private PositionElement centerPosition = new PositionElement();
     private List<PositionElement> positions = new ArrayList<>();
     private List<DriveResource> mediaResources = new ArrayList<>();
-    private Map<String, DriveResource> commonResources = new HashMap<>();
     private Map<String, PermissionElement> userPermissions = new HashMap<>();
 
     public double getMeasureSqFt() {
@@ -115,19 +114,8 @@ public class AreaElement implements Serializable {
         this.userPermissions = userPermissions;
     }
 
-    public Map<String, DriveResource> getCommonResources() {
-        return commonResources;
-    }
-
-    public void setCommonResources(Map<String, DriveResource> commonResources) {
-        this.commonResources = commonResources;
-    }
-
     public PositionElement getCenterPosition() {
         return centerPosition;
     }
 
-    public void setCenterPosition(PositionElement centerPosition) {
-        this.centerPosition = centerPosition;
-    }
 }

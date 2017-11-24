@@ -2,7 +2,6 @@ package lm.pkp.com.landmap;
 
 import android.R.drawable;
 import android.app.AlertDialog.Builder;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
@@ -11,13 +10,9 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.app.FragmentStatePagerAdapter;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.AttributeSet;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -25,9 +20,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import lm.pkp.com.landmap.R.id;
-import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.AreaDisplayMetaStore;
+import lm.pkp.com.landmap.area.AreaDashboardDisplayMetaStore;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.area.dashboard.AreaDashboardOwnedFragment;
 import lm.pkp.com.landmap.area.dashboard.AreaDashboardPublicFragment;
@@ -88,7 +82,6 @@ public class AreaDashboardActivity extends AppCompatActivity {
         };
         ImageView createAreaView = (ImageView) this.findViewById(id.action_area_create);
         createAreaView.setOnClickListener(createListener);
-
     }
 
 
@@ -98,7 +91,7 @@ public class AreaDashboardActivity extends AppCompatActivity {
         AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
         if(areaElement != null){
             TabLayout tabLayout = (TabLayout) this.findViewById(id.areas_display_tab_layout);
-            Integer position = AreaDisplayMetaStore.INSTANCE.getTabPositionByAreaType(areaElement.getType());
+            Integer position = AreaDashboardDisplayMetaStore.INSTANCE.getTabPositionByAreaType(areaElement.getType());
             tabLayout.getTabAt(position).select();
         }
     }

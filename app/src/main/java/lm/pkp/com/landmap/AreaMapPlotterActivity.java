@@ -340,7 +340,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                     pdh.updatePositionToServer(newPosition);
 
                     AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
-                    areaElement.setPositions(pdh.getAllPositionForArea(areaElement));
+                    areaElement.setPositions(pdh.getPositionsForArea(areaElement));
                     AreaContext.INSTANCE.reCenter(areaElement);
 
                     polygon.remove();

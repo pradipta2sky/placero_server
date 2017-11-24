@@ -1,7 +1,6 @@
 package lm.pkp.com.landmap.area.dashboard;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -25,12 +24,12 @@ import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
+import lm.pkp.com.landmap.area.AreaDashboardDisplayMetaStore;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.res.disp.AreaItemAdaptor;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.custom.FragmentIdentificationHandler;
-import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.sync.LocalDataRefresher;
 
 /**
@@ -65,6 +64,7 @@ public class AreaDashboardPublicFragment extends Fragment implements FragmentIde
     public void setUserVisibleHint(boolean visible) {
         super.setUserVisibleHint(visible);
         if (visible && (mView != null) && (mActivity != null)) {
+            AreaDashboardDisplayMetaStore.INSTANCE.setActiveTab(AreaDashboardDisplayMetaStore.TAB_PUBLIC_SEQ);
             this.loadFragment();
         }
     }
@@ -75,11 +75,8 @@ public class AreaDashboardPublicFragment extends Fragment implements FragmentIde
     }
 
     private void loadFragment() {
-        View view = mView;
-        if(view != null){
-            View splashView = view.findViewById(id.splash_panel);
-            splashView.setVisibility(View.VISIBLE);
-        }
+        AreaContext.INSTANCE.setDisplayBMap(null);
+        mView.findViewById(id.splash_panel).setVisibility(View.VISIBLE);
 
         final EditText inputSearch = (EditText) mActivity.findViewById(id.dashboard_search_box);
         String availableKey = inputSearch.getText().toString();
@@ -187,14 +184,16 @@ public class AreaDashboardPublicFragment extends Fragment implements FragmentIde
 
         @Override
         public void afterTextChanged(Editable editable) {
-            mView.findViewById(id.splash_panel).setVisibility(View.VISIBLE);
-            String filterStr = editable.toString().trim();
-            if (!filterStr.equalsIgnoreCase("")) {
-                LocalDataRefresher dataRefresher = new LocalDataRefresher(mActivity, new DataReloadCallback(filterStr));
-                dataRefresher.refreshPublicAreas(filterStr);
-            } else {
-                LocalDataRefresher dataRefresher = new LocalDataRefresher(mActivity, new DataReloadCallback());
-                dataRefresher.refreshPublicAreas();
+            if(AreaDashboardDisplayMetaStore.INSTANCE.getActiveTab() == AreaDashboardDisplayMetaStore.TAB_PUBLIC_SEQ){
+                mView.findViewById(id.splash_panel).setVisibility(View.VISIBLE);
+                String filterStr = editable.toString().trim();
+                if (!filterStr.equalsIgnoreCase("")) {
+                    LocalDataRefresher dataRefresher = new LocalDataRefresher(mActivity, new DataReloadCallback(filterStr));
+                    dataRefresher.refreshPublicAreas(filterStr);
+                } else {
+                    LocalDataRefresher dataRefresher = new LocalDataRefresher(mActivity, new DataReloadCallback());
+                    dataRefresher.refreshPublicAreas();
+                }
             }
         }
     }

@@ -1,6 +1,5 @@
 package lm.pkp.com.landmap.area.res.doc;
 
-import android.app.AlertDialog;
 import android.app.AlertDialog.Builder;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -28,7 +27,6 @@ import java.util.TimeZone;
 import java.util.UUID;
 
 import lm.pkp.com.landmap.AreaAddResourcesActivity;
-import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.R.drawable;
 import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.R.layout;

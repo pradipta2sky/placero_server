@@ -38,7 +38,6 @@ public class AreaPopulationUtil {
     }
 
     public void populateAreaElement(View view, AreaElement ae) {
-
         TextView areaNameView = (TextView) view.findViewById(id.area_name_text);
         String areaName = ae.getName();
         if (areaName.length() > 25) {
@@ -75,26 +74,29 @@ public class AreaPopulationUtil {
         }
 
         DriveDBHelper ddh = new DriveDBHelper(view.getContext());
-        List<DriveResource> imageResources = ddh.fetchImageResources(ae);
         ImageView areaImg = (ImageView) view.findViewById(id.area_default_img);
 
-        Iterator<DriveResource> imageResIter = imageResources.iterator();
         String thumbRootPath = AreaContext.INSTANCE
                 .getAreaLocalPictureThumbnailRoot(ae.getUniqueId()).getAbsolutePath();
 
-        while (imageResIter.hasNext()) {
-            DriveResource imageResource = imageResIter.next();
-            String imageName = imageResource.getName();
-            String thumbnailPath = thumbRootPath + File.separatorChar + imageName;
-            File thumbFile = new File(thumbnailPath);
-            if (thumbFile.exists()) {
-                Bitmap displayBMap = AreaContext.INSTANCE.getDisplayBMap();
-                if(displayBMap == null){
+        Bitmap displayBMap = AreaContext.INSTANCE.getDisplayBMap();
+        if(displayBMap != null){
+            areaImg.setImageBitmap(displayBMap);
+        }else {
+            List<DriveResource> imageResources = ddh.fetchImageResources(ae);
+            Iterator<DriveResource> imageResIter = imageResources.iterator();
+            while (imageResIter.hasNext()) {
+                DriveResource imageResource = imageResIter.next();
+                String imageName = imageResource.getName();
+                String thumbnailPath = thumbRootPath + File.separatorChar + imageName;
+                File thumbFile = new File(thumbnailPath);
+                if (thumbFile.exists()) {
                     displayBMap = BitmapFactory.decodeFile(thumbnailPath);
+                    AreaContext.INSTANCE.getViewBitmaps().add(displayBMap);
+                    areaImg.setImageBitmap(displayBMap);
                 }
-                areaImg.setImageBitmap(displayBMap);
+                break;
             }
-            break;
         }
     }
 

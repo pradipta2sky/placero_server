@@ -69,7 +69,7 @@ public class RemoveDriveResourcesActivity extends Activity implements Permission
         this.mProgress = new ProgressDialog(this);
         this.mProgress.setMessage("Removing area files ...");
         this.mCredential = GoogleAccountCredential.usingOAuth2(this.getApplicationContext(),
-                Arrays.asList(RemoveDriveResourcesActivity.SCOPES)).setBackOff(new ExponentialBackOff());
+                Arrays.asList(SCOPES)).setBackOff(new ExponentialBackOff());
 
         Bundle extras = this.getIntent().getExtras();
         if (extras == null) {
@@ -97,25 +97,25 @@ public class RemoveDriveResourcesActivity extends Activity implements Permission
         }
     }
 
-    @AfterPermissionGranted(RemoveDriveResourcesActivity.REQUEST_PERMISSION_GET_ACCOUNTS)
+    @AfterPermissionGranted(REQUEST_PERMISSION_GET_ACCOUNTS)
     private void chooseAccount() {
         if (EasyPermissions.hasPermissions(
                 this, permission.GET_ACCOUNTS)) {
             String accountName = this.getPreferences(Context.MODE_PRIVATE)
-                    .getString(RemoveDriveResourcesActivity.PREF_ACCOUNT_NAME, null);
+                    .getString(PREF_ACCOUNT_NAME, null);
             if (accountName != null) {
                 this.mCredential.setSelectedAccountName(accountName);
                 this.removeResources(this.resourceIds);
             } else {
                 // Start a dialog from which the user can choose an account
-                this.startActivityForResult(this.mCredential.newChooseAccountIntent(), RemoveDriveResourcesActivity.REQUEST_ACCOUNT_PICKER);
+                this.startActivityForResult(this.mCredential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
             }
         } else {
             // Request the GET_ACCOUNTS permission via a user dialog
             EasyPermissions.requestPermissions(
                     this,
                     "This app needs to access your Google account.",
-                    RemoveDriveResourcesActivity.REQUEST_PERMISSION_GET_ACCOUNTS,
+                    REQUEST_PERMISSION_GET_ACCOUNTS,
                     permission.GET_ACCOUNTS);
         }
     }
@@ -125,27 +125,27 @@ public class RemoveDriveResourcesActivity extends Activity implements Permission
             int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
-            case RemoveDriveResourcesActivity.REQUEST_GOOGLE_PLAY_SERVICES:
+            case REQUEST_GOOGLE_PLAY_SERVICES:
                 if (resultCode == Activity.RESULT_OK) {
                     this.removeResources(null);
                 } else {
                     // TODO Share the error with the user
                 }
                 break;
-            case RemoveDriveResourcesActivity.REQUEST_ACCOUNT_PICKER:
+            case REQUEST_ACCOUNT_PICKER:
                 if (resultCode == Activity.RESULT_OK && data != null && data.getExtras() != null) {
                     String accountName = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
                     if (accountName != null) {
                         SharedPreferences settings = this.getPreferences(Context.MODE_PRIVATE);
                         Editor editor = settings.edit();
-                        editor.putString(RemoveDriveResourcesActivity.PREF_ACCOUNT_NAME, accountName);
+                        editor.putString(PREF_ACCOUNT_NAME, accountName);
                         editor.apply();
                         this.mCredential.setSelectedAccountName(accountName);
                         this.removeResources(this.resourceIds);
                     }
                 }
                 break;
-            case RemoveDriveResourcesActivity.REQUEST_AUTHORIZATION:
+            case REQUEST_AUTHORIZATION:
                 if (resultCode == Activity.RESULT_OK) {
                     this.removeResources(this.resourceIds);
                 }
@@ -187,7 +187,7 @@ public class RemoveDriveResourcesActivity extends Activity implements Permission
     void showGooglePlayServicesAvailabilityErrorDialog(
             int connectionStatusCode) {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
-        Dialog dialog = apiAvailability.getErrorDialog(this, connectionStatusCode, RemoveDriveResourcesActivity.REQUEST_GOOGLE_PLAY_SERVICES);
+        Dialog dialog = apiAvailability.getErrorDialog(this, connectionStatusCode, REQUEST_GOOGLE_PLAY_SERVICES);
         dialog.show();
     }
 
@@ -216,13 +216,14 @@ public class RemoveDriveResourcesActivity extends Activity implements Permission
             try {
                 AreaContext ac = AreaContext.INSTANCE;
                 AreaElement ae = ac.getAreaElement();
-                DriveDBHelper ddh = new DriveDBHelper(RemoveDriveResourcesActivity.this.getApplicationContext());
+                DriveDBHelper ddh = new DriveDBHelper(getApplicationContext());
                 if (this.resourceIds != null) {
                     String[] resourceArr = this.resourceIds.split(",");
                     for (int i = 0; i < resourceArr.length; i++) {
                         String resourceID = resourceArr[i];
                         DriveResource fetchedResource = ddh.getDriveResourceByResourceId(resourceID);
                         ddh.deleteResourceByResourceId(resourceID);
+                        ddh.deleteResourceFromServer(fetchedResource);
                         ae.getMediaResources().remove(fetchedResource);
 
                         String contentType = fetchedResource.getContentType();
@@ -291,30 +292,30 @@ public class RemoveDriveResourcesActivity extends Activity implements Permission
             super.onPostExecute(aBoolean);
             Intent displayIntent = null;
             if (this.resourceIds != null) {
-                displayIntent = new Intent(RemoveDriveResourcesActivity.this.getApplicationContext(), AreaResourceDisplayActivity.class);
-                displayIntent.putExtras(RemoveDriveResourcesActivity.this.getIntent().getExtras());
+                displayIntent = new Intent(getApplicationContext(), AreaResourceDisplayActivity.class);
+                displayIntent.putExtras(getIntent().getExtras());
             } else {
-                displayIntent = new Intent(RemoveDriveResourcesActivity.this.getApplicationContext(), AreaDashboardActivity.class);
+                displayIntent = new Intent(getApplicationContext(), AreaDashboardActivity.class);
             }
-            RemoveDriveResourcesActivity.this.startActivity(displayIntent);
-            RemoveDriveResourcesActivity.this.finish();
+            startActivity(displayIntent);
+            finish();
         }
 
         @Override
         protected void onCancelled() {
-            RemoveDriveResourcesActivity.this.mProgress.hide();
+            mProgress.hide();
             if (this.mLastError != null) {
                 if (this.mLastError instanceof GooglePlayServicesAvailabilityIOException) {
-                    RemoveDriveResourcesActivity.this.showGooglePlayServicesAvailabilityErrorDialog(
+                    showGooglePlayServicesAvailabilityErrorDialog(
                             ((GooglePlayServicesAvailabilityIOException) this.mLastError)
                                     .getConnectionStatusCode());
                 } else if (this.mLastError instanceof UserRecoverableAuthIOException) {
-                    RemoveDriveResourcesActivity.this.startActivityForResult(
+                    startActivityForResult(
                             ((UserRecoverableAuthIOException) this.mLastError).getIntent(),
                             REQUEST_AUTHORIZATION);
                 }
             }
-            RemoveDriveResourcesActivity.this.finish();
+            finish();
         }
     }
 }

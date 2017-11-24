@@ -1,7 +1,6 @@
 package lm.pkp.com.landmap.sync;
 
 import android.os.Environment;
-import android.util.Log;
 
 import java.io.File;
 

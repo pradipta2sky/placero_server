@@ -20,7 +20,6 @@ import java.io.File;
 import java.util.ArrayList;
 
 import lm.pkp.com.landmap.R;
-import lm.pkp.com.landmap.R.drawable;
 import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.RemoveDriveResourcesActivity;
 import lm.pkp.com.landmap.area.AreaContext;

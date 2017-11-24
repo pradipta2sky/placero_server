@@ -138,7 +138,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         db.close();
     }
 
-    public ArrayList<PositionElement> getAllPositionForArea(AreaElement ae) {
+    public ArrayList<PositionElement> getPositionsForArea(AreaElement ae) {
         ArrayList<PositionElement> pes = new ArrayList<PositionElement>();
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("select * from " + POSITION_TABLE_NAME + " WHERE " + POSITION_COLUMN_UNIQUE_AREA_ID + "=?",
@@ -163,7 +163,9 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
                 pe.setTags(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_TAGS)));
                 pe.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_CREATED_ON)));
 
-                pes.add(pe);
+                if(!pes.contains(pe)){
+                    pes.add(pe);
+                }
                 cursor.moveToNext();
             }
             cursor.close();

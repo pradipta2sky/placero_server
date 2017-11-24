@@ -1,6 +1,7 @@
 package lm.pkp.com.landmap.position;
 
 import org.apache.commons.lang3.SerializationUtils;
+import org.apache.commons.lang3.builder.EqualsBuilder;
 
 import java.io.Serializable;
 
@@ -104,5 +105,13 @@ public class PositionElement implements Serializable {
 
     public void setWeather(WeatherElement weather) {
         this.weather = weather;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        EqualsBuilder builder = new EqualsBuilder();
+        builder.append(lat, ((PositionElement) o).lat);
+        builder.append(lon, ((PositionElement) o).lon);
+        return builder.isEquals();
     }
 }

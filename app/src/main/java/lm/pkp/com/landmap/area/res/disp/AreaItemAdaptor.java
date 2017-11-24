@@ -1,18 +1,19 @@
 package lm.pkp.com.landmap.area.res.disp;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Filter;
-import android.widget.Filterable;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.R.layout;
+import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.util.AreaPopulationUtil;
 
@@ -37,8 +38,9 @@ public class AreaItemAdaptor extends ArrayAdapter {
         View v = convertView;
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            v = vi.inflate(layout.area_element_row, null);
+            v = vi.inflate(R.layout.area_element_row, null);
         }
+        AreaContext.INSTANCE.setDisplayBMap(null);
         AreaPopulationUtil.INSTANCE.populateAreaElement(v, this.items.get(position));
         return v;
     }

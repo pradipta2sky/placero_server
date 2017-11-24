@@ -24,7 +24,6 @@ import java.io.File;
 import java.util.ArrayList;
 
 import lm.pkp.com.landmap.R;
-import lm.pkp.com.landmap.R.drawable;
 import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.RemoveDriveResourcesActivity;
 import lm.pkp.com.landmap.area.AreaContext;
@@ -32,7 +31,6 @@ import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
 import lm.pkp.com.landmap.permission.PermissionConstants;
 import lm.pkp.com.landmap.permission.PermissionManager;
-import lm.pkp.com.landmap.permission.PermissionsDBHelper;
 
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
 

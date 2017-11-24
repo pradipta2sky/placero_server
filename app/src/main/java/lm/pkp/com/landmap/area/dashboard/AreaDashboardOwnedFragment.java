@@ -1,5 +1,6 @@
 package lm.pkp.com.landmap.area.dashboard;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -25,6 +26,7 @@ import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
+import lm.pkp.com.landmap.area.AreaDashboardDisplayMetaStore;
 import lm.pkp.com.landmap.area.AreaElement;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.res.disp.AreaItemAdaptor;
@@ -41,10 +43,13 @@ import lm.pkp.com.landmap.user.UserContext;
  */
 public class AreaDashboardOwnedFragment extends Fragment implements FragmentIdentificationHandler{
 
+    private Activity mActivity = null;
+    private View mView = null;
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(layout.fragment_owned_areas, container, false);
+        return inflater.inflate(R.layout.fragment_owned_areas, container, false);
     }
 
     @Override
@@ -55,82 +60,104 @@ public class AreaDashboardOwnedFragment extends Fragment implements FragmentIden
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        mView = view;
+        mActivity = getActivity();
+        if(getUserVisibleHint()){
+            loadFragment();
+        }
+    }
 
-        ArrayList<AreaElement> areas = new AreaDBHelper(view.getContext()).getAreas("self");
-        ListView areaListView = (ListView) view.findViewById(id.area_display_list);
+    @Override
+    public void setUserVisibleHint(boolean visible) {
+        super.setUserVisibleHint(visible);
+        if (visible && (mView != null) && (mActivity != null)) {
+            AreaDashboardDisplayMetaStore.INSTANCE.setActiveTab(AreaDashboardDisplayMetaStore.TAB_OWNED_SEQ);
+            this.loadFragment();
+        }
+    }
+
+
+    private void loadFragment() {
+        AreaContext.INSTANCE.clearContext();
+        mView.findViewById(id.splash_panel).setVisibility(View.VISIBLE);
+
+        ArrayList<AreaElement> areas = new AreaDBHelper(mView.getContext()).getAreas("self");
+        ListView areaListView = (ListView) mView.findViewById(id.area_display_list);
+
+        ImageView createAreaView = (ImageView) mView.findViewById(id.owned_area_empty_layout_action);
+        createAreaView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mActivity.findViewById(id.splash_panel).setVisibility(View.VISIBLE);
+                AreaDBHelper adh = new AreaDBHelper(mActivity, new DataInsertServerCallback());
+                AreaElement areaElement = adh.insertAreaLocally();
+
+                PermissionElement pe = new PermissionElement();
+                pe.setUserId(UserContext.getInstance().getUserElement().getEmail());
+                pe.setAreaId(areaElement.getUniqueId());
+                pe.setFunctionCode(PermissionConstants.FULL_CONTROL);
+
+                PermissionsDBHelper pdh = new PermissionsDBHelper(mActivity);
+                pdh.insertPermissionLocally(pe);
+                areaElement.getUserPermissions().put(PermissionConstants.FULL_CONTROL, pe);
+
+                // Resetting the context for new Area
+                AreaContext.INSTANCE.setAreaElement(areaElement, mActivity);
+                adh.insertAreaToServer(areaElement);
+            }
+        });
 
         if (areas.size() > 0) {
-            view.findViewById(R.id.owned_area_empty_layout).setVisibility(View.GONE);
+            mView.findViewById(R.id.owned_area_empty_layout).setVisibility(View.GONE);
             areaListView.setVisibility(View.VISIBLE);
 
-            AreaItemAdaptor adaptor = new AreaItemAdaptor(this.getContext(), layout.area_element_row, areas);
-
+            AreaItemAdaptor adaptor = new AreaItemAdaptor(mView.getContext(), layout.area_element_row, areas);
             areaListView.setAdapter(adaptor);
             areaListView.setDescendantFocusability(ListView.FOCUS_BLOCK_DESCENDANTS);
             areaListView.setOnItemClickListener(new OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapter, View v, int position, long arg3) {
-                    getActivity().finish();
                     AreaElement ae = (AreaElement) adapter.getItemAtPosition(position);
-                    AreaContext.INSTANCE.setAreaElement(ae, getContext());
-                    Intent intent = new Intent(getContext(), AreaDetailsActivity.class);
+                    AreaContext.INSTANCE.setAreaElement(ae, mActivity);
+                    Intent intent = new Intent(mActivity, AreaDetailsActivity.class);
                     startActivity(intent);
+                    mActivity.finish();
                 }
             });
 
         } else {
             areaListView.setVisibility(View.GONE);
-            view.findViewById(id.owned_area_empty_layout).setVisibility(View.VISIBLE);
-
-            View.OnClickListener createListener = new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    getActivity().findViewById(id.splash_panel).setVisibility(View.VISIBLE);
-                    AreaDBHelper adh = new AreaDBHelper(getActivity().getApplicationContext(), new DataInsertServerCallback());
-                    AreaElement areaElement = adh.insertAreaLocally();
-
-                    PermissionElement pe = new PermissionElement();
-                    pe.setUserId(UserContext.getInstance().getUserElement().getEmail());
-                    pe.setAreaId(areaElement.getUniqueId());
-                    pe.setFunctionCode(PermissionConstants.FULL_CONTROL);
-
-                    PermissionsDBHelper pdh = new PermissionsDBHelper(getActivity().getApplicationContext());
-                    pdh.insertPermissionLocally(pe);
-                    areaElement.getUserPermissions().put(PermissionConstants.FULL_CONTROL, pe);
-
-                    // Resetting the context for new Area
-                    AreaContext.INSTANCE.setAreaElement(areaElement, getActivity().getApplicationContext());
-                    adh.insertAreaToServer(areaElement);
-                }
-            };
-
-            ImageView createAreaView = (ImageView) getView().findViewById(id.owned_area_empty_layout_action);
-            createAreaView.setOnClickListener(createListener);
+            mView.findViewById(id.owned_area_empty_layout).setVisibility(View.VISIBLE);
         }
 
-        EditText inputSearch = (EditText) this.getActivity().findViewById(id.dashboard_search_box);
-        inputSearch.addTextChangedListener(new UserInputWatcher());
+        EditText inputSearch = (EditText) mActivity.findViewById(id.dashboard_search_box);
+        if(AreaDashboardDisplayMetaStore.INSTANCE.getActiveTab() == AreaDashboardDisplayMetaStore.TAB_OWNED_SEQ){
+            inputSearch.addTextChangedListener(new UserInputWatcher());
+        }
 
-        Button seachClearButton = (Button) this.getActivity().findViewById(id.dashboard_search_clear);
-        seachClearButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EditText inputSearch = (EditText)
-                        getActivity().findViewById(id.dashboard_search_box);
-                inputSearch.setText("");
-            }
-        });
+        Button seachClearButton = (Button) mActivity.findViewById(id.dashboard_search_clear);
+        if(AreaDashboardDisplayMetaStore.INSTANCE.getActiveTab() == AreaDashboardDisplayMetaStore.TAB_OWNED_SEQ){
+                seachClearButton.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        EditText inputSearch = (EditText) mActivity.findViewById(id.dashboard_search_box);
+                        inputSearch.setText("");
+                    }
+                });
+        }
 
-        ImageView refreshAreaView = (ImageView) this.getActivity().findViewById(id.action_area_refresh);
-        refreshAreaView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        ImageView refreshAreaView = (ImageView) mActivity.findViewById(id.action_area_refresh);
+        if(AreaDashboardDisplayMetaStore.INSTANCE.getActiveTab() == AreaDashboardDisplayMetaStore.TAB_OWNED_SEQ){
+            refreshAreaView.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mActivity.findViewById(id.splash_panel).setVisibility(View.VISIBLE);
+                    new LocalDataRefresher(mView.getContext(), new DataReloadCallback()).refreshLocalData();
+                }
+            });
+        }
+        mView.findViewById(id.splash_panel).setVisibility(View.GONE);
 
-                getActivity().findViewById(id.splash_panel).setVisibility(View.VISIBLE);
-                new LocalDataRefresher(
-                        getContext(), new DataReloadCallback()).refreshLocalData();
-            }
-        });
     }
 
     @Override
@@ -142,78 +169,37 @@ public class AreaDashboardOwnedFragment extends Fragment implements FragmentIden
 
         @Override
         public void taskCompleted(Object result) {
-            ArrayList<AreaElement> areas = new AreaDBHelper(getView().getContext()).getAreas("self");
-            ListView areaListView = (ListView) getView().findViewById(id.area_display_list);
+            ArrayList<AreaElement> areas = new AreaDBHelper(mActivity).getAreas("self");
+            ListView areaListView = (ListView) mView.findViewById(id.area_display_list);
 
             if (areas.size() > 0) {
-                getView().findViewById(id.owned_area_empty_layout).setVisibility(View.GONE);
+                mView.findViewById(id.owned_area_empty_layout).setVisibility(View.GONE);
                 areaListView.setVisibility(View.VISIBLE);
 
-                AreaItemAdaptor adaptor = new AreaItemAdaptor(getContext(), layout.area_element_row, areas);
+                AreaItemAdaptor adaptor = new AreaItemAdaptor(mView.getContext(), layout.area_element_row, areas);
                 areaListView.setAdapter(adaptor);
                 areaListView.setDescendantFocusability(ListView.FOCUS_BLOCK_DESCENDANTS);
                 areaListView.setOnItemClickListener(new OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> adapter, View v, int position, long arg3) {
-                        getActivity().finish();
                         AreaElement ae = (AreaElement) adapter.getItemAtPosition(position);
-                        AreaContext.INSTANCE.setAreaElement(ae,getContext());
-                        Intent intent = new Intent(getContext(), AreaDetailsActivity.class);
+                        AreaContext.INSTANCE.setAreaElement(ae,mActivity);
+                        Intent intent = new Intent(mActivity, AreaDetailsActivity.class);
                         startActivity(intent);
+                        mActivity.finish();
                     }
                 });
+                EditText inputSearch = (EditText) mActivity.findViewById(id.dashboard_search_box);
+                String filterStr = inputSearch.getText().toString().trim();
+                if (!filterStr.equalsIgnoreCase("")) {
+                    adaptor.getFilter().filter(filterStr);
+                }
             } else {
                 areaListView.setVisibility(View.GONE);
-                getView().findViewById(id.owned_area_empty_layout).setVisibility(View.VISIBLE);
+                mView.findViewById(id.owned_area_empty_layout).setVisibility(View.VISIBLE);
             }
-
-            AreaItemAdaptor adaptor = new AreaItemAdaptor(getContext(), layout.area_element_row, areas);
-            areaListView.setAdapter(adaptor);
-
-            EditText inputSearch = (EditText) getActivity().findViewById(id.dashboard_search_box);
-            String filterStr = inputSearch.getText().toString().trim();
-            if (!filterStr.equalsIgnoreCase("")) {
-                adaptor.getFilter().filter(filterStr);
-            }
-            getView().findViewById(id.splash_panel).setVisibility(View.INVISIBLE);
+            mView.findViewById(id.splash_panel).setVisibility(View.INVISIBLE);
         }
-    }
-
-    @Override
-    public void setUserVisibleHint(boolean visible) {
-        super.setUserVisibleHint(visible);
-        if (visible && this.isResumed()) {
-            this.loadFragment();
-        }
-    }
-
-    private void loadFragment() {
-        View view = this.getView();
-        view.findViewById(id.splash_panel).setVisibility(View.VISIBLE);
-
-        ImageView refreshAreaView = (ImageView) this.getActivity().findViewById(id.action_area_refresh);
-        refreshAreaView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-
-                getView().findViewById(id.splash_panel).setVisibility(View.VISIBLE);
-                new LocalDataRefresher(getContext(), new DataReloadCallback()).refreshLocalData();
-            }
-        });
-
-        Button seachClearButton = (Button) this.getActivity().findViewById(id.dashboard_search_clear);
-        seachClearButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                EditText inputSearch = (EditText)getActivity().findViewById(id.dashboard_search_box);
-                inputSearch.setText("");
-            }
-        });
-
-        EditText inputSearch = (EditText) this.getActivity().findViewById(id.dashboard_search_box);
-        inputSearch.addTextChangedListener(new UserInputWatcher());
-
-        view.findViewById(id.splash_panel).setVisibility(View.GONE);
     }
 
     private class UserInputWatcher implements TextWatcher {
@@ -227,17 +213,18 @@ public class AreaDashboardOwnedFragment extends Fragment implements FragmentIden
 
         @Override
         public void afterTextChanged(Editable editable) {
-            if(editable.toString().equalsIgnoreCase("")){
-                return;
-            }else {
-                View view = getView();
-                view.findViewById(id.splash_panel).setVisibility(View.VISIBLE);
+            if(AreaDashboardDisplayMetaStore.INSTANCE.getActiveTab() == AreaDashboardDisplayMetaStore.TAB_OWNED_SEQ){
+                if(editable.toString().equalsIgnoreCase("")){
+                    return;
+                }else {
+                    mView.findViewById(id.splash_panel).setVisibility(View.VISIBLE);
 
-                ListView areaListView = (ListView) view.findViewById(id.area_display_list);
-                ArrayAdapter<AreaElement> adapter = (ArrayAdapter<AreaElement>) areaListView.getAdapter();
-                adapter.getFilter().filter(editable.toString());
+                    ListView areaListView = (ListView) mView.findViewById(id.area_display_list);
+                    ArrayAdapter<AreaElement> adapter = (ArrayAdapter<AreaElement>) areaListView.getAdapter();
+                    adapter.getFilter().filter(editable.toString());
 
-                view.findViewById(id.splash_panel).setVisibility(View.GONE);
+                    mView.findViewById(id.splash_panel).setVisibility(View.GONE);
+                }
             }
         }
     }
@@ -245,7 +232,7 @@ public class AreaDashboardOwnedFragment extends Fragment implements FragmentIden
     private class DataInsertServerCallback implements AsyncTaskCallback {
         @Override
         public void taskCompleted(Object result) {
-            Intent intent = new Intent(getContext(), CreateAreaFolderStructureActivity.class);
+            Intent intent = new Intent(mActivity, CreateAreaFolderStructureActivity.class);
             startActivity(intent);
         }
     }
