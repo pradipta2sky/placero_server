@@ -14,7 +14,7 @@ import java.net.URLEncoder;
 
 import javax.net.ssl.HttpsURLConnection;
 
-import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.drive.DriveDBHelper;

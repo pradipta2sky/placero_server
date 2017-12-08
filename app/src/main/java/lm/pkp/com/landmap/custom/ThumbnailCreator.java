@@ -32,9 +32,7 @@ public class ThumbnailCreator {
 
     public void createImageThumbnail(File resourceFile, String areaId) {
         Options bitmapOptions = new Options();
-
         bitmapOptions.inJustDecodeBounds = true; // obtain the size of the image, without loading it in memory
-        BitmapFactory.decodeFile(resourceFile.getAbsolutePath(), bitmapOptions);
 
         // find the best scaling factor for the desired dimensions
         int desiredWidth = 300;

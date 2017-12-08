@@ -22,7 +22,7 @@ import java.util.Map;
 import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaDashboardDisplayMetaStore;
-import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.area.dashboard.AreaDashboardOwnedFragment;
 import lm.pkp.com.landmap.area.dashboard.AreaDashboardPublicFragment;
 import lm.pkp.com.landmap.area.dashboard.AreaDashboardSharedFragment;

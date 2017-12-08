@@ -30,6 +30,7 @@ public class AreaPictureDisplayFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         GridView gridView = (GridView) this.getView().findViewById(id.gridView);
         gridView.setAdapter(new AreaPictureDisplayAdaptor(getContext(), this, 0));
+        getView().findViewById(id.res_action_layout).setVisibility(View.GONE);
     }
 
 }

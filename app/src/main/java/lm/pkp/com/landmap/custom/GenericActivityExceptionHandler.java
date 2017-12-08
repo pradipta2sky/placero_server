@@ -46,16 +46,18 @@ public class GenericActivityExceptionHandler implements UncaughtExceptionHandler
 
         if (ex instanceof UserUnavailableException) {
             // Check why the user went off. ?? Do something here.
+            restartApplication("user_absent", ex.getMessage());
         }
 
-        this.sendEmail(content.toString());
-        this.restartApplication();
+        restartApplication("crash", content.toString());
     }
 
 
-    private void restartApplication() {
+    private void restartApplication(String cause, String reason) {
         Intent intent = new Intent(this.activity, SignInActivity.class);
-        intent.putExtra("crash", true);
+        intent.putExtra("cause", cause);
+        intent.putExtra("reason", reason);
+
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP
                 | Intent.FLAG_ACTIVITY_CLEAR_TASK
                 | Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -72,14 +74,4 @@ public class GenericActivityExceptionHandler implements UncaughtExceptionHandler
         System.exit(2);
     }
 
-    private void sendEmail(String content) {
-        try {
-            Date currDate = Calendar.getInstance(TimeZone.getTimeZone("Asia/Calcutta")).getTime();
-            GMailSender sender = new GMailSender("pradhans.prasanna@gmail.com", "baramania");
-            sender.sendMail("Landmap crash report - " + currDate, content,
-                    "pradhans.prasanna@gmail.com", "pradipta2sky@gmail.com");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
 }

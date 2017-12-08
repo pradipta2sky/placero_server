@@ -25,12 +25,17 @@ import com.google.android.gms.common.api.Status;
 
 import org.json.JSONObject;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.TimeZone;
+
 import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.R.string;
 import lm.pkp.com.landmap.SplashActivity;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
+import lm.pkp.com.landmap.mail.GMailSender;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.user.UserDBHelper;
 import lm.pkp.com.landmap.user.UserElement;
@@ -56,10 +61,18 @@ public class SignInActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(layout.activity_google_signin_main);
 
-        ActionBar ab = getSupportActionBar();
-        ab.hide();
+        Intent intent = getIntent();
+        Bundle extras = intent.getExtras();
+        if(extras != null){
+            String cause = extras.getString("cause");
+            if(cause != null && cause.equalsIgnoreCase("crash")){
+                sendEmail(extras.getString("reason"));
+            }
+        }
+
+        setContentView(layout.activity_google_signin_main);
+        getSupportActionBar().hide();
 
         mStatusTextView = (TextView) findViewById(id.status);
 
@@ -133,9 +146,7 @@ public class SignInActivity extends AppCompatActivity implements
             UserContext.getInstance().setUserElement(signedUser);
             searchOnRemoteAndUpdate(signedUser);
 
-            Intent spashIntent = new Intent(this, SplashActivity.class);
-            startActivity(spashIntent);
-            finish();
+            mGoogleApiClient.disconnect();
         } else {
             updateUI(false);
         }
@@ -159,9 +170,15 @@ public class SignInActivity extends AppCompatActivity implements
         try {
             String userDetails = result.toString();
             UserDBHelper udh = new UserDBHelper(getApplicationContext());
+            Intent spashIntent = new Intent(this, SplashActivity.class);
             if (userDetails.trim().equalsIgnoreCase("[]")) {
                 udh.insertUserToServer(signedUser);
+                spashIntent.putExtra("user_exists", "false");
+            }else {
+                spashIntent.putExtra("user_exists", "true");
             }
+            startActivity(spashIntent);
+            finish();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -248,6 +265,17 @@ public class SignInActivity extends AppCompatActivity implements
             case id.disconnect_button:
                 revokeAccess();
                 break;
+        }
+    }
+
+    private void sendEmail(String content) {
+        try {
+            Date currDate = Calendar.getInstance(TimeZone.getTimeZone("Asia/Calcutta")).getTime();
+            GMailSender sender = new GMailSender("pradhans.prasanna@gmail.com", "baramania");
+            sender.sendMail("Landmap crash report - " + currDate, content,
+                    "pradhans.prasanna@gmail.com", "pradipta2sky@gmail.com");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

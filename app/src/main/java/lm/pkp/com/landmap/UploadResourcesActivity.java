@@ -28,7 +28,8 @@ import java.util.Stack;
 
 import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.area.db.AreaDBHelper;
+import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.custom.ApiClientAsyncTask;
 import lm.pkp.com.landmap.custom.ThumbnailCreator;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
@@ -53,26 +54,32 @@ public class UploadResourcesActivity extends BaseDriveActivity {
     @Override
     public void onConnected(Bundle connectionHint) {
         super.onConnected(connectionHint);
-
-        // Preprocessing of the resources.
         ArrayList<DriveResource> resources = AreaContext.INSTANCE.getUploadedQueue();
         for (int i = 0; i < resources.size(); i++) {
             this.processStack.push(resources.get(i));
         }
-
         this.processResources();
+    }
+
+    @Override
+    protected void handleConnectionIssues() {
+        Intent areaDetailsIntent = new Intent(getApplicationContext(), AreaDetailsActivity.class);
+        areaDetailsIntent.putExtra("action", "Upload");
+        areaDetailsIntent.putExtra("outcome_type", "error");
+        areaDetailsIntent.putExtra("outcome", "Connection issues.");
+        startActivity(areaDetailsIntent);
     }
 
     private void processResources() {
         if (!this.processStack.isEmpty()) {
             this.processResource(this.processStack.pop());
         } else {
-            this.finish();
-            this.getGoogleApiClient().disconnect();
-
             Intent addResourcesIntent = new Intent(this, ShareUploadedResourcesActivity.class);
             addResourcesIntent.putExtra("uploaded_resource_ids", uploadedResources.toArray());
-            this.startActivity(addResourcesIntent);
+            getGoogleApiClient().disconnect();
+            startActivity(addResourcesIntent);
+
+            finish();
         }
     }
 
@@ -93,20 +100,30 @@ public class UploadResourcesActivity extends BaseDriveActivity {
 
             DriveApi.DriveIdResult idResult
                     = Drive.DriveApi.fetchDriveId(getGoogleApiClient(), this.resource.getContainerId()).await();
-            DriveFolder folder = idResult.getDriveId().asDriveFolder();
+            DriveId driveId = idResult.getDriveId();
+            if(driveId == null){
+                Intent addResourcesIntent = new Intent(getApplicationContext(), AreaAddResourcesActivity.class);
+                addResourcesIntent.putExtra("action", "Upload");
+                addResourcesIntent.putExtra("outcome_type", "error");
+                addResourcesIntent.putExtra("outcome", "Upload location corrupted.");
+                getGoogleApiClient().disconnect();
+                startActivity(addResourcesIntent);
 
-            DriveApi.DriveContentsResult contentsResult
-                    = Drive.DriveApi.newDriveContents(getGoogleApiClient()).await();
-            DriveContents contents = contentsResult.getDriveContents();
-            MetadataChangeSet changeSet = new Builder()
-                    .setTitle(this.resource.getName())
-                    .setMimeType(this.resource.getMimeType())
-                    .build();
-            DriveFolder.DriveFileResult driveFileResult = folder.createFile(getGoogleApiClient(), changeSet, contents).await();
+                finish();
+            }else {
+                DriveFolder folder = driveId.asDriveFolder();
+                DriveApi.DriveContentsResult contentsResult
+                        = Drive.DriveApi.newDriveContents(getGoogleApiClient()).await();
+                DriveContents contents = contentsResult.getDriveContents();
+                MetadataChangeSet changeSet = new Builder()
+                        .setTitle(this.resource.getName())
+                        .setMimeType(this.resource.getMimeType())
+                        .build();
+                DriveFolder.DriveFileResult driveFileResult = folder.createFile(getGoogleApiClient(), changeSet, contents).await();
 
-            DriveFile createdFile = driveFileResult.getDriveFile();
-            createdFile.addChangeListener(getGoogleApiClient(), new FileMetaChangeListener(this.resource, createdFile));
-
+                DriveFile createdFile = driveFileResult.getDriveFile();
+                createdFile.addChangeListener(getGoogleApiClient(), new FileMetaChangeListener(this.resource, createdFile));
+            }
             return null;
         }
     }

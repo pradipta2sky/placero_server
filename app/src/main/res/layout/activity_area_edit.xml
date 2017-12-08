@@ -1,110 +1,130 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:weightSum="1">
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/position_list_scroll"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:layout_margin="10dp"
+    android:fillViewport="true"
+    android:visibility="visible">
 
-    <include
-        layout="@layout/area_element_row"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:id="@+id/selected_area_include" />
-
-    <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:orientation="vertical"
-        android:layout_margin="25dp">
+        android:weightSum="1">
 
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:layout_marginBottom="8dp">
 
-            <EditText
-                android:id="@+id/area_name_edit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text"
-                android:hint="Name"
-                android:textSize="18sp" />
-        </android.support.design.widget.TextInputLayout>
-
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:layout_marginBottom="8dp">
-
-            <EditText
-                android:id="@+id/area_desc_edit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text"
-                android:hint="Description"
-                android:textSize="18sp" />
-        </android.support.design.widget.TextInputLayout>
-
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:layout_marginBottom="8dp">
-
-            <EditText
-                android:id="@+id/area_address_edit"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text"
-                android:hint="Address"
-                android:textSize="18sp" />
-        </android.support.design.widget.TextInputLayout>
+        <include
+            android:id="@+id/selected_area_include"
+            layout="@layout/area_element_row"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content" />
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:weightSum="1"
-            android:layout_weight="0.4"
-            android:layout_marginTop="20dp">
+            android:layout_margin="25dp"
+            android:orientation="vertical">
 
-            <CheckBox
-                android:id="@+id/make_area_public"
-                android:layout_width="wrap_content"
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Make place public !!. Anyone can find and view your place. Public places are view only no changes are possible."
-                android:checked="false" />
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="18dp">
+
+                <EditText
+                    android:id="@+id/area_name_edit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Name"
+                    android:inputType="text"
+                    android:textSize="18sp" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="18dp">
+
+                <EditText
+                    android:id="@+id/area_desc_edit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Description"
+                    android:inputType="text"
+                    android:textSize="18sp" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:layout_marginTop="18dp">
+
+                <EditText
+                    android:id="@+id/area_address_edit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Address"
+                    android:inputType="text"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="5dp"
+                    android:text="** Please do not delete the @$ markers."
+                    android:textSize="14sp"/>
+
+            </android.support.design.widget.TextInputLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_weight="0.4"
+                android:orientation="horizontal"
+                android:weightSum="1">
+
+                <CheckBox
+                    android:id="@+id/make_area_public"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:checked="false"
+                    android:text="Make place public !!. Anyone can find and view your place. Public places are view only no changes are possible." />
+
+            </LinearLayout>
 
         </LinearLayout>
 
-    </LinearLayout>
-
-    <Button
-        android:id="@+id/area_edit_save_btn"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center_horizontal"
-        android:background="@color/blue_grey_500"
-        android:elevation="4dp"
-        android:paddingLeft="70dp"
-        android:paddingRight="70dp"
-        android:text="Save"
-        android:textColor="#fff"
-        android:layout_marginTop="20dp" />
-
-    <RelativeLayout
-        android:id="@+id/splash_panel"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:visibility="gone">
-
-        <ProgressBar
+        <Button
+            android:id="@+id/area_edit_save_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:indeterminate="true" />
-    </RelativeLayout>
+            android:layout_gravity="bottom|center_horizontal"
+            android:layout_marginTop="20dp"
+            android:background="@color/blue_grey_500"
+            android:elevation="4dp"
+            android:paddingLeft="70dp"
+            android:paddingRight="70dp"
+            android:text="Save"
+            android:textColor="#fff" />
 
-</LinearLayout>
+        <RelativeLayout
+            android:id="@+id/splash_panel"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <ProgressBar
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:indeterminate="true" />
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</ScrollView>
+

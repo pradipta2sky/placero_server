@@ -20,7 +20,7 @@ import java.util.ArrayList;
 
 import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.area.res.disp.AreaAddResourceAdaptor;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.drive.DriveResource;
@@ -91,13 +91,25 @@ public class AreaAddResourcesActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 if(AreaAddResourcesActivity.this.adaptor.getCount() == 0){
-                    AreaAddResourcesActivity.this.showErrorMessage("Nothing to upload.", "error");
+                    AreaAddResourcesActivity.this.showMessage("Nothing to upload.", "error");
                     return;
                 }
                 Intent i = new Intent(AreaAddResourcesActivity.this, UploadResourcesActivity.class);
                 AreaAddResourcesActivity.this.startActivity(i);
             }
         });
+
+        showErrorsIfAny();
+    }
+
+    private void showErrorsIfAny() {
+        Bundle intentBundle = getIntent().getExtras();
+        if (intentBundle != null) {
+            String action = intentBundle.getString("action");
+            String outcome = intentBundle.getString("outcome");
+            String outcomeType = intentBundle.getString("outcome_type");
+            showMessage(action + " " + outcomeType + ". " + outcome, outcomeType);
+        }
     }
 
     @Override
@@ -118,21 +130,22 @@ public class AreaAddResourcesActivity extends AppCompatActivity {
         this.startActivity(i);
     }
 
-    private void showErrorMessage(String message, String type) {
-        final Snackbar snackbar = Snackbar.make(this.getWindow().getDecorView(), message, Snackbar.LENGTH_INDEFINITE);
+    private void showMessage(String message, String type) {
+        final Snackbar snackbar = Snackbar.make(getWindow().getDecorView(),
+                message + ".", Snackbar.LENGTH_INDEFINITE);
 
         View sbView = snackbar.getView();
-        snackbar.getView().setBackgroundColor(Color.WHITE);
+        snackbar.getView().setBackgroundColor(Color.parseColor("#FAF7F6"));
 
-        TextView textView = (TextView) sbView.findViewById(id.snackbar_text);
-        if(type.equalsIgnoreCase("info")){
-            textView.setTextColor(Color.GREEN);
-        } else if(type.equalsIgnoreCase("error")) {
+        TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+        if (type.equalsIgnoreCase("info")) {
+            textView.setTextColor(Color.parseColor("#30601F"));
+        } else if (type.equalsIgnoreCase("error")) {
             textView.setTextColor(Color.RED);
-        }else{
+        } else {
             textView.setTextColor(Color.DKGRAY);
         }
-        textView.setTypeface(Typeface.SANS_SERIF,Typeface.BOLD);
+        textView.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
         textView.setTextSize(15);
         textView.setMaxLines(3);
 

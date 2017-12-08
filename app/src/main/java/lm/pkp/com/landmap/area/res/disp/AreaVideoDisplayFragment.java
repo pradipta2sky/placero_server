@@ -35,21 +35,7 @@ public class AreaVideoDisplayFragment extends Fragment {
         this.gridView = (GridView) this.getView().findViewById(id.gridView);
         this.adaptor = new AreaVideoDisplayAdaptor(getContext(), this, 1);
         this.gridView.setAdapter(this.adaptor);
+        getView().findViewById(id.res_action_layout).setVisibility(View.GONE);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-    }
-
-    @Override
-    public void setUserVisibleHint(boolean visible) {
-        super.setUserVisibleHint(visible);
-        if (visible && this.isResumed()) {
-            this.loadFragment();
-        }
-    }
-
-    private void loadFragment() {
-    }
 }

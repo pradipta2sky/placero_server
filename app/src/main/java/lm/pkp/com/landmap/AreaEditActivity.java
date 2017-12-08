@@ -16,7 +16,7 @@ import android.widget.TextView;
 
 import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
@@ -33,7 +33,7 @@ public class AreaEditActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
 
-        this.setContentView(layout.activity_area_edit);
+        this.setContentView(R.layout.activity_area_edit);
 
         final AreaElement ae = AreaContext.INSTANCE.getAreaElement();
         ActionBar ab = this.getSupportActionBar();

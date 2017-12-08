@@ -3,7 +3,7 @@ package lm.pkp.com.landmap.permission;
 import java.util.Map;
 
 import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.area.model.AreaElement;
 
 /**
  * Created by USER on 11/11/2017.

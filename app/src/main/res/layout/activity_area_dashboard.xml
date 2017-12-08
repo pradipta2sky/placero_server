@@ -1,7 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="fill_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    >
 
     <android.support.v7.widget.Toolbar
         android:id="@+id/areas_display_toolbar"
@@ -32,6 +33,27 @@
         android:id="@+id/areas_display_tab_pager"
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
-        android:layout_below="@id/areas_display_tab_layout" />
+        android:layout_below="@id/areas_display_tab_layout"
+        android:clickable="true"/>
+
+    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fitsSystemWindows="false"
+        android:id="@+id/res_action_layout"
+        android:visibility="gone">
+
+        <android.support.design.widget.FloatingActionButton xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/res_report"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginBottom="15dp"
+            android:layout_marginRight="15dp"
+            android:src="@drawable/pdf_icon"
+            android:visibility="visible"
+            app:backgroundTint="#F97464" />
+
+    </android.support.design.widget.CoordinatorLayout>
 
 </RelativeLayout>

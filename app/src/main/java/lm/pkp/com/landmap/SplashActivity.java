@@ -16,12 +16,18 @@ import lm.pkp.com.landmap.sync.LocalFolderStructureManager;
 
 public class SplashActivity extends Activity {
 
+    private boolean userExists = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
-
         setContentView(layout.activity_splash);
+
+        Bundle extras = getIntent().getExtras();
+        if(extras != null){
+            userExists = new Boolean(extras.getString("user_exists"));
+        }
 
         new LocalDataRefresher(getApplicationContext(), new DataReloadCallback()).refreshLocalData();
         LocalFolderStructureManager.create();
@@ -31,9 +37,13 @@ public class SplashActivity extends Activity {
 
         @Override
         public void taskCompleted(Object result) {
-            Intent commonFoldersIntent = new Intent(SplashActivity.this,
-                    CreateCommonFolderStructureActivity.class);
-            startActivity(commonFoldersIntent);
+            if(userExists){
+                Intent dashboardIntent = new Intent(SplashActivity.this, AreaDashboardActivity.class);
+                startActivity(dashboardIntent);
+            }else {
+                Intent commonFoldersIntent = new Intent(SplashActivity.this, CreateCommonFolderStructureActivity.class);
+                startActivity(commonFoldersIntent);
+            }
             finish();
         }
     }

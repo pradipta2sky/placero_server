@@ -31,7 +31,7 @@ import lm.pkp.com.landmap.R.drawable;
 import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.area.res.disp.DocumentChooserAdaptor;
 import lm.pkp.com.landmap.area.res.disp.FileDisplayElement;
 import lm.pkp.com.landmap.custom.PermittedFileArrayList;
@@ -63,14 +63,14 @@ public class AreaDocumentChooserFragment extends Fragment {
             this.listView.setOnItemClickListener(new OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                    FileDisplayElement item = AreaDocumentChooserFragment.this.items.get(i);
+                    FileDisplayElement item = items.get(i);
                     File documentFile = new File(item.getPath());
                     if (!documentFile.canRead()) {
-                        AreaDocumentChooserFragment.this.showErrorBox("Error: File cannot be read. Probably corrupt / locked.");
+                        showErrorBox("Error: File cannot be read. Probably corrupt / locked.");
                         return;
                     }
                     if (documentFile.length() == 0) {
-                        AreaDocumentChooserFragment.this.showErrorBox("Error: File does not have any contents.");
+                        showErrorBox("Error: File does not have any contents.");
                         return;
                     }
 
@@ -96,13 +96,11 @@ public class AreaDocumentChooserFragment extends Fragment {
                     resource.setMimeType(FileUtil.getMimeType(loadFile));
                     resource.setContentType("Document");
                     resource.setContainerId(areaContext.getDocumentRootDriveResource().getResourceId());
-
                     areaContext.addResourceToQueue(resource);
 
-                    AreaDocumentChooserFragment.this.getActivity().finish();
-
-                    Intent intent = new Intent(AreaDocumentChooserFragment.this.getActivity(), AreaAddResourcesActivity.class);
-                    AreaDocumentChooserFragment.this.startActivity(intent);
+                    Intent intent = new Intent(getActivity(), AreaAddResourcesActivity.class);
+                    startActivity(intent);
+                    getActivity().finish();
                 }
             });
 

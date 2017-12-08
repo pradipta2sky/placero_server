@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.drive.DriveResource;
 
 /**

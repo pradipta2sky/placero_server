@@ -2,7 +2,7 @@ package lm.pkp.com.landmap.util;
 
 import android.graphics.Color;
 
-import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.area.model.AreaElement;
 
 /**
  * Created by USER on 11/12/2017.

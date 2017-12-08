@@ -12,7 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.area.res.disp.AreaDocumentDisplayFragment;
 import lm.pkp.com.landmap.area.res.disp.AreaPictureDisplayFragment;
 import lm.pkp.com.landmap.area.res.disp.AreaVideoDisplayFragment;

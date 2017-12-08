@@ -11,9 +11,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.UUID;
 
-import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.google.geo.CommonGeoHelper;
@@ -164,8 +165,8 @@ public class AreaDBHelper extends SQLiteOpenHelper {
             contentValues.put(AREA_COLUMN_ADDRESS, ae.getAddress());
         } else {
             CommonGeoHelper geoHelper = CommonGeoHelper.INSTANCE;
-            String address = geoHelper.getAddressByGeoLocation(this.localContext, centerPosition.getLat(), centerPosition.getLon());
-            contentValues.put(AREA_COLUMN_ADDRESS, address);
+            Map<String, String> addressStore = geoHelper.getAddressByGeoLocation(this.localContext, centerPosition.getLat(), centerPosition.getLon());
+            contentValues.put(AREA_COLUMN_ADDRESS, addressStore.toString());
         }
         ae.setAddress(contentValues.getAsString(AREA_COLUMN_ADDRESS));
         db.update(AREA_TABLE_NAME, contentValues, AREA_COLUMN_UNIQUE_ID + " = ? ", new String[]{ae.getUniqueId()});

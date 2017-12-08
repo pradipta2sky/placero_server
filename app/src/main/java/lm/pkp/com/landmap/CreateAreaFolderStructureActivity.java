@@ -18,9 +18,8 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.UUID;
 
-import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.area.FileStorageConstants;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
@@ -33,13 +32,22 @@ public class CreateAreaFolderStructureActivity extends BaseDriveActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setContentView(layout.activity_synchronize_folders);
+        this.setContentView(R.layout.activity_synchronize_folders);
     }
 
     @Override
     public void onConnected(Bundle connectionHint) {
         super.onConnected(connectionHint);
         new FileProcessingTask().execute();
+    }
+
+    @Override
+    protected void handleConnectionIssues() {
+        Intent areaDetailsIntent = new Intent(getApplicationContext(), AreaDetailsActivity.class);
+        areaDetailsIntent.putExtra("action", "Drive Error");
+        areaDetailsIntent.putExtra("outcome_type", "error");
+        areaDetailsIntent.putExtra("outcome", "Place folder creation failed.");
+        startActivity(areaDetailsIntent);
     }
 
     private class FileProcessingTask extends AsyncTask {
@@ -61,19 +69,19 @@ public class CreateAreaFolderStructureActivity extends BaseDriveActivity {
         private void fetchStatusAndAct() {
             DriveDBHelper ddh = new DriveDBHelper(getApplicationContext());
             // Check if there are common folders defined in database. //content_type = folder
-            Map<String, DriveResource> commonResourceMap = ddh.getCommonResources();
+            Map<String, DriveResource> commonResourceMap = ddh.getCommonResourcesByName();
             AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
 
             DriveResource imagesFolder = commonResourceMap.get(FileStorageConstants.IMAGE_ROOT_FOLDER_NAME);
-            DriveResource folderResource = createFolderResource(areaElement.getUniqueId(), imagesFolder);
+            DriveResource folderResource = createFolderResource(areaElement.getUniqueId(), imagesFolder, "Images");
             this.createStack.push(folderResource);
 
             DriveResource videosFolder = commonResourceMap.get(FileStorageConstants.VIDEO_ROOT_FOLDER_NAME);
-            folderResource = createFolderResource(areaElement.getUniqueId(), videosFolder);
+            folderResource = createFolderResource(areaElement.getUniqueId(), videosFolder, "Videos");
             this.createStack.push(folderResource);
 
             DriveResource docsFolder = commonResourceMap.get(FileStorageConstants.DOCUMENT_ROOT_FOLDER_NAME);
-            folderResource = createFolderResource(areaElement.getUniqueId(), docsFolder);
+            folderResource = createFolderResource(areaElement.getUniqueId(), docsFolder, "Documents");
             this.createStack.push(folderResource);
 
             // Start processing.
@@ -83,7 +91,7 @@ public class CreateAreaFolderStructureActivity extends BaseDriveActivity {
         public void processCreateStack() {
             if (this.createStack.isEmpty()) {
                 getGoogleApiClient().disconnect();
-                Intent i = new Intent(CreateAreaFolderStructureActivity.this, AreaDetailsActivity.class);
+                Intent i = new Intent(getApplicationContext(), AreaDetailsActivity.class);
                 startActivity(i);
             } else {
                 DriveResource resource = this.createStack.pop();
@@ -172,7 +180,7 @@ public class CreateAreaFolderStructureActivity extends BaseDriveActivity {
 
     }
 
-    private DriveResource createFolderResource(String folderName, DriveResource parent) {
+    private DriveResource createFolderResource(String folderName, DriveResource parent, String contentType) {
         DriveResource resource = new DriveResource();
 
         AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
@@ -185,7 +193,7 @@ public class CreateAreaFolderStructureActivity extends BaseDriveActivity {
         resource.setSize("0");
         resource.setAreaId(areaElement.getUniqueId());
         resource.setContainerId(parent.getResourceId());
-        resource.setContentType("folder");
+        resource.setContentType("");
         resource.setMimeType("application/vnd.google-apps.folder");
         resource.setResourceId(null);
 

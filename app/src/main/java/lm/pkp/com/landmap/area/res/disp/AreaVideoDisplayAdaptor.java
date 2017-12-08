@@ -23,8 +23,10 @@ import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.RemoveDriveResourcesActivity;
 import lm.pkp.com.landmap.area.AreaContext;
+import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
+import lm.pkp.com.landmap.util.FileUtil;
 
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
 
@@ -92,32 +94,49 @@ final class AreaVideoDisplayAdaptor extends BaseAdapter {
                 ImageView clickedImage = (ImageView) referredView;
                 clickedImage.setBackgroundResource(R.drawable.image_border);
 
-                FloatingActionButton deleteButton = (FloatingActionButton) fragment.getView().findViewById(id.res_delete);
-                deleteButton.setVisibility(View.VISIBLE);
+                fragment.getView().findViewById(id.res_action_layout).setVisibility(View.VISIBLE);
 
                 final VideoDisplayElement videoDisplayElement = dataSet.get(position);
+                final String resourceId = videoDisplayElement.getResourceId();
+                FloatingActionButton deleteButton = (FloatingActionButton) fragment.getView().findViewById(id.res_delete);
                 deleteButton.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(referredView.getContext(), RemoveDriveResourcesActivity.class);
-                        String resourceId = videoDisplayElement.getResourceId();
-                        if (!resourceId.equalsIgnoreCase("2")) {
-                            intent.putExtra("resource_ids", resourceId);
-                            intent.putExtra("tab_position", tabPosition);
-                            referredView.getContext().startActivity(intent);
-                        } else {
-                            DriveDBHelper ddh = new DriveDBHelper(fragment.getContext());
-                            DriveResource driveResource = ddh.getDriveResourceByResourceId(resourceId);
+                        intent.putExtra("resource_ids", resourceId);
+                        intent.putExtra("tab_position", tabPosition);
 
-                            AreaContext.INSTANCE.getAreaElement().getMediaResources().remove(driveResource);
-                            ddh.deleteResourceLocally(driveResource);
-                            ddh.deleteResourceFromServer(driveResource);
+                        DriveDBHelper ddh = new DriveDBHelper(fragment.getContext());
+                        DriveResource driveResource = ddh.getDriveResourceByResourceId(resourceId);
 
-                            dataSet.remove(videoDisplayElement);
-                            notifyDataSetChanged();
-                        }
+                        AreaContext.INSTANCE.getAreaElement().getMediaResources().remove(driveResource);
+                        ddh.deleteResourceLocally(driveResource);
+                        ddh.deleteResourceFromServer(driveResource);
+
+                        dataSet.remove(videoDisplayElement);
+                        notifyDataSetChanged();
+                        referredView.getContext().startActivity(intent);
                     }
                 });
+
+                FloatingActionButton mailButton = (FloatingActionButton) fragment.getView().findViewById(id.res_mail);
+                mailButton.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        File videoFile = videoDisplayElement.getVideoFile();
+
+                        AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
+                        Intent intent = new Intent(Intent.ACTION_SEND);
+                        intent.putExtra(Intent.EXTRA_SUBJECT, "Video shared using [Placero LMS] for place - " + areaElement.getName());
+                        intent.putExtra(Intent.EXTRA_TEXT, "Hi, \nCheck out video for " + areaElement.getName());
+                        intent.setType(FileUtil.getMimeType(videoFile));
+                        Uri uri = Uri.fromFile(videoFile);
+                        intent.putExtra(Intent.EXTRA_STREAM, uri);
+
+                        referredView.getContext().startActivity(Intent.createChooser(intent, "Send email..."));
+                    }
+                });
+
                 return false;
             }
         });

@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.sync.LMSRestAsyncTask;
 import lm.pkp.com.landmap.user.UserContext;

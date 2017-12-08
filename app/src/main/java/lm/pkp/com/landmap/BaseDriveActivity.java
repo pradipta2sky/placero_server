@@ -18,9 +18,7 @@ import com.google.android.gms.drive.Drive;
 import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 
-public abstract class BaseDriveActivity extends Activity implements
-        ConnectionCallbacks,
-        OnConnectionFailedListener {
+public abstract class BaseDriveActivity extends Activity implements ConnectionCallbacks, OnConnectionFailedListener {
 
     private static final String TAG = "BaseDriveActivity";
     protected static final int REQUEST_CODE_RESOLUTION = 1;
@@ -33,7 +31,7 @@ public abstract class BaseDriveActivity extends Activity implements
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
 
-        this.setContentView(layout.activity_generic_wait);
+        setContentView(layout.activity_generic_wait);
     }
 
     @Override
@@ -57,6 +55,8 @@ public abstract class BaseDriveActivity extends Activity implements
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == BaseDriveActivity.REQUEST_CODE_RESOLUTION && resultCode == Activity.RESULT_OK) {
             this.mGoogleApiClient.connect();
+        }else {
+            handleConnectionIssues();
         }
     }
 
@@ -84,6 +84,7 @@ public abstract class BaseDriveActivity extends Activity implements
         if (!result.hasResolution()) {
             // show the localized error dialog.
             GoogleApiAvailability.getInstance().getErrorDialog(this, result.getErrorCode(), 0).show();
+            handleConnectionIssues();
             return;
         }
         try {
@@ -91,10 +92,6 @@ public abstract class BaseDriveActivity extends Activity implements
         } catch (IntentSender.SendIntentException e) {
             Log.e(BaseDriveActivity.TAG, "Exception while starting resolution activity", e);
         }
-    }
-
-    public void showMessage(String message) {
-        this.statusText.setText(message);
     }
 
     public GoogleApiClient getGoogleApiClient() {
@@ -115,4 +112,6 @@ public abstract class BaseDriveActivity extends Activity implements
     protected void onDestroy() {
         super.onDestroy();
     }
+
+    protected abstract void handleConnectionIssues();
 }

@@ -30,7 +30,7 @@ import java.util.UUID;
 import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
@@ -75,7 +75,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         bottomDrawable.setColor(ColorProvider.getAreaToolBarColor(ae));
 
         if (!askForLocationPermission()) {
-            showErrorMessage("No permission given for location fix !!", "error");
+            showMessage("No permission given for location fix !!", "error");
             finish();
         }
 
@@ -119,11 +119,9 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
             @Override
             public void onClick(View v) {
                 if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.REMOVE_AREA)) {
-                    AreaDBHelper adh = new AreaDBHelper(getApplicationContext(), new DeleteAreaCallback());
-                    adh.deleteArea(ae);
-                    adh.deleteAreaFromServer(ae);
+                    showAreaDeleteConfirmation();
                 } else {
-                    showErrorMessage("You do not have removal rights !!", "error");
+                    showMessage("You do not have removal rights !!", "error");
                 }
             }
         });
@@ -138,7 +136,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
                     findViewById(id.splash_panel).setVisibility(View.VISIBLE);
                     new GPSLocationProvider(AreaDetailsActivity.this).getLocation();
                 } else {
-                    showErrorMessage("You do not have Plotting rights !!", "error");
+                    showMessage("You do not have Plotting rights !!", "error");
                 }
             }
         };
@@ -160,7 +158,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
                     Intent intent = new Intent(getApplicationContext(), AreaMapPlotterActivity.class);
                     startActivity(intent);
                 } else {
-                    showErrorMessage("You need atleast 1 points to plot!!!", "error");
+                    showMessage("You need atleast 1 points to plot!!!", "error");
                 }
             }
         });
@@ -177,7 +175,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
                     navigationIntent.setPackage("com.google.android.apps.maps");
                     startActivity(navigationIntent);
                 } else {
-                    showErrorMessage("No positions available for navigation", "error");
+                    showMessage("No positions available for navigation", "error");
                 }
             }
         });
@@ -190,7 +188,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
                     Intent areaShareIntent = new Intent(getApplicationContext(), AreaShareActivity.class);
                     startActivity(areaShareIntent);
                 } else {
-                    showErrorMessage("You do not have area sharing rights !!", "error");
+                    showMessage("You do not have area sharing rights !!", "error");
                 }
             }
         });
@@ -203,7 +201,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
                     Intent intent = new Intent(getApplicationContext(), AreaAddResourcesActivity.class);
                     startActivity(intent);
                 } else {
-                    showErrorMessage("You do not have resource addition rights !!", "error");
+                    showMessage("You do not have resource addition rights !!", "error");
                 }
             }
         });
@@ -226,7 +224,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
             String action = intentBundle.getString("action");
             String outcome = intentBundle.getString("outcome");
             String outcomeType = intentBundle.getString("outcome_type");
-            showErrorMessage(action + " " + outcomeType + ". " + outcome, outcomeType);
+            showMessage(action + " " + outcomeType + ". " + outcome, outcomeType);
         }
     }
 
@@ -238,6 +236,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         AreaElement ae = AreaContext.INSTANCE.getAreaElement();
         List<PositionElement> positions = ae.getPositions();
         if(!positions.contains(pe)){
+            pe.setDisplayName("Position_" + positions.size());
             positions.add(pe);
             pe = pdb.insertPositionLocally(pe);
             pdb.insertPositionToServer(pe);
@@ -246,7 +245,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
             positionList.add(pe);
             adaptor.notifyDataSetChanged();
         }else{
-            showErrorMessage("Position already exists. Ignoring.", "info");
+            showMessage("Position already exists. Ignoring.", "info");
         }
 
         if (positions.size() > 0) {
@@ -347,7 +346,36 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
                 .show();
     }
 
-    private void showErrorMessage(String message, String type) {
+    private void showAreaDeleteConfirmation() {
+        new Builder(this)
+                .setTitle("Delete Area !!, Cannot Undo")
+                .setMessage("Do you really want to remove the area ?")
+                .setPositiveButton(string.yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        AreaDBHelper adh = new AreaDBHelper(getApplicationContext(), new DeleteAreaCallback());
+                        adh.deleteArea(ae);
+                        adh.deleteAreaFromServer(ae);
+                    }
+                })
+                .setNegativeButton(string.no, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int whichButton) {
+                        // Add some marker in the context saying that GPS is not enabled.
+                    }
+                })
+                .show();
+    }
+
+    private class DeleteAreaCallback implements AsyncTaskCallback {
+        @Override
+        public void taskCompleted(Object result) {
+            finish();
+            Intent areaDashboardIntent = new Intent(getApplicationContext(), RemoveDriveResourcesActivity.class);
+            startActivity(areaDashboardIntent);
+        }
+    }
+
+
+    private void showMessage(String message, String type) {
         final Snackbar snackbar = Snackbar.make(getWindow().getDecorView(),
                 message + ".", Snackbar.LENGTH_INDEFINITE);
 
@@ -373,15 +401,6 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
             }
         });
         snackbar.show();
-    }
-
-    private class DeleteAreaCallback implements AsyncTaskCallback {
-        @Override
-        public void taskCompleted(Object result) {
-            finish();
-            Intent areaDashboardIntent = new Intent(getApplicationContext(), RemoveDriveResourcesActivity.class);
-            startActivity(areaDashboardIntent);
-        }
     }
 
     private class WeatherDataCallback implements AsyncTaskCallback {

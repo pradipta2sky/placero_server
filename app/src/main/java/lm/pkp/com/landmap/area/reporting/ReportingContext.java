@@ -1,4 +1,4 @@
-package lm.pkp.com.landmap.area;
+package lm.pkp.com.landmap.area.reporting;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -9,6 +9,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import lm.pkp.com.landmap.area.model.AreaElement;
+import lm.pkp.com.landmap.area.FileStorageConstants;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
 import lm.pkp.com.landmap.permission.PermissionsDBHelper;
@@ -19,11 +20,11 @@ import lm.pkp.com.landmap.sync.LocalFolderStructureManager;
 /**
  * Created by USER on 10/24/2017.
  */
-public class AreaContext {
+public class ReportingContext {
 
-    public static final AreaContext INSTANCE = new AreaContext();
+    public static final ReportingContext INSTANCE = new ReportingContext();
 
-    private AreaContext() {
+    private ReportingContext() {
     }
 
     private AreaElement currentArea;
@@ -31,18 +32,14 @@ public class AreaContext {
     private Bitmap displayBMap;
     private Boolean generatingReport;
     private List<Bitmap> viewBitmaps = new ArrayList<>();
-    private final ArrayList<DriveResource> uploadQueue = new ArrayList<>();
 
     public AreaElement getAreaElement() {
         return this.currentArea;
     }
 
     public void setAreaElement(AreaElement areaElement, Context context) {
-        clearContext();
-
         this.currentArea = areaElement;
         this.context = context;
-        this.uploadQueue.clear();
 
         PositionsDBHelper pdb = new PositionsDBHelper(context);
         this.currentArea.setPositions(pdb.getPositionsForArea(this.currentArea));
@@ -53,31 +50,6 @@ public class AreaContext {
 
         PermissionsDBHelper pdh = new PermissionsDBHelper(context);
         currentArea.setUserPermissions(pdh.fetchPermissionsByAreaId(currentArea.getUniqueId()));
-    }
-
-    public void clearContext(){
-        if(currentArea != null){
-            currentArea.getPositions().clear();
-            currentArea.getMediaResources().clear();
-            currentArea.getUserPermissions().clear();
-
-            currentArea = null;
-            context = null;
-            uploadQueue.clear();
-
-            if(displayBMap != null){
-                displayBMap.recycle();
-            }
-            Iterator<Bitmap> iterator = viewBitmaps.iterator();
-            while (iterator.hasNext()){
-                Bitmap bitmap = iterator.next();
-                if(bitmap != null){
-                    bitmap.recycle();
-                }
-            }
-            displayBMap = null;
-            System.gc();
-        }
     }
 
     public void reCenter(AreaElement areaElement) {
@@ -107,19 +79,6 @@ public class AreaContext {
         centerPosition.setLat(latAvg);
         centerPosition.setLon(lonAvg);
         centerPosition.setUniqueId(positionId);
-    }
-
-    // Drive specific resources.
-    public void addResourceToQueue(DriveResource dr) {
-        this.uploadQueue.add(dr);
-    }
-
-    public void removeResourceFromQueue(DriveResource dr) {
-        this.uploadQueue.remove(dr);
-    }
-
-    public ArrayList<DriveResource> getUploadedQueue() {
-        return this.uploadQueue;
     }
 
     private DriveResource imagesResourceRoot = null;

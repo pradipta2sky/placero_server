@@ -8,7 +8,15 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.Polygon;
+import com.google.android.gms.maps.model.Polyline;
+import com.google.maps.android.PolyUtil;
+import com.google.maps.android.SphericalUtil;
+
+import java.util.LinkedHashMap;
+import java.util.Set;
 
 public class MapWrapperLayout extends RelativeLayout {
     /**
@@ -28,6 +36,8 @@ public class MapWrapperLayout extends RelativeLayout {
      * A currently selected marker
      */
     private Marker marker;
+    private LinkedHashMap<Polygon, Marker> polygonMarkers;
+
 
     /**
      * Our custom view which is returned from either the InfoWindowAdapter.getInfoContents
@@ -67,6 +77,7 @@ public class MapWrapperLayout extends RelativeLayout {
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
         boolean ret = false;
+
         // Make sure that the infoWindow is shown and we have all the needed references
         if (this.marker != null && this.marker.isInfoWindowShown() && this.map != null && this.infoWindow != null) {
             // Get a marker position on the screen
@@ -84,5 +95,9 @@ public class MapWrapperLayout extends RelativeLayout {
         // If the infoWindow consumed the touch event, then just return true.
         // Otherwise pass this event to the super class and return it's result
         return ret || super.dispatchTouchEvent(ev);
+    }
+
+    public void setPolygonMarkers(LinkedHashMap<Polygon, Marker> polygonMarkers) {
+        this.polygonMarkers = polygonMarkers;
     }
 }

@@ -13,7 +13,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.UUID;
 
-import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.sync.LMSRestAsyncTask;
 import lm.pkp.com.landmap.util.AndroidSystemUtil;
 

@@ -25,12 +25,28 @@
 
     </RelativeLayout>
 
-    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <android.support.design.widget.CoordinatorLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:fitsSystemWindows="true">
+        android:fitsSystemWindows="false"
+        android:id="@+id/res_action_layout"
+        android:visibility="visible">
 
-        <android.support.design.widget.FloatingActionButton xmlns:app="http://schemas.android.com/apk/res-auto"
+        <android.support.design.widget.FloatingActionButton
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/res_mail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginBottom="75dp"
+            android:layout_marginRight="15dp"
+            android:src="@drawable/gmail_icon"
+            android:visibility="visible"
+            app:backgroundTint="#F8F9F9" />
+
+        <android.support.design.widget.FloatingActionButton
+            xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/res_delete"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -38,8 +54,8 @@
             android:layout_marginBottom="15dp"
             android:layout_marginRight="15dp"
             android:src="@drawable/delete"
-            android:visibility="gone"
-            app:backgroundTint="#F97464" />
+            android:visibility="visible"
+            app:backgroundTint="#F8F9F9" />
 
     </android.support.design.widget.CoordinatorLayout>
 

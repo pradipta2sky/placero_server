@@ -23,8 +23,10 @@ import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.RemoveDriveResourcesActivity;
 import lm.pkp.com.landmap.area.AreaContext;
+import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
+import lm.pkp.com.landmap.util.FileUtil;
 
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
 
@@ -52,12 +54,12 @@ final class AreaDocumentDisplayAdaptor extends BaseAdapter {
         }
 
         Drawable drawable = view.getDrawable();
-        if(drawable == null){
+        if (drawable == null) {
             drawable = view.getBackground();
         }
-        if(drawable != null){
+        if (drawable != null) {
             Bitmap previousBitmap = ((BitmapDrawable) drawable).getBitmap();
-            if(previousBitmap != null){
+            if (previousBitmap != null) {
                 previousBitmap.recycle();
             }
         }
@@ -68,7 +70,7 @@ final class AreaDocumentDisplayAdaptor extends BaseAdapter {
         Bitmap bMap = null;
         if (thumbFile.exists()) {
             bMap = BitmapFactory.decodeFile(thumbFile.getAbsolutePath());
-        }else {
+        } else {
             bMap = BitmapFactory.decodeResource(context.getResources(), R.drawable.error);
         }
         view.setImageBitmap(bMap);
@@ -91,30 +93,47 @@ final class AreaDocumentDisplayAdaptor extends BaseAdapter {
                 ImageView clickedImage = (ImageView) referredView;
                 clickedImage.setBackgroundResource(R.drawable.image_border);
 
-                FloatingActionButton deleteButton = (FloatingActionButton) fragment.getView().findViewById(id.res_delete);
-                deleteButton.setVisibility(View.VISIBLE);
+                fragment.getView().findViewById(id.res_action_layout).setVisibility(View.VISIBLE);
 
                 final DocumentDisplayElement documentDisplayElement = dataSet.get(position);
+                final String resourceId = documentDisplayElement.getResourceId();
+                FloatingActionButton deleteButton = (FloatingActionButton) fragment.getView().findViewById(id.res_delete);
                 deleteButton.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         Intent intent = new Intent(referredView.getContext(), RemoveDriveResourcesActivity.class);
-                        String resourceId = documentDisplayElement.getResourceId();
-                        if (!resourceId.equalsIgnoreCase("3")) {
-                            intent.putExtra("resource_ids", resourceId);
-                            intent.putExtra("tab_position", tabPosition);
-                            referredView.getContext().startActivity(intent);
-                        }  else {
-                            DriveDBHelper ddh = new DriveDBHelper(fragment.getContext());
-                            DriveResource driveResource = ddh.getDriveResourceByResourceId(resourceId);
+                        intent.putExtra("resource_ids", resourceId);
+                        intent.putExtra("tab_position", tabPosition);
 
-                            AreaContext.INSTANCE.getAreaElement().getMediaResources().remove(driveResource);
-                            ddh.deleteResourceLocally(driveResource);
-                            ddh.deleteResourceFromServer(driveResource);
+                        DriveDBHelper ddh = new DriveDBHelper(fragment.getContext());
+                        DriveResource driveResource = ddh.getDriveResourceByResourceId(resourceId);
 
-                            dataSet.remove(documentDisplayElement);
-                            notifyDataSetChanged();
-                        }
+                        AreaContext.INSTANCE.getAreaElement().getMediaResources().remove(driveResource);
+                        ddh.deleteResourceLocally(driveResource);
+                        ddh.deleteResourceFromServer(driveResource);
+
+                        dataSet.remove(documentDisplayElement);
+                        notifyDataSetChanged();
+
+                        referredView.getContext().startActivity(intent);
+                    }
+                });
+
+                FloatingActionButton mailButton = (FloatingActionButton) fragment.getView().findViewById(id.res_mail);
+                mailButton.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        File reportFile = documentDisplayElement.getDocumentFile();
+
+                        AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
+                        Intent intent = new Intent(Intent.ACTION_SEND);
+                        intent.putExtra(Intent.EXTRA_SUBJECT, "Document shared using [Placero LMS] for place - " + areaElement.getName());
+                        intent.putExtra(Intent.EXTRA_TEXT, "Hi, \nCheck out document for " + areaElement.getName());
+                        intent.setType(FileUtil.getMimeType(reportFile));
+                        Uri uri = Uri.fromFile(reportFile);
+                        intent.putExtra(Intent.EXTRA_STREAM, uri);
+
+                        referredView.getContext().startActivity(Intent.createChooser(intent, "Send email..."));
                     }
                 });
                 return false;

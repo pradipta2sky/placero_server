@@ -11,12 +11,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.sync.LMSRestAsyncTask;
 import lm.pkp.com.landmap.util.AndroidSystemUtil;
@@ -215,15 +216,14 @@ public class DriveDBHelper extends SQLiteOpenHelper {
         return resource;
     }
 
-    public DriveResource getDriveResourceRoot(String parentName) {
+    public DriveResource getDriveResourceRoot(String parentName, AreaElement areaElement) {
         DriveResource childResource = new DriveResource();
-        AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = null;
         try {
             cursor = db.rawQuery("select * from " + DRIVE_TABLE_NAME + " WHERE "
                             + DRIVE_COLUMN_AREA_ID + "=? AND " + DRIVE_COLUMN_TYPE + "='folder' AND "
-                            + DRIVE_COLUMN_CONTENT_TYPE + "='folder'",
+                            + DRIVE_COLUMN_CONTENT_TYPE + "=''",
                     new String[]{areaElement.getUniqueId()});
             if (cursor == null) {
                 return null;
@@ -246,13 +246,16 @@ public class DriveDBHelper extends SQLiteOpenHelper {
                     resource.setLongitude(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_LONGITUDE)));
                     resource.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CREATED_ON)));
 
-                    Map<String, DriveResource> commonResources = this.getCommonResources();
-                    DriveResource commonParent = commonResources.get(parentName);
-                    if (resource.getContainerId().equals(commonParent.getResourceId())) {
-                        childResource = resource;
-                        break;
-                    } else {
-                        cursor.moveToNext();
+                    Map<String, DriveResource> commonResources = this.getCommonResourcesById();
+                    Collection<DriveResource> commonDriveResources = commonResources.values();
+
+                    Iterator<DriveResource> iterator = commonDriveResources.iterator();
+                    while (iterator.hasNext()){
+                        DriveResource commonRoot = iterator.next();
+                        if(resource.getContainerId().equalsIgnoreCase(commonRoot.getResourceId())){
+                            childResource = resource;
+                            break;
+                        }
                     }
                 }
             }
@@ -265,7 +268,7 @@ public class DriveDBHelper extends SQLiteOpenHelper {
         return childResource;
     }
 
-    public Map<String, DriveResource> getCommonResources() {
+    public Map<String, DriveResource> getCommonResourcesByName() {
         Map<String, DriveResource> resources = new HashMap<>();
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = null;
@@ -308,6 +311,51 @@ public class DriveDBHelper extends SQLiteOpenHelper {
         db.close();
         return resources;
     }
+
+    public Map<String, DriveResource> getCommonResourcesById() {
+        Map<String, DriveResource> resources = new HashMap<>();
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = null;
+        try {
+            cursor = db.rawQuery("select * from " + DRIVE_TABLE_NAME + " WHERE "
+                            + DRIVE_COLUMN_CONTENT_TYPE + "=? AND "
+                            + DRIVE_COLUMN_AREA_ID + "=''",
+                    new String[]{"folder"});
+            if (cursor == null) {
+                return resources;
+            }
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                while (cursor.isAfterLast() == false) {
+                    DriveResource dr = new DriveResource();
+
+                    dr.setUniqueId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_UNIQUE_ID)));
+                    dr.setUserId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_USER_ID)));
+                    dr.setContainerId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CONTAINER_ID)));
+                    dr.setResourceId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_RESOURCE_ID)));
+                    dr.setName(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_NAME)));
+                    dr.setType(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_TYPE)));
+                    dr.setContentType("folder");
+                    dr.setMimeType("application/vnd.google-apps.folder");
+                    dr.setAreaId("");
+                    dr.setSize("0");
+                    dr.setLatitude("");
+                    dr.setLongitude("");
+                    dr.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CREATED_ON)));
+
+                    resources.put(dr.getResourceId(), dr);
+                    cursor.moveToNext();
+                }
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        db.close();
+        return resources;
+    }
+
 
     public List<DriveResource> fetchImageResources(AreaElement areaElement) {
         List<DriveResource> resources = new ArrayList<>();

@@ -5,8 +5,12 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+
+import lm.pkp.com.landmap.area.model.AreaAddress;
 
 /**
  * Created by USER on 11/8/2017.
@@ -18,8 +22,8 @@ public class CommonGeoHelper {
     private CommonGeoHelper() {
     }
 
-    public String getAddressByGeoLocation(Context context, Double lat, Double lon) {
-        StringBuffer buf = new StringBuffer();
+    public Map<String,String> getAddressByGeoLocation(Context context, Double lat, Double lon) {
+        Map<String, String> addressStore = new HashMap<>();
         try {
             Location areaLocation = new Location("");
             areaLocation.setLatitude(lat);
@@ -31,15 +35,12 @@ public class CommonGeoHelper {
                 Address address = addresses.get(i);
                 int maxLine = address.getMaxAddressLineIndex();
                 for (int j = 0; j <= maxLine; j++) {
-                    buf.append(address.getAddressLine(j));
-                    if (j != maxLine) {
-                        buf.append(",");
-                    }
+                    addressStore.put("line_" + j, address.getAddressLine(j));
                 }
             }
         } catch (Exception e) {
             // Do nothing if fails.
         }
-        return buf.toString();
+        return addressStore;
     }
 }

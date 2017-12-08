@@ -10,8 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -20,14 +18,13 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 
-import lm.pkp.com.landmap.AreaDetailsActivity;
 import lm.pkp.com.landmap.CreateAreaFolderStructureActivity;
 import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.AreaDashboardDisplayMetaStore;
-import lm.pkp.com.landmap.area.AreaElement;
+import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.res.disp.AreaItemAdaptor;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
@@ -62,6 +59,7 @@ public class AreaDashboardOwnedFragment extends Fragment implements FragmentIden
         super.onViewCreated(view, savedInstanceState);
         mView = view;
         mActivity = getActivity();
+        mActivity.findViewById(R.id.res_action_layout).setVisibility(View.GONE);
         if(getUserVisibleHint()){
             loadFragment();
         }
@@ -81,7 +79,7 @@ public class AreaDashboardOwnedFragment extends Fragment implements FragmentIden
         AreaContext.INSTANCE.clearContext();
         mView.findViewById(id.splash_panel).setVisibility(View.VISIBLE);
 
-        ArrayList<AreaElement> areas = new AreaDBHelper(mView.getContext()).getAreas("self");
+        ArrayList<AreaElement> areas = new AreaDBHelper(mActivity).getAreas("self");
         ListView areaListView = (ListView) mView.findViewById(id.area_display_list);
 
         ImageView createAreaView = (ImageView) mView.findViewById(id.owned_area_empty_layout_action);
@@ -111,20 +109,9 @@ public class AreaDashboardOwnedFragment extends Fragment implements FragmentIden
             mView.findViewById(R.id.owned_area_empty_layout).setVisibility(View.GONE);
             areaListView.setVisibility(View.VISIBLE);
 
-            AreaItemAdaptor adaptor = new AreaItemAdaptor(mView.getContext(), layout.area_element_row, areas);
+            AreaItemAdaptor adaptor = new AreaItemAdaptor(mActivity, layout.area_element_row, areas);
             areaListView.setAdapter(adaptor);
             areaListView.setDescendantFocusability(ListView.FOCUS_BLOCK_DESCENDANTS);
-            areaListView.setOnItemClickListener(new OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> adapter, View v, int position, long arg3) {
-                    AreaElement ae = (AreaElement) adapter.getItemAtPosition(position);
-                    AreaContext.INSTANCE.setAreaElement(ae, mActivity);
-                    Intent intent = new Intent(mActivity, AreaDetailsActivity.class);
-                    startActivity(intent);
-                    mActivity.finish();
-                }
-            });
-
         } else {
             areaListView.setVisibility(View.GONE);
             mView.findViewById(id.owned_area_empty_layout).setVisibility(View.VISIBLE);
@@ -152,7 +139,7 @@ public class AreaDashboardOwnedFragment extends Fragment implements FragmentIden
                 @Override
                 public void onClick(View v) {
                     mActivity.findViewById(id.splash_panel).setVisibility(View.VISIBLE);
-                    new LocalDataRefresher(mView.getContext(), new DataReloadCallback()).refreshLocalData();
+                    new LocalDataRefresher(mActivity, new DataReloadCallback()).refreshLocalData();
                 }
             });
         }
@@ -176,19 +163,10 @@ public class AreaDashboardOwnedFragment extends Fragment implements FragmentIden
                 mView.findViewById(id.owned_area_empty_layout).setVisibility(View.GONE);
                 areaListView.setVisibility(View.VISIBLE);
 
-                AreaItemAdaptor adaptor = new AreaItemAdaptor(mView.getContext(), layout.area_element_row, areas);
+                AreaItemAdaptor adaptor = new AreaItemAdaptor(mActivity, layout.area_element_row, areas);
                 areaListView.setAdapter(adaptor);
                 areaListView.setDescendantFocusability(ListView.FOCUS_BLOCK_DESCENDANTS);
-                areaListView.setOnItemClickListener(new OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> adapter, View v, int position, long arg3) {
-                        AreaElement ae = (AreaElement) adapter.getItemAtPosition(position);
-                        AreaContext.INSTANCE.setAreaElement(ae,mActivity);
-                        Intent intent = new Intent(mActivity, AreaDetailsActivity.class);
-                        startActivity(intent);
-                        mActivity.finish();
-                    }
-                });
+
                 EditText inputSearch = (EditText) mActivity.findViewById(id.dashboard_search_box);
                 String filterStr = inputSearch.getText().toString().trim();
                 if (!filterStr.equalsIgnoreCase("")) {

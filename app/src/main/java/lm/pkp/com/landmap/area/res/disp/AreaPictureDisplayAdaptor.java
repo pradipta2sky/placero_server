@@ -27,10 +27,12 @@ import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.RemoveDriveResourcesActivity;
 import lm.pkp.com.landmap.area.AreaContext;
+import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
 import lm.pkp.com.landmap.permission.PermissionConstants;
 import lm.pkp.com.landmap.permission.PermissionManager;
+import lm.pkp.com.landmap.util.FileUtil;
 
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
 
@@ -98,36 +100,53 @@ final class AreaPictureDisplayAdaptor extends BaseAdapter {
                 ImageView clickedImage = (ImageView) referredView;
                 clickedImage.setBackgroundResource(R.drawable.image_border);
 
-                fragment.getView().findViewById(id.res_delete_layout).setVisibility(View.VISIBLE);
+                fragment.getView().findViewById(id.res_action_layout).setVisibility(View.VISIBLE);
+
                 final PictureDisplayElement pictureDisplayElement = dataSet.get(position);
                 final String resourceId = pictureDisplayElement.getResourceId();
-
                 FloatingActionButton deleteButton = (FloatingActionButton) fragment.getView().findViewById(id.res_delete);
                 deleteButton.setOnClickListener(new OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        if(PermissionManager.INSTANCE.hasAccess(PermissionConstants.REMOVE_RESOURCES)){
+                        if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.REMOVE_RESOURCES)) {
                             Intent intent = new Intent(referredView.getContext(), RemoveDriveResourcesActivity.class);
-                            if (!resourceId.equalsIgnoreCase("1")) {
-                                intent.putExtra("resource_ids", resourceId);
-                                intent.putExtra("tab_position", tabPosition);
-                                referredView.getContext().startActivity(intent);
-                            } else {
-                                DriveDBHelper ddh = new DriveDBHelper(fragment.getContext());
-                                DriveResource driveResource = ddh.getDriveResourceByResourceId(resourceId);
+                            intent.putExtra("resource_ids", resourceId);
+                            intent.putExtra("tab_position", tabPosition);
 
-                                AreaContext.INSTANCE.getAreaElement().getMediaResources().remove(driveResource);
-                                ddh.deleteResourceLocally(driveResource);
-                                ddh.deleteResourceFromServer(driveResource);
+                            DriveDBHelper ddh = new DriveDBHelper(fragment.getContext());
+                            DriveResource driveResource = ddh.getDriveResourceByResourceId(resourceId);
 
-                                dataSet.remove(pictureDisplayElement);
-                                notifyDataSetChanged();
-                            }
-                        }else {
-                            showErrorMessage(referredView,"Do not have removal rights", "error");
+                            AreaContext.INSTANCE.getAreaElement().getMediaResources().remove(driveResource);
+                            ddh.deleteResourceLocally(driveResource);
+                            ddh.deleteResourceFromServer(driveResource);
+
+                            dataSet.remove(pictureDisplayElement);
+                            notifyDataSetChanged();
+                            referredView.getContext().startActivity(intent);
+                        } else {
+                            showErrorMessage(referredView, "Do not have removal rights", "error");
                         }
                     }
                 });
+
+                FloatingActionButton mailButton = (FloatingActionButton) fragment.getView().findViewById(id.res_mail);
+                mailButton.setOnClickListener(new OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        File pictureFile = pictureDisplayElement.getImageFile();
+
+                        AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
+                        Intent intent = new Intent(Intent.ACTION_SEND);
+                        intent.putExtra(Intent.EXTRA_SUBJECT, "Picture shared using [Placero LMS] for place - " + areaElement.getName());
+                        intent.putExtra(Intent.EXTRA_TEXT, "Hi, \nCheck out picture for " + areaElement.getName());
+                        intent.setType(FileUtil.getMimeType(pictureFile));
+                        Uri uri = Uri.fromFile(pictureFile);
+                        intent.putExtra(Intent.EXTRA_STREAM, uri);
+
+                        referredView.getContext().startActivity(Intent.createChooser(intent, "Send email..."));
+                    }
+                });
+
                 return false;
             }
         });

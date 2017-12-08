@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 
+import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.R.layout;
 
@@ -20,7 +21,7 @@ public class AreaDocumentDisplayFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        return inflater.inflate(layout.fragment_document_display, container, false);
+        return inflater.inflate(R.layout.fragment_document_display, container, false);
     }
 
     @Override
@@ -34,16 +35,7 @@ public class AreaDocumentDisplayFragment extends Fragment {
         this.gridView = (GridView) this.getView().findViewById(id.gridView);
         this.adaptor = new AreaDocumentDisplayAdaptor(this.getContext(), this, 2);
         this.gridView.setAdapter(this.adaptor);
+        getView().findViewById(id.res_action_layout).setVisibility(View.GONE);
     }
 
-    @Override
-    public void setUserVisibleHint(boolean visible) {
-        super.setUserVisibleHint(visible);
-        if (visible && this.isResumed()) {
-            this.loadFragment();
-        }
-    }
-
-    private void loadFragment() {
-    }
 }
