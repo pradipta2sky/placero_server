@@ -216,14 +216,14 @@ public class DriveDBHelper extends SQLiteOpenHelper {
         return resource;
     }
 
-    public DriveResource getDriveResourceRoot(String parentName, AreaElement areaElement) {
+    public DriveResource getDriveResourceRoot(String contentType, AreaElement areaElement) {
         DriveResource childResource = new DriveResource();
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = null;
         try {
             cursor = db.rawQuery("select * from " + DRIVE_TABLE_NAME + " WHERE "
                             + DRIVE_COLUMN_AREA_ID + "=? AND " + DRIVE_COLUMN_TYPE + "='folder' AND "
-                            + DRIVE_COLUMN_CONTENT_TYPE + "=''",
+                            + DRIVE_COLUMN_CONTENT_TYPE + "='" + contentType + "'",
                     new String[]{areaElement.getUniqueId()});
             if (cursor == null) {
                 return null;
@@ -246,17 +246,8 @@ public class DriveDBHelper extends SQLiteOpenHelper {
                     resource.setLongitude(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_LONGITUDE)));
                     resource.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CREATED_ON)));
 
-                    Map<String, DriveResource> commonResources = this.getCommonResourcesById();
-                    Collection<DriveResource> commonDriveResources = commonResources.values();
-
-                    Iterator<DriveResource> iterator = commonDriveResources.iterator();
-                    while (iterator.hasNext()){
-                        DriveResource commonRoot = iterator.next();
-                        if(resource.getContainerId().equalsIgnoreCase(commonRoot.getResourceId())){
-                            childResource = resource;
-                            break;
-                        }
-                    }
+                    childResource = resource;
+                    break;
                 }
             }
         } finally {

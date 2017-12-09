@@ -127,7 +127,7 @@ public class AreaContext {
         if(imagesResourceRoot == null){
             DriveDBHelper ddh = new DriveDBHelper(context);
             imagesResourceRoot
-                    = ddh.getDriveResourceRoot(FileStorageConstants.IMAGE_ROOT_FOLDER_NAME, currentArea);
+                    = ddh.getDriveResourceRoot(FileStorageConstants.IMAGE_CONTENT_TYPE, currentArea);
         }
         return imagesResourceRoot;
     }
@@ -137,7 +137,7 @@ public class AreaContext {
         if(videosResourceRoot == null){
             DriveDBHelper ddh = new DriveDBHelper(context);
             videosResourceRoot
-                    = ddh.getDriveResourceRoot(FileStorageConstants.VIDEO_ROOT_FOLDER_NAME, currentArea);
+                    = ddh.getDriveResourceRoot(FileStorageConstants.VIDEO_CONTENT_TYPE, currentArea);
         }
         return videosResourceRoot;
     }
@@ -147,7 +147,7 @@ public class AreaContext {
         if(documentsResourceRoot == null){
             DriveDBHelper ddh = new DriveDBHelper(context);
             documentsResourceRoot
-                    = ddh.getDriveResourceRoot(FileStorageConstants.DOCUMENT_ROOT_FOLDER_NAME, currentArea);
+                    = ddh.getDriveResourceRoot(FileStorageConstants.DOCUMENTS_CONTENT_TYPE, currentArea);
         }
         return documentsResourceRoot;
     }

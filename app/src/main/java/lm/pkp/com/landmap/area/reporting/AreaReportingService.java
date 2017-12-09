@@ -88,14 +88,40 @@ public class AreaReportingService extends IntentService {
         notifyCompletion();
     }
 
+    private String docRoot = null;
     private void generateReport() {
         String areaId = areaElement.getUniqueId();
-        String docRoot = reportingContext.getAreaLocalDocumentRoot(areaId).getAbsolutePath();
+        docRoot = reportingContext.getAreaLocalDocumentRoot(areaId).getAbsolutePath();
         // Gets data from the incoming Intent
         prepareAreaTextContext();
 
-        populateSummaryDocument();
-        populatePicturesDocument(1);
+        populateSummary();
+        populatePictures(1);
+        populateDocuments();
+        populateEnd();
+
+        // Prepare final doc by merging all documents
+        PDDocument finalDoc = mergeDocuments();
+        String docFilePath = docRoot + File.separatorChar + reportName;
+        try {
+            docFile = new File(docFilePath);
+            finalDoc.save(docFilePath);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            Iterator<PDDocument> docsIter = workDocuments.iterator();
+            while (docsIter.hasNext()) {
+                PDDocument document = docsIter.next();
+                document.close();
+            }
+            finalDoc.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void populateDocuments() {
         List<DriveResource> mediaResources = areaElement.getMediaResources();
         for (DriveResource resource : mediaResources) {
             if (resource.getType().equalsIgnoreCase("file")
@@ -112,28 +138,6 @@ public class AreaReportingService extends IntentService {
                     e.printStackTrace();
                 }
             }
-        }
-        populateEndDocument();
-
-        // Prepare final doc by merging all documents
-        PDDocument finalDoc = mergeDocuments();
-        String docFilePath = docRoot + File.separatorChar + reportName;
-        try {
-            docFile = new File(docFilePath);
-            finalDoc.save(docFilePath);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            Iterator<PDDocument> docsIter = workDocuments.iterator();
-            while (docsIter.hasNext()) {
-                PDDocument document = docsIter.next();
-                document.close();
-            }
-            finalDoc.close();
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
@@ -198,7 +202,7 @@ public class AreaReportingService extends IntentService {
         }
     }
 
-    private void populateSummaryDocument() {
+    private void populateSummary() {
         AssetManager assetManager = reportingContext.getActivityContext().getAssets();
         PDDocument document = null;
         try {
@@ -245,10 +249,10 @@ public class AreaReportingService extends IntentService {
         }
     }
 
-    private final int IMG_HEIGHT = 224;
-    private final int IMG_WIDTH = 224;
+    private final int IMG_HEIGHT = 220;
+    private final int IMG_WIDTH = 220;
 
-    private void populatePicturesDocument(int start) {
+    private void populatePictures(int start) {
         AssetManager assetManager = reportingContext.getActivityContext().getAssets();
         PDDocument document = null;
         try {
@@ -256,19 +260,26 @@ public class AreaReportingService extends IntentService {
             document = PDDocument.load(stream);
             stream.close();
 
+            PDAcroForm acroForm = document.getDocumentCatalog().getAcroForm();
+            List<PDFieldTreeNode> fields = acroForm.getFields();
+            for (PDFieldTreeNode field : fields) {
+                String fieldName = field.getFullyQualifiedName();
+                String fieldValue = reportContent.get(fieldName);
+                field.setValue(fieldValue);
+            }
+
             File[] pictureFiles = getPictureFiles();
 
-            int x = 70; int y = 350;
+            int x = 70; int y = 400;
             int xshift = IMG_WIDTH + (int) (20 * (8.0 / 6.0));
             int yshift = IMG_HEIGHT + (int) (20 * (8.0 / 6.0));
             int startX = x; int startY = y;
 
             PDPage page = document.getPages().get(0);
+
             PDRectangle mediaBox = page.getMediaBox();
             float pageLeftX = mediaBox.getLowerLeftX();
             float pageLeftY = mediaBox.getLowerLeftY();
-
-            PDPageContentStream contentStream = new PDPageContentStream(document, page, true, false);
 
             int i = start;
             for (; i <= pictureFiles.length; i++) {
@@ -287,7 +298,11 @@ public class AreaReportingService extends IntentService {
                 float positionX = pageLeftX + startX;
                 float positionY = pageLeftY + startY;
 
-                contentStream.drawImage(imgObject, positionX, positionY, IMG_WIDTH, IMG_HEIGHT);
+                PDPageContentStream contentStream = new PDPageContentStream(document, page, true, false, true);
+                //contentStream.restoreGraphicsState();
+                contentStream.drawImage(imgObject, positionX, positionY);
+                //contentStream.saveGraphicsState();
+                contentStream.close();
 
                 if ((i % 2) == 0) {
                     startY = startY - yshift;
@@ -295,35 +310,21 @@ public class AreaReportingService extends IntentService {
                 } else {
                     startX = startX + xshift;
                 }
-
-                imgObject.getImage().recycle();
-
                 if((i % 4 == 0)){
                     break;
                 }
             }
-            contentStream.saveGraphicsState();
-            contentStream.close();
-
-            PDAcroForm acroForm = document.getDocumentCatalog().getAcroForm();
-            List<PDFieldTreeNode> fields = acroForm.getFields();
-            for (PDFieldTreeNode field : fields) {
-                String fieldName = field.getFullyQualifiedName();
-                String fieldValue = reportContent.get(fieldName);
-                field.setValue(fieldValue);
-            }
-
             workDocuments.add(document);
 
             if(pictureFiles.length > i){
-                populatePicturesDocument(i + 1);
+                populatePictures(i + 1);
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void populateEndDocument() {
+    private void populateEnd() {
         AssetManager assetManager = reportingContext.getActivityContext().getAssets();
         PDDocument document = null;
         try {

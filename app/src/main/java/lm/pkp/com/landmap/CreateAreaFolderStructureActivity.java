@@ -73,15 +73,18 @@ public class CreateAreaFolderStructureActivity extends BaseDriveActivity {
             AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
 
             DriveResource imagesFolder = commonResourceMap.get(FileStorageConstants.IMAGE_ROOT_FOLDER_NAME);
-            DriveResource folderResource = createFolderResource(areaElement.getUniqueId(), imagesFolder, "Images");
+            DriveResource folderResource = createFolderResource(areaElement.getUniqueId(), imagesFolder,
+                    FileStorageConstants.IMAGE_CONTENT_TYPE);
             this.createStack.push(folderResource);
 
             DriveResource videosFolder = commonResourceMap.get(FileStorageConstants.VIDEO_ROOT_FOLDER_NAME);
-            folderResource = createFolderResource(areaElement.getUniqueId(), videosFolder, "Videos");
+            folderResource = createFolderResource(areaElement.getUniqueId(), videosFolder,
+                    FileStorageConstants.VIDEO_CONTENT_TYPE);
             this.createStack.push(folderResource);
 
             DriveResource docsFolder = commonResourceMap.get(FileStorageConstants.DOCUMENT_ROOT_FOLDER_NAME);
-            folderResource = createFolderResource(areaElement.getUniqueId(), docsFolder, "Documents");
+            folderResource = createFolderResource(areaElement.getUniqueId(), docsFolder,
+                    FileStorageConstants.DOCUMENTS_CONTENT_TYPE);
             this.createStack.push(folderResource);
 
             // Start processing.
@@ -193,7 +196,7 @@ public class CreateAreaFolderStructureActivity extends BaseDriveActivity {
         resource.setSize("0");
         resource.setAreaId(areaElement.getUniqueId());
         resource.setContainerId(parent.getResourceId());
-        resource.setContentType("");
+        resource.setContentType(contentType);
         resource.setMimeType("application/vnd.google-apps.folder");
         resource.setResourceId(null);
 
