@@ -79,7 +79,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@+id/upload_section"
         android:orientation="vertical"
-        android:layout_marginLeft="15dp">
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp">
 
         <ListView
             android:id="@+id/file_display_list"

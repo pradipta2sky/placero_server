@@ -127,7 +127,7 @@ public class AreaContext {
         if(imagesResourceRoot == null){
             DriveDBHelper ddh = new DriveDBHelper(context);
             imagesResourceRoot
-                    = ddh.getDriveResourceRoot(FileStorageConstants.IMAGE_CONTENT_TYPE, currentArea);
+                    = ddh.getDriveResourceRoot(FileStorageConstants.IMAGES_CONTENT_TYPE, currentArea);
         }
         return imagesResourceRoot;
     }
@@ -137,7 +137,7 @@ public class AreaContext {
         if(videosResourceRoot == null){
             DriveDBHelper ddh = new DriveDBHelper(context);
             videosResourceRoot
-                    = ddh.getDriveResourceRoot(FileStorageConstants.VIDEO_CONTENT_TYPE, currentArea);
+                    = ddh.getDriveResourceRoot(FileStorageConstants.VIDEOS_CONTENT_TYPE, currentArea);
         }
         return videosResourceRoot;
     }

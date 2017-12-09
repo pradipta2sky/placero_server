@@ -46,7 +46,7 @@ public class AreaItemAdaptor extends ArrayAdapter {
             LayoutInflater vi = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             itemView = vi.inflate(R.layout.area_element_row, null);
         }
-        final View refferedView = itemView;
+
         AreaContext.INSTANCE.setDisplayBMap(null);
 
         final AreaElement areaElement = items.get(position);
@@ -58,13 +58,10 @@ public class AreaItemAdaptor extends ArrayAdapter {
                 int siblingCount = parent.getChildCount();
                 for (int i = 0; i < siblingCount; i++) {
                     View child = parent.getChildAt(i);
-                    if (i == position) {
-                        child.setBackgroundResource(R.drawable.image_border);
-                    } else {
-                        child.setBackgroundResource(0);
-                        child.setBackgroundColor(ColorProvider.getAreaDetailsColor(areaElement));
-                    }
+                    child.setBackgroundResource(0);
+                    child.setBackgroundColor(ColorProvider.getAreaDetailsColor(areaElement));
                 }
+                v.setBackgroundResource(R.drawable.image_border);
 
                 final Activity activity = (Activity) context;
                 activity.findViewById(R.id.res_action_layout).setVisibility(View.VISIBLE);
@@ -73,13 +70,15 @@ public class AreaItemAdaptor extends ArrayAdapter {
                 reportButton.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        ReportingContext.INSTANCE.setAreaElement(areaElement, activity);
-                        Intent serviceIntent = new Intent(activity, AreaReportingService.class);
-                        activity.startService(serviceIntent);
-
-                        Toast.makeText(activity, "Report generation started", Toast.LENGTH_LONG).show();
-                        refferedView.setBackgroundColor(ColorProvider.getAreaDetailsColor(areaElement));
-
+                        ReportingContext reportingContext = ReportingContext.INSTANCE;
+                        if(!reportingContext.getGeneratingReport()){
+                            reportingContext.setAreaElement(areaElement, activity);
+                            Intent serviceIntent = new Intent(activity, AreaReportingService.class);
+                            activity.startService(serviceIntent);
+                            Toast.makeText(activity, "Report generation started.", Toast.LENGTH_LONG).show();
+                        }else {
+                            Toast.makeText(activity, "Report generation is active. Please try later.", Toast.LENGTH_LONG).show();
+                        }
                         activity.findViewById(R.id.res_action_layout).setVisibility(View.GONE);
                     }
                 });

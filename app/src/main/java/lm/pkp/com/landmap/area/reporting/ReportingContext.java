@@ -5,7 +5,6 @@ import android.graphics.Bitmap;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import lm.pkp.com.landmap.area.model.AreaElement;
@@ -86,7 +85,7 @@ public class ReportingContext {
         if(imagesResourceRoot == null){
             DriveDBHelper ddh = new DriveDBHelper(context);
             imagesResourceRoot
-                    = ddh.getDriveResourceRoot(FileStorageConstants.IMAGE_CONTENT_TYPE, currentArea);
+                    = ddh.getDriveResourceRoot(FileStorageConstants.IMAGES_CONTENT_TYPE, currentArea);
         }
         return imagesResourceRoot;
     }
@@ -96,7 +95,7 @@ public class ReportingContext {
         if(videosResourceRoot == null){
             DriveDBHelper ddh = new DriveDBHelper(context);
             videosResourceRoot
-                    = ddh.getDriveResourceRoot(FileStorageConstants.VIDEO_CONTENT_TYPE, currentArea);
+                    = ddh.getDriveResourceRoot(FileStorageConstants.VIDEOS_CONTENT_TYPE, currentArea);
         }
         return videosResourceRoot;
     }

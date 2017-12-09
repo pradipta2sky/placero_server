@@ -37,7 +37,7 @@ public class AreaAddResourcesActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
 
-        this.setContentView(layout.activity_area_resource_main);
+        this.setContentView(R.layout.activity_area_resource_main);
 
         ActionBar ab = this.getSupportActionBar();
         ab.setHomeButtonEnabled(false);

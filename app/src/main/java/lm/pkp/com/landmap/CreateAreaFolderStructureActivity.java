@@ -74,12 +74,12 @@ public class CreateAreaFolderStructureActivity extends BaseDriveActivity {
 
             DriveResource imagesFolder = commonResourceMap.get(FileStorageConstants.IMAGE_ROOT_FOLDER_NAME);
             DriveResource folderResource = createFolderResource(areaElement.getUniqueId(), imagesFolder,
-                    FileStorageConstants.IMAGE_CONTENT_TYPE);
+                    FileStorageConstants.IMAGES_CONTENT_TYPE);
             this.createStack.push(folderResource);
 
             DriveResource videosFolder = commonResourceMap.get(FileStorageConstants.VIDEO_ROOT_FOLDER_NAME);
             folderResource = createFolderResource(areaElement.getUniqueId(), videosFolder,
-                    FileStorageConstants.VIDEO_CONTENT_TYPE);
+                    FileStorageConstants.VIDEOS_CONTENT_TYPE);
             this.createStack.push(folderResource);
 
             DriveResource docsFolder = commonResourceMap.get(FileStorageConstants.DOCUMENT_ROOT_FOLDER_NAME);

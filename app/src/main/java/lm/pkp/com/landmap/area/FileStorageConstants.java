@@ -13,9 +13,15 @@ public interface FileStorageConstants {
 
     String TEMP_ROOT_FOLDER_NAME = "app.lms.temp";
 
-    String IMAGE_CONTENT_TYPE = "Images";
+    String IMAGES_CONTENT_TYPE = "Images";
 
-    String VIDEO_CONTENT_TYPE = "Videos";
+    String IMAGE_CONTENT_TYPE = "Image";
+
+    String VIDEOS_CONTENT_TYPE = "Videos";
+
+    String VIDEO_CONTENT_TYPE = "Video";
 
     String DOCUMENTS_CONTENT_TYPE = "Documents";
+
+    String DOCUMENT_CONTENT_TYPE = "Documents";
 }

@@ -9,11 +9,15 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
+import java.io.File;
 import java.util.ArrayList;
 
+import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
+import lm.pkp.com.landmap.area.FileStorageConstants;
+import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.drive.DriveResource;
 
 /**
@@ -35,36 +39,37 @@ public class AreaAddResourceAdaptor extends ArrayAdapter<DriveResource> {
         View v = convertView;
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            v = vi.inflate(layout.file_element_row, null);
+            v = vi.inflate(R.layout.file_element_row, null);
         }
 
-        final DriveResource dr = this.items.get(position);
+        final AreaContext areaContext = AreaContext.INSTANCE;
+        final DriveResource resource = this.items.get(position);
 
         TextView nameText = (TextView) v.findViewById(id.ar_file_name);
-        nameText.setText(dr.getName());
+        nameText.setText(resource.getName());
 
         TextView filePathText = (TextView) v.findViewById(id.ar_file_path);
         String message = "";
-        String resLat = dr.getLatitude();
-        String resLong = dr.getLongitude();
+        String resLat = resource.getLatitude();
+        String resLong = resource.getLongitude();
         if (!resLat.trim().equalsIgnoreCase("")) {
             message = "Position: " + resLat + ", " + resLong;
             filePathText.setText(message);
         } else {
-            filePathText.setText(dr.getPath());
+            filePathText.setText(resource.getPath());
         }
 
         Button removeButton = (Button) v.findViewById(id.remove_upload_resource);
         removeButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                AreaContext.INSTANCE.getUploadedQueue().remove(dr);
-                if (AreaAddResourceAdaptor.this.items.contains(dr)) {
-                    AreaAddResourceAdaptor.this.items.remove(dr);
+                areaContext.getUploadedQueue().remove(resource);
+                if (items.contains(resource)) {
+                    items.remove(resource);
                 } else {
                     System.out.println("Resource not found");
                 }
-                AreaAddResourceAdaptor.this.notifyDataSetChanged();
+                notifyDataSetChanged();
             }
         });
         return v;

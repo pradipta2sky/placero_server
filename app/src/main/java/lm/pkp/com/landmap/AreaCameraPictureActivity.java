@@ -21,6 +21,7 @@ import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.custom.LocationPositionReceiver;
+import lm.pkp.com.landmap.custom.ThumbnailCreator;
 import lm.pkp.com.landmap.drive.DriveResource;
 import lm.pkp.com.landmap.position.PositionElement;
 import lm.pkp.com.landmap.provider.GPSLocationProvider;
@@ -151,5 +152,6 @@ public class AreaCameraPictureActivity extends Activity implements LocationPosit
     public void providerDisabled() {
 
     }
+
 
 }
