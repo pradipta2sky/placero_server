@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
+import lm.pkp.com.landmap.area.model.AreaAddress;
 import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
@@ -62,9 +63,11 @@ public class AreaEditActivity extends AppCompatActivity {
         }
 
         final TextView addressText = (TextView) this.findViewById(R.id.area_address_edit);
-        addressText.setText(ae.getAddress());
-        if (!PermissionManager.INSTANCE.hasAccess(PermissionConstants.CHANGE_ADDRESS)) {
-            addressText.setEnabled(false);
+        AreaAddress address = ae.getAddress();
+        if(address != null){
+            addressText.setText(address.getDisplaybleAddress());
+        }else {
+            addressText.setText("");
         }
 
         Button saveButton = (Button) this.findViewById(R.id.area_edit_save_btn);
@@ -81,7 +84,6 @@ public class AreaEditActivity extends AppCompatActivity {
                 }
                 ae.setName(areaName);
                 ae.setDescription(descText.getText().toString());
-                ae.setAddress(addressText.getText().toString());
 
                 AreaDBHelper adh = new AreaDBHelper(getApplicationContext(), new UpdateAreaToServerCallback());
                 adh.updateAreaAttributes(ae);

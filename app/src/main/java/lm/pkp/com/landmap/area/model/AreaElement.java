@@ -23,7 +23,7 @@ public class AreaElement implements Serializable {
     private String type;
     private double measureSqFt;
     private String uniqueId;
-    private String address;
+    private AreaAddress address;
 
     private PositionElement centerPosition = new PositionElement();
     private List<PositionElement> positions = new ArrayList<>();
@@ -102,14 +102,6 @@ public class AreaElement implements Serializable {
         this.type = type;
     }
 
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
     public Map<String, PermissionElement> getUserPermissions() {
         return userPermissions;
     }
@@ -122,4 +114,11 @@ public class AreaElement implements Serializable {
         return centerPosition;
     }
 
+    public AreaAddress getAddress() {
+        return this.address;
+    }
+
+    public void setAddress(AreaAddress address) {
+        this.address = address;
+    }
 }

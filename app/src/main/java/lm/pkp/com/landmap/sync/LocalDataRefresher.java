@@ -11,6 +11,7 @@ import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.permission.PermissionsDBHelper;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
+import lm.pkp.com.landmap.tags.TagsDBHelper;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.weather.db.WeatherDBHelper;
 
@@ -43,6 +44,9 @@ public class LocalDataRefresher implements AsyncTaskCallback {
 
         PermissionsDBHelper pmh = new PermissionsDBHelper(this.ctxt);
         pmh.deletePermissionsLocally();
+
+        TagsDBHelper tdh = new TagsDBHelper(this.ctxt);
+        tdh.deleteAllTagsLocally();
 
         UserAreaDetailsLoadTask loadTask = new UserAreaDetailsLoadTask(this.ctxt);
         loadTask.setCompletionCallback(this);
@@ -88,6 +92,5 @@ public class LocalDataRefresher implements AsyncTaskCallback {
     public void taskCompleted(Object result) {
         this.callback.taskCompleted(result);
     }
-
 
 }

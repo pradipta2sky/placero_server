@@ -14,6 +14,7 @@ import java.net.URLEncoder;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import lm.pkp.com.landmap.area.model.AreaAddress;
 import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
@@ -23,6 +24,7 @@ import lm.pkp.com.landmap.permission.PermissionElement;
 import lm.pkp.com.landmap.permission.PermissionsDBHelper;
 import lm.pkp.com.landmap.position.PositionElement;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
+import lm.pkp.com.landmap.tags.TagsDBHelper;
 
 /**
  * Created by Rinky on 21-10-2017.
@@ -35,15 +37,17 @@ public class PublicAreasLoadTask extends AsyncTask<JSONObject, Void, String> {
     private PositionsDBHelper pdh;
     private DriveDBHelper ddh;
     private PermissionsDBHelper pmh;
+    private TagsDBHelper tdh;
 
     private AsyncTaskCallback callback;
 
     public PublicAreasLoadTask(Context appContext) {
         localContext = appContext;
-        this.adh = new AreaDBHelper(localContext);
-        this.pdh = new PositionsDBHelper(localContext);
-        this.ddh = new DriveDBHelper(localContext);
-        this.pmh = new PermissionsDBHelper(localContext, null);
+        adh = new AreaDBHelper(localContext);
+        pdh = new PositionsDBHelper(localContext);
+        ddh = new DriveDBHelper(localContext);
+        pmh = new PermissionsDBHelper(localContext, null);
+        tdh = new TagsDBHelper(localContext, null);
     }
 
     protected void onPreExecute() {
@@ -107,9 +111,15 @@ public class PublicAreasLoadTask extends AsyncTask<JSONObject, Void, String> {
                 ae.getCenterPosition().setLon(areaObj.getDouble("center_lon"));
                 ae.setUniqueId(areaObj.getString("unique_id"));
                 ae.setMeasureSqFt(areaObj.getDouble("measure_sqft"));
-                ae.setAddress(areaObj.getString("address"));
-                ae.setType(areaObj.getString("type"));
 
+                String addressText = areaObj.getString("address");
+                AreaAddress areaAddress = AreaAddress.fromStoredAddress(addressText);
+                if(areaAddress != null){
+                    ae.setAddress(areaAddress);
+                    tdh.insertTagsLocally(areaAddress.getTags(), "area", ae.getUniqueId());
+                }
+
+                ae.setType(areaObj.getString("type"));
                 this.adh.insertAreaFromServer(ae);
 
                 JSONArray positionsArr = (JSONArray) responseObj.get("positions");
@@ -126,7 +136,7 @@ public class PublicAreasLoadTask extends AsyncTask<JSONObject, Void, String> {
                     pe.setTags((String) positionObj.get("tags"));
                     pe.setCreatedOnMillis(positionObj.getString("created_on"));
 
-                    this.pdh.insertPositionFromServer(pe);
+                    pdh.insertPositionFromServer(pe);
                 }
 
                 JSONArray driveArr = (JSONArray) responseObj.get("drs");
@@ -148,7 +158,7 @@ public class PublicAreasLoadTask extends AsyncTask<JSONObject, Void, String> {
                     dr.setLongitude(driveObj.getString("longitude"));
                     dr.setCreatedOnMillis(driveObj.getString("created_on"));
 
-                    this.ddh.insertResourceFromServer(dr);
+                    ddh.insertResourceFromServer(dr);
                 }
 
                 JSONArray permissionsArr = (JSONArray) responseObj.get("permissions");
@@ -160,13 +170,13 @@ public class PublicAreasLoadTask extends AsyncTask<JSONObject, Void, String> {
                     pe.setAreaId(permissionObj.getString("area_id"));
                     pe.setFunctionCode(permissionObj.getString("function_code"));
 
-                    this.pmh.insertPermissionLocally(pe);
+                    pmh.insertPermissionLocally(pe);
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        this.finalizeTaskCompletion();
+        finalizeTaskCompletion();
     }
 
     public void setCompletionCallback(AsyncTaskCallback callback) {

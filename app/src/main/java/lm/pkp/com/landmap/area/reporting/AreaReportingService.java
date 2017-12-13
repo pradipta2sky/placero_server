@@ -38,6 +38,7 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 
 import lm.pkp.com.landmap.R;
+import lm.pkp.com.landmap.area.model.AreaAddress;
 import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.custom.ThumbnailCreator;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
@@ -159,12 +160,14 @@ public class AreaReportingService extends IntentService {
         reportContent.put("area_description", areaElement.getDescription());
 
         // Area Address attributes
-        String address = areaElement.getAddress();
-        String quote = Pattern.quote("@$");
-        String[] addressSplit = address.split(quote);
-        for (int i = 0; i < addressSplit.length; i++) {
-            String line = addressSplit[i];
-            reportContent.put("area_address_line" + i, line);
+        AreaAddress areaAddress = areaElement.getAddress();
+        if(areaAddress != null){
+            String quote = Pattern.quote("@$");
+            String[] addressSplit = areaAddress.getStorableAddress().split(quote);
+            for (int i = 0; i < addressSplit.length; i++) {
+                String line = addressSplit[i];
+                reportContent.put("area_address_line" + i, line);
+            }
         }
 
         // Area Measurement attributes

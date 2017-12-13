@@ -174,6 +174,8 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
             AreaDBHelper adh = new AreaDBHelper(getApplicationContext());
             adh.updateAreaLocally(ae);
             adh.updateAreaOnServer(ae);
+            adh.insertAreaAddressTagsLocally(ae);
+            adh.insertAreaAddressTagsOnServer(ae);
         }
         polygonMarkers.put(polygon, centerMarker);
     }

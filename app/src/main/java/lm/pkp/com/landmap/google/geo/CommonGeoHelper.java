@@ -22,8 +22,8 @@ public class CommonGeoHelper {
     private CommonGeoHelper() {
     }
 
-    public Map<String,String> getAddressByGeoLocation(Context context, Double lat, Double lon) {
-        Map<String, String> addressStore = new HashMap<>();
+    public AreaAddress getAddressByGeoLocation(Context context, Double lat, Double lon) {
+        AreaAddress areaAddress = new AreaAddress();
         try {
             Location areaLocation = new Location("");
             areaLocation.setLatitude(lat);
@@ -33,14 +33,21 @@ public class CommonGeoHelper {
             List<Address> addresses = geocoder.getFromLocation(areaLocation.getLatitude(), areaLocation.getLongitude(), 1);
             for (int i = 0; i < addresses.size(); i++) {
                 Address address = addresses.get(i);
-                int maxLine = address.getMaxAddressLineIndex();
-                for (int j = 0; j <= maxLine; j++) {
-                    addressStore.put("line_" + j, address.getAddressLine(j));
-                }
+                areaAddress.setAdminArea(address.getAdminArea());
+                areaAddress.setSubAdminArea(address.getSubAdminArea());
+                areaAddress.setCountry(address.getCountryName());
+                areaAddress.setFeatureName(address.getFeatureName());
+                areaAddress.setLocality(address.getLocality());
+                areaAddress.setSubLocality(address.getSubLocality());
+                areaAddress.setPostalCode(address.getPostalCode());
+                areaAddress.setPremises(address.getPremises());
+                areaAddress.setThoroughFare(address.getThoroughfare());
+                areaAddress.setSubThoroughFare(address.getSubThoroughfare());
+                break;
             }
         } catch (Exception e) {
             // Do nothing if fails.
         }
-        return addressStore;
+        return areaAddress;
     }
 }
