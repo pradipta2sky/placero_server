@@ -51,7 +51,6 @@ public class AreaDashboardPublicFragment extends Fragment implements FragmentIde
         super.onViewCreated(view, savedInstanceState);
         mView = view;
         mActivity = getActivity();
-        mActivity.findViewById(R.id.res_action_layout).setVisibility(View.GONE);
         if(getUserVisibleHint()){
             loadFragment();
         }

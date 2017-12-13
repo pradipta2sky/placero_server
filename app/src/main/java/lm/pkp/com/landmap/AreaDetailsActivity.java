@@ -55,11 +55,16 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
     private PositionListAdaptor adaptor;
 
     @Override
+    public void showLockTaskEscapeMessage() {
+        super.showLockTaskEscapeMessage();
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
 
-        setContentView(layout.activity_area_details);
+        setContentView(R.layout.activity_area_details);
         getSupportActionBar().hide();
 
         ae = AreaContext.INSTANCE.getAreaElement();

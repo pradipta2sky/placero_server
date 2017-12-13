@@ -28,9 +28,7 @@ public class ReportingContext {
 
     private AreaElement currentArea;
     private Context context;
-    private Bitmap displayBMap;
-    private Boolean generatingReport;
-    private List<Bitmap> viewBitmaps = new ArrayList<>();
+    private Boolean generatingReport = false;
 
     public AreaElement getAreaElement() {
         return this.currentArea;
@@ -80,26 +78,6 @@ public class ReportingContext {
         centerPosition.setUniqueId(positionId);
     }
 
-    private DriveResource imagesResourceRoot = null;
-    public DriveResource getImagesRootDriveResource() {
-        if(imagesResourceRoot == null){
-            DriveDBHelper ddh = new DriveDBHelper(context);
-            imagesResourceRoot
-                    = ddh.getDriveResourceRoot(FileStorageConstants.IMAGES_CONTENT_TYPE, currentArea);
-        }
-        return imagesResourceRoot;
-    }
-
-    private DriveResource videosResourceRoot = null;
-    public DriveResource getVideosRootDriveResource() {
-        if(videosResourceRoot == null){
-            DriveDBHelper ddh = new DriveDBHelper(context);
-            videosResourceRoot
-                    = ddh.getDriveResourceRoot(FileStorageConstants.VIDEOS_CONTENT_TYPE, currentArea);
-        }
-        return videosResourceRoot;
-    }
-
     private DriveResource documentsResourceRoot = null;
     public DriveResource getDocumentRootDriveResource() {
         if(documentsResourceRoot == null){
@@ -146,72 +124,6 @@ public class ReportingContext {
         return areaDocumentsFolder;
     }
 
-    public File getAreaLocalPictureThumbnailRoot(String areaId) {
-        String localImageRootPath = this.getAreaLocalImageRoot(areaId).getAbsolutePath();
-        String pictureThumbnailRoot = localImageRootPath + File.separatorChar + "thumb" + File.separatorChar;
-        File pictureThumbnailFolder = new File(pictureThumbnailRoot);
-        if (pictureThumbnailFolder.exists()) {
-            return pictureThumbnailFolder;
-        } else {
-            pictureThumbnailFolder.mkdirs();
-        }
-        return pictureThumbnailFolder;
-    }
-
-    public File getAreaLocalVideoThumbnailRoot(String areaId) {
-        String localVideoRootPath = this.getAreaLocalVideoRoot(areaId).getAbsolutePath();
-        String videoThumbnailRoot = localVideoRootPath + File.separatorChar + "thumb" + File.separatorChar;
-        File videoThumbnailFolder = new File(videoThumbnailRoot);
-        if (videoThumbnailFolder.exists()) {
-            return videoThumbnailFolder;
-        } else {
-            videoThumbnailFolder.mkdirs();
-        }
-        return videoThumbnailFolder;
-    }
-
-    public File getAreaLocalDocumentThumbnailRoot(String areaId) {
-        String localDocumentRootPath = this.getAreaLocalDocumentRoot(areaId).getAbsolutePath();
-        String documentThumbnailRoot = localDocumentRootPath + File.separatorChar + "thumb" + File.separatorChar;
-        File documentThumbnailFolder = new File(documentThumbnailRoot);
-        if (documentThumbnailFolder.exists()) {
-            return documentThumbnailFolder;
-        } else {
-            documentThumbnailFolder.mkdirs();
-        }
-        return documentThumbnailFolder;
-    }
-
-    public File getLocalStoreLocationForDriveResource(DriveResource resource) {
-        // Assuming that folders will not be passed.
-        File dumpRoot = null;
-        String contentType = resource.getContentType();
-        if (contentType.equalsIgnoreCase("Image")) {
-            dumpRoot = this.getAreaLocalImageRoot(resource.getAreaId());
-        } else if (contentType.equalsIgnoreCase("Video")) {
-            dumpRoot = this.getAreaLocalVideoRoot(resource.getAreaId());
-        } else if (contentType.equalsIgnoreCase("Document")) {
-            dumpRoot = this.getAreaLocalDocumentRoot(resource.getAreaId());
-        }
-        return dumpRoot;
-    }
-
-    public Bitmap getDisplayBMap() {
-        return this.displayBMap;
-    }
-
-    public void setDisplayBMap(Bitmap displayBMap) {
-        this.displayBMap = displayBMap;
-    }
-
-    public List<Bitmap> getViewBitmaps() {
-        return this.viewBitmaps;
-    }
-
-    public void setViewBitmaps(List<Bitmap> viewBitmaps) {
-        this.viewBitmaps = viewBitmaps;
-    }
-
     public Boolean getGeneratingReport() {
         return this.generatingReport;
     }
@@ -224,8 +136,4 @@ public class ReportingContext {
         return this.context;
     }
 
-
-    public void setActivityContext(Context context) {
-        this.context = context;
-    }
 }

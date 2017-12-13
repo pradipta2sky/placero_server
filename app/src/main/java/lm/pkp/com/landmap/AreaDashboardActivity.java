@@ -5,7 +5,11 @@ import android.app.AlertDialog.Builder;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -15,6 +19,8 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,6 +33,8 @@ import lm.pkp.com.landmap.area.dashboard.AreaDashboardOwnedFragment;
 import lm.pkp.com.landmap.area.dashboard.AreaDashboardPublicFragment;
 import lm.pkp.com.landmap.area.dashboard.AreaDashboardSharedFragment;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
+import lm.pkp.com.landmap.area.reporting.AreaReportingService;
+import lm.pkp.com.landmap.area.reporting.ReportingContext;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.custom.FragmentIdentificationHandler;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
@@ -45,9 +53,12 @@ public class AreaDashboardActivity extends AppCompatActivity {
 
         this.setContentView(R.layout.activity_area_dashboard);
         // Setup Toolbar
-        Toolbar toolbar = (Toolbar) this.findViewById(id.areas_display_toolbar);
-        this.setSupportActionBar(toolbar);
-        toolbar.setBackgroundColor(ColorProvider.getDefaultToolBarColor());
+        Toolbar topToolbar = (Toolbar) this.findViewById(id.areas_display_toolbar);
+        setSupportActionBar(topToolbar);
+        topToolbar.setBackgroundColor(ColorProvider.getDefaultToolBarColor());
+
+        Toolbar bottomToolbar = (Toolbar) this.findViewById(id.areas_macro_toolbar);
+        bottomToolbar.setBackgroundColor(ColorProvider.getDefaultToolBarColor());
 
         ViewPager viewPager = (ViewPager) this.findViewById(id.areas_display_tab_pager);
         // Assign created adapter to viewPager
@@ -59,7 +70,8 @@ public class AreaDashboardActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.setBackgroundColor(ColorProvider.getDefaultToolBarColor());
 
-        View.OnClickListener createListener = new View.OnClickListener() {
+        ImageView createAreaView = (ImageView) this.findViewById(id.action_area_create);
+        createAreaView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 findViewById(id.splash_panel).setVisibility(View.VISIBLE);
@@ -79,9 +91,30 @@ public class AreaDashboardActivity extends AppCompatActivity {
                 AreaContext.INSTANCE.setAreaElement(areaElement, getApplicationContext());
                 adh.insertAreaToServer(areaElement);
             }
-        };
-        ImageView createAreaView = (ImageView) this.findViewById(id.action_area_create);
-        createAreaView.setOnClickListener(createListener);
+        });
+
+        ImageView generateReportView = (ImageView) this.findViewById(id.action_generate_report);
+        generateReportView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
+                if(areaElement == null){
+                    showMessage("You need to select a Place first", "error");
+                    return;
+                }
+
+                ReportingContext reportingContext = ReportingContext.INSTANCE;
+                if (!reportingContext.getGeneratingReport()) {
+                    reportingContext.setAreaElement(areaElement, getApplicationContext());
+                    Intent serviceIntent = new Intent(getApplicationContext(), AreaReportingService.class);
+                    startService(serviceIntent);
+                    showMessage("Report generation started", "info");
+                } else {
+                    showMessage("Report generation is active. Please try later", "error");
+                }
+            }
+        });
+
     }
 
 
@@ -151,6 +184,36 @@ public class AreaDashboardActivity extends AppCompatActivity {
             startActivity(intent);
             finish();
         }
+    }
+
+    private void showMessage(String message, String type) {
+        final Snackbar snackbar = Snackbar.make(getWindow().getDecorView(),
+                message + ".", Snackbar.LENGTH_INDEFINITE);
+
+        View sbView = snackbar.getView();
+        snackbar.getView().setBackgroundColor(Color.parseColor("#FAF7F6"));
+
+        TextView textView = (TextView) sbView.findViewById(android.support.design.R.id.snackbar_text);
+        if (type.equalsIgnoreCase("info")) {
+            textView.setTextColor(Color.parseColor("#30601F"));
+        } else if (type.equalsIgnoreCase("error")) {
+            textView.setTextColor(Color.RED);
+        } else {
+            textView.setTextColor(Color.DKGRAY);
+        }
+        textView.setTypeface(Typeface.SANS_SERIF, Typeface.BOLD);
+        textView.setTextSize(15);
+        textView.setMaxLines(3);
+
+        snackbar.setAction("Dismiss", new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                v.setBackgroundColor(ColorProvider.DEFAULT_TOOLBAR_COLOR);
+                snackbar.dismiss();
+            }
+        });
+        snackbar.setActionTextColor(ColorProvider.DEFAULT_TOOLBAR_COLOR);
+        snackbar.show();
     }
 
 }

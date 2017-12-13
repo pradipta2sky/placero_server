@@ -3,7 +3,6 @@ package lm.pkp.com.landmap.google.signin;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -35,7 +34,6 @@ import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.R.string;
 import lm.pkp.com.landmap.SplashActivity;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
-import lm.pkp.com.landmap.mail.GMailSender;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.user.UserDBHelper;
 import lm.pkp.com.landmap.user.UserElement;
@@ -67,7 +65,7 @@ public class SignInActivity extends AppCompatActivity implements
         if(extras != null){
             String cause = extras.getString("cause");
             if(cause != null && cause.equalsIgnoreCase("crash")){
-                sendEmail(extras.getString("reason"));
+                // TODO something for crash recovery
             }
         }
 
@@ -267,16 +265,4 @@ public class SignInActivity extends AppCompatActivity implements
                 break;
         }
     }
-
-    private void sendEmail(String content) {
-        try {
-            Date currDate = Calendar.getInstance(TimeZone.getTimeZone("Asia/Calcutta")).getTime();
-            GMailSender sender = new GMailSender("pradhans.prasanna@gmail.com", "baramania");
-            sender.sendMail("Landmap crash report - " + currDate, content,
-                    "pradhans.prasanna@gmail.com", "pradipta2sky@gmail.com");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
 }

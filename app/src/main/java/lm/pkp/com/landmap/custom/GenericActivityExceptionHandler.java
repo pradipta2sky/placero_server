@@ -7,12 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 
 import java.lang.Thread.UncaughtExceptionHandler;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
 
 import lm.pkp.com.landmap.google.signin.SignInActivity;
-import lm.pkp.com.landmap.mail.GMailSender;
 
 /**
  * Created by USER on 11/8/2017.

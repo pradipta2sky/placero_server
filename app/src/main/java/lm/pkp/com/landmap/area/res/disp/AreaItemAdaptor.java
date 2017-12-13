@@ -62,26 +62,7 @@ public class AreaItemAdaptor extends ArrayAdapter {
                     child.setBackgroundColor(ColorProvider.getAreaDetailsColor(areaElement));
                 }
                 v.setBackgroundResource(R.drawable.image_border);
-
-                final Activity activity = (Activity) context;
-                activity.findViewById(R.id.res_action_layout).setVisibility(View.VISIBLE);
-
-                final FloatingActionButton reportButton = (FloatingActionButton) activity.findViewById(R.id.res_report);
-                reportButton.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        ReportingContext reportingContext = ReportingContext.INSTANCE;
-                        if(!reportingContext.getGeneratingReport()){
-                            reportingContext.setAreaElement(areaElement, activity);
-                            Intent serviceIntent = new Intent(activity, AreaReportingService.class);
-                            activity.startService(serviceIntent);
-                            Toast.makeText(activity, "Report generation started.", Toast.LENGTH_LONG).show();
-                        }else {
-                            Toast.makeText(activity, "Report generation is active. Please try later.", Toast.LENGTH_LONG).show();
-                        }
-                        activity.findViewById(R.id.res_action_layout).setVisibility(View.GONE);
-                    }
-                });
+                AreaContext.INSTANCE.setAreaElement(areaElement, context);
                 return false;
             }
         });
@@ -97,6 +78,7 @@ public class AreaItemAdaptor extends ArrayAdapter {
             }
 
         });
+
         return itemView;
     }
 
@@ -110,8 +92,8 @@ public class AreaItemAdaptor extends ArrayAdapter {
             @SuppressWarnings("unchecked")
             @Override
             protected void publishResults(CharSequence constraint, Filter.FilterResults results) {
-                AreaItemAdaptor.this.items = (ArrayList<AreaElement>) results.values;
-                AreaItemAdaptor.this.notifyDataSetChanged();
+                items = (ArrayList<AreaElement>) results.values;
+                notifyDataSetChanged();
             }
 
             @Override
@@ -126,11 +108,11 @@ public class AreaItemAdaptor extends ArrayAdapter {
 
             private List<AreaElement> getFilteredResults(CharSequence constraint) {
                 List<AreaElement> results = new ArrayList<>();
-                for (int i = 0; i < AreaItemAdaptor.this.fixedItems.size(); i++) {
-                    AreaElement areaElement = AreaItemAdaptor.this.fixedItems.get(i);
+                for (int i = 0; i < fixedItems.size(); i++) {
+                    AreaElement areaElement = fixedItems.get(i);
                     String areaName = areaElement.getName().toLowerCase();
                     String description = areaElement.getDescription().toLowerCase();
-                    String address = areaElement.getAddress().toLowerCase();
+                    String address = areaElement.getAddress().getDisplaybleAddress();
                     String cons = constraint.toString().toLowerCase();
                     if (areaName.contains(cons) || description.contains(constraint) || address.contains(constraint)) {
                         results.add(areaElement);

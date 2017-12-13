@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
 
 import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.area.AreaContext;
+import lm.pkp.com.landmap.area.model.AreaAddress;
 import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
@@ -51,11 +52,14 @@ public class AreaPopulationUtil {
         desc = "<b>Description: </b>" + desc;
         descText.setText(Html.fromHtml(desc));
 
-        TextView tagsText = (TextView) view.findViewById(id.area_tags_text);
-        String areaAddress = ae.getAddress();
-        areaAddress = areaAddress.replaceAll(Pattern.quote("@$"), "");
-        String tagsContent = "<b>Address: </b>" + areaAddress;
-        tagsText.setText(Html.fromHtml(tagsContent));
+        TextView addressTextView = (TextView) view.findViewById(id.area_tags_text);
+        AreaAddress address = ae.getAddress();
+        String areaAddressText = "";
+        if(address != null){
+            areaAddressText = address.getDisplaybleAddress();
+        }
+        String addressContent = "<b>Address: </b>" + areaAddressText;
+        addressTextView.setText(Html.fromHtml(addressContent));
 
         double areaMeasureSqFt = ae.getMeasureSqFt();
         double areaMeasureAcre = areaMeasureSqFt / 43560;
