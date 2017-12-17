@@ -163,7 +163,10 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
 
         List<Marker> markerList = new ArrayList<>(markers);
         for (Marker m : markerList) {
-            polyOptions.add(m.getPosition());
+            PositionElement positionElement = positionMarkers.get(m);
+            if(positionElement.getType().equalsIgnoreCase("boundary")){
+                polyOptions.add(m.getPosition());
+            }
         }
         polygon = googleMap.addPolygon(polyOptions);
 
@@ -211,7 +214,6 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                     marker.setDraggable(false);
                     marker.setVisible(true);
 
-
                     PolylineOptions polylineOptions = new PolylineOptions()
                             .add(marker.getPosition(), centerMarker.getPosition())
                             .width(5)
@@ -240,9 +242,9 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                 DriveResource resource = resourceMarkers.get(marker);
                 String markerTag = (String) marker.getTag();
 
-                if(markerTag.equalsIgnoreCase("PositionMarker")){
+                if (markerTag.equalsIgnoreCase("PositionMarker")) {
                     infoImage.setImageResource(drawable.marker_image);
-                    infoTitle.setText(position.getDisplayName());
+                    infoTitle.setText(position.getName());
                     CharSequence timeSpan = DateUtils.getRelativeTimeSpanString(new Long(position.getCreatedOnMillis()),
                             System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS);
                     DecimalFormat formatter = new DecimalFormat("##.##");
@@ -251,7 +253,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                     infoButton.setText("Remove");
                 }
 
-                if(markerTag.equalsIgnoreCase("AreaCenter")){
+                if (markerTag.equalsIgnoreCase("AreaCenter")) {
                     infoTitle.setText(marker.getTitle());
                     LatLng markerPosition = marker.getPosition();
                     DecimalFormat locFormat = new DecimalFormat("##.####");
@@ -262,16 +264,16 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                     infoButton.setVisibility(View.GONE);
                 }
 
-                if(markerTag.equalsIgnoreCase("MediaMarker")){
+                if (markerTag.equalsIgnoreCase("MediaMarker")) {
                     String thumbRootPath = "";
-                    if(resource.getContentType().equalsIgnoreCase("Video")){
+                    if (resource.getContentType().equalsIgnoreCase("Video")) {
                         thumbRootPath = ac.getAreaLocalVideoThumbnailRoot(ae.getUniqueId()).getAbsolutePath();
-                    }else {
+                    } else {
                         thumbRootPath = ac.getAreaLocalPictureThumbnailRoot(ae.getUniqueId()).getAbsolutePath();
                     }
                     String thumbnailPath = thumbRootPath + File.separatorChar + resource.getName();
                     File thumbFile = new File(thumbnailPath);
-                    if(thumbFile.exists()){
+                    if (thumbFile.exists()) {
                         Bitmap bMap = BitmapFactory.decodeFile(thumbnailPath);
                         infoImage.setImageBitmap(bMap);
                     }
@@ -351,7 +353,9 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
         marker.setTag("PositionMarker");
         marker.setTitle(pe.getUniqueId());
         marker.setDraggable(false);
-        if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.UPDATE_AREA)) {
+        // First check for movement permission then check if the marker is a boundary marker.
+        if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.UPDATE_AREA)
+                && pe.getType().equalsIgnoreCase("boundary")) {
             marker.setDraggable(true);
             googleMap.setOnMarkerDragListener(new OnMarkerDragListener() {
                 @Override
@@ -389,8 +393,22 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
     }
 
     private void zoomCameraToPosition(Marker marker) {
+        AreaMeasure measure = ae.getMeasure();
+        float zoomLevel = 20f;
+        double decimals = measure.getDecimals();
+        if(decimals > 10 && decimals < 300){
+            zoomLevel = 19f;
+        }else if(decimals > 300 && decimals < 700){
+            zoomLevel = 18f;
+        }else if(decimals > 700 && decimals < 1300){
+            zoomLevel = 17f;
+        }else if(decimals > 1300 && decimals < 2200){
+            zoomLevel = 16f;
+        }else if(decimals > 2200){
+            zoomLevel = 14f;
+        }
         LatLng position = marker.getPosition();
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(position, 21f);
+        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(position, zoomLevel);
         googleMap.animateCamera(cameraUpdate);
         googleMap.moveCamera(cameraUpdate);
     }

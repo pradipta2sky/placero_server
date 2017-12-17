@@ -13,7 +13,6 @@ import lm.pkp.com.landmap.weather.model.WeatherElement;
 public class PositionElement implements Serializable {
 
     private String name = "";
-    private String displayName = "";
     private String description = "";
     private double lat;
     private double lon;
@@ -21,6 +20,7 @@ public class PositionElement implements Serializable {
     private String uniqueAreaId = "";
     private String uniqueId = "";
     private String createdOnMillis = System.currentTimeMillis() + "";
+    private String type = "boundary";
     private WeatherElement weather;
 
     public String getName() {
@@ -91,20 +91,20 @@ public class PositionElement implements Serializable {
         this.createdOnMillis = createdOnMillis;
     }
 
-    public String getDisplayName() {
-        return this.displayName;
-    }
-
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-    }
-
     public WeatherElement getWeather() {
         return weather;
     }
 
     public void setWeather(WeatherElement weather) {
         this.weather = weather;
+    }
+
+    public String getType() {
+        return this.type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     @Override

@@ -23,6 +23,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
     public static final String POSITION_TABLE_NAME = "position_master";
 
     public static final String POSITION_COLUMN_NAME = "name";
+    public static final String POSITION_COLUMN_TYPE = "type";
     public static final String POSITION_COLUMN_DESCRIPTION = "desc";
     public static final String POSITION_COLUMN_LAT = "lat";
     public static final String POSITION_COLUMN_LON = "lon";
@@ -40,6 +41,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         db.execSQL(
                 "create table " + POSITION_TABLE_NAME + "(" +
                         POSITION_COLUMN_NAME + " text," +
+                        POSITION_COLUMN_TYPE + " text," +
                         POSITION_COLUMN_DESCRIPTION + " text," +
                         POSITION_COLUMN_LAT + " text, " +
                         POSITION_COLUMN_LON + " text," +
@@ -66,6 +68,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
 
         contentValues.put(POSITION_COLUMN_UNIQUE_AREA_ID, pe.getUniqueAreaId());
         contentValues.put(POSITION_COLUMN_NAME, pe.getName());
+        contentValues.put(POSITION_COLUMN_TYPE, pe.getType());
         contentValues.put(POSITION_COLUMN_DESCRIPTION, pe.getDescription());
         contentValues.put(POSITION_COLUMN_LAT, pe.getLat());
         contentValues.put(POSITION_COLUMN_LON, pe.getLon());
@@ -85,6 +88,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         contentValues.put(POSITION_COLUMN_UNIQUE_ID, pe.getUniqueId());
         contentValues.put(POSITION_COLUMN_UNIQUE_AREA_ID, pe.getUniqueAreaId());
         contentValues.put(POSITION_COLUMN_NAME, pe.getName());
+        contentValues.put(POSITION_COLUMN_TYPE, pe.getType());
         contentValues.put(POSITION_COLUMN_DESCRIPTION, pe.getDescription());
         contentValues.put(POSITION_COLUMN_LAT, pe.getLat());
         contentValues.put(POSITION_COLUMN_LON, pe.getLon());
@@ -103,6 +107,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         contentValues.put(POSITION_COLUMN_UNIQUE_ID, pe.getUniqueId());
         contentValues.put(POSITION_COLUMN_UNIQUE_AREA_ID, pe.getUniqueAreaId());
         contentValues.put(POSITION_COLUMN_NAME, pe.getName());
+        contentValues.put(POSITION_COLUMN_TYPE, pe.getType());
         contentValues.put(POSITION_COLUMN_DESCRIPTION, pe.getDescription());
         contentValues.put(POSITION_COLUMN_LAT, pe.getLat());
         contentValues.put(POSITION_COLUMN_LON, pe.getLon());
@@ -115,18 +120,18 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
     }
 
     public void insertPositionToServer(PositionElement pe) {
-        new LMSRestAsyncTask().execute(this.preparePostParams("insert", pe));
+        new LMSRestAsyncTask().execute(preparePostParams("insert", pe));
     }
 
     public void updatePositionToServer(PositionElement pe) {
-        new LMSRestAsyncTask().execute(this.preparePostParams("update", pe));
+        new LMSRestAsyncTask().execute(preparePostParams("update", pe));
     }
 
     public void deletePositionGlobally(PositionElement pe) {
         SQLiteDatabase db = getWritableDatabase();
         db.delete(POSITION_TABLE_NAME, POSITION_COLUMN_UNIQUE_ID + " = ? ", new String[]{pe.getUniqueId()});
 
-        new LMSRestAsyncTask().execute(this.preparePostParams("delete", pe));
+        new LMSRestAsyncTask().execute(preparePostParams("delete", pe));
         db.close();
     }
 
@@ -152,6 +157,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
                 pe.setUniqueAreaId(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_UNIQUE_AREA_ID)));
 
                 pe.setName(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_NAME)));
+                pe.setType(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_TYPE)));
                 pe.setDescription(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_DESCRIPTION)));
 
                 String latStr = cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_LAT));
@@ -185,6 +191,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
             postParams.put("desc", pe.getDescription());
             postParams.put("tags", pe.getTags());
             postParams.put("name", pe.getName());
+            postParams.put("type", pe.getType());
             postParams.put("uniqueAreaId", pe.getUniqueAreaId());
             postParams.put("uniqueId", pe.getUniqueId());
             postParams.put("created_on", pe.getCreatedOnMillis());

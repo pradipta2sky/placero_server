@@ -57,7 +57,7 @@ public class AreaElement implements Serializable {
     public List<PositionElement> getPositions() {
         int size = positions.size();
         for (int i = 0; i < size; i++) {
-            positions.get(i).setDisplayName("Position_" + (i + 1));
+            positions.get(i).setName("Position_" + (i + 1));
         }
         return this.positions;
     }

@@ -9,8 +9,12 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 
+import lm.pkp.com.landmap.AreaDetailsActivity;
+import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
@@ -30,25 +34,35 @@ public class PositionListAdaptor extends ArrayAdapter<PositionElement> {
         super(context, textViewResourceId, items);
         this.context = context;
         this.items = items;
-        this.pdh = new PositionsDBHelper(context);
+        pdh = new PositionsDBHelper(context);
     }
 
     @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, final ViewGroup parent) {
         View v = convertView;
         if (v == null) {
             LayoutInflater vi = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            v = vi.inflate(layout.position_element_row, null);
+            v = vi.inflate(R.layout.position_element_row, null);
         }
 
-        final PositionElement pe = this.items.get(position);
-        TextView nameText = (TextView) v.findViewById(id.pos_name);
-        nameText.setText(pe.getDisplayName());
+        final PositionElement pe = items.get(position);
+        TextView nameText = (TextView) v.findViewById(R.id.pos_name);
+        nameText.setText(pe.getName() + ", " + StringUtils.capitalize(pe.getType()));
 
-        TextView latLongText = (TextView) v.findViewById(id.pos_latlng);
+        TextView latLongText = (TextView) v.findViewById(R.id.pos_latlng);
         latLongText.setText("Lat: " + pe.getLat() + ", " + "Long: " + pe.getLon());
 
-        ImageView deleteButton = (ImageView) v.findViewById(id.del_row);
+        ImageView editButton = (ImageView) v.findViewById(R.id.edit_row);
+        editButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.MARK_POSITION)) {
+                    ((AreaDetailsActivity)context).showPositionEdit(pe);
+                }
+            }
+        });
+
+        ImageView deleteButton = (ImageView) v.findViewById(R.id.del_row);
         deleteButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {

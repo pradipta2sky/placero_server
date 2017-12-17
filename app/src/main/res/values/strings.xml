@@ -94,4 +94,9 @@
         <item>less_than_equals</item>
     </string-array>
 
+    <string-array name="position_types">
+        <item>Boundary</item>
+        <item>Internal</item>
+    </string-array>
+
 </resources>
