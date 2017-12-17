@@ -1,5 +1,8 @@
 package lm.pkp.com.landmap.user;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Created by USER on 10/24/2017.
  */
@@ -11,6 +14,7 @@ public class UserElement {
     private String givenName;
     private String photoUrl;
     private String authSystemId;
+    private UserPreferences preferences = new UserPreferences();
 
     public String getDisplayName() {
         return this.displayName;
@@ -60,4 +64,11 @@ public class UserElement {
         this.authSystemId = authSystemId;
     }
 
+    public UserPreferences getPreferences() {
+        return this.preferences;
+    }
+
+    public void setPreferences(UserPreferences preferences) {
+        this.preferences = preferences;
+    }
 }

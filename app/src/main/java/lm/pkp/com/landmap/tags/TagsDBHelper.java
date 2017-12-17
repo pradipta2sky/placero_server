@@ -11,26 +11,24 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
-import lm.pkp.com.landmap.permission.PermissionElement;
-import lm.pkp.com.landmap.sync.LMSRestAsyncTask;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.user.UserElement;
 
 public class TagsDBHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "landmap.db";
-    public static final String ACCESS_TABLE_NAME = "tag_master";
-    public static final String ACCESS_COLUMN_NAME = "name";
-    public static final String ACCESS_COLUMN_CONTEXT = "context";
-    public static final String ACCESS_COLUMN_CONTEXT_ID = "context_id";
+    public static final String TAG_TABLE_NAME = "tag_master";
+    public static final String TAG_COLUMN_NAME = "name";
+    public static final String TAG_COLUMN_TYPE = "type";
+    public static final String TAG_COLUMN_TYPE_FIELD = "type_field";
+    public static final String TAG_COLUMN_CONTEXT = "context";
+    public static final String TAG_COLUMN_CONTEXT_ID = "context_id";
     private AsyncTaskCallback callback;
 
     public TagsDBHelper(Context context, AsyncTaskCallback callback) {
@@ -46,78 +44,97 @@ public class TagsDBHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(
                 "create table " +
-                        ACCESS_TABLE_NAME + "(" +
-                        ACCESS_COLUMN_NAME + " text," +
-                        ACCESS_COLUMN_CONTEXT + " text, " +
-                        ACCESS_COLUMN_CONTEXT_ID + " text)"
+                        TAG_TABLE_NAME + "(" +
+                        TAG_COLUMN_NAME + " text," +
+                        TAG_COLUMN_TYPE + " text," +
+                        TAG_COLUMN_TYPE_FIELD + " text," +
+                        TAG_COLUMN_CONTEXT + " text, " +
+                        TAG_COLUMN_CONTEXT_ID + " text)"
         );
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + ACCESS_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + TAG_TABLE_NAME);
         this.onCreate(db);
     }
 
-    public void insertTagsLocally(List<String> names, String context, String contextId) {
+    public void insertTagsLocally(List<TagElement> elements, String context, String contextId) {
         SQLiteDatabase db = getWritableDatabase();
-
-        ContentValues contentValues = new ContentValues();
-        if(context.equalsIgnoreCase("user")){
-            contentValues.put(ACCESS_COLUMN_CONTEXT_ID, contextId);
-            contentValues.put(ACCESS_COLUMN_CONTEXT, "user");
-        }else {
-            contentValues.put(ACCESS_COLUMN_CONTEXT_ID, contextId);
-            contentValues.put(ACCESS_COLUMN_CONTEXT, "area");
-        }
-        for(String name : names){
-            contentValues.put(ACCESS_COLUMN_NAME, name);
-            db.insert(ACCESS_TABLE_NAME, null, contentValues);
+        for(TagElement tagElement : elements){
+            ContentValues contentValues = new ContentValues();
+            if(context.equalsIgnoreCase("user")){
+                contentValues.put(TAG_COLUMN_CONTEXT_ID, contextId);
+                contentValues.put(TAG_COLUMN_CONTEXT, "user");
+            }else {
+                contentValues.put(TAG_COLUMN_CONTEXT_ID, contextId);
+                contentValues.put(TAG_COLUMN_CONTEXT, "area");
+            }
+            contentValues.put(TAG_COLUMN_NAME, tagElement.getName());
+            contentValues.put(TAG_COLUMN_TYPE, tagElement.getType());
+            contentValues.put(TAG_COLUMN_TYPE_FIELD, tagElement.getTypeField());
+            db.insert(TAG_TABLE_NAME, null, contentValues);
         }
         db.close();
     }
 
-    public void insertTagsToServer(List<String> names, String context) {
-        TagInsertAsyncTask task = new TagInsertAsyncTask(callback);
-        task.execute(preparePostParams(names, context));
+    public void insertTagsToServer(List<TagElement> tagElements, String context, String contextId) {
+        for (TagElement tagElement: tagElements){
+            TagInsertAsyncTask task = new TagInsertAsyncTask(callback);
+            task.execute(preparePostParams(tagElement, context, contextId));
+        }
     }
 
-    private JSONObject preparePostParams(List<String> names, String context) {
+    private JSONObject preparePostParams(TagElement tagElement, String context, String contextId) {
         JSONObject postParams = new JSONObject();
-        AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
-        UserElement userElement = UserContext.getInstance().getUserElement();
         try {
-            if(names.size() == 1){
-                postParams.put("query_type", "insert_single");
-                postParams.put("name", names.get(0));
-            }else {
-                postParams.put("query_type", "insert_multiple");
-                Object[] nameArr = names.toArray();
-                String joinedNames = StringUtils.join(nameArr, ",");
-                postParams.put("names", joinedNames);
-            }
+            postParams.put("name", tagElement.getName());
+            postParams.put("type", tagElement.getType());
+            postParams.put("type_field", tagElement.getTypeField());
             postParams.put("context", context);
-            if(context.equalsIgnoreCase("user")){
-                postParams.put("context_id", userElement.getEmail());
-            }else {
-                postParams.put("context_id", areaElement.getUniqueId());
-            }
+            postParams.put("context_id", contextId);
+            postParams.put("query_type", "insert");
         } catch (JSONException e) {
             e.printStackTrace();
         }
         return postParams;
     }
 
+    public ArrayList<TagElement> getTagsByContext(String context){
+        ArrayList<TagElement> tagElements = new ArrayList<TagElement>();
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("select * from " + TAG_TABLE_NAME + " WHERE " + TAG_COLUMN_CONTEXT + "=?",
+                new String[]{context});
+        if (cursor != null) {
+            cursor.moveToFirst();
+            while (cursor.isAfterLast() == false) {
+                TagElement te = new TagElement();
+                te.setName(cursor.getString(cursor.getColumnIndex(TAG_COLUMN_NAME)));
+                te.setContext(cursor.getString(cursor.getColumnIndex(TAG_COLUMN_CONTEXT)));
+                te.setContextId(cursor.getString(cursor.getColumnIndex(TAG_COLUMN_CONTEXT_ID)));
+                te.setType(cursor.getString(cursor.getColumnIndex(TAG_COLUMN_TYPE)));
+                te.setTypeField(cursor.getString(cursor.getColumnIndex(TAG_COLUMN_TYPE_FIELD)));
+                if(!tagElements.contains(te)){
+                    tagElements.add(te);
+                }
+                cursor.moveToNext();
+            }
+            cursor.close();
+        }
+        db.close();
+        return tagElements;
+    }
+
     public void deleteTagsByContext(String context, String contextId) {
         SQLiteDatabase db = getWritableDatabase();
-        db.delete(ACCESS_TABLE_NAME, ACCESS_COLUMN_CONTEXT + "=? AND " + ACCESS_COLUMN_CONTEXT_ID + "=?",
+        db.delete(TAG_TABLE_NAME, TAG_COLUMN_CONTEXT + "=? AND " + TAG_COLUMN_CONTEXT_ID + "=?",
                 new String[]{context, contextId});
         db.close();
     }
 
     public void deleteAllTagsLocally() {
         SQLiteDatabase db = getWritableDatabase();
-        db.delete(ACCESS_TABLE_NAME, "1", null);
+        db.delete(TAG_TABLE_NAME, "1", null);
         db.close();
     }
 

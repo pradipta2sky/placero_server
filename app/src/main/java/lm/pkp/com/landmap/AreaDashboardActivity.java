@@ -7,6 +7,7 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -14,6 +15,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -22,7 +24,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import lm.pkp.com.landmap.R.id;
@@ -36,12 +40,17 @@ import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.reporting.AreaReportingService;
 import lm.pkp.com.landmap.area.reporting.ReportingContext;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
+import lm.pkp.com.landmap.custom.FragmentFilterHandler;
 import lm.pkp.com.landmap.custom.FragmentIdentificationHandler;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.permission.PermissionConstants;
 import lm.pkp.com.landmap.permission.PermissionElement;
 import lm.pkp.com.landmap.permission.PermissionsDBHelper;
+import lm.pkp.com.landmap.tags.TagElement;
+import lm.pkp.com.landmap.tags.TagsDisplayMetaStore;
 import lm.pkp.com.landmap.user.UserContext;
+import lm.pkp.com.landmap.user.UserElement;
+import lm.pkp.com.landmap.user.UserPreferences;
 import lm.pkp.com.landmap.util.ColorProvider;
 
 public class AreaDashboardActivity extends AppCompatActivity {
@@ -53,19 +62,19 @@ public class AreaDashboardActivity extends AppCompatActivity {
 
         this.setContentView(R.layout.activity_area_dashboard);
         // Setup Toolbar
-        Toolbar topToolbar = (Toolbar) this.findViewById(id.areas_display_toolbar);
+        Toolbar topToolbar = (Toolbar) this.findViewById(R.id.areas_display_toolbar);
         setSupportActionBar(topToolbar);
         topToolbar.setBackgroundColor(ColorProvider.getDefaultToolBarColor());
 
-        Toolbar bottomToolbar = (Toolbar) this.findViewById(id.areas_macro_toolbar);
+        Toolbar bottomToolbar = (Toolbar) this.findViewById(R.id.areas_macro_toolbar);
         bottomToolbar.setBackgroundColor(ColorProvider.getDefaultToolBarColor());
 
-        ViewPager viewPager = (ViewPager) this.findViewById(id.areas_display_tab_pager);
+        final ViewPager viewPager = (ViewPager) this.findViewById(R.id.areas_display_tab_pager);
         // Assign created adapter to viewPager
-        viewPager.setAdapter(new DisplayAreasPagerAdapter(this.getSupportFragmentManager()));
+        viewPager.setAdapter(new DisplayAreasPagerAdapter(getSupportFragmentManager()));
         viewPager.setOffscreenPageLimit(1);
 
-        TabLayout tabLayout = (TabLayout) this.findViewById(id.areas_display_tab_layout);
+        TabLayout tabLayout = (TabLayout) this.findViewById(R.id.areas_display_tab_layout);
         // This method setup all required method for TabLayout with Viewpager
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.setBackgroundColor(ColorProvider.getDefaultToolBarColor());
@@ -115,7 +124,48 @@ public class AreaDashboardActivity extends AppCompatActivity {
             }
         });
 
+        ImageView tagAssignmentView = (ImageView) this.findViewById(id.action_tag_assignment);
+        tagAssignmentView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getApplicationContext(), TagAssignmentActivity.class);
+                startActivity(intent);
+                finish();
+            }
+        });
+
+        final ImageView filterUTView = (ImageView) this.findViewById(id.action_filter_ut);
+        UserElement userElement = UserContext.getInstance().getUserElement();
+        final UserPreferences userPreferences = userElement.getPreferences();
+        filterUTView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DisplayAreasPagerAdapter adapter = (DisplayAreasPagerAdapter) viewPager.getAdapter();
+                FragmentFilterHandler filterHandler
+                        = (FragmentFilterHandler) adapter.getItem(AreaDashboardDisplayMetaStore.INSTANCE.getActiveTab());
+                if(userPreferences.isFilteringEnabled()){
+                    filterHandler.resetFilter();
+                    userPreferences.setFilteringEnabled(false);
+                    filterUTView.setBackground(null);
+                }else {
+                    userPreferences.setFilteringEnabled(true);
+                    filterUTView.setBackground(getResources().getDrawable(R.drawable.rounded_corner));
+                    List<TagElement> tags = userPreferences.getTags();
+                    List<String> filterables = new ArrayList<>();
+                    List<String> executables = new ArrayList<>();
+                    for(TagElement tag: tags){
+                        if(tag.getType().equals("filterable")){
+                            filterables.add(tag.getName());
+                        }else {
+                            executables.add(tag.getName());
+                        }
+                    }
+                    filterHandler.doFilter(filterables, executables);
+                }
+            }
+        });
     }
+
 
 
     @Override

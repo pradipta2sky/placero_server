@@ -73,4 +73,25 @@
     <string name="wi_yahoo_46">&#xf01b;</string>
     <string name="wi_yahoo_47">&#xf00e;</string>
     <string name="wi_yahoo_3200">&#xf077;</string>
+
+
+    <string name="measure_prompt">Choose Measure</string>
+    <string name="compare_prompt">Choose Comparison</string>
+
+    <string-array name="measure_arrays">
+        <item>SqFeet</item>
+        <item>SqMeters</item>
+        <item>Acre</item>
+        <item>Hectare</item>
+        <item>Decimals</item>
+    </string-array>
+
+    <string-array name="compare_arrays">
+        <item>greater_than</item>
+        <item>less_than</item>
+        <item>equals</item>
+        <item>greater_than_equals</item>
+        <item>less_than_equals</item>
+    </string-array>
+
 </resources>

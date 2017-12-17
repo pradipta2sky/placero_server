@@ -26,12 +26,21 @@
         android:padding="2dp"/>
 
     <ImageView
-        android:id="@+id/action_manage_tags"
+        android:id="@+id/action_tag_assignment"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_gravity="right|center"
         android:layout_marginRight="15dp"
         android:src="@drawable/tag_icon"
+        android:padding="2dp"/>
+
+    <ImageView
+        android:id="@+id/action_filter_ut"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="right|center"
+        android:layout_marginRight="15dp"
+        android:src="@drawable/funnel"
         android:padding="2dp"/>
 
 </LinearLayout>

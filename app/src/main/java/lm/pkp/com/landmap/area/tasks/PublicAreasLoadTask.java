@@ -17,6 +17,7 @@ import javax.net.ssl.HttpsURLConnection;
 import lm.pkp.com.landmap.area.model.AreaAddress;
 import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
+import lm.pkp.com.landmap.area.model.AreaMeasure;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
@@ -110,7 +111,8 @@ public class PublicAreasLoadTask extends AsyncTask<JSONObject, Void, String> {
                 ae.getCenterPosition().setLat(areaObj.getDouble("center_lat"));
                 ae.getCenterPosition().setLon(areaObj.getDouble("center_lon"));
                 ae.setUniqueId(areaObj.getString("unique_id"));
-                ae.setMeasureSqFt(areaObj.getDouble("measure_sqft"));
+                AreaMeasure measure = new AreaMeasure(areaObj.getDouble("measure_sqft"));
+                ae.setMeasure(measure);
 
                 String addressText = areaObj.getString("address");
                 AreaAddress areaAddress = AreaAddress.fromStoredAddress(addressText);

@@ -20,6 +20,7 @@ import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.model.AreaAddress;
 import lm.pkp.com.landmap.area.model.AreaElement;
+import lm.pkp.com.landmap.area.model.AreaMeasure;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
 
@@ -61,14 +62,12 @@ public class AreaPopulationUtil {
         String addressContent = "<b>Address: </b>" + areaAddressText;
         addressTextView.setText(Html.fromHtml(addressContent));
 
-        double areaMeasureSqFt = ae.getMeasureSqFt();
-        double areaMeasureAcre = areaMeasureSqFt / 43560;
-        double areaMeasureDecimals = areaMeasureSqFt / 436;
+        AreaMeasure measure = ae.getMeasure();
         DecimalFormat df = new DecimalFormat("###.##");
 
         TextView measureText = (TextView) view.findViewById(id.area_measure_text);
-        String content = "<b>Area: </b>" + df.format(areaMeasureSqFt) + " Sqft, "
-                + df.format(areaMeasureAcre) + " Acre, " + df.format(areaMeasureDecimals) + " Decimals.";
+        String content = "<b>Area: </b>" + df.format(measure.getSqFeet()) + " Sqft, "
+                + df.format(measure.getAcre()) + " Acre, " + df.format(measure.getDecimals()) + " Decimals.";
         measureText.setText(Html.fromHtml(content));
 
         Drawable drawable = view.getBackground().getCurrent();

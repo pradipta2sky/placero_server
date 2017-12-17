@@ -18,6 +18,7 @@ import lm.pkp.com.landmap.AreaDetailsActivity;
 import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.model.AreaElement;
+import lm.pkp.com.landmap.area.model.AreaMeasure;
 import lm.pkp.com.landmap.area.reporting.AreaReportingService;
 import lm.pkp.com.landmap.area.reporting.ReportingContext;
 import lm.pkp.com.landmap.util.AreaPopulationUtil;
@@ -43,7 +44,7 @@ public class AreaItemAdaptor extends ArrayAdapter {
     public View getView(final int position, View convertView, final ViewGroup parent) {
         View itemView = convertView;
         if (itemView == null) {
-            LayoutInflater vi = (LayoutInflater) this.context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             itemView = vi.inflate(R.layout.area_element_row, null);
         }
 
@@ -99,10 +100,8 @@ public class AreaItemAdaptor extends ArrayAdapter {
             @Override
             protected Filter.FilterResults performFiltering(CharSequence constraint) {
                 List<AreaElement> filteredResults = getFilteredResults(constraint);
-
                 Filter.FilterResults results = new Filter.FilterResults();
                 results.values = filteredResults;
-
                 return results;
             }
 
@@ -122,4 +121,127 @@ public class AreaItemAdaptor extends ArrayAdapter {
             }
         };
     }
+
+    public Filter resetFilter() {
+        return new Filter() {
+            @SuppressWarnings("unchecked")
+            @Override
+            protected void publishResults(CharSequence constraint, Filter.FilterResults results) {
+                items = (ArrayList<AreaElement>) results.values;
+                notifyDataSetChanged();
+            }
+
+            @Override
+            protected Filter.FilterResults performFiltering(CharSequence constraint) {
+                Filter.FilterResults results = new Filter.FilterResults();
+                results.values = fixedItems;
+                return results;
+            }
+        };
+    }
+
+    public Filter getFilterChain(final List<String> filterables, final List<String> executables) {
+        return new Filter() {
+            ArrayList<AreaElement> filteredItems = fixedItems;
+
+            @SuppressWarnings("unchecked")
+            @Override
+            protected void publishResults(CharSequence constraint, Filter.FilterResults results) {
+                items = (ArrayList<AreaElement>) results.values;
+                notifyDataSetChanged();
+            }
+
+            @Override
+            protected Filter.FilterResults performFiltering(CharSequence constraint) {
+                String constraintStr = "";
+                Filter.FilterResults results = new Filter.FilterResults();
+                if(constraint == null || constraint.toString().trim().equals("")){
+                    results.values = fixedItems;
+                }else {
+                    filteredItems = (ArrayList<AreaElement>) filterByConstraint(fixedItems, constraintStr);
+                }
+                for (String filterable: filterables) {
+                    filteredItems = (ArrayList<AreaElement>) filterByFilterable(filteredItems, filterable);
+                }
+                for (String executable: executables) {
+                    filteredItems = (ArrayList<AreaElement>) filterByExecutable(filteredItems, executable);
+                }
+                results.values = filteredItems;
+                return results;
+            }
+
+            private List<AreaElement> filterByFilterable(ArrayList<AreaElement> filterableItems, String filterable) {
+                if(filterableItems.size() == 0){
+                    return filterableItems;
+                }
+                List<AreaElement> results = new ArrayList<>();
+                for (int i = 0; i < filterableItems.size(); i++) {
+                    AreaElement areaElement = filterableItems.get(i);
+                    String address = areaElement.getAddress().getDisplaybleAddress().toLowerCase();
+                    String lowerFilterable = filterable.toString().toLowerCase();
+                    if (address.contains(lowerFilterable)) {
+                        results.add(areaElement);
+                    }
+                }
+                return results;
+            }
+
+            private List<AreaElement> filterByExecutable(ArrayList<AreaElement> executableItems, String executable) {
+                if(executableItems.size() == 0){
+                    return executableItems;
+                }
+                List<AreaElement> results = new ArrayList<>();
+                for (int i = 0; i < executableItems.size(); i++) {
+                    AreaElement areaElement = executableItems.get(i);
+                    AreaMeasure measure = areaElement.getMeasure();
+
+                    String[] splitExec = executable.split(" ");
+                    double instanceValue = measure.getValueByField(splitExec[0]);
+                    String condition = splitExec[1];
+                    String conditionValueStr = splitExec[2];
+                    double conditionValue = new Double(conditionValueStr);
+
+                    if(condition.equalsIgnoreCase("greater_than")){
+                        if(instanceValue > conditionValue){
+                            results.add(areaElement);
+                        }
+                    }else if(condition.equalsIgnoreCase("less_than")){
+                        if(instanceValue < conditionValue){
+                            results.add(areaElement);
+                        }
+                    }else if(condition.equalsIgnoreCase("equals")){
+                        if(instanceValue == conditionValue){
+                            results.add(areaElement);
+                        }
+                    }else if(condition.equalsIgnoreCase("less_than_equals")){
+                        if(instanceValue <= conditionValue){
+                            results.add(areaElement);
+                        }
+                    }else if(condition.equalsIgnoreCase("greater_than_equals")){
+                        if(instanceValue >= conditionValue){
+                            results.add(areaElement);
+                        }
+                    }
+
+                }
+                return results;
+            }
+
+            private List<AreaElement> filterByConstraint(ArrayList<AreaElement> filterableItems, String constraint) {
+                List<AreaElement> results = new ArrayList<>();
+                for (int i = 0; i < filterableItems.size(); i++) {
+                    AreaElement areaElement = filterableItems.get(i);
+                    String areaName = areaElement.getName().toLowerCase();
+                    String description = areaElement.getDescription().toLowerCase();
+                    String address = areaElement.getAddress().getDisplaybleAddress();
+                    String cons = constraint.toString().toLowerCase();
+                    if (areaName.contains(cons) || description.contains(constraint) || address.contains(constraint)) {
+                        results.add(areaElement);
+                    }
+                }
+                return results;
+            }
+        };
+    }
+
 }

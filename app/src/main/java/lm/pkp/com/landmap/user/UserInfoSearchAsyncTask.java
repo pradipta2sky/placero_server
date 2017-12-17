@@ -43,9 +43,7 @@ public class UserInfoSearchAsyncTask extends AsyncTask<JSONObject, Void, String>
 
             int responseCode = conn.getResponseCode();
             if (responseCode == HttpsURLConnection.HTTP_OK) {
-                BufferedReader in = new BufferedReader(new
-                        InputStreamReader(
-                        conn.getInputStream()));
+                BufferedReader in = new BufferedReader(new InputStreamReader(conn.getInputStream()));
 
                 StringBuffer sb = new StringBuffer("");
                 String line = "";

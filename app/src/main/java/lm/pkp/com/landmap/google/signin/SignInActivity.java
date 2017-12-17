@@ -22,6 +22,7 @@ import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.Calendar;
@@ -34,6 +35,7 @@ import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.R.string;
 import lm.pkp.com.landmap.SplashActivity;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
+import lm.pkp.com.landmap.tags.TagElement;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.user.UserDBHelper;
 import lm.pkp.com.landmap.user.UserElement;
@@ -173,6 +175,20 @@ public class SignInActivity extends AppCompatActivity implements
                 udh.insertUserToServer(signedUser);
                 spashIntent.putExtra("user_exists", "false");
             }else {
+                // Parse user details
+                JSONArray userArr = new JSONArray(userDetails);
+                JSONObject userObj = (JSONObject) userArr.get(0);
+                String tagsStr = userObj.getString("tags");
+                String[] tagsArr = tagsStr.split(",");
+
+                String tagTypes = userObj.getString("tag_types");
+                String[] tagTypesArr = tagTypes.split(",");
+
+                UserElement userElement = UserContext.getInstance().getUserElement();
+                for (int i = 0; i < tagsArr.length; i++) {
+                    TagElement tagElement = new TagElement(tagsArr[i], tagTypesArr[i], "user");
+                    userElement.getPreferences().getTags().add(tagElement);
+                }
                 spashIntent.putExtra("user_exists", "true");
             }
             startActivity(spashIntent);

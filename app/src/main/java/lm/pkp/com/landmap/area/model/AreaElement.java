@@ -21,22 +21,14 @@ public class AreaElement implements Serializable {
     private String description;
     private String createdBy;
     private String type;
-    private double measureSqFt;
     private String uniqueId;
     private AreaAddress address;
+    private AreaMeasure measure;
 
     private PositionElement centerPosition = new PositionElement();
     private List<PositionElement> positions = new ArrayList<>();
     private List<DriveResource> mediaResources = new ArrayList<>();
     private Map<String, PermissionElement> userPermissions = new HashMap<>();
-
-    public double getMeasureSqFt() {
-        return this.measureSqFt;
-    }
-
-    public void setMeasureSqFt(double measureSqFt) {
-        this.measureSqFt = measureSqFt;
-    }
 
     public String getCreatedBy() {
         return this.createdBy;
@@ -120,5 +112,13 @@ public class AreaElement implements Serializable {
 
     public void setAddress(AreaAddress address) {
         this.address = address;
+    }
+
+    public AreaMeasure getMeasure() {
+        return this.measure;
+    }
+
+    public void setMeasure(AreaMeasure measure) {
+        this.measure = measure;
     }
 }

@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.R.id;
@@ -26,13 +27,19 @@ import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.res.disp.AreaItemAdaptor;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
+import lm.pkp.com.landmap.custom.FragmentFilterHandler;
 import lm.pkp.com.landmap.custom.FragmentIdentificationHandler;
 import lm.pkp.com.landmap.sync.LocalDataRefresher;
+import lm.pkp.com.landmap.tags.TagElement;
+import lm.pkp.com.landmap.user.UserContext;
+import lm.pkp.com.landmap.user.UserElement;
+import lm.pkp.com.landmap.user.UserPreferences;
 
 /**
  * Created by USER on 11/4/2017.
  */
-public class AreaDashboardSharedFragment extends Fragment implements FragmentIdentificationHandler{
+public class AreaDashboardSharedFragment extends Fragment
+        implements FragmentIdentificationHandler, FragmentFilterHandler {
 
     private Activity mActivity = null;
     private View mView = null;
@@ -109,11 +116,47 @@ public class AreaDashboardSharedFragment extends Fragment implements FragmentIde
             mView.findViewById(id.shared_area_empty_layout).setVisibility(View.VISIBLE);
         }
         mView.findViewById(id.splash_panel).setVisibility(View.GONE);
+
+        final ImageView filterUTView = (ImageView) mActivity.findViewById(id.action_filter_ut);
+        UserElement userElement = UserContext.getInstance().getUserElement();
+        UserPreferences userPreferences = userElement.getPreferences();
+        if(userPreferences.isFilteringEnabled()){
+            filterUTView.setBackground(getResources().getDrawable(R.drawable.rounded_corner));
+            List<TagElement> tags = userPreferences.getTags();
+            List<String> filterables = new ArrayList<>();
+            List<String> executables = new ArrayList<>();
+            for(TagElement tag: tags){
+                if(tag.getType().equals("filterable")){
+                    filterables.add(tag.getName());
+                }else {
+                    executables.add(tag.getName());
+                }
+            }
+            doFilter(filterables, executables);
+        }else {
+            filterUTView.setBackground(null);
+        }
     }
 
     @Override
     public String getFragmentTitle() {
         return "Shared";
+    }
+
+    @Override
+    public void doFilter(List<String> filterables, List<String> executables) {
+        ListView areaListView = (ListView) mView.findViewById(id.area_display_list);
+        AreaItemAdaptor adapter = (AreaItemAdaptor) areaListView.getAdapter();
+        EditText inputSearch = (EditText) mActivity.findViewById(id.dashboard_search_box);
+        Editable inputSearchText = inputSearch.getText();
+        adapter.getFilterChain(filterables, executables).filter(inputSearchText.toString());
+    }
+
+    @Override
+    public void resetFilter() {
+        ListView areaListView = (ListView) mView.findViewById(id.area_display_list);
+        AreaItemAdaptor adapter = (AreaItemAdaptor) areaListView.getAdapter();
+        adapter.resetFilter().filter(null);
     }
 
     private class DataReloadCallback implements AsyncTaskCallback {

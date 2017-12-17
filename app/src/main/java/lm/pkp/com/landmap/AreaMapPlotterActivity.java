@@ -53,6 +53,7 @@ import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
+import lm.pkp.com.landmap.area.model.AreaMeasure;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.custom.MapWrapperLayout;
 import lm.pkp.com.landmap.custom.OnInfoWindowElemTouchListener;
@@ -169,7 +170,9 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
         double polygonAreaSqMt = SphericalUtil.computeArea(polygon.getPoints());
         double polygonAreaSqFt = polygonAreaSqMt * 10.7639;
 
-        ae.setMeasureSqFt(polygonAreaSqFt);
+        AreaMeasure areaMeasure = new AreaMeasure(polygonAreaSqFt);
+        ae.setMeasure(areaMeasure);
+
         if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.UPDATE_AREA)) {
             AreaDBHelper adh = new AreaDBHelper(getApplicationContext());
             adh.updateAreaLocally(ae);

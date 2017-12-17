@@ -1,5 +1,7 @@
 package lm.pkp.com.landmap.area.model;
 
+import com.cunoraz.tagview.Tag;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -7,6 +9,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
+
+import lm.pkp.com.landmap.tags.TagElement;
 
 /**
  * Created by USER on 11/27/2017.
@@ -128,28 +132,85 @@ public class AreaAddress {
         return address;
     }
 
-    public List<String> getTags(){
-        List<String> tags = new ArrayList<>();
-        if(premises != null){
-            tags.add(premises);
+    public List<TagElement> getTags(){
+        List<TagElement> tags = new ArrayList<>();
+        if(premises != null && !premises.trim().equalsIgnoreCase("")){
+            premises = premises.replaceAll("[-+.^:,]","");
+            if(!premises.matches("[0-9]+")){
+                String[] split = premises.split(" ");
+                if(split.length > 1){
+                    for (int i = 0; i < split.length; i++) {
+                        if(!split[i].matches("[0-9]+")){
+                            tags.add(new TagElement(split[i], "filterable", "address"));
+                        }
+                    }
+                }
+                tags.add(new TagElement(premises, "filterable", "address"));
+            }
         }
-        if(subLocality != null){
-            tags.add(subLocality);
+        if(subLocality != null && !subLocality.trim().equalsIgnoreCase("")){
+            subLocality = subLocality.replaceAll("[-+.^:,]","");
+            if(!subLocality.matches("[0-9]+")) {
+                String[] split = subLocality.split(" ");
+                if(split.length > 1){
+                    for (int i = 0; i < split.length; i++) {
+                        if(!split[i].matches("[0-9]+")){
+                            tags.add(new TagElement(split[i], "filterable", "address"));
+                        }
+                    }
+                }
+                tags.add(new TagElement(subLocality, "filterable", "address"));
+            }
         }
-        if(locality != null){
-            tags.add(locality);
+        if(locality != null && !locality.trim().equalsIgnoreCase("")){
+            locality = locality.replaceAll("[-+.^:,]","");
+            if(!locality.matches("[0-9]+")) {
+                String[] split = locality.split(" ");
+                if(split.length > 1){
+                    for (int i = 0; i < split.length; i++) {
+                        if(!split[i].matches("[0-9]+")){
+                            tags.add(new TagElement(split[i], "filterable", "address"));
+                        }
+                    }
+                }
+                tags.add(new TagElement(locality, "filterable", "address"));
+            }
         }
-        if(subAdminArea != null){
-            tags.add(subAdminArea);
+        if(subAdminArea != null && !subAdminArea.trim().equalsIgnoreCase("")){
+            subAdminArea = subAdminArea.replaceAll("[-+.^:,]","");
+            if(!subAdminArea.matches("[0-9]+")) {
+                String[] split = subAdminArea.split(" ");
+                if(split.length > 1){
+                    for (int i = 0; i < split.length; i++) {
+                        if(!split[i].matches("[0-9]+")){
+                            tags.add(new TagElement(split[i], "filterable", "address"));
+                        }
+                    }
+                }
+                tags.add(new TagElement(subAdminArea, "filterable", "address"));
+            }
         }
-        if(adminArea != null){
-            tags.add(adminArea);
+        if(adminArea != null && !adminArea.trim().equalsIgnoreCase("")){
+            adminArea = adminArea.replaceAll("[-+.^:,]","");
+            if(!adminArea.matches("[0-9]+")) {
+                String[] split = adminArea.split(" ");
+                if(split.length > 1){
+                    for (int i = 0; i < split.length; i++) {
+                        if(!split[i].matches("[0-9]+")){
+                            tags.add(new TagElement(split[i], "filterable", "address"));
+                        }
+                    }
+                }
+                tags.add(new TagElement(adminArea, "filterable", "address"));
+            }
         }
-        if(postalCode != null){
-            tags.add(postalCode);
+        if(postalCode != null && !postalCode.trim().equalsIgnoreCase("")){
+            postalCode = postalCode.replaceAll("[-+.^:,]","");
+            tags.add(new TagElement(postalCode, "filterable", "address"));
         }
-        if(country != null){
-            tags.add(country);
+        if(country != null && !country.trim().equalsIgnoreCase("")){
+            country = country.replaceAll("[-+.^:,]","");
+            tags.add(new TagElement(country, "filterable", "address"));
         }
         return tags;
     }
