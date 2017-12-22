@@ -21,6 +21,8 @@ import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.area.model.AreaMeasure;
 import lm.pkp.com.landmap.area.reporting.AreaReportingService;
 import lm.pkp.com.landmap.area.reporting.ReportingContext;
+import lm.pkp.com.landmap.user.UserContext;
+import lm.pkp.com.landmap.user.UserElement;
 import lm.pkp.com.landmap.util.AreaPopulationUtil;
 import lm.pkp.com.landmap.util.ColorProvider;
 
@@ -59,12 +61,12 @@ public class AreaItemAdaptor extends ArrayAdapter {
                 int siblingCount = parent.getChildCount();
                 for (int i = 0; i < siblingCount; i++) {
                     View child = parent.getChildAt(i);
-                    child.setBackgroundResource(0);
-                    child.setBackgroundColor(ColorProvider.getAreaDetailsColor(areaElement));
+                    child.setBackgroundResource(R.drawable.rounded_area_list_view);
                 }
-                v.setBackgroundResource(R.drawable.image_border);
-                AreaContext.INSTANCE.setAreaElement(areaElement, context);
-                return false;
+                v.setBackgroundResource(R.drawable.rounded_area_list_view_sel);
+                UserElement userElement = UserContext.getInstance().getUserElement();
+                userElement.getSelections().setArea(areaElement);
+                return true;
             }
         });
 
@@ -73,6 +75,10 @@ public class AreaItemAdaptor extends ArrayAdapter {
             public void onClick(View v) {
                 final Activity activity = (Activity) context;
                 AreaContext.INSTANCE.setAreaElement(areaElement, activity);
+
+                UserElement userElement = UserContext.getInstance().getUserElement();
+                userElement.getSelections().setArea(areaElement);
+
                 Intent intent = new Intent(activity, AreaDetailsActivity.class);
                 activity.startActivity(intent);
                 activity.finish();

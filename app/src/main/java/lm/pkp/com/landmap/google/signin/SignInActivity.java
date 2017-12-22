@@ -25,10 +25,6 @@ import com.google.android.gms.common.api.Status;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
-
 import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.R.layout;
@@ -71,7 +67,7 @@ public class SignInActivity extends AppCompatActivity implements
             }
         }
 
-        setContentView(layout.activity_google_signin_main);
+        setContentView(R.layout.activity_google_signin_main);
         getSupportActionBar().hide();
 
         mStatusTextView = (TextView) findViewById(id.status);
@@ -187,7 +183,7 @@ public class SignInActivity extends AppCompatActivity implements
                 UserElement userElement = UserContext.getInstance().getUserElement();
                 for (int i = 0; i < tagsArr.length; i++) {
                     TagElement tagElement = new TagElement(tagsArr[i], tagTypesArr[i], "user");
-                    userElement.getPreferences().getTags().add(tagElement);
+                    userElement.getSelections().getTags().add(tagElement);
                 }
                 spashIntent.putExtra("user_exists", "true");
             }

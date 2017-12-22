@@ -13,8 +13,11 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 
+import java.util.List;
 import java.util.UUID;
 
+import lm.pkp.com.landmap.area.AreaContext;
+import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.custom.LocationPositionReceiver;
 import lm.pkp.com.landmap.position.PositionElement;
 
@@ -50,9 +53,9 @@ public class GPSLocationProvider implements LocationListener {
             handler.postDelayed(new Runnable() {
                 public void run() {
                     locationManager.removeUpdates(GPSLocationProvider.this);
-                    String uniqueId = GPSLocationProvider.this.pe.getUniqueId();
+                    String uniqueId = pe.getUniqueId();
                     if (uniqueId.equalsIgnoreCase("")) {
-                        GPSLocationProvider.this.notifyFailureForLocationFix();
+                        notifyFailureForLocationFix();
                     }
                 }
             }, 1000 * timeout);
@@ -64,23 +67,27 @@ public class GPSLocationProvider implements LocationListener {
     @Override
     public void onLocationChanged(Location location) {
         pe.setUniqueId(UUID.randomUUID().toString());
+
+        AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
+        List<PositionElement> positions = areaElement.getPositions();
+        pe.setName("Position_" + positions.size());
         pe.setLon(location.getLongitude());
         pe.setLat(location.getLatitude());
         pe.setCreatedOnMillis(System.currentTimeMillis() + "");
 
-        if (this.receiver != null) {
-            this.receiver.receivedLocationPostion(this.pe);
+        if (receiver != null) {
+            receiver.receivedLocationPostion(pe);
         } else {
-            ((LocationPositionReceiver) this.activity).receivedLocationPostion(this.pe);
+            ((LocationPositionReceiver) activity).receivedLocationPostion(pe);
         }
     }
 
     @Override
     public void onProviderDisabled(String provider) {
-        if (this.receiver != null) {
-            this.receiver.providerDisabled();
+        if (receiver != null) {
+            receiver.providerDisabled();
         } else {
-            ((LocationPositionReceiver) this.activity).providerDisabled();
+            ((LocationPositionReceiver) activity).providerDisabled();
         }
     }
 
@@ -93,10 +100,10 @@ public class GPSLocationProvider implements LocationListener {
     }
 
     public void notifyFailureForLocationFix() {
-        if (this.receiver != null) {
-            this.receiver.locationFixTimedOut();
+        if (receiver != null) {
+            receiver.locationFixTimedOut();
         } else {
-            ((LocationPositionReceiver) this.activity).locationFixTimedOut();
+            ((LocationPositionReceiver) activity).locationFixTimedOut();
         }
     }
 

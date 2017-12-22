@@ -16,6 +16,8 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.DialogFragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -23,11 +25,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,12 +46,15 @@ import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.custom.LocationPositionReceiver;
+import lm.pkp.com.landmap.drive.DriveResource;
 import lm.pkp.com.landmap.permission.PermissionConstants;
 import lm.pkp.com.landmap.permission.PermissionManager;
 import lm.pkp.com.landmap.position.PositionElement;
 import lm.pkp.com.landmap.position.PositionListAdaptor;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.provider.GPSLocationProvider;
+import lm.pkp.com.landmap.user.UserContext;
+import lm.pkp.com.landmap.user.UserElement;
 import lm.pkp.com.landmap.util.ColorProvider;
 import lm.pkp.com.landmap.weather.WeatherDisplayFragment;
 import lm.pkp.com.landmap.weather.WeatherManager;
@@ -74,8 +82,6 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         getSupportActionBar().hide();
 
         ae = AreaContext.INSTANCE.getAreaElement();
-        WeatherManager weatherManager = new WeatherManager(getApplicationContext(), new WeatherDataCallback());
-        weatherManager.loadWeatherInfoForPosition(ae.getCenterPosition());
 
         Toolbar topTB = (Toolbar) findViewById(R.id.toolbar_top);
         ColorDrawable topDrawable = (ColorDrawable) topTB.getBackground().getCurrent();
@@ -112,8 +118,6 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         } else {
             findViewById(R.id.positions_view_master).setVisibility(View.VISIBLE);
             findViewById(R.id.position_list_empty_img).setVisibility(View.GONE);
-            // Render the weather data here.
-
         }
 
         ImageView areaEditItem = (ImageView) findViewById(R.id.action_area_edit);
@@ -180,8 +184,13 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
             public void onClick(View v) {
                 List<PositionElement> positions = ae.getPositions();
                 if (positions.size() > 0) {
-                    PositionElement pe = positions.get(0);
-                    Uri gmmIntentUri = Uri.parse("google.navigation:q=" + pe.getLat() + "," + pe.getLon());
+                    UserElement userElement = UserContext.getInstance().getUserElement();
+                    PositionElement position = userElement.getSelections().getPosition();
+                    if(position == null){
+                        position = positions.get(0);
+                    }
+                    Uri gmmIntentUri = Uri.parse("google.navigation:q="
+                            + position.getLat() + "," + position.getLon()+"&daddr=" + ae.getName());
                     Intent navigationIntent = new Intent(Intent.ACTION_VIEW, gmmIntentUri);
                     navigationIntent.setPackage("com.google.android.apps.maps");
                     startActivity(navigationIntent);
@@ -223,6 +232,15 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), DownloadDriveResourcesActivity.class);
                 startActivity(intent);
+            }
+        });
+
+        ImageView weatherItem = (ImageView) findViewById(R.id.action_area_weather);
+        weatherItem.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                WeatherManager weatherManager = new WeatherManager(getApplicationContext(), new WeatherDataCallback());
+                weatherManager.loadWeatherInfoForPosition(ae.getCenterPosition());
             }
         });
 
@@ -389,7 +407,6 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
 
     public void showPositionEdit(final PositionElement positionElement){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Edit Position");
 
         LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View v = layoutInflater.inflate(R.layout.position_edit,
@@ -400,6 +417,9 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         posNameView.setText(positionElement.getName());
 
         final Spinner spinner = (Spinner) v.findViewById(id.position_type);
+        String ptype = StringUtils.capitalize(positionElement.getType());
+        spinner.setSelection(((ArrayAdapter)spinner.getAdapter()).getPosition(ptype));
+
         builder.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -456,11 +476,14 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         @Override
         public void taskCompleted(Object result) {
             if (result instanceof WeatherElement) {
-                getSupportFragmentManager().beginTransaction()
-                        .add(id.weather_container, new WeatherDisplayFragment())
-                        .commit();
+                showWeather();
             }
         }
+    }
+
+    public void showWeather(){
+        DialogFragment dFragment = new WeatherDisplayFragment();
+        dFragment.show(getSupportFragmentManager(), "Weather Now");
     }
 
 }

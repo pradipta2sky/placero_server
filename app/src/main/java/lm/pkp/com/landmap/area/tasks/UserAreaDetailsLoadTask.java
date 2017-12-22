@@ -121,13 +121,14 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
                 for (int p = 0; p < positionsArr.length(); p++) {
                     JSONObject positionObj = (JSONObject) positionsArr.get(p);
                     PositionElement pe = new PositionElement();
-                    pe.setUniqueId((String) positionObj.get("unique_id"));
-                    pe.setUniqueAreaId((String) positionObj.get("unique_area_id"));
-                    pe.setName((String) positionObj.get("name"));
-                    pe.setDescription((String) positionObj.get("description"));
+                    pe.setUniqueId(positionObj.getString("unique_id"));
+                    pe.setUniqueAreaId(positionObj.getString("unique_area_id"));
+                    pe.setName(positionObj.getString("name"));
+                    pe.setDescription(positionObj.getString("description"));
                     pe.setLat(positionObj.getDouble("lat"));
                     pe.setLon(positionObj.getDouble("lon"));
-                    pe.setTags((String) positionObj.get("tags"));
+                    pe.setTags(positionObj.getString("tags"));
+                    pe.setType(positionObj.getString("type"));
                     pe.setCreatedOnMillis(positionObj.getString("created_on"));
 
                     pdh.insertPositionFromServer(pe);
@@ -136,22 +137,23 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
                 JSONArray driveArr = (JSONArray) areaResponseObj.get("drs");
                 for (int d = 0; d < driveArr.length(); d++) {
                     JSONObject driveObj = (JSONObject) driveArr.get(d);
-                    DriveResource dr = new DriveResource();
-                    dr.setUniqueId(driveObj.getString("unique_id"));
-                    dr.setAreaId(driveObj.getString("area_id"));
-                    dr.setUserId(driveObj.getString("user_id"));
-                    dr.setContainerId(driveObj.getString("container_id"));
-                    dr.setResourceId(driveObj.getString("resource_id"));
-                    dr.setName(driveObj.getString("name"));
-                    dr.setType(driveObj.getString("type"));
-                    dr.setSize(driveObj.getString("size"));
-                    dr.setMimeType(driveObj.getString("mime_type"));
-                    dr.setContentType(driveObj.getString("content_type"));
-                    dr.setLatitude(driveObj.getString("latitude"));
-                    dr.setLongitude(driveObj.getString("longitude"));
-                    dr.setCreatedOnMillis(driveObj.getString("created_on"));
-
-                    ddh.insertResourceFromServer(dr);
+                    DriveResource resource = new DriveResource();
+                    resource.setUniqueId(driveObj.getString("unique_id"));
+                    resource.setAreaId(driveObj.getString("area_id"));
+                    resource.setUserId(driveObj.getString("user_id"));
+                    resource.setContainerId(driveObj.getString("container_id"));
+                    resource.setResourceId(driveObj.getString("resource_id"));
+                    resource.setName(driveObj.getString("name"));
+                    resource.setType(driveObj.getString("type"));
+                    resource.setSize(driveObj.getString("size"));
+                    resource.setMimeType(driveObj.getString("mime_type"));
+                    resource.setContentType(driveObj.getString("content_type"));
+                    String positionId = driveObj.getString("position_id");
+                    if(!positionId.equalsIgnoreCase("null")){
+                        resource.setPosition(pdh.getPositionById(positionId));
+                    }
+                    resource.setCreatedOnMillis(driveObj.getString("created_on"));
+                    ddh.insertResourceFromServer(resource);
                 }
 
                 JSONArray permissionsArr = (JSONArray) areaResponseObj.get("permissions");
@@ -161,7 +163,6 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
                     pe.setUserId(permissionObj.getString("user_id"));
                     pe.setAreaId(permissionObj.getString("area_id"));
                     pe.setFunctionCode(permissionObj.getString("function_code"));
-
                     pmh.insertPermissionLocally(pe);
                 }
             }
@@ -186,7 +187,7 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
             }
 
             UserElement userElement = UserContext.getInstance().getUserElement();
-            tdh.insertTagsLocally(userElement.getPreferences().getTags(), "user", userElement.getEmail());
+            tdh.insertTagsLocally(userElement.getSelections().getTags(), "user", userElement.getEmail());
         } catch (Exception e) {
             e.printStackTrace();
         }

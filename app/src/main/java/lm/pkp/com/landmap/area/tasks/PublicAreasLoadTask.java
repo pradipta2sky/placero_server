@@ -11,6 +11,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.util.UUID;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -156,8 +157,16 @@ public class PublicAreasLoadTask extends AsyncTask<JSONObject, Void, String> {
                     dr.setSize(driveObj.getString("size"));
                     dr.setMimeType(driveObj.getString("mime_type"));
                     dr.setContentType(driveObj.getString("content_type"));
-                    dr.setLatitude(driveObj.getString("latitude"));
-                    dr.setLongitude(driveObj.getString("longitude"));
+
+                    PositionElement position = new PositionElement();
+                    try{
+                        position.setLat(driveObj.getDouble("latitude"));
+                        position.setLon(driveObj.getDouble("longitude"));
+                        position.setUniqueId(UUID.randomUUID().toString());
+                    }catch (Exception e){
+                    }
+                    dr.setPosition(position);
+
                     dr.setCreatedOnMillis(driveObj.getString("created_on"));
 
                     ddh.insertResourceFromServer(dr);

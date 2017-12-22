@@ -1,17 +1,21 @@
 package lm.pkp.com.landmap.weather;
 
+import android.app.Dialog;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
+import android.support.v4.app.DialogFragment;
 import android.text.format.DateUtils;
+import android.util.DisplayMetrics;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.Window;
 import android.widget.TextView;
 
-import lm.pkp.com.landmap.R.id;
-import lm.pkp.com.landmap.R.layout;
+import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.position.PositionElement;
 import lm.pkp.com.landmap.weather.model.WeatherElement;
@@ -20,38 +24,59 @@ import lm.pkp.com.landmap.weather.util.WindInterpreter;
 /**
  * Created by USER on 11/20/2017.
  */
-public class WeatherDisplayFragment extends Fragment {
+public class WeatherDisplayFragment extends DialogFragment {
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Window window = getDialog().getWindow();
+        DisplayMetrics metrics = getResources().getDisplayMetrics();
+        int width = (int)(metrics.widthPixels * 0.80);
+        int height = (int)(metrics.heightPixels * 0.50);
+        window.setLayout(width, height);
+    }
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        Window window = dialog.getWindow();
+        window.requestFeature(Window.FEATURE_NO_TITLE);
+        window.setGravity(Gravity.CENTER);
+        return dialog;
+    }
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(layout.area_weather_widget, container, false);
+
+        View rootView = inflater.inflate(R.layout.fragment_weather, container, false);
         PositionElement centerPosition = AreaContext.INSTANCE.getAreaElement().getCenterPosition();
         WeatherElement weather = centerPosition.getWeather();
 
-        TextView addressText = (TextView) rootView.findViewById(id.w_address);
+        TextView addressText = (TextView) rootView.findViewById(R.id.w_address);
         addressText.setText(weather.getAddress());
 
-        TextView updatedText = (TextView) rootView.findViewById(id.w_updated);
+        TextView updatedText = (TextView) rootView.findViewById(R.id.w_updated);
         Long createdMillis = new Long(weather.getCreatedOn());
         CharSequence timeSpan = DateUtils.getRelativeTimeSpanString(createdMillis,
                 System.currentTimeMillis(), DateUtils.MINUTE_IN_MILLIS);
         updatedText.setText(timeSpan.toString());
 
-        TextView weatherIcon = (TextView) rootView.findViewById(id.weather_icon);
+        TextView weatherIcon = (TextView) rootView.findViewById(R.id.weather_icon);
         weatherIcon.setTypeface(Typeface.createFromAsset(this.getActivity().getAssets(), "fonts/weathericons-regular-webfont.ttf"));
         weatherIcon.setText(this.getWeatherIcon(new Integer(weather.getConditionCode())));
 
-        TextView condition = (TextView) rootView.findViewById(id.w_condition);
+        TextView condition = (TextView) rootView.findViewById(R.id.w_condition);
         condition.setText(weather.getConditionText());
 
-        TextView temperature = (TextView) rootView.findViewById(id.w_temperature);
+        TextView temperature = (TextView) rootView.findViewById(R.id.w_temperature);
         temperature.setText("Temperature " + this.convertFarenheitToCelcius(weather.getTemperature()) + " \u2103");
 
-        TextView humidity = (TextView) rootView.findViewById(id.w_humidity);
+        TextView humidity = (TextView) rootView.findViewById(R.id.w_humidity);
         humidity.setText("Humidity " + weather.getHumidity() + " %");
 
-        TextView windDetails = (TextView) rootView.findViewById(id.w_wind_details);
+        TextView windDetails = (TextView) rootView.findViewById(R.id.w_wind_details);
         String windChill = this.convertFarenheitToCelcius(weather.getWindChill());
         String windDirection
                 = WindInterpreter.getDirectionFromBearing(Double.parseDouble(weather.getWindDirection()));
@@ -60,7 +85,13 @@ public class WeatherDisplayFragment extends Fragment {
                 + windDirection + ", " + windChill + " \u2103";
         windDetails.setText(windText);
 
-        // Fill the data here
+        rootView.findViewById(R.id.close_dialog).setOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                dismiss();
+            }
+        });
+
         return rootView;
     }
 

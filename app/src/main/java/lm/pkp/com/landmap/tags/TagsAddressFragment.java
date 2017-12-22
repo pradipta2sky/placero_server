@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,11 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lm.pkp.com.landmap.R;
-import lm.pkp.com.landmap.TagAssignmentActivity;
 import lm.pkp.com.landmap.custom.FragmentIdentificationHandler;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.user.UserElement;
-import lm.pkp.com.landmap.user.UserPreferences;
+import lm.pkp.com.landmap.user.UserPersistableSelections;
 import lm.pkp.com.landmap.util.ColorProvider;
 
 /**
@@ -113,7 +111,7 @@ public class TagsAddressFragment extends Fragment implements FragmentIdentificat
             public void onClick(View v) {
                 List<Tag> selectedTags = bottomContainer.getTags();
                 UserElement userElement = UserContext.getInstance().getUserElement();
-                UserPreferences preferences = userElement.getPreferences();
+                UserPersistableSelections preferences = userElement.getSelections();
                 if(selectedTags.size() > 0){
                     for(Tag selectedTag: selectedTags){
                         TagElement tagElement = new TagElement(selectedTag.text, "filterable", "address");

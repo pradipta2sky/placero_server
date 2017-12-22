@@ -1,11 +1,11 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="15dp"
-    android:background="@drawable/rounded_corner"
+    android:layout_margin="10dp"
+    android:background="@drawable/rounded_pos_list_view"
     android:baselineAligned="false"
     android:elevation="5dp"
-    android:minHeight="80dp"
+    android:minHeight="65dp"
     android:orientation="horizontal"
     android:paddingBottom="10dp"
     android:paddingTop="10dp">
@@ -23,7 +23,7 @@
             android:layout_height="40dp"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="10dp"
-            android:src="@drawable/marker_image" />
+            android:src="@drawable/position" />
     </LinearLayout>
 
 
@@ -58,17 +58,16 @@
 
     <ImageView
         android:id="@+id/edit_row"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginTop="5dp"
-        android:layout_marginRight="20dp"
         android:gravity="right|center_vertical"
-        android:src="@drawable/edit" />
+        android:src="@drawable/edit_position" />
 
     <ImageView
         android:id="@+id/del_row"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_marginTop="5dp"
         android:layout_marginRight="10dp"
         android:gravity="right|center_vertical"

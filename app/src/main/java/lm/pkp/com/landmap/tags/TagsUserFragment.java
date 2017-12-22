@@ -4,29 +4,23 @@ import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.Toast;
 
 import com.cunoraz.tagview.Tag;
 import com.cunoraz.tagview.TagView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import lm.pkp.com.landmap.AreaDashboardActivity;
 import lm.pkp.com.landmap.R;
-import lm.pkp.com.landmap.TagAssignmentActivity;
 import lm.pkp.com.landmap.custom.FragmentIdentificationHandler;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.user.UserElement;
-import lm.pkp.com.landmap.user.UserPreferences;
-import lm.pkp.com.landmap.util.ColorProvider;
+import lm.pkp.com.landmap.user.UserPersistableSelections;
 
 /**
  * Created by USER on 11/4/2017.
@@ -76,7 +70,7 @@ public class TagsUserFragment extends Fragment implements FragmentIdentification
         topContainer.removeAll();
 
         UserElement userElement = UserContext.getInstance().getUserElement();
-        final UserPreferences preferences = userElement.getPreferences();
+        final UserPersistableSelections preferences = userElement.getSelections();
         final String userId = userElement.getEmail();
 
         final List<TagElement> userTags = preferences.getTags();

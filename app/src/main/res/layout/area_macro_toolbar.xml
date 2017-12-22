@@ -9,38 +9,38 @@
 
     <ImageView
         android:id="@+id/action_area_create"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="right|center"
         android:layout_marginRight="15dp"
-        android:src="@drawable/plus"
-        android:padding="2dp"/>
+        android:src="@drawable/create"
+        />
 
     <ImageView
         android:id="@+id/action_generate_report"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="right|center"
         android:layout_marginRight="15dp"
-        android:src="@drawable/pdf_icon"
-        android:padding="2dp"/>
+        android:src="@drawable/report"
+        />
 
     <ImageView
         android:id="@+id/action_tag_assignment"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="right|center"
         android:layout_marginRight="15dp"
-        android:src="@drawable/tag_icon"
-        android:padding="2dp"/>
+        android:src="@drawable/tag"
+        />
 
     <ImageView
         android:id="@+id/action_filter_ut"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_gravity="right|center"
         android:layout_marginRight="15dp"
-        android:src="@drawable/funnel"
-        android:padding="2dp"/>
+        android:src="@drawable/filter"
+        />
 
 </LinearLayout>

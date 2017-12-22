@@ -7,22 +7,18 @@ import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
-import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,10 +43,9 @@ import lm.pkp.com.landmap.permission.PermissionConstants;
 import lm.pkp.com.landmap.permission.PermissionElement;
 import lm.pkp.com.landmap.permission.PermissionsDBHelper;
 import lm.pkp.com.landmap.tags.TagElement;
-import lm.pkp.com.landmap.tags.TagsDisplayMetaStore;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.user.UserElement;
-import lm.pkp.com.landmap.user.UserPreferences;
+import lm.pkp.com.landmap.user.UserPersistableSelections;
 import lm.pkp.com.landmap.util.ColorProvider;
 
 public class AreaDashboardActivity extends AppCompatActivity {
@@ -70,12 +65,10 @@ public class AreaDashboardActivity extends AppCompatActivity {
         bottomToolbar.setBackgroundColor(ColorProvider.getDefaultToolBarColor());
 
         final ViewPager viewPager = (ViewPager) this.findViewById(R.id.areas_display_tab_pager);
-        // Assign created adapter to viewPager
         viewPager.setAdapter(new DisplayAreasPagerAdapter(getSupportFragmentManager()));
         viewPager.setOffscreenPageLimit(1);
 
         TabLayout tabLayout = (TabLayout) this.findViewById(R.id.areas_display_tab_layout);
-        // This method setup all required method for TabLayout with Viewpager
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.setBackgroundColor(ColorProvider.getDefaultToolBarColor());
 
@@ -106,15 +99,15 @@ public class AreaDashboardActivity extends AppCompatActivity {
         generateReportView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
-                if(areaElement == null){
+                UserPersistableSelections selections = UserContext.getInstance().getUserElement().getSelections();
+                AreaElement selectedArea = selections.getArea();
+                if(selectedArea == null){
                     showMessage("You need to select a Place first", "error");
                     return;
                 }
-
                 ReportingContext reportingContext = ReportingContext.INSTANCE;
                 if (!reportingContext.getGeneratingReport()) {
-                    reportingContext.setAreaElement(areaElement, getApplicationContext());
+                    reportingContext.setAreaElement(selectedArea, getApplicationContext());
                     Intent serviceIntent = new Intent(getApplicationContext(), AreaReportingService.class);
                     startService(serviceIntent);
                     showMessage("Report generation started", "info");
@@ -136,21 +129,21 @@ public class AreaDashboardActivity extends AppCompatActivity {
 
         final ImageView filterUTView = (ImageView) this.findViewById(id.action_filter_ut);
         UserElement userElement = UserContext.getInstance().getUserElement();
-        final UserPreferences userPreferences = userElement.getPreferences();
+        final UserPersistableSelections userPersistableSelections = userElement.getSelections();
         filterUTView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 DisplayAreasPagerAdapter adapter = (DisplayAreasPagerAdapter) viewPager.getAdapter();
                 FragmentFilterHandler filterHandler
                         = (FragmentFilterHandler) adapter.getItem(AreaDashboardDisplayMetaStore.INSTANCE.getActiveTab());
-                if(userPreferences.isFilteringEnabled()){
+                if(userPersistableSelections.isFilter()){
                     filterHandler.resetFilter();
-                    userPreferences.setFilteringEnabled(false);
+                    userPersistableSelections.setFilter(false);
                     filterUTView.setBackground(null);
                 }else {
-                    userPreferences.setFilteringEnabled(true);
+                    userPersistableSelections.setFilter(true);
                     filterUTView.setBackground(getResources().getDrawable(R.drawable.rounded_corner));
-                    List<TagElement> tags = userPreferences.getTags();
+                    List<TagElement> tags = userPersistableSelections.getTags();
                     List<String> filterables = new ArrayList<>();
                     List<String> executables = new ArrayList<>();
                     for(TagElement tag: tags){
@@ -230,7 +223,7 @@ public class AreaDashboardActivity extends AppCompatActivity {
     private class DataInsertServerCallback implements AsyncTaskCallback {
         @Override
         public void taskCompleted(Object result) {
-            Intent intent = new Intent(getApplicationContext(), CreateAreaFolderStructureActivity.class);
+            Intent intent = new Intent(getApplicationContext(), CreateAreaFoldersActivity.class);
             startActivity(intent);
             finish();
         }

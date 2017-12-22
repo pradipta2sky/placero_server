@@ -12,10 +12,9 @@ import android.widget.TextView;
 
 import java.io.File;
 import java.text.DecimalFormat;
-import java.util.Iterator;
 import java.util.List;
-import java.util.regex.Pattern;
 
+import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.model.AreaAddress;
@@ -56,7 +55,7 @@ public class AreaPopulationUtil {
         TextView addressTextView = (TextView) view.findViewById(id.area_tags_text);
         AreaAddress address = ae.getAddress();
         String areaAddressText = "";
-        if(address != null){
+        if (address != null) {
             areaAddressText = address.getDisplaybleAddress();
         }
         String addressContent = "<b>Address: </b>" + areaAddressText;
@@ -70,37 +69,28 @@ public class AreaPopulationUtil {
                 + df.format(measure.getAcre()) + " Acre, " + df.format(measure.getDecimals()) + " Decimals.";
         measureText.setText(Html.fromHtml(content));
 
-        Drawable drawable = view.getBackground().getCurrent();
-        if (drawable instanceof GradientDrawable) {
-            ((GradientDrawable) drawable).setColor(ColorProvider.getAreaDetailsColor(ae));
-        } else if (drawable instanceof ColorDrawable) {
-            ((ColorDrawable) drawable).setColor(ColorProvider.getAreaDetailsColor(ae));
-        }
-
         DriveDBHelper ddh = new DriveDBHelper(view.getContext());
-        ImageView areaImg = (ImageView) view.findViewById(id.area_default_img);
-
+        ImageView areaImgView = (ImageView) view.findViewById(id.area_default_img);
         String thumbRootPath = AreaContext.INSTANCE
                 .getAreaLocalPictureThumbnailRoot(ae.getUniqueId()).getAbsolutePath();
-
-        Bitmap displayBMap = AreaContext.INSTANCE.getDisplayBMap();
-        if(displayBMap != null){
-            areaImg.setImageBitmap(displayBMap);
-        }else {
-            List<DriveResource> imageResources = ddh.fetchImageResources(ae);
-            Iterator<DriveResource> imageResIter = imageResources.iterator();
-            while (imageResIter.hasNext()) {
-                DriveResource imageResource = imageResIter.next();
+        List<DriveResource> imageResources = ddh.fetchImageResources(ae);
+        if (imageResources.size() > 0) {
+            Bitmap displayBMap = AreaContext.INSTANCE.getDisplayBMap();
+            if (displayBMap != null) {
+                areaImgView.setImageBitmap(displayBMap);
+            } else {
+                DriveResource imageResource = imageResources.get(0);
                 String imageName = imageResource.getName();
                 String thumbnailPath = thumbRootPath + File.separatorChar + imageName;
                 File thumbFile = new File(thumbnailPath);
                 if (thumbFile.exists()) {
                     displayBMap = BitmapFactory.decodeFile(thumbnailPath);
                     AreaContext.INSTANCE.getViewBitmaps().add(displayBMap);
-                    areaImg.setImageBitmap(displayBMap);
+                    areaImgView.setImageBitmap(displayBMap);
                 }
-                break;
             }
+        } else {
+            areaImgView.setImageResource(R.drawable.ic_launcher);
         }
     }
 

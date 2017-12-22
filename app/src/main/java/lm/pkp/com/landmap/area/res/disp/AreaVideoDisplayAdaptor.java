@@ -83,7 +83,7 @@ final class AreaVideoDisplayAdaptor extends BaseAdapter {
             public void onClick(View v) {
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_VIEW);
-                intent.setDataAndType(Uri.fromFile(videoFile), "video/*");
+                intent.setDataAndType(Uri.fromFile(videoFile), "video/mp4");
                 referredView.getContext().startActivity(intent);
             }
         });
@@ -128,7 +128,7 @@ final class AreaVideoDisplayAdaptor extends BaseAdapter {
                         AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
                         Intent intent = new Intent(Intent.ACTION_SEND);
                         intent.putExtra(Intent.EXTRA_SUBJECT, "Video shared using [Placero LMS] for place - " + areaElement.getName());
-                        intent.putExtra(Intent.EXTRA_TEXT, "Hi, \nCheck out video for " + areaElement.getName());
+                        intent.putExtra(Intent.EXTRA_TEXT, "Hi, \nCheck out video_map for " + areaElement.getName());
                         intent.setType(FileUtil.getMimeType(videoFile));
                         Uri uri = Uri.fromFile(videoFile);
                         intent.putExtra(Intent.EXTRA_STREAM, uri);

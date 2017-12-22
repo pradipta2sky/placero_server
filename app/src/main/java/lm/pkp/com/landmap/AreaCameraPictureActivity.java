@@ -37,7 +37,7 @@ public class AreaCameraPictureActivity extends Activity implements LocationPosit
     // Camera activity request codes
     private static final int CAMERA_CAPTURE_IMAGE_REQUEST_CODE = 100;
 
-    private Uri fileUri; // file url to store image/video
+    private Uri fileUri; // file url to store image/video_map
     private final DriveResource pictureResource = new DriveResource();
 
     @Override
@@ -128,7 +128,7 @@ public class AreaCameraPictureActivity extends Activity implements LocationPosit
     }
 
     /**
-     * returning image / video
+     * returning image / video_map
      */
     private static File getOutputMediaFile() {
         AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
@@ -139,8 +139,8 @@ public class AreaCameraPictureActivity extends Activity implements LocationPosit
 
     @Override
     public void receivedLocationPostion(PositionElement pe) {
-        pictureResource.setLatitude(pe.getLat() + "");
-        pictureResource.setLongitude(pe.getLon() + "");
+        pe.setType("Media");
+        pictureResource.setPosition(pe);
     }
 
     @Override

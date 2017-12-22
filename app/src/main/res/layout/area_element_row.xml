@@ -5,7 +5,7 @@
     android:orientation="horizontal"
     android:elevation="5dp"
     android:weightSum="1"
-    android:background="@drawable/rounded_corner"
+    android:background="@drawable/rounded_area_list_view"
     android:baselineAligned="false"
     android:minHeight="100dp"
     android:paddingTop="10dp"
@@ -21,7 +21,7 @@
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:id="@+id/area_default_img"
-            android:src="@drawable/app_icon1"
+            android:src="@drawable/ic_launcher"
             android:layout_gravity="center_vertical"
             android:padding="5dp"/>
     </LinearLayout>

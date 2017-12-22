@@ -33,7 +33,7 @@ import lm.pkp.com.landmap.sync.LocalDataRefresher;
 import lm.pkp.com.landmap.tags.TagElement;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.user.UserElement;
-import lm.pkp.com.landmap.user.UserPreferences;
+import lm.pkp.com.landmap.user.UserPersistableSelections;
 
 /**
  * Created by USER on 11/4/2017.
@@ -119,10 +119,10 @@ public class AreaDashboardSharedFragment extends Fragment
 
         final ImageView filterUTView = (ImageView) mActivity.findViewById(id.action_filter_ut);
         UserElement userElement = UserContext.getInstance().getUserElement();
-        UserPreferences userPreferences = userElement.getPreferences();
-        if(userPreferences.isFilteringEnabled()){
+        UserPersistableSelections userPersistableSelections = userElement.getSelections();
+        if(userPersistableSelections.isFilter()){
             filterUTView.setBackground(getResources().getDrawable(R.drawable.rounded_corner));
-            List<TagElement> tags = userPreferences.getTags();
+            List<TagElement> tags = userPersistableSelections.getTags();
             List<String> filterables = new ArrayList<>();
             List<String> executables = new ArrayList<>();
             for(TagElement tag: tags){

@@ -140,7 +140,7 @@ public class AreaDocumentChooserFragment extends Fragment {
                 String fileCreated = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DATE_ADDED));
 
                 FileDisplayElement fileDisplayItem = new FileDisplayElement();
-                fileDisplayItem.setIcon(drawable.pdf_icon);
+                fileDisplayItem.setIcon(drawable.report);
                 fileDisplayItem.setName(fileTitle);
                 fileDisplayItem.setDesc(this.createDescriptionText(fileSize, fileLastModifed));
                 fileDisplayItem.setMimeType(fileMime);

@@ -31,7 +31,7 @@ public class AreaCameraVideoActivity extends Activity implements LocationPositio
     private static final int CAMERA_CAPTURE_VIDEO_REQUEST_CODE = 200;
     public static final int MEDIA_TYPE_VIDEO = 2;
 
-    private Uri fileUri; // file url to store image/video
+    private Uri fileUri; // file url to store image/video_map
     private final DriveResource videoResource = new DriveResource();
 
     @Override
@@ -47,18 +47,18 @@ public class AreaCameraVideoActivity extends Activity implements LocationPositio
     }
 
     /**
-     * Launching camera app to record video
+     * Launching camera app to record video_map
      */
     private void recordVideo() {
         Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
         fileUri = getOutputMediaFileUri(MEDIA_TYPE_VIDEO);
 
-        // set video quality
+        // set video_map quality
         intent.putExtra(MediaStore.EXTRA_VIDEO_QUALITY, 0);
         intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri); // set the image file
         // name
 
-        // start the video capture Intent
+        // start the video_map capture Intent
         startActivityForResult(intent, CAMERA_CAPTURE_VIDEO_REQUEST_CODE);
     }
 
@@ -123,14 +123,14 @@ public class AreaCameraVideoActivity extends Activity implements LocationPositio
     }
 
     /**
-     * Creating file uri to store image/video
+     * Creating file uri to store image/video_map
      */
     public Uri getOutputMediaFileUri(int type) {
         return Uri.fromFile(getOutputMediaFile());
     }
 
     /**
-     * returning image / video
+     * returning image / video_map
      */
     private static File getOutputMediaFile() {
         AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
@@ -141,8 +141,8 @@ public class AreaCameraVideoActivity extends Activity implements LocationPositio
 
     @Override
     public void receivedLocationPostion(PositionElement pe) {
-        videoResource.setLatitude(pe.getLat() + "");
-        videoResource.setLongitude(pe.getLon() + "");
+        pe.setType("Media");
+        videoResource.setPosition(pe);
     }
 
     @Override

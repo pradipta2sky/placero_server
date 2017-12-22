@@ -96,6 +96,7 @@
 
     <string-array name="position_types">
         <item>Boundary</item>
+        <item>Media</item>
         <item>Internal</item>
     </string-array>
 

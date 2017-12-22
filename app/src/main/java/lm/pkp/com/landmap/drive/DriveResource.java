@@ -2,6 +2,8 @@ package lm.pkp.com.landmap.drive;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
+import lm.pkp.com.landmap.position.PositionElement;
+
 /**
  * Created by USER on 10/31/2017.
  */
@@ -18,8 +20,7 @@ public class DriveResource {
     private String size = "";
     private String contentType = "";
     private String mimeType = "";
-    private String latitude = "";
-    private String longitude = "";
+    private PositionElement position = null;
     private String createdOnMillis = System.currentTimeMillis() + "";
 
     public String getUserId() {
@@ -110,22 +111,6 @@ public class DriveResource {
         this.containerId = containerId;
     }
 
-    public String getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(String latitude) {
-        this.latitude = latitude;
-    }
-
-    public String getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(String longitude) {
-        this.longitude = longitude;
-    }
-
     @Override
     public boolean equals(Object o) {
         EqualsBuilder builder = new EqualsBuilder().append(getResourceId(), ((DriveResource) o).getResourceId());
@@ -138,5 +123,13 @@ public class DriveResource {
 
     public void setCreatedOnMillis(String createdOnMillis) {
         this.createdOnMillis = createdOnMillis;
+    }
+
+    public PositionElement getPosition() {
+        return this.position;
+    }
+
+    public void setPosition(PositionElement position) {
+        this.position = position;
     }
 }

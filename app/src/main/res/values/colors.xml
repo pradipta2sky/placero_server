@@ -19,6 +19,7 @@
     <color name="blue_grey_900">#263238</color>
 
     <color name="view_background">#e8ecfa</color>
+    <color name="area_border">#AED6F1</color>
     <color name="txt_font">#4e5572</color>
 
     <color name="image_border_start">#40990000</color>

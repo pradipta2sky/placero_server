@@ -34,6 +34,8 @@ import lm.pkp.com.landmap.custom.ApiClientAsyncTask;
 import lm.pkp.com.landmap.custom.ThumbnailCreator;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
+import lm.pkp.com.landmap.position.PositionElement;
+import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.util.FileUtil;
 
 
@@ -148,6 +150,14 @@ public class UploadResourcesActivity extends BaseDriveActivity {
                 ddh.insertResourceLocally(resource);
                 ddh.insertResourceToServer(resource);
 
+                PositionsDBHelper pdh = new PositionsDBHelper(getApplicationContext());
+                PositionElement position = resource.getPosition();
+                if(position != null){
+                    position.setUniqueAreaId(resource.getAreaId());
+                    pdh.insertPositionLocally(position);
+                    pdh.insertPositionToServer(position);
+                }
+
                 this.driveFile.removeChangeListener(getGoogleApiClient(), this);
                 new CopyContentsAsyncTask(getApplicationContext(), this.resource).execute(this.driveFile);
             }
@@ -166,7 +176,7 @@ public class UploadResourcesActivity extends BaseDriveActivity {
         protected Boolean doInBackgroundConnected(DriveFile... args) {
             DriveFile file = args[0];
             DriveApi.DriveContentsResult driveContentsResult = file.open(
-                    this.getGoogleApiClient(), DriveFile.MODE_WRITE_ONLY, null).await();
+                    getGoogleApiClient(), DriveFile.MODE_WRITE_ONLY, null).await();
             if (!driveContentsResult.getStatus().isSuccess()) {
                 return false;
             }
@@ -174,7 +184,7 @@ public class UploadResourcesActivity extends BaseDriveActivity {
             DriveContents driveContents = driveContentsResult.getDriveContents();
             OutputStream outputStream = driveContents.getOutputStream();
             try {
-                File inputFile = new File(this.resource.getPath());
+                File inputFile = new File(resource.getPath());
                 FileInputStream fileInputStream = new FileInputStream(inputFile);
                 IOUtils.copyLarge(fileInputStream, outputStream);
                 IOUtils.closeQuietly(fileInputStream);
@@ -189,11 +199,12 @@ public class UploadResourcesActivity extends BaseDriveActivity {
         protected void onPostExecute(Boolean result) {
             AreaContext areaContext = AreaContext.INSTANCE;
             AreaElement areaElement = areaContext.getAreaElement();
-            areaContext.removeResourceFromQueue(this.resource);
-            areaElement.getMediaResources().add(this.resource);
+
+            areaContext.removeResourceFromQueue(resource);
+            areaElement.getMediaResources().add(resource);
 
             // Create thumbnails of the uploaded files for display.
-            String resourcePath = this.resource.getPath();
+            String resourcePath = resource.getPath();
             File resourceFile = new File(resourcePath);
 
             ThumbnailCreator tCreator = new ThumbnailCreator(getApplicationContext());

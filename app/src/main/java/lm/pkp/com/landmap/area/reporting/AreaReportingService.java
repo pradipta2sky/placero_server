@@ -363,8 +363,7 @@ public class AreaReportingService extends IntentService {
         resource.setMimeType("application/pdf");
         resource.setAreaId(areaElement.getUniqueId());
         resource.setSize(docFile.length() + "");
-        resource.setLatitude("");
-        resource.setLongitude("");
+        resource.setPosition(new PositionElement());
         resource.setCreatedOnMillis(System.currentTimeMillis() + "");
 
         ThumbnailCreator creator = new ThumbnailCreator(reportingContext.getActivityContext());
@@ -383,7 +382,7 @@ public class AreaReportingService extends IntentService {
         Notification notification = new Notification.Builder(this)
                 .setContentTitle("Your report is now available")
                 .setContentText(reportName)
-                .setSmallIcon(R.drawable.pdf_icon)
+                .setSmallIcon(R.drawable.report)
                 .setAutoCancel(false)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setVisibility(Notification.VISIBILITY_PUBLIC)

@@ -19,6 +19,7 @@ import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.FileStorageConstants;
 import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.drive.DriveResource;
+import lm.pkp.com.landmap.position.PositionElement;
 
 /**
  * Created by USER on 10/16/2017.
@@ -50,12 +51,14 @@ public class AreaAddResourceAdaptor extends ArrayAdapter<DriveResource> {
 
         TextView filePathText = (TextView) v.findViewById(id.ar_file_path);
         String message = "";
-        String resLat = resource.getLatitude();
-        String resLong = resource.getLongitude();
-        if (!resLat.trim().equalsIgnoreCase("")) {
-            message = "Position: " + resLat + ", " + resLong;
+
+        PositionElement resourcePosition = resource.getPosition();
+        String resLat = "";
+        String resLong = "";
+        if(resourcePosition != null){
+            message = "Position: " + resourcePosition.getLat() + ", " + resourcePosition.getLon();
             filePathText.setText(message);
-        } else {
+        }else {
             filePathText.setText(resource.getPath());
         }
 

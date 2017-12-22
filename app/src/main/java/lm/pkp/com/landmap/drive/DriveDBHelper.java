@@ -16,17 +16,18 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
+import lm.pkp.com.landmap.position.PositionElement;
+import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.sync.LMSRestAsyncTask;
 import lm.pkp.com.landmap.util.AndroidSystemUtil;
 
 public class DriveDBHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "landmap.db";
-    private AsyncTaskCallback callback;
-
     public static final String DRIVE_TABLE_NAME = "drive_master";
 
     public static final String DRIVE_COLUMN_UNIQUE_ID = "unique_id";
@@ -40,17 +41,21 @@ public class DriveDBHelper extends SQLiteOpenHelper {
     public static final String DRIVE_COLUMN_CONTENT_TYPE = "content_type";
     public static final String DRIVE_COLUMN_MIME_TYPE = "mime_type";
     public static final String DRIVE_COLUMN_SIZE = "size";
-    public static final String DRIVE_COLUMN_LATITUDE = "latitude";
-    public static final String DRIVE_COLUMN_LONGITUDE = "longitude";
+    public static final String DRIVE_COLUMN_POSITION_ID = "position_id";
     public static final String DRIVE_COLUMN_CREATED_ON = "created_on";
+
+    private AsyncTaskCallback callback;
+    private Context context;
 
     public DriveDBHelper(Context context, AsyncTaskCallback callback) {
         super(context, DATABASE_NAME, null, 1);
         this.callback = callback;
+        this.context = context;
     }
 
     public DriveDBHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
+        this.context = context;
     }
 
     @Override
@@ -66,8 +71,7 @@ public class DriveDBHelper extends SQLiteOpenHelper {
                         DRIVE_COLUMN_TYPE + " text," +
                         DRIVE_COLUMN_CONTENT_TYPE + " text," +
                         DRIVE_COLUMN_MIME_TYPE + " text," +
-                        DRIVE_COLUMN_LATITUDE + " text," +
-                        DRIVE_COLUMN_LONGITUDE + " text," +
+                        DRIVE_COLUMN_POSITION_ID + " text," +
                         DRIVE_COLUMN_CREATED_ON + " text," +
                         DRIVE_COLUMN_SIZE + " text)"
         );
@@ -93,10 +97,14 @@ public class DriveDBHelper extends SQLiteOpenHelper {
         contentValues.put(DRIVE_COLUMN_CONTENT_TYPE, dr.getContentType());
         contentValues.put(DRIVE_COLUMN_MIME_TYPE, dr.getMimeType());
         contentValues.put(DRIVE_COLUMN_SIZE, dr.getSize());
-        contentValues.put(DRIVE_COLUMN_LATITUDE, dr.getLatitude());
-        contentValues.put(DRIVE_COLUMN_LONGITUDE, dr.getLongitude());
-        contentValues.put(DRIVE_COLUMN_CREATED_ON, dr.getCreatedOnMillis());
 
+        PositionElement position = dr.getPosition();
+        if(position != null){
+            contentValues.put(DRIVE_COLUMN_POSITION_ID, position.getUniqueId());
+        }else {
+            contentValues.put(DRIVE_COLUMN_POSITION_ID, "");
+        }
+        contentValues.put(DRIVE_COLUMN_CREATED_ON, dr.getCreatedOnMillis());
         db.insert(DRIVE_TABLE_NAME, null, contentValues);
         db.close();
     }
@@ -104,11 +112,6 @@ public class DriveDBHelper extends SQLiteOpenHelper {
     public void insertResourceToServer(DriveResource dr) {
         LMSRestAsyncTask task = new LMSRestAsyncTask(this.callback);
         task.execute(this.preparePostParams("insert", dr));
-    }
-
-    public void updateResourceOnServer(DriveResource dr) {
-        LMSRestAsyncTask task = new LMSRestAsyncTask(this.callback);
-        task.execute(this.preparePostParams("update", dr));
     }
 
     public DriveResource insertResourceFromServer(DriveResource dr) {
@@ -125,8 +128,13 @@ public class DriveDBHelper extends SQLiteOpenHelper {
         contentValues.put(DRIVE_COLUMN_CONTENT_TYPE, dr.getContentType());
         contentValues.put(DRIVE_COLUMN_MIME_TYPE, dr.getMimeType());
         contentValues.put(DRIVE_COLUMN_SIZE, dr.getSize());
-        contentValues.put(DRIVE_COLUMN_LATITUDE, dr.getLatitude());
-        contentValues.put(DRIVE_COLUMN_LONGITUDE, dr.getLongitude());
+
+        PositionElement position = dr.getPosition();
+        if(position != null){
+            contentValues.put(DRIVE_COLUMN_POSITION_ID, position.getUniqueId());
+        }else {
+            contentValues.put(DRIVE_COLUMN_POSITION_ID, "");
+        }
         contentValues.put(DRIVE_COLUMN_CREATED_ON, dr.getCreatedOnMillis());
 
         db.insert(DRIVE_TABLE_NAME, null, contentValues);
@@ -136,6 +144,7 @@ public class DriveDBHelper extends SQLiteOpenHelper {
 
     public ArrayList<DriveResource> getDriveResourcesByAreaId(String aid) {
         ArrayList<DriveResource> allResources = new ArrayList<DriveResource>();
+        PositionsDBHelper pdh = new PositionsDBHelper(context);
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = null;
         try {
@@ -160,8 +169,11 @@ public class DriveDBHelper extends SQLiteOpenHelper {
                     dr.setContentType(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CONTENT_TYPE)));
                     dr.setMimeType(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_MIME_TYPE)));
                     dr.setSize(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_SIZE)));
-                    dr.setLatitude(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_LATITUDE)));
-                    dr.setLongitude(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_LONGITUDE)));
+
+                    String positionId = cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_POSITION_ID));
+                    if(positionId != null && !positionId.trim().equalsIgnoreCase("")){
+                        dr.setPosition(pdh.getPositionById(positionId));
+                    }
                     dr.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CREATED_ON)));
 
                     allResources.add(dr);
@@ -179,6 +191,7 @@ public class DriveDBHelper extends SQLiteOpenHelper {
 
     public DriveResource getDriveResourceByResourceId(String resourceID) {
         SQLiteDatabase db = getReadableDatabase();
+        PositionsDBHelper pdh = new PositionsDBHelper(context);
         Cursor cursor = null;
         DriveResource resource = new DriveResource();
         try {
@@ -201,8 +214,50 @@ public class DriveDBHelper extends SQLiteOpenHelper {
                     resource.setContentType(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CONTENT_TYPE)));
                     resource.setMimeType(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_MIME_TYPE)));
                     resource.setSize(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_SIZE)));
-                    resource.setLatitude(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_LATITUDE)));
-                    resource.setLongitude(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_LONGITUDE)));
+
+                    String positionId = cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_POSITION_ID));
+                    if(positionId != null && !positionId.trim().equalsIgnoreCase("")){
+                        resource.setPosition(pdh.getPositionById(positionId));
+                    }
+                    resource.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CREATED_ON)));
+                    break;
+                }
+            }
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+        }
+        db.close();
+        return resource;
+    }
+
+    public DriveResource getDriveResourceByPositionId(String positionId) {
+        SQLiteDatabase db = getReadableDatabase();
+        PositionsDBHelper pdh = new PositionsDBHelper(context);
+        Cursor cursor = null;
+        DriveResource resource = new DriveResource();
+        try {
+            cursor = db.rawQuery("select * from " + DRIVE_TABLE_NAME + " WHERE "
+                            + DRIVE_COLUMN_POSITION_ID + "=?",
+                    new String[]{positionId});
+            if (cursor == null) {
+                return null;
+            }
+            if (cursor.getCount() > 0) {
+                cursor.moveToFirst();
+                while (cursor.isAfterLast() == false) {
+                    resource.setUniqueId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_UNIQUE_ID)));
+                    resource.setAreaId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_AREA_ID)));
+                    resource.setUserId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_USER_ID)));
+                    resource.setContainerId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CONTAINER_ID)));
+                    resource.setResourceId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_RESOURCE_ID)));
+                    resource.setName(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_NAME)));
+                    resource.setType(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_TYPE)));
+                    resource.setContentType(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CONTENT_TYPE)));
+                    resource.setMimeType(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_MIME_TYPE)));
+                    resource.setSize(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_SIZE)));
+                    resource.setPosition(null);
                     resource.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CREATED_ON)));
                     break;
                 }
@@ -218,6 +273,7 @@ public class DriveDBHelper extends SQLiteOpenHelper {
 
     public DriveResource getDriveResourceRoot(String contentType, AreaElement areaElement) {
         DriveResource childResource = new DriveResource();
+        PositionsDBHelper pdh = new PositionsDBHelper(context);
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = null;
         try {
@@ -242,8 +298,11 @@ public class DriveDBHelper extends SQLiteOpenHelper {
                     resource.setContentType(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CONTENT_TYPE)));
                     resource.setMimeType(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_MIME_TYPE)));
                     resource.setSize(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_SIZE)));
-                    resource.setLatitude(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_LATITUDE)));
-                    resource.setLongitude(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_LONGITUDE)));
+
+                    String positionId = cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_POSITION_ID));
+                    if(positionId != null && !positionId.trim().equalsIgnoreCase("")){
+                        resource.setPosition(pdh.getPositionById(positionId));
+                    }
                     resource.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CREATED_ON)));
 
                     childResource = resource;
@@ -286,8 +345,7 @@ public class DriveDBHelper extends SQLiteOpenHelper {
                     dr.setMimeType("application/vnd.google-apps.folder");
                     dr.setAreaId("");
                     dr.setSize("0");
-                    dr.setLatitude("");
-                    dr.setLongitude("");
+                    dr.setPosition(null);
                     dr.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CREATED_ON)));
 
                     resources.put(dr.getName(), dr);
@@ -303,53 +361,9 @@ public class DriveDBHelper extends SQLiteOpenHelper {
         return resources;
     }
 
-    public Map<String, DriveResource> getCommonResourcesById() {
-        Map<String, DriveResource> resources = new HashMap<>();
-        SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = null;
-        try {
-            cursor = db.rawQuery("select * from " + DRIVE_TABLE_NAME + " WHERE "
-                            + DRIVE_COLUMN_CONTENT_TYPE + "=? AND "
-                            + DRIVE_COLUMN_AREA_ID + "=''",
-                    new String[]{"folder"});
-            if (cursor == null) {
-                return resources;
-            }
-            if (cursor.getCount() > 0) {
-                cursor.moveToFirst();
-                while (cursor.isAfterLast() == false) {
-                    DriveResource dr = new DriveResource();
-
-                    dr.setUniqueId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_UNIQUE_ID)));
-                    dr.setUserId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_USER_ID)));
-                    dr.setContainerId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CONTAINER_ID)));
-                    dr.setResourceId(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_RESOURCE_ID)));
-                    dr.setName(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_NAME)));
-                    dr.setType(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_TYPE)));
-                    dr.setContentType("folder");
-                    dr.setMimeType("application/vnd.google-apps.folder");
-                    dr.setAreaId("");
-                    dr.setSize("0");
-                    dr.setLatitude("");
-                    dr.setLongitude("");
-                    dr.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CREATED_ON)));
-
-                    resources.put(dr.getResourceId(), dr);
-                    cursor.moveToNext();
-                }
-            }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-        db.close();
-        return resources;
-    }
-
-
     public List<DriveResource> fetchImageResources(AreaElement areaElement) {
         List<DriveResource> resources = new ArrayList<>();
+        PositionsDBHelper pdh = new PositionsDBHelper(context);
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = null;
         try {
@@ -374,8 +388,11 @@ public class DriveDBHelper extends SQLiteOpenHelper {
                     resource.setContentType(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CONTENT_TYPE)));
                     resource.setMimeType(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_MIME_TYPE)));
                     resource.setSize(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_SIZE)));
-                    resource.setLatitude(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_LATITUDE)));
-                    resource.setLongitude(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_LONGITUDE)));
+
+                    String positionId = cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_POSITION_ID));
+                    if(positionId != null && !positionId.trim().equalsIgnoreCase("")){
+                        resource.setPosition(pdh.getPositionById(positionId));
+                    }
                     resource.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(DRIVE_COLUMN_CREATED_ON)));
 
                     resources.add(resource);
@@ -407,9 +424,13 @@ public class DriveDBHelper extends SQLiteOpenHelper {
             postParams.put(DRIVE_COLUMN_CONTENT_TYPE, dr.getContentType());
             postParams.put(DRIVE_COLUMN_MIME_TYPE, dr.getMimeType());
             postParams.put(DRIVE_COLUMN_SIZE, dr.getSize());
-            postParams.put(DRIVE_COLUMN_LATITUDE, dr.getLatitude());
-            postParams.put(DRIVE_COLUMN_LONGITUDE, dr.getLongitude());
-            postParams.put(DRIVE_COLUMN_LONGITUDE, dr.getLongitude());
+
+            PositionElement position = dr.getPosition();
+            if(position != null){
+                postParams.put(DRIVE_COLUMN_POSITION_ID, position.getUniqueId());
+            }else {
+                postParams.put(DRIVE_COLUMN_POSITION_ID, "");
+            }
             postParams.put(DRIVE_COLUMN_CREATED_ON, dr.getCreatedOnMillis());
 
         } catch (JSONException e) {

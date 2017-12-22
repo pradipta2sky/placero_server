@@ -14,13 +14,12 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import lm.pkp.com.landmap.CreateAreaFolderStructureActivity;
+import lm.pkp.com.landmap.CreateAreaFoldersActivity;
 import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.R.layout;
@@ -39,7 +38,7 @@ import lm.pkp.com.landmap.sync.LocalDataRefresher;
 import lm.pkp.com.landmap.tags.TagElement;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.user.UserElement;
-import lm.pkp.com.landmap.user.UserPreferences;
+import lm.pkp.com.landmap.user.UserPersistableSelections;
 
 /**
  * Created by USER on 11/4/2017.
@@ -153,10 +152,10 @@ public class AreaDashboardOwnedFragment extends Fragment
 
         final ImageView filterUTView = (ImageView) mActivity.findViewById(id.action_filter_ut);
         UserElement userElement = UserContext.getInstance().getUserElement();
-        UserPreferences userPreferences = userElement.getPreferences();
-        if(userPreferences.isFilteringEnabled()){
+        UserPersistableSelections userPersistableSelections = userElement.getSelections();
+        if(userPersistableSelections.isFilter()){
             filterUTView.setBackground(getResources().getDrawable(R.drawable.rounded_corner));
-            List<TagElement> tags = userPreferences.getTags();
+            List<TagElement> tags = userPersistableSelections.getTags();
             List<String> filterables = new ArrayList<>();
             List<String> executables = new ArrayList<>();
             for(TagElement tag: tags){
@@ -243,7 +242,7 @@ public class AreaDashboardOwnedFragment extends Fragment
                     final ImageView filterUTView = (ImageView) mActivity.findViewById(id.action_filter_ut);
                     UserElement userElement = UserContext.getInstance().getUserElement();
                     if(filterUTView.getBackground() != null){
-                        List<TagElement> tags = userElement.getPreferences().getTags();
+                        List<TagElement> tags = userElement.getSelections().getTags();
                         List<String> filterables = new ArrayList<>();
                         List<String> executables = new ArrayList<>();
                         for(TagElement tag: tags){
@@ -266,7 +265,7 @@ public class AreaDashboardOwnedFragment extends Fragment
     private class DataInsertServerCallback implements AsyncTaskCallback {
         @Override
         public void taskCompleted(Object result) {
-            Intent intent = new Intent(mActivity, CreateAreaFolderStructureActivity.class);
+            Intent intent = new Intent(mActivity, CreateAreaFoldersActivity.class);
             startActivity(intent);
         }
     }

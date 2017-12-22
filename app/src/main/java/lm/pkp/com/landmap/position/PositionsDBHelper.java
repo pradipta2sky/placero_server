@@ -180,6 +180,34 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         return pes;
     }
 
+    public PositionElement getPositionById(String positionId) {
+        SQLiteDatabase db = getReadableDatabase();
+        PositionElement pe = null;
+        Cursor cursor = db.rawQuery("select * from " + POSITION_TABLE_NAME + " WHERE " + POSITION_COLUMN_UNIQUE_ID + "=?",
+                new String[]{positionId});
+        if (cursor != null) {
+            cursor.moveToFirst();
+            while (cursor.isAfterLast() == false) {
+                pe = new PositionElement();
+                pe.setUniqueId(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_UNIQUE_ID)));
+                pe.setUniqueAreaId(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_UNIQUE_AREA_ID)));
+                pe.setName(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_NAME)));
+                pe.setType(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_TYPE)));
+                pe.setDescription(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_DESCRIPTION)));
+                String latStr = cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_LAT));
+                pe.setLat(Double.parseDouble(latStr));
+                String lonStr = cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_LON));
+                pe.setLon(Double.parseDouble(lonStr));
+                pe.setTags(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_TAGS)));
+                pe.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_CREATED_ON)));
+                break;
+            }
+            cursor.close();
+        }
+        db.close();
+        return pe;
+    }
+
     private JSONObject preparePostParams(String queryType, PositionElement pe) {
         JSONObject postParams = new JSONObject();
         try {

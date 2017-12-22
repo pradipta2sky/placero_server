@@ -1,6 +1,8 @@
 package lm.pkp.com.landmap.position;
 
+import android.app.Activity;
 import android.content.Context;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -11,6 +13,8 @@ import android.widget.TextView;
 
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.File;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 import lm.pkp.com.landmap.AreaDetailsActivity;
@@ -18,8 +22,14 @@ import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
+import lm.pkp.com.landmap.area.model.AreaElement;
+import lm.pkp.com.landmap.drive.DriveDBHelper;
+import lm.pkp.com.landmap.drive.DriveResource;
 import lm.pkp.com.landmap.permission.PermissionConstants;
 import lm.pkp.com.landmap.permission.PermissionManager;
+import lm.pkp.com.landmap.user.UserContext;
+import lm.pkp.com.landmap.user.UserElement;
+import lm.pkp.com.landmap.util.ColorProvider;
 
 /**
  * Created by USER on 10/16/2017.
@@ -29,12 +39,14 @@ public class PositionListAdaptor extends ArrayAdapter<PositionElement> {
     private final ArrayList<PositionElement> items;
     private final Context context;
     private PositionsDBHelper pdh;
+    private DriveDBHelper ddh;
 
     public PositionListAdaptor(Context context, int textViewResourceId, ArrayList<PositionElement> items) {
         super(context, textViewResourceId, items);
         this.context = context;
         this.items = items;
         pdh = new PositionsDBHelper(context);
+        ddh = new DriveDBHelper(context);
     }
 
     @Override
@@ -47,10 +59,30 @@ public class PositionListAdaptor extends ArrayAdapter<PositionElement> {
 
         final PositionElement pe = items.get(position);
         TextView nameText = (TextView) v.findViewById(R.id.pos_name);
-        nameText.setText(pe.getName() + ", " + StringUtils.capitalize(pe.getType()));
+        String posType = pe.getType();
+        nameText.setText(pe.getName() + ", " + StringUtils.capitalize(posType));
 
+        final AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
+        ImageView posImgView = (ImageView) v.findViewById(id.position_default_img);
+        if(posType.equalsIgnoreCase("media")){
+            String thumbRootPath = AreaContext.INSTANCE
+                    .getAreaLocalPictureThumbnailRoot(areaElement.getUniqueId()).getAbsolutePath();
+            DriveResource resource = ddh.getDriveResourceByPositionId(pe.getUniqueId());
+            String imageName = resource.getName();
+            String thumbnailPath = thumbRootPath + File.separatorChar + imageName;
+            File thumbFile = new File(thumbnailPath);
+            if (thumbFile.exists()) {
+                posImgView.setImageBitmap(BitmapFactory.decodeFile(thumbnailPath));
+            }
+        }else {
+            posImgView.setImageResource(R.drawable.position);
+        }
+
+        // Area Positions
+        DecimalFormat locFormat = new DecimalFormat("##.####");
         TextView latLongText = (TextView) v.findViewById(R.id.pos_latlng);
-        latLongText.setText("Lat: " + pe.getLat() + ", " + "Long: " + pe.getLon());
+        latLongText.setText("Lat: " + locFormat.format(pe.getLat()) + ", "
+                + "Long: " + locFormat.format(pe.getLon()));
 
         ImageView editButton = (ImageView) v.findViewById(R.id.edit_row);
         editButton.setOnClickListener(new OnClickListener() {
@@ -69,11 +101,28 @@ public class PositionListAdaptor extends ArrayAdapter<PositionElement> {
                 if(PermissionManager.INSTANCE.hasAccess(PermissionConstants.UPDATE_AREA)){
                     items.remove(position);
                     pdh.deletePositionGlobally(pe);
-                    AreaContext.INSTANCE.getAreaElement().getPositions().remove(pe);
+                    areaElement.getPositions().remove(pe);
                     notifyDataSetChanged();
                 }
             }
         });
+
+        v.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                int siblingCount = parent.getChildCount();
+                for (int i = 0; i < siblingCount; i++) {
+                    View child = parent.getChildAt(i);
+                    child.setBackgroundResource(R.drawable.rounded_pos_list_view);
+                }
+                v.setBackgroundResource(R.drawable.rounded_pos_list_view_sel);
+                UserElement userElement = UserContext.getInstance().getUserElement();
+                userElement.getSelections().setPosition(pe);
+                ((AreaDetailsActivity) context).findViewById(R.id.action_navigate_area).setBackgroundResource(R.drawable.rounded_corner);
+                return true;
+            }
+        });
+
         return v;
     }
 }

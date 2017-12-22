@@ -281,7 +281,12 @@ public class AreaDBHelper extends SQLiteOpenHelper {
             postParams.put("created_by", ae.getCreatedBy());
             postParams.put("unique_id", ae.getUniqueId());
             postParams.put("msqft", ae.getMeasure().getSqFeet());
-            postParams.put("address", ae.getAddress().getStorableAddress());
+            AreaAddress address = ae.getAddress();
+            if(address != null){
+                postParams.put("address", address.getStorableAddress());
+            }else {
+                postParams.put("address", "");
+            }
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -320,11 +325,17 @@ public class AreaDBHelper extends SQLiteOpenHelper {
 
     public void insertAreaAddressTagsLocally(AreaElement ae) {
         TagsDBHelper tagsDBHelper = new TagsDBHelper(localContext);
-        tagsDBHelper.insertTagsLocally(ae.getAddress().getTags(), "area", ae.getUniqueId());
+        AreaAddress address = ae.getAddress();
+        if(address != null){
+            tagsDBHelper.insertTagsLocally(address.getTags(), "area", ae.getUniqueId());
+        }
     }
 
     public void insertAreaAddressTagsOnServer(AreaElement ae) {
         TagsDBHelper tagsDBHelper = new TagsDBHelper(localContext);
-        tagsDBHelper.insertTagsToServer(ae.getAddress().getTags(), "area", ae.getUniqueId());
+        AreaAddress address = ae.getAddress();
+        if(address != null) {
+            tagsDBHelper.insertTagsToServer(address.getTags(), "area", ae.getUniqueId());
+        }
     }
 }
