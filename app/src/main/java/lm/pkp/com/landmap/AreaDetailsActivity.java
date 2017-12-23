@@ -407,6 +407,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
 
     public void showPositionEdit(final PositionElement positionElement){
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Change Position Details");
 
         LayoutInflater layoutInflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View v = layoutInflater.inflate(R.layout.position_edit,
@@ -415,6 +416,9 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
 
         final EditText posNameView = (EditText) v.findViewById(R.id.position_name);
         posNameView.setText(positionElement.getName());
+
+        final EditText posDescView = (EditText) v.findViewById(R.id.position_desc);
+        posDescView.setText(positionElement.getDescription());
 
         final Spinner spinner = (Spinner) v.findViewById(id.position_type);
         String ptype = StringUtils.capitalize(positionElement.getType());
@@ -425,6 +429,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
             public void onClick(DialogInterface dialog, int which) {
                 positionElement.setName(posNameView.getText().toString());
                 positionElement.setType(spinner.getSelectedItem().toString());
+                positionElement.setDescription(posDescView.getText().toString());
 
                 PositionsDBHelper pdh = new PositionsDBHelper(getApplicationContext());
                 pdh.updatePositionLocally(positionElement);

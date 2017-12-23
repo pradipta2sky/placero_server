@@ -13,7 +13,7 @@ import lm.pkp.com.landmap.weather.model.WeatherElement;
 public class PositionElement implements Serializable {
 
     private String name = "";
-    private String description = "";
+    private String description = "No Description";
     private double lat;
     private double lon;
     private String tags = "";

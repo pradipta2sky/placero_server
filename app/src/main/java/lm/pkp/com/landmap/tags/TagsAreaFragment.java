@@ -84,6 +84,11 @@ public class TagsAreaFragment extends Fragment implements FragmentIdentification
 
                 EditText compareValue = (EditText) mView.findViewById(R.id.compare_value);
                 Editable text = compareValue.getText();
+                if(text.toString().trim().equalsIgnoreCase("")
+                        || text.toString().equalsIgnoreCase("?")){
+                    compareValue.setText("?");
+                    return;
+                }
                 Tag tag = new Tag(selectedMeasure + " " + selectedCompare + " " + text);
                 tag.isDeletable = true;
                 bottomContainer.addTag(tag);

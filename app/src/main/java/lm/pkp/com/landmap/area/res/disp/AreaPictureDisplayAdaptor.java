@@ -100,7 +100,7 @@ final class AreaPictureDisplayAdaptor extends BaseAdapter {
                 ImageView clickedImage = (ImageView) referredView;
                 clickedImage.setBackgroundResource(R.drawable.image_border);
 
-                fragment.getView().findViewById(id.res_action_layout).setVisibility(View.VISIBLE);
+                fragment.getView().findViewById(R.id.res_action_layout).setVisibility(View.VISIBLE);
 
                 final PictureDisplayElement pictureDisplayElement = dataSet.get(position);
                 final String resourceId = pictureDisplayElement.getResourceId();

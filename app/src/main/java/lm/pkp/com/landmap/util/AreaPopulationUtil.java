@@ -10,6 +10,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.io.File;
 import java.text.DecimalFormat;
 import java.util.List;
@@ -42,9 +44,9 @@ public class AreaPopulationUtil {
         TextView areaNameView = (TextView) view.findViewById(id.area_name_text);
         String areaName = ae.getName();
         if (areaName.length() > 25) {
-            areaNameView.setText(areaName.substring(0, 22).concat("..."));
+            areaNameView.setText(StringUtils.capitalize(areaName.substring(0, 22).concat("...")));
         } else {
-            areaNameView.setText(areaName);
+            areaNameView.setText(StringUtils.capitalize(areaName));
         }
 
         TextView descText = (TextView) view.findViewById(id.area_desc_text);

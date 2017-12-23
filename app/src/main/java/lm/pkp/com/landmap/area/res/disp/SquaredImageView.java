@@ -2,17 +2,19 @@ package lm.pkp.com.landmap.area.res.disp;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.util.AttributeSet;
+import android.view.ViewGroup;
 import android.widget.ImageView;
+
+import lm.pkp.com.landmap.R;
 
 /**
  * Created by USER on 11/6/2017.
  */
 public class SquaredImageView extends ImageView {
 
-    /**
-     * An image view which always remains square with respect to its width.
-     */
     public SquaredImageView(Context context) {
         super(context);
     }

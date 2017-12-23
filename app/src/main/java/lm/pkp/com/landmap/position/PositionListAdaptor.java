@@ -58,9 +58,13 @@ public class PositionListAdaptor extends ArrayAdapter<PositionElement> {
         }
 
         final PositionElement pe = items.get(position);
-        TextView nameText = (TextView) v.findViewById(R.id.pos_name);
         String posType = pe.getType();
-        nameText.setText(pe.getName() + ", " + StringUtils.capitalize(posType));
+
+        TextView nameText = (TextView) v.findViewById(R.id.pos_name);
+        nameText.setText(StringUtils.capitalize(pe.getName()) + ", " + StringUtils.capitalize(posType));
+
+        TextView descText = (TextView) v.findViewById(R.id.pos_desc);
+        descText.setText(StringUtils.capitalize(pe.getDescription()));
 
         final AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
         ImageView posImgView = (ImageView) v.findViewById(id.position_default_img);
@@ -82,7 +86,7 @@ public class PositionListAdaptor extends ArrayAdapter<PositionElement> {
         DecimalFormat locFormat = new DecimalFormat("##.####");
         TextView latLongText = (TextView) v.findViewById(R.id.pos_latlng);
         latLongText.setText("Lat: " + locFormat.format(pe.getLat()) + ", "
-                + "Long: " + locFormat.format(pe.getLon()));
+                + "Lng: " + locFormat.format(pe.getLon()));
 
         ImageView editButton = (ImageView) v.findViewById(R.id.edit_row);
         editButton.setOnClickListener(new OnClickListener() {

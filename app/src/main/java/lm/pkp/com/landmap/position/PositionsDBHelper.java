@@ -158,7 +158,10 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
 
                 pe.setName(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_NAME)));
                 pe.setType(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_TYPE)));
-                pe.setDescription(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_DESCRIPTION)));
+                String posDesc = cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_DESCRIPTION));
+                if(!posDesc.trim().equalsIgnoreCase("")){
+                    pe.setDescription(posDesc);
+                }
 
                 String latStr = cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_LAT));
                 pe.setLat(Double.parseDouble(latStr));
