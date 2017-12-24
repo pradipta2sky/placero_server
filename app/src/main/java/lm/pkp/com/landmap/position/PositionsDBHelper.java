@@ -60,12 +60,8 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
 
     public PositionElement insertPositionLocally(PositionElement pe) {
         SQLiteDatabase db = getWritableDatabase();
-
         ContentValues contentValues = new ContentValues();
-        String uniqueId = UUID.randomUUID().toString();
-        contentValues.put(POSITION_COLUMN_UNIQUE_ID, uniqueId);
-        pe.setUniqueId(uniqueId);
-
+        contentValues.put(POSITION_COLUMN_UNIQUE_ID, pe.getUniqueId());
         contentValues.put(POSITION_COLUMN_UNIQUE_AREA_ID, pe.getUniqueAreaId());
         contentValues.put(POSITION_COLUMN_NAME, pe.getName());
         contentValues.put(POSITION_COLUMN_TYPE, pe.getType());
@@ -82,9 +78,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
 
     public PositionElement updatePositionLocally(PositionElement pe) {
         SQLiteDatabase db = getWritableDatabase();
-
         ContentValues contentValues = new ContentValues();
-
         contentValues.put(POSITION_COLUMN_UNIQUE_ID, pe.getUniqueId());
         contentValues.put(POSITION_COLUMN_UNIQUE_AREA_ID, pe.getUniqueAreaId());
         contentValues.put(POSITION_COLUMN_NAME, pe.getName());

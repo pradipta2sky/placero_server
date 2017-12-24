@@ -267,7 +267,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         if(!positions.contains(pe)){
             pe.setName("Position_" + positions.size());
             positions.add(pe);
-            pe = pdb.insertPositionLocally(pe);
+            pdb.insertPositionLocally(pe);
             pdb.insertPositionToServer(pe);
 
             AreaContext.INSTANCE.setAreaElement(ae, getApplicationContext());

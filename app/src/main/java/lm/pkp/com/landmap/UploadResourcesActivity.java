@@ -122,7 +122,6 @@ public class UploadResourcesActivity extends BaseDriveActivity {
                         .setMimeType(this.resource.getMimeType())
                         .build();
                 DriveFolder.DriveFileResult driveFileResult = folder.createFile(getGoogleApiClient(), changeSet, contents).await();
-
                 DriveFile createdFile = driveFileResult.getDriveFile();
                 createdFile.addChangeListener(getGoogleApiClient(), new FileMetaChangeListener(this.resource, createdFile));
             }
@@ -157,7 +156,6 @@ public class UploadResourcesActivity extends BaseDriveActivity {
                     pdh.insertPositionLocally(position);
                     pdh.insertPositionToServer(position);
                 }
-
                 this.driveFile.removeChangeListener(getGoogleApiClient(), this);
                 new CopyContentsAsyncTask(getApplicationContext(), this.resource).execute(this.driveFile);
             }

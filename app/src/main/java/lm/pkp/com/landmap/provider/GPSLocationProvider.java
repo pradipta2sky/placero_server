@@ -70,7 +70,7 @@ public class GPSLocationProvider implements LocationListener {
 
         AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
         List<PositionElement> positions = areaElement.getPositions();
-        pe.setName("Position_" + positions.size());
+        pe.setName("Position_" + (positions.size() + 1));
         pe.setLon(location.getLongitude());
         pe.setLat(location.getLatitude());
         pe.setCreatedOnMillis(System.currentTimeMillis() + "");

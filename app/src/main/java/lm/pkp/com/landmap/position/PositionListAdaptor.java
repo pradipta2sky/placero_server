@@ -113,6 +113,16 @@ public class PositionListAdaptor extends ArrayAdapter<PositionElement> {
                 if(PermissionManager.INSTANCE.hasAccess(PermissionConstants.UPDATE_AREA)){
                     items.remove(position);
                     pdh.deletePositionGlobally(pe);
+
+                    if(pe.getType().equalsIgnoreCase("Media")){
+                        DriveResource resource = ddh.getDriveResourceByPositionId(pe.getUniqueId());
+                        resource.setPosition(null);
+                        ddh.updateResourceLocally(resource);
+                        ddh.updateResourceToServer(resource);
+                        areaElement.getMediaResources().remove(resource);
+                        areaElement.getMediaResources().add(resource);
+                    }
+
                     areaElement.getPositions().remove(pe);
                     notifyDataSetChanged();
                 }

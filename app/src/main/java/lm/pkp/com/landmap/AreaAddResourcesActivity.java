@@ -64,7 +64,7 @@ public class AreaAddResourcesActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(AreaAddResourcesActivity.this, AreaCameraPictureActivity.class);
-                AreaAddResourcesActivity.this.startActivity(i);
+                startActivity(i);
             }
         });
 
@@ -73,7 +73,7 @@ public class AreaAddResourcesActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(AreaAddResourcesActivity.this, AreaCameraVideoActivity.class);
-                AreaAddResourcesActivity.this.startActivity(i);
+                startActivity(i);
             }
         });
 
@@ -82,7 +82,7 @@ public class AreaAddResourcesActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent i = new Intent(AreaAddResourcesActivity.this, AreaDocumentChooserActivity.class);
-                AreaAddResourcesActivity.this.startActivity(i);
+                startActivity(i);
             }
         });
 
@@ -90,12 +90,12 @@ public class AreaAddResourcesActivity extends AppCompatActivity {
         driveUploadButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(AreaAddResourcesActivity.this.adaptor.getCount() == 0){
-                    AreaAddResourcesActivity.this.showMessage("Nothing to upload.", "error");
+                if(adaptor.getCount() == 0){
+                    showMessage("Nothing to upload.", "error");
                     return;
                 }
                 Intent i = new Intent(AreaAddResourcesActivity.this, UploadResourcesActivity.class);
-                AreaAddResourcesActivity.this.startActivity(i);
+                startActivity(i);
             }
         });
 

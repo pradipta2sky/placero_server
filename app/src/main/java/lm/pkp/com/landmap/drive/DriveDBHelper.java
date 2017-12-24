@@ -85,7 +85,6 @@ public class DriveDBHelper extends SQLiteOpenHelper {
 
     public void insertResourceLocally(DriveResource dr) {
         SQLiteDatabase db = getWritableDatabase();
-
         ContentValues contentValues = new ContentValues();
         contentValues.put(DRIVE_COLUMN_UNIQUE_ID, dr.getUniqueId());
         contentValues.put(DRIVE_COLUMN_AREA_ID, dr.getAreaId());
@@ -107,6 +106,36 @@ public class DriveDBHelper extends SQLiteOpenHelper {
         contentValues.put(DRIVE_COLUMN_CREATED_ON, dr.getCreatedOnMillis());
         db.insert(DRIVE_TABLE_NAME, null, contentValues);
         db.close();
+    }
+
+    public void updateResourceLocally(DriveResource dr) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues contentValues = new ContentValues();
+        contentValues.put(DRIVE_COLUMN_UNIQUE_ID, dr.getUniqueId());
+        contentValues.put(DRIVE_COLUMN_AREA_ID, dr.getAreaId());
+        contentValues.put(DRIVE_COLUMN_USER_ID, dr.getUserId());
+        contentValues.put(DRIVE_COLUMN_RESOURCE_ID, dr.getResourceId());
+        contentValues.put(DRIVE_COLUMN_CONTAINER_ID, dr.getContainerId());
+        contentValues.put(DRIVE_COLUMN_NAME, dr.getName());
+        contentValues.put(DRIVE_COLUMN_TYPE, dr.getType());
+        contentValues.put(DRIVE_COLUMN_CONTENT_TYPE, dr.getContentType());
+        contentValues.put(DRIVE_COLUMN_MIME_TYPE, dr.getMimeType());
+        contentValues.put(DRIVE_COLUMN_SIZE, dr.getSize());
+
+        PositionElement position = dr.getPosition();
+        if(position != null){
+            contentValues.put(DRIVE_COLUMN_POSITION_ID, position.getUniqueId());
+        }else {
+            contentValues.put(DRIVE_COLUMN_POSITION_ID, "");
+        }
+        contentValues.put(DRIVE_COLUMN_CREATED_ON, dr.getCreatedOnMillis());
+        db.update(DRIVE_TABLE_NAME, contentValues, DRIVE_COLUMN_UNIQUE_ID + "='" + dr.getUniqueId() + "'", null);
+        db.close();
+    }
+
+    public void updateResourceToServer(DriveResource dr) {
+        LMSRestAsyncTask task = new LMSRestAsyncTask(this.callback);
+        task.execute(this.preparePostParams("update", dr));
     }
 
     public void insertResourceToServer(DriveResource dr) {
