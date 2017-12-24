@@ -22,7 +22,8 @@
             android:verticalSpacing="10dp"
             android:horizontalSpacing="10dp"
             android:focusable="true"
-            android:clickable="true" />
+            android:clickable="true"
+            />
     </RelativeLayout>
 
     <android.support.design.widget.CoordinatorLayout
@@ -36,28 +37,30 @@
         <android.support.design.widget.FloatingActionButton
             xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/res_mail"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_marginBottom="75dp"
             android:layout_marginRight="15dp"
             android:src="@drawable/send"
             android:visibility="visible"
             android:scaleType="center"
-            app:backgroundTint="#F8F9F9" />
+            app:backgroundTint="#F8F9F9"
+            />
 
         <android.support.design.widget.FloatingActionButton
             xmlns:app="http://schemas.android.com/apk/res-auto"
             android:id="@+id/res_delete"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_marginBottom="15dp"
             android:layout_marginRight="15dp"
             android:src="@drawable/delete"
             android:visibility="visible"
             android:scaleType="center"
-            app:backgroundTint="#F8F9F9" />
+            app:backgroundTint="#F8F9F9"
+            />
 
     </android.support.design.widget.CoordinatorLayout>
 

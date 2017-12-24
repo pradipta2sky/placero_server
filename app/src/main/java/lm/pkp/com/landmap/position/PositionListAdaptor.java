@@ -66,17 +66,25 @@ public class PositionListAdaptor extends ArrayAdapter<PositionElement> {
         TextView descText = (TextView) v.findViewById(R.id.pos_desc);
         descText.setText(StringUtils.capitalize(pe.getDescription()));
 
-        final AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
+        final AreaContext areaContext = AreaContext.INSTANCE;
+        final AreaElement areaElement = areaContext.getAreaElement();
+        final String uniqueId = areaElement.getUniqueId();
+
         ImageView posImgView = (ImageView) v.findViewById(id.position_default_img);
         if(posType.equalsIgnoreCase("media")){
-            String thumbRootPath = AreaContext.INSTANCE
-                    .getAreaLocalPictureThumbnailRoot(areaElement.getUniqueId()).getAbsolutePath();
+            String rootPath = null;
             DriveResource resource = ddh.getDriveResourceByPositionId(pe.getUniqueId());
-            String imageName = resource.getName();
-            String thumbnailPath = thumbRootPath + File.separatorChar + imageName;
+            if(resource.getContentType().equalsIgnoreCase("Image")){
+                rootPath = areaContext.getAreaLocalPictureThumbnailRoot(uniqueId).getAbsolutePath();
+            }else {
+                rootPath = areaContext.getAreaLocalVideoThumbnailRoot(uniqueId).getAbsolutePath();
+            }
+            String thumbnailPath = rootPath + File.separatorChar + resource.getName();
             File thumbFile = new File(thumbnailPath);
             if (thumbFile.exists()) {
                 posImgView.setImageBitmap(BitmapFactory.decodeFile(thumbnailPath));
+            }else {
+                posImgView.setImageResource(R.drawable.position);
             }
         }else {
             posImgView.setImageResource(R.drawable.position);
@@ -122,7 +130,8 @@ public class PositionListAdaptor extends ArrayAdapter<PositionElement> {
                 v.setBackgroundResource(R.drawable.rounded_pos_list_view_sel);
                 UserElement userElement = UserContext.getInstance().getUserElement();
                 userElement.getSelections().setPosition(pe);
-                ((AreaDetailsActivity) context).findViewById(R.id.action_navigate_area).setBackgroundResource(R.drawable.rounded_corner);
+                ((AreaDetailsActivity) context).findViewById(R.id.action_navigate_area)
+                        .setBackgroundResource(R.drawable.rounded_corner);
                 return true;
             }
         });

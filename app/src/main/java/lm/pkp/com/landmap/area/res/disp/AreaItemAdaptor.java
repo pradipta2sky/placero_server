@@ -50,9 +50,10 @@ public class AreaItemAdaptor extends ArrayAdapter {
             itemView = vi.inflate(R.layout.area_element_row, null);
         }
 
-        AreaContext.INSTANCE.setDisplayBMap(null);
-
+        final AreaContext areaContext = AreaContext.INSTANCE;
+        areaContext.setDisplayBMap(null);
         final AreaElement areaElement = items.get(position);
+
         AreaPopulationUtil.INSTANCE.populateAreaElement(itemView, areaElement);
 
         itemView.setOnLongClickListener(new View.OnLongClickListener() {
@@ -66,6 +67,11 @@ public class AreaItemAdaptor extends ArrayAdapter {
                 v.setBackgroundResource(R.drawable.rounded_area_list_view_sel);
                 UserElement userElement = UserContext.getInstance().getUserElement();
                 userElement.getSelections().setArea(areaElement);
+
+                final Activity activity = (Activity) context;
+                final View reportView = activity.findViewById(R.id.action_generate_report);
+                reportView.setBackgroundResource(R.drawable.rounded_corner);
+
                 return true;
             }
         });

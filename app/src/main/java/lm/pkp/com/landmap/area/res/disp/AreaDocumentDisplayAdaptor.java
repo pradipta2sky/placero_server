@@ -24,11 +24,13 @@ import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.RemoveDriveResourcesActivity;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.model.AreaElement;
+import lm.pkp.com.landmap.custom.ThumbnailCreator;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
 import lm.pkp.com.landmap.util.FileUtil;
 
 import static android.widget.ImageView.ScaleType.CENTER_CROP;
+import static android.widget.ImageView.ScaleType.FIT_XY;
 
 final class AreaDocumentDisplayAdaptor extends BaseAdapter {
 
@@ -44,11 +46,11 @@ final class AreaDocumentDisplayAdaptor extends BaseAdapter {
     }
 
     @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, final ViewGroup parent) {
         SquaredImageView view = (SquaredImageView) convertView;
         if (view == null) {
             view = new SquaredImageView(this.context);
-            view.setScaleType(CENTER_CROP);
+            view.setScaleType(FIT_XY);
         } else {
             return view;
         }
@@ -68,15 +70,21 @@ final class AreaDocumentDisplayAdaptor extends BaseAdapter {
         final File documentFile = dataSet.get(position).getDocumentFile();
 
         Bitmap bMap = null;
+        final AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
         if (thumbFile.exists()) {
             bMap = BitmapFactory.decodeFile(thumbFile.getAbsolutePath());
         } else {
-            bMap = BitmapFactory.decodeResource(context.getResources(), R.drawable.error);
+            if(documentFile.exists()){
+                ThumbnailCreator creator = new ThumbnailCreator(context);
+                creator.createVideoThumbnail(documentFile, areaElement.getUniqueId());
+                bMap = BitmapFactory.decodeFile(thumbFile.getAbsolutePath());
+            }else {
+                bMap = BitmapFactory.decodeResource(context.getResources(), R.drawable.error);
+            }
         }
         view.setImageBitmap(bMap);
 
         final View referredView = view;
-
         view.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -90,9 +98,12 @@ final class AreaDocumentDisplayAdaptor extends BaseAdapter {
         view.setOnLongClickListener(new OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                ImageView clickedImage = (ImageView) referredView;
-                clickedImage.setBackgroundResource(R.drawable.image_border);
-
+                int siblingCount = parent.getChildCount();
+                for (int i = 0; i < siblingCount; i++) {
+                    View child = parent.getChildAt(i);
+                    child.setPadding(0,0,0,0);
+                }
+                referredView.setPadding(20, 20, 20, 20);
                 fragment.getView().findViewById(id.res_action_layout).setVisibility(View.VISIBLE);
 
                 final DocumentDisplayElement documentDisplayElement = dataSet.get(position);
@@ -124,8 +135,6 @@ final class AreaDocumentDisplayAdaptor extends BaseAdapter {
                     @Override
                     public void onClick(View v) {
                         File reportFile = documentDisplayElement.getDocumentFile();
-
-                        AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
                         Intent intent = new Intent(Intent.ACTION_SEND);
                         intent.putExtra(Intent.EXTRA_SUBJECT, "Document shared using [Placero LMS] for place - " + areaElement.getName());
                         intent.putExtra(Intent.EXTRA_TEXT, "Hi, \nCheck out document for " + areaElement.getName());
