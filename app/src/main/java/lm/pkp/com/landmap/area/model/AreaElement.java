@@ -22,6 +22,9 @@ public class AreaElement implements Serializable {
     private String createdBy;
     private String type;
     private String uniqueId;
+    private Integer dirty = 0;
+    private String dirtyAction = "";
+
     private AreaAddress address;
     private AreaMeasure measure;
 
@@ -50,6 +53,22 @@ public class AreaElement implements Serializable {
         return this.description;
     }
 
+    public Integer getDirty() {
+        return this.dirty;
+    }
+
+    public void setDirty(Integer dirty) {
+        this.dirty = dirty;
+    }
+
+    public String getDirtyAction() {
+        return this.dirtyAction;
+    }
+
+    public void setDirtyAction(String dirtyAction) {
+        this.dirtyAction = dirtyAction;
+    }
+
     public void setDescription(String description) {
         this.description = description;
     }
@@ -75,10 +94,6 @@ public class AreaElement implements Serializable {
 
     public void setUniqueId(String uniqueId) {
         this.uniqueId = uniqueId;
-    }
-
-    public AreaElement copy() {
-        return SerializationUtils.clone(this);
     }
 
     public List<DriveResource> getMediaResources() {

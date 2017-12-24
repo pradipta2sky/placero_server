@@ -5,7 +5,10 @@ package lm.pkp.com.landmap;
  */
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 
 import lm.pkp.com.landmap.R.layout;
@@ -17,19 +20,22 @@ import lm.pkp.com.landmap.sync.LocalFolderStructureManager;
 public class SplashActivity extends Activity {
 
     private boolean userExists = false;
+    private boolean offline = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
         setContentView(layout.activity_splash);
+        registerReceiver(broadcastReceiver, new IntentFilter("INTERNET_LOST"));
 
         Bundle extras = getIntent().getExtras();
         if(extras != null){
             userExists = new Boolean(extras.getString("user_exists"));
         }
-
-        new LocalDataRefresher(getApplicationContext(), new DataReloadCallback()).refreshLocalData();
+        if(!offline){
+            new LocalDataRefresher(getApplicationContext(), new DataReloadCallback()).refreshLocalData();
+        }
         LocalFolderStructureManager.create();
     }
 
@@ -47,5 +53,17 @@ public class SplashActivity extends Activity {
             finish();
         }
     }
+
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(action.equalsIgnoreCase("INTERNET_LOST")){
+                offline = true;
+            }else {
+                offline = false;
+            }
+        }
+    };
 
 }

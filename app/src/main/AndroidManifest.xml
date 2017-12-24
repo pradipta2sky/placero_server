@@ -153,5 +153,11 @@
             android:name=".area.reporting.AreaReportingService"
             android:exported="false"/>
 
+        <receiver android:name=".connectivity.ConnectivityChangeReceiver" >
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
+
     </application>
 </manifest>

@@ -1,5 +1,9 @@
 package lm.pkp.com.landmap.custom;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,9 +14,11 @@ public class GlobalContext {
 
     public static final GlobalContext INSTANCE = new GlobalContext();
 
-    private GlobalContext(){
+    public static final String INTERNET_AVAILABLE = "internet_available";
 
+    private GlobalContext(){
     }
+
     private Map<String, String> store = new HashMap<>();
 
     public void put(String key, String value){

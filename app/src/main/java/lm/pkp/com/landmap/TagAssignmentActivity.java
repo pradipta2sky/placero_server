@@ -17,7 +17,7 @@ import android.support.v7.widget.Toolbar;
 import java.util.HashMap;
 import java.util.Map;
 
-import lm.pkp.com.landmap.custom.FragmentIdentificationHandler;
+import lm.pkp.com.landmap.custom.FragmentHandler;
 import lm.pkp.com.landmap.tags.TagsAddressFragment;
 import lm.pkp.com.landmap.tags.TagsAreaFragment;
 import lm.pkp.com.landmap.tags.TagsDisplayMetaStore;
@@ -73,7 +73,7 @@ public class TagAssignmentActivity extends AppCompatActivity{
 
         @Override
         public CharSequence getPageTitle(int position) {
-            FragmentIdentificationHandler identification = (FragmentIdentificationHandler) store.get(position);
+            FragmentHandler identification = (FragmentHandler) store.get(position);
             return identification.getFragmentTitle();
         }
     }

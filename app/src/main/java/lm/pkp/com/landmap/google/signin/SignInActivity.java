@@ -1,8 +1,13 @@
 package lm.pkp.com.landmap.google.signin;
 
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -27,7 +32,6 @@ import org.json.JSONObject;
 
 import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.R.id;
-import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.R.string;
 import lm.pkp.com.landmap.SplashActivity;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
@@ -53,22 +57,14 @@ public class SignInActivity extends AppCompatActivity implements
     private TextView mStatusTextView;
     private ProgressDialog mProgressDialog;
     private UserElement signedUser;
+    private boolean offline = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        Intent intent = getIntent();
-        Bundle extras = intent.getExtras();
-        if(extras != null){
-            String cause = extras.getString("cause");
-            if(cause != null && cause.equalsIgnoreCase("crash")){
-                // TODO something for crash recovery
-            }
-        }
-
         setContentView(R.layout.activity_google_signin_main);
         getSupportActionBar().hide();
+        registerReceiver(broadcastReceiver, new IntentFilter("INTERNET_LOST"));
 
         mStatusTextView = (TextView) findViewById(id.status);
 
@@ -87,13 +83,23 @@ public class SignInActivity extends AppCompatActivity implements
         signInButton.setSize(SignInButton.SIZE_STANDARD);
     }
 
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(action.equalsIgnoreCase("INTERNET_LOST")){
+                offline = true;
+            }else {
+                offline = false;
+            }
+        }
+    };
+
     @Override
     public void onStart() {
         super.onStart();
-
         OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
         if (opr.isDone()) {
-            Log.d(TAG, "Got cached sign-in");
             GoogleSignInResult result = opr.get();
             handleSignInResult(result);
         } else {
@@ -129,23 +135,61 @@ public class SignInActivity extends AppCompatActivity implements
     }
 
     private void handleSignInResult(GoogleSignInResult result) {
-        Log.d(TAG, "handleSignInResult:" + result.isSuccess());
         if (result.isSuccess()) {
             GoogleSignInAccount acct = result.getSignInAccount();
+            // Convert google specific user account to app specific
             signedUser = UserMappingUtil.convertGoogleAccountToLocalAccount(acct);
-
-            UserDBHelper udh = new UserDBHelper(getApplicationContext());
-            UserElement localUser = udh.getUserByEmail(signedUser.getEmail());
-            if (localUser == null) {
-                udh.insertUserLocally(signedUser);
-            }
+            // Set the user context.
             UserContext.getInstance().setUserElement(signedUser);
-            searchOnRemoteAndUpdate(signedUser);
+            // Create the database.
+            UserDBHelper udh = new UserDBHelper(getApplicationContext());
+            udh.dryRun();
 
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString("user_email", signedUser.getEmail());
+            editor.putString("user_display_name", signedUser.getDisplayName());
+            editor.putString("user_photo_url", signedUser.getPhotoUrl());
+            editor.commit();
+
+            searchOnRemoteAndUpdate(signedUser);
             mGoogleApiClient.disconnect();
         } else {
-            updateUI(false);
+            if(offline){
+                UserElement user = buildUserFromPreferences();
+                if(user == null){
+                    updateUI(false);
+                }else {
+                    Intent spashIntent = new Intent(this, SplashActivity.class);
+                    spashIntent.putExtra("user_exists", "true");
+                    startActivity(spashIntent);
+                    finish();
+                }
+            }
         }
+    }
+
+    private UserElement buildUserFromPreferences() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String email = preferences.getString("user_email", null);
+        if(email == null){
+            return null;
+        }
+        UserElement user = new UserElement();
+        user.setEmail(email);
+
+        String displayName = preferences.getString("user_display_name", null);
+        user.setDisplayName(displayName);
+
+        String photoUrl = preferences.getString("user_photo_url", null);
+        user.setPhotoUrl(photoUrl);
+
+        UserContext.getInstance().setUserElement(user);
+        String userDetails = preferences.getString("user_details", null);
+        if(userDetails != null){
+            buildUserSelectionsFromDetails(userDetails);
+        }
+        return user;
     }
 
     private void searchOnRemoteAndUpdate(UserElement ue) {
@@ -171,26 +215,37 @@ public class SignInActivity extends AppCompatActivity implements
                 udh.insertUserToServer(signedUser);
                 spashIntent.putExtra("user_exists", "false");
             }else {
-                // Parse user details
-                JSONArray userArr = new JSONArray(userDetails);
-                JSONObject userObj = (JSONObject) userArr.get(0);
-                String tagsStr = userObj.getString("tags");
-                String[] tagsArr = tagsStr.split(",");
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putString("user_details", userDetails);
+                editor.commit();
 
-                String tagTypes = userObj.getString("tag_types");
-                String[] tagTypesArr = tagTypes.split(",");
-
-                UserElement userElement = UserContext.getInstance().getUserElement();
-                for (int i = 0; i < tagsArr.length; i++) {
-                    TagElement tagElement = new TagElement(tagsArr[i], tagTypesArr[i], "user");
-                    userElement.getSelections().getTags().add(tagElement);
-                }
+                buildUserSelectionsFromDetails(userDetails);
                 spashIntent.putExtra("user_exists", "true");
             }
             startActivity(spashIntent);
             finish();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void buildUserSelectionsFromDetails(String userDetails) {
+        try {
+            JSONArray userArr = new JSONArray(userDetails);
+            JSONObject userObj = (JSONObject) userArr.get(0);
+            String tagsStr = userObj.getString("tags");
+            String[] tagsArr = tagsStr.split(",");
+
+            String tagTypes = userObj.getString("tag_types");
+            String[] tagTypesArr = tagTypes.split(",");
+
+            UserElement userElement = UserContext.getInstance().getUserElement();
+            for (int i = 0; i < tagsArr.length; i++) {
+                TagElement tagElement = new TagElement(tagsArr[i], tagTypesArr[i], "user");
+                userElement.getSelections().getTags().add(tagElement);
+            }
+        }catch (Exception e){
         }
     }
 

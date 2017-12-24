@@ -201,6 +201,10 @@ public class UploadResourcesActivity extends BaseDriveActivity {
             areaContext.removeResourceFromQueue(resource);
             areaElement.getMediaResources().add(resource);
 
+            PositionElement position = resource.getPosition();
+            if(position != null){
+                areaElement.getPositions().add(position);
+            }
             // Create thumbnails of the uploaded files for display.
             String resourcePath = resource.getPath();
             File resourceFile = new File(resourcePath);

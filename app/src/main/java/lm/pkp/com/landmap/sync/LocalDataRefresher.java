@@ -20,35 +20,35 @@ import lm.pkp.com.landmap.weather.db.WeatherDBHelper;
  */
 public class LocalDataRefresher implements AsyncTaskCallback {
 
-    private Context ctxt;
+    private Context context;
     private AsyncTaskCallback callback;
 
     public LocalDataRefresher(Context context, AsyncTaskCallback caller) {
-        this.ctxt = context;
+        this.context = context;
         this.callback = caller;
     }
 
     public void refreshLocalData() {
 
-        AreaDBHelper adh = new AreaDBHelper(this.ctxt);
+        AreaDBHelper adh = new AreaDBHelper(this.context);
         adh.deleteAreasLocally();
 
-        PositionsDBHelper pdh = new PositionsDBHelper(this.ctxt);
+        PositionsDBHelper pdh = new PositionsDBHelper(this.context);
         pdh.deletePositionsLocally();
 
-        WeatherDBHelper wdh = new WeatherDBHelper(this.ctxt);
+        WeatherDBHelper wdh = new WeatherDBHelper(this.context);
         wdh.deleteWeatherElementsLocally();
 
-        DriveDBHelper ddh = new DriveDBHelper(this.ctxt);
+        DriveDBHelper ddh = new DriveDBHelper(this.context);
         ddh.cleanLocalDriveResources();
 
-        PermissionsDBHelper pmh = new PermissionsDBHelper(this.ctxt);
+        PermissionsDBHelper pmh = new PermissionsDBHelper(this.context);
         pmh.deletePermissionsLocally();
 
-        TagsDBHelper tdh = new TagsDBHelper(this.ctxt);
+        TagsDBHelper tdh = new TagsDBHelper(this.context);
         tdh.deleteAllTagsLocally();
 
-        UserAreaDetailsLoadTask loadTask = new UserAreaDetailsLoadTask(this.ctxt);
+        UserAreaDetailsLoadTask loadTask = new UserAreaDetailsLoadTask(this.context);
         loadTask.setCompletionCallback(this);
 
         try {
@@ -61,10 +61,10 @@ public class LocalDataRefresher implements AsyncTaskCallback {
     }
 
     public void refreshPublicAreas() {
-        AreaDBHelper adh = new AreaDBHelper(this.ctxt);
+        AreaDBHelper adh = new AreaDBHelper(this.context);
         adh.deletePublicAreas();
 
-        PublicAreasLoadTask loadTask = new PublicAreasLoadTask(this.ctxt);
+        PublicAreasLoadTask loadTask = new PublicAreasLoadTask(this.context);
         loadTask.setCompletionCallback(this);
         try {
             loadTask.execute();
@@ -74,10 +74,10 @@ public class LocalDataRefresher implements AsyncTaskCallback {
     }
 
     public void refreshPublicAreas(String searchKey) {
-        AreaDBHelper adh = new AreaDBHelper(this.ctxt);
+        AreaDBHelper adh = new AreaDBHelper(this.context);
         adh.deletePublicAreas();
 
-        PublicAreasLoadTask loadTask = new PublicAreasLoadTask(this.ctxt);
+        PublicAreasLoadTask loadTask = new PublicAreasLoadTask(this.context);
         try {
             JSONObject queryObj = new JSONObject();
             queryObj.put("sk", searchKey);
@@ -90,7 +90,9 @@ public class LocalDataRefresher implements AsyncTaskCallback {
 
     @Override
     public void taskCompleted(Object result) {
-        this.callback.taskCompleted(result);
+        if(callback != null){
+            this.callback.taskCompleted(result);
+        }
     }
 
 }

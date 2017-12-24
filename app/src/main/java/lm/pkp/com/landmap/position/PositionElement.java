@@ -21,6 +21,8 @@ public class PositionElement implements Serializable {
     private String uniqueId = "";
     private String createdOnMillis = System.currentTimeMillis() + "";
     private String type = "boundary";
+    private Integer dirty = 0;
+    private String dirtyAction = "";
     private WeatherElement weather;
 
     public String getName() {
@@ -105,6 +107,22 @@ public class PositionElement implements Serializable {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public Integer isDirty() {
+        return this.dirty;
+    }
+
+    public void setDirty(Integer dirty) {
+        this.dirty = dirty;
+    }
+
+    public String getDirtyAction() {
+        return this.dirtyAction;
+    }
+
+    public void setDirtyAction(String dirtyAction) {
+        this.dirtyAction = dirtyAction;
     }
 
     @Override

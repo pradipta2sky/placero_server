@@ -2,9 +2,12 @@ package lm.pkp.com.landmap;
 
 import android.R.drawable;
 import android.app.AlertDialog.Builder;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.DialogInterface.OnClickListener;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -37,7 +40,7 @@ import lm.pkp.com.landmap.area.reporting.AreaReportingService;
 import lm.pkp.com.landmap.area.reporting.ReportingContext;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.custom.FragmentFilterHandler;
-import lm.pkp.com.landmap.custom.FragmentIdentificationHandler;
+import lm.pkp.com.landmap.custom.FragmentHandler;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.permission.PermissionConstants;
 import lm.pkp.com.landmap.permission.PermissionElement;
@@ -50,35 +53,43 @@ import lm.pkp.com.landmap.util.ColorProvider;
 
 public class AreaDashboardActivity extends AppCompatActivity {
 
+    private boolean offline = false;
+
+    public boolean isOffline() {
+        return this.offline;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
 
-        this.setContentView(R.layout.activity_area_dashboard);
+        setContentView(R.layout.activity_area_dashboard);
+        registerReceiver(broadcastReceiver, new IntentFilter("INTERNET_LOST"));
+
         // Setup Toolbar
         Toolbar topToolbar = (Toolbar) this.findViewById(R.id.areas_display_toolbar);
         setSupportActionBar(topToolbar);
         topToolbar.setBackgroundColor(ColorProvider.getDefaultToolBarColor());
 
-        Toolbar bottomToolbar = (Toolbar) this.findViewById(R.id.areas_macro_toolbar);
+        Toolbar bottomToolbar = (Toolbar) findViewById(R.id.areas_macro_toolbar);
         bottomToolbar.setBackgroundColor(ColorProvider.getDefaultToolBarColor());
 
-        final ViewPager viewPager = (ViewPager) this.findViewById(R.id.areas_display_tab_pager);
+        final ViewPager viewPager = (ViewPager) findViewById(R.id.areas_display_tab_pager);
         viewPager.setAdapter(new DisplayAreasPagerAdapter(getSupportFragmentManager()));
         viewPager.setOffscreenPageLimit(1);
 
-        TabLayout tabLayout = (TabLayout) this.findViewById(R.id.areas_display_tab_layout);
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.areas_display_tab_layout);
         tabLayout.setupWithViewPager(viewPager);
         tabLayout.setBackgroundColor(ColorProvider.getDefaultToolBarColor());
 
-        ImageView createAreaView = (ImageView) this.findViewById(id.action_area_create);
+        ImageView createAreaView = (ImageView) findViewById(id.action_area_create);
         createAreaView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 findViewById(id.splash_panel).setVisibility(View.VISIBLE);
                 AreaDBHelper adh = new AreaDBHelper(getApplicationContext(), new DataInsertServerCallback());
-                AreaElement areaElement = adh.insertAreaLocally();
+                AreaElement areaElement = adh.insertAreaLocally(offline);
 
                 PermissionElement pe = new PermissionElement();
                 pe.setUserId(UserContext.getInstance().getUserElement().getEmail());
@@ -91,7 +102,9 @@ public class AreaDashboardActivity extends AppCompatActivity {
 
                 // Resetting the context for new Area
                 AreaContext.INSTANCE.setAreaElement(areaElement, getApplicationContext());
-                adh.insertAreaToServer(areaElement);
+                if(!offline){
+                    adh.insertAreaToServer(areaElement);
+                }
             }
         });
 
@@ -199,7 +212,7 @@ public class AreaDashboardActivity extends AppCompatActivity {
 
         @Override
         public CharSequence getPageTitle(int position) {
-            FragmentIdentificationHandler identification = (FragmentIdentificationHandler) store.get(position);
+            FragmentHandler identification = (FragmentHandler) store.get(position);
             return identification.getFragmentTitle();
         }
     }
@@ -258,5 +271,26 @@ public class AreaDashboardActivity extends AppCompatActivity {
         snackbar.setActionTextColor(ColorProvider.DEFAULT_TOOLBAR_COLOR);
         snackbar.show();
     }
+
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(action.equalsIgnoreCase("INTERNET_LOST")){
+                offline = true;
+            }else {
+                offline = false;
+            }
+
+            // notify fragments
+            final ViewPager viewPager = (ViewPager) findViewById(R.id.areas_display_tab_pager);
+            DisplayAreasPagerAdapter adapter = (DisplayAreasPagerAdapter) viewPager.getAdapter();
+            int fragmentCount = adapter.getCount();
+            for (int i = 0; i < fragmentCount; i++) {
+                FragmentHandler item = (FragmentHandler) adapter.getItem(i);
+                item.setOffline(offline);
+            }
+        }
+    };
 
 }

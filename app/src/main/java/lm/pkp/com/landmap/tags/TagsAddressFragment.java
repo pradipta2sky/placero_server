@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import lm.pkp.com.landmap.R;
-import lm.pkp.com.landmap.custom.FragmentIdentificationHandler;
+import lm.pkp.com.landmap.custom.FragmentHandler;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.user.UserElement;
 import lm.pkp.com.landmap.user.UserPersistableSelections;
@@ -27,7 +27,7 @@ import lm.pkp.com.landmap.util.ColorProvider;
 /**
  * Created by USER on 11/4/2017.
  */
-public class TagsAddressFragment extends Fragment implements FragmentIdentificationHandler{
+public class TagsAddressFragment extends Fragment implements FragmentHandler {
 
     private Activity mActivity = null;
     private View mView = null;

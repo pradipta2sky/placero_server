@@ -17,6 +17,7 @@ import android.widget.ListView;
 import java.util.ArrayList;
 import java.util.List;
 
+import lm.pkp.com.landmap.AreaDashboardActivity;
 import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.R.layout;
@@ -27,7 +28,7 @@ import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.res.disp.AreaItemAdaptor;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.custom.FragmentFilterHandler;
-import lm.pkp.com.landmap.custom.FragmentIdentificationHandler;
+import lm.pkp.com.landmap.custom.FragmentHandler;
 import lm.pkp.com.landmap.sync.LocalDataRefresher;
 import lm.pkp.com.landmap.tags.TagElement;
 import lm.pkp.com.landmap.user.UserContext;
@@ -38,10 +39,11 @@ import lm.pkp.com.landmap.user.UserPersistableSelections;
  * Created by USER on 11/4/2017.
  */
 public class AreaDashboardPublicFragment extends Fragment
-        implements FragmentIdentificationHandler, FragmentFilterHandler {
+        implements FragmentHandler, FragmentFilterHandler {
 
     private Activity mActivity = null;
     private View mView = null;
+    private boolean offline = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -61,6 +63,7 @@ public class AreaDashboardPublicFragment extends Fragment
         if(getUserVisibleHint()){
             loadFragment();
         }
+        offline = ((AreaDashboardActivity)mActivity).isOffline();
     }
 
     @Override
@@ -92,22 +95,6 @@ public class AreaDashboardPublicFragment extends Fragment
             LocalDataRefresher dataRefresher = new LocalDataRefresher(mActivity, new DataReloadCallback(availableKey.trim()));
             dataRefresher.refreshPublicAreas(availableKey.trim());
         }
-
-        ImageView refreshAreaView = (ImageView) mActivity.findViewById(id.action_area_refresh);
-        refreshAreaView.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                mView.findViewById(id.splash_panel).setVisibility(View.VISIBLE);
-                String key = inputSearch.getText().toString();
-                if (key.trim().equalsIgnoreCase("")) {
-                    LocalDataRefresher dataRefresher = new LocalDataRefresher(mActivity, new DataReloadCallback());
-                    dataRefresher.refreshPublicAreas();
-                } else {
-                    LocalDataRefresher dataRefresher = new LocalDataRefresher(mActivity,new DataReloadCallback(key.trim()));
-                    dataRefresher.refreshPublicAreas(key.trim());
-                }
-            }
-        });
 
         Button seachClearButton = (Button) mActivity.findViewById(id.dashboard_search_clear);
         seachClearButton.setOnClickListener(new OnClickListener() {
@@ -223,4 +210,7 @@ public class AreaDashboardPublicFragment extends Fragment
         }
     }
 
+    public void setOffline(boolean offline) {
+        this.offline = offline;
+    }
 }
