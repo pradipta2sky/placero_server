@@ -17,6 +17,7 @@ import java.util.List;
 
 import lm.pkp.com.landmap.AreaDashboardActivity;
 import lm.pkp.com.landmap.R;
+import lm.pkp.com.landmap.TagAssignmentActivity;
 import lm.pkp.com.landmap.custom.FragmentHandler;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.user.UserElement;
@@ -29,9 +30,9 @@ public class TagsUserFragment extends Fragment implements FragmentHandler {
 
     private Activity mActivity = null;
     private View mView = null;
+    private boolean offline = false;
 
     public TagsUserFragment(){
-        super();
         setArguments(new Bundle());
     }
 
@@ -53,6 +54,7 @@ public class TagsUserFragment extends Fragment implements FragmentHandler {
         if(getUserVisibleHint()){
             loadFragment();
         }
+        offline = ((TagAssignmentActivity)mActivity).isOffline();
     }
 
     @Override
@@ -115,6 +117,11 @@ public class TagsUserFragment extends Fragment implements FragmentHandler {
     @Override
     public String getFragmentTitle() {
         return "User";
+    }
+
+    @Override
+    public void setOffline(boolean offline) {
+        this.offline = offline;
     }
 
 }

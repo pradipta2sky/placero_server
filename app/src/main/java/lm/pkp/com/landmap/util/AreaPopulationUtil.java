@@ -71,6 +71,9 @@ public class AreaPopulationUtil {
                 + df.format(measure.getAcre()) + " Acre, " + df.format(measure.getDecimals()) + " Decimals.";
         measureText.setText(Html.fromHtml(content));
 
+        if(ae.getDirty() == 1){
+            view.setBackgroundColor(ColorProvider.BUFF_YELLOW_AREA_DISPLAY);
+        }
         DriveDBHelper ddh = new DriveDBHelper(view.getContext());
         ImageView areaImgView = (ImageView) view.findViewById(id.area_default_img);
         String thumbRootPath = AreaContext.INSTANCE

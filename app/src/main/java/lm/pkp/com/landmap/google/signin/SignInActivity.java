@@ -1,10 +1,7 @@
 package lm.pkp.com.landmap.google.signin;
 
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -35,6 +32,7 @@ import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.R.string;
 import lm.pkp.com.landmap.SplashActivity;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
+import lm.pkp.com.landmap.custom.GlobalContext;
 import lm.pkp.com.landmap.tags.TagElement;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.user.UserDBHelper;
@@ -62,9 +60,12 @@ public class SignInActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Intent intent = new Intent("lm.pkp.com.APPLICATION_START");
+        sendBroadcast(intent);
+
         setContentView(R.layout.activity_google_signin_main);
         getSupportActionBar().hide();
-        registerReceiver(broadcastReceiver, new IntentFilter("INTERNET_LOST"));
 
         mStatusTextView = (TextView) findViewById(id.status);
 
@@ -83,17 +84,6 @@ public class SignInActivity extends AppCompatActivity implements
         signInButton.setSize(SignInButton.SIZE_STANDARD);
     }
 
-    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            String action = intent.getAction();
-            if(action.equalsIgnoreCase("INTERNET_LOST")){
-                offline = true;
-            }else {
-                offline = false;
-            }
-        }
-    };
 
     @Override
     public void onStart() {
@@ -155,7 +145,8 @@ public class SignInActivity extends AppCompatActivity implements
             searchOnRemoteAndUpdate(signedUser);
             mGoogleApiClient.disconnect();
         } else {
-            if(offline){
+            offline = new Boolean(GlobalContext.INSTANCE.get(GlobalContext.INTERNET_AVAILABLE));
+            if(!offline){
                 UserElement user = buildUserFromPreferences();
                 if(user == null){
                     updateUI(false);
@@ -165,6 +156,8 @@ public class SignInActivity extends AppCompatActivity implements
                     startActivity(spashIntent);
                     finish();
                 }
+            }else {
+                updateUI(false);
             }
         }
     }

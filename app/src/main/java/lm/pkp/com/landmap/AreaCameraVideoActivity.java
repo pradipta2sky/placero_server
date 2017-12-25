@@ -106,7 +106,10 @@ public class AreaCameraVideoActivity extends Activity implements LocationPositio
                 videoResource.setContentType("Video");
                 videoResource.setContainerId(areaContext.getVideosRootDriveResource().getResourceId());
                 videoResource.setCreatedOnMillis(System.currentTimeMillis() + "");
+                videoResource.setDirty(1);
+                videoResource.setDirtyAction("upload");
 
+                ae.getMediaResources().add(videoResource);
                 areaContext.addResourceToQueue(videoResource);
 
                 Intent i = new Intent(this, AreaAddResourcesActivity.class);
@@ -142,6 +145,8 @@ public class AreaCameraVideoActivity extends Activity implements LocationPositio
     @Override
     public void receivedLocationPostion(PositionElement pe) {
         pe.setType("Media");
+        pe.setDirty(1);
+        pe.setDirtyAction("insert");
         videoResource.setPosition(pe);
     }
 

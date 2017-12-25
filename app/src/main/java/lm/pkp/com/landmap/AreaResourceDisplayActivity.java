@@ -41,7 +41,7 @@ public class AreaResourceDisplayActivity extends AppCompatActivity {
 
         ViewPager viewPager = (ViewPager) this.findViewById(id.area_tab_pager);
         // Assign created adapter to viewPager
-        viewPager.setAdapter(new AreaResourceDisplayActivity.DisplayResourcesPagerAdapter(this.getSupportFragmentManager()));
+        viewPager.setAdapter(new DisplayResourcesPagerAdapter(getSupportFragmentManager()));
 
         TabLayout tabLayout = (TabLayout) this.findViewById(id.tab_layout);
         // This method setup all required method for TabLayout with Viewpager
@@ -75,7 +75,7 @@ public class AreaResourceDisplayActivity extends AppCompatActivity {
 
         @Override
         public int getCount() {
-            return DisplayResourcesPagerAdapter.NUM_ITEMS;
+            return NUM_ITEMS;
 
         }
 
@@ -96,9 +96,8 @@ public class AreaResourceDisplayActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        this.finish();
-
-        Intent areaDashboardIntent = new Intent(this.getApplicationContext(), AreaDetailsActivity.class);
-        this.startActivity(areaDashboardIntent);
+        Intent areaDashboardIntent = new Intent(getApplicationContext(), AreaDetailsActivity.class);
+        startActivity(areaDashboardIntent);
+        finish();
     }
 }

@@ -76,7 +76,7 @@ final class AreaDocumentDisplayAdaptor extends BaseAdapter {
         } else {
             if(documentFile.exists()){
                 ThumbnailCreator creator = new ThumbnailCreator(context);
-                creator.createVideoThumbnail(documentFile, areaElement.getUniqueId());
+                creator.createDocumentThumbnail(documentFile, areaElement.getUniqueId());
                 bMap = BitmapFactory.decodeFile(thumbFile.getAbsolutePath());
             }else {
                 bMap = BitmapFactory.decodeResource(context.getResources(), R.drawable.error);

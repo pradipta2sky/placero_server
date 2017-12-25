@@ -86,7 +86,7 @@ public class AreaEditActivity extends AppCompatActivity {
                 ae.setDescription(descText.getText().toString());
 
                 AreaDBHelper adh = new AreaDBHelper(getApplicationContext(), new UpdateAreaToServerCallback());
-                adh.updateAreaAttributes(ae);
+                adh.updateAreaLocally(ae);
                 adh.updateAreaOnServer(ae);
             }
         });

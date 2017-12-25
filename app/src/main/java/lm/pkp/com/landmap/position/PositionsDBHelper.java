@@ -11,7 +11,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
 import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.custom.GlobalContext;
@@ -74,7 +73,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         contentValues.put(POSITION_COLUMN_LAT, pe.getLat());
         contentValues.put(POSITION_COLUMN_LON, pe.getLon());
         contentValues.put(POSITION_COLUMN_TAGS, pe.getTags());
-        contentValues.put(POSITION_COLUMN_DIRTY_FLAG, pe.isDirty());
+        contentValues.put(POSITION_COLUMN_DIRTY_FLAG, pe.getDirty());
         contentValues.put(POSITION_COLUMN_DIRTY_ACTION, pe.getDirtyAction());
         contentValues.put(POSITION_COLUMN_CREATED_ON, pe.getCreatedOnMillis());
 
@@ -94,11 +93,12 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         contentValues.put(POSITION_COLUMN_LAT, pe.getLat());
         contentValues.put(POSITION_COLUMN_LON, pe.getLon());
         contentValues.put(POSITION_COLUMN_TAGS, pe.getTags());
-        contentValues.put(POSITION_COLUMN_DIRTY_FLAG, pe.isDirty());
+        contentValues.put(POSITION_COLUMN_DIRTY_FLAG, pe.getDirty());
         contentValues.put(POSITION_COLUMN_DIRTY_ACTION, pe.getDirtyAction());
         contentValues.put(POSITION_COLUMN_CREATED_ON, pe.getCreatedOnMillis());
 
-        db.update(POSITION_TABLE_NAME, contentValues, POSITION_COLUMN_UNIQUE_ID + "='" + pe.getUniqueId() + "'", null);
+        db.update(POSITION_TABLE_NAME, contentValues, POSITION_COLUMN_UNIQUE_ID + "='"
+                + pe.getUniqueId() + "'", null);
         db.close();
         return pe;
     }
@@ -114,9 +114,11 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         contentValues.put(POSITION_COLUMN_LAT, pe.getLat());
         contentValues.put(POSITION_COLUMN_LON, pe.getLon());
         contentValues.put(POSITION_COLUMN_TAGS, pe.getTags());
-        contentValues.put(POSITION_COLUMN_DIRTY_FLAG, pe.isDirty());
+        contentValues.put(POSITION_COLUMN_DIRTY_FLAG, pe.getDirty());
         contentValues.put(POSITION_COLUMN_DIRTY_ACTION, pe.getDirtyAction());
         contentValues.put(POSITION_COLUMN_CREATED_ON, pe.getCreatedOnMillis());
+        contentValues.put(POSITION_COLUMN_DIRTY_FLAG, 0);
+        contentValues.put(POSITION_COLUMN_DIRTY_ACTION, "none");
 
         db.insert(POSITION_TABLE_NAME, null, contentValues);
         db.close();
@@ -125,9 +127,9 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
 
     public boolean insertPositionToServer(PositionElement pe) {
         boolean networkAvailable = new Boolean(GlobalContext.INSTANCE.get(GlobalContext.INTERNET_AVAILABLE));
-        if(networkAvailable){
+        if (networkAvailable) {
             new LMSRestAsyncTask().execute(preparePostParams("insert", pe));
-        }else {
+        } else {
             pe.setDirty(1);
             pe.setDirtyAction("insert");
             updatePositionLocally(pe);
@@ -137,9 +139,9 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
 
     public boolean updatePositionToServer(PositionElement pe) {
         boolean networkAvailable = new Boolean(GlobalContext.INSTANCE.get(GlobalContext.INTERNET_AVAILABLE));
-        if(networkAvailable) {
+        if (networkAvailable) {
             new LMSRestAsyncTask().execute(preparePostParams("update", pe));
-        }else {
+        } else {
             pe.setDirty(1);
             pe.setDirtyAction("update");
             updatePositionLocally(pe);
@@ -152,9 +154,9 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         db.delete(POSITION_TABLE_NAME, POSITION_COLUMN_UNIQUE_ID + " = ? ", new String[]{pe.getUniqueId()});
 
         boolean networkAvailable = new Boolean(GlobalContext.INSTANCE.get(GlobalContext.INTERNET_AVAILABLE));
-        if(networkAvailable) {
+        if (networkAvailable) {
             new LMSRestAsyncTask().execute(preparePostParams("delete", pe));
-        }else {
+        } else {
             pe.setDirty(1);
             pe.setDirtyAction("delete");
             updatePositionLocally(pe);
@@ -172,11 +174,13 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
     }
 
     public ArrayList<PositionElement> getPositionsForArea(AreaElement ae) {
-        ArrayList<PositionElement> pes = new ArrayList<PositionElement>();
+        ArrayList<PositionElement> pes = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery("select * from " + POSITION_TABLE_NAME + " WHERE " + POSITION_COLUMN_UNIQUE_AREA_ID + "=?",
+        Cursor cursor = db.rawQuery("select * from " + POSITION_TABLE_NAME
+                        + " WHERE " + POSITION_COLUMN_UNIQUE_AREA_ID + "=? AND "
+                        + POSITION_COLUMN_DIRTY_ACTION + "<> 'delete'",
                 new String[]{ae.getUniqueId()});
-        if (cursor != null) {
+        if((cursor != null) && (cursor.getCount() > 0)){
             cursor.moveToFirst();
             while (cursor.isAfterLast() == false) {
                 PositionElement pe = new PositionElement();
@@ -187,7 +191,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
                 pe.setName(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_NAME)));
                 pe.setType(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_TYPE)));
                 String posDesc = cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_DESCRIPTION));
-                if(!posDesc.trim().equalsIgnoreCase("")){
+                if (!posDesc.trim().equalsIgnoreCase("")) {
                     pe.setDescription(posDesc);
                 }
 
@@ -200,7 +204,10 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
                 pe.setTags(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_TAGS)));
                 pe.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_CREATED_ON)));
 
-                if(!pes.contains(pe)){
+                pe.setDirty(cursor.getInt(cursor.getColumnIndex(POSITION_COLUMN_DIRTY_FLAG)));
+                pe.setDirtyAction(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_DIRTY_ACTION)));
+
+                if (!pes.contains(pe)) {
                     pes.add(pe);
                 }
                 cursor.moveToNext();
@@ -215,8 +222,8 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         ArrayList<PositionElement> pes = new ArrayList<PositionElement>();
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("select * from " + POSITION_TABLE_NAME
-                        + " WHERE " + POSITION_COLUMN_DIRTY_FLAG + " = 1", null);
-        if (cursor != null) {
+                + " WHERE " + POSITION_COLUMN_DIRTY_FLAG + " = 1", null);
+        if((cursor != null) && (cursor.getCount() > 0)){
             cursor.moveToFirst();
             while (cursor.isAfterLast() == false) {
                 PositionElement pe = new PositionElement();
@@ -226,7 +233,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
                 pe.setName(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_NAME)));
                 pe.setType(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_TYPE)));
                 String posDesc = cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_DESCRIPTION));
-                if(!posDesc.trim().equalsIgnoreCase("")){
+                if (!posDesc.trim().equalsIgnoreCase("")) {
                     pe.setDescription(posDesc);
                 }
                 String latStr = cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_LAT));
@@ -235,8 +242,11 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
                 pe.setLon(Double.parseDouble(lonStr));
                 pe.setTags(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_TAGS)));
                 pe.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_CREATED_ON)));
+
+                pe.setDirty(cursor.getInt(cursor.getColumnIndex(POSITION_COLUMN_DIRTY_FLAG)));
                 pe.setDirtyAction(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_DIRTY_ACTION)));
-                if(!pes.contains(pe)){
+
+                if (!pes.contains(pe)) {
                     pes.add(pe);
                 }
                 cursor.moveToNext();
@@ -250,25 +260,30 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
     public PositionElement getPositionById(String positionId) {
         SQLiteDatabase db = getReadableDatabase();
         PositionElement pe = null;
-        Cursor cursor = db.rawQuery("select * from " + POSITION_TABLE_NAME + " WHERE " + POSITION_COLUMN_UNIQUE_ID + "=?",
+        Cursor cursor = db.rawQuery("select * from " + POSITION_TABLE_NAME
+                        + " WHERE " + POSITION_COLUMN_UNIQUE_ID + "=?",
                 new String[]{positionId});
-        if (cursor != null) {
+        if((cursor != null) && (cursor.getCount() > 0)){
             cursor.moveToFirst();
-            while (cursor.isAfterLast() == false) {
-                pe = new PositionElement();
-                pe.setUniqueId(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_UNIQUE_ID)));
-                pe.setUniqueAreaId(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_UNIQUE_AREA_ID)));
-                pe.setName(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_NAME)));
-                pe.setType(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_TYPE)));
-                pe.setDescription(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_DESCRIPTION)));
-                String latStr = cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_LAT));
-                pe.setLat(Double.parseDouble(latStr));
-                String lonStr = cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_LON));
-                pe.setLon(Double.parseDouble(lonStr));
-                pe.setTags(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_TAGS)));
-                pe.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_CREATED_ON)));
-                break;
-            }
+            pe = new PositionElement();
+
+            pe.setUniqueId(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_UNIQUE_ID)));
+            pe.setUniqueAreaId(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_UNIQUE_AREA_ID)));
+            pe.setName(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_NAME)));
+            pe.setType(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_TYPE)));
+            pe.setDescription(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_DESCRIPTION)));
+
+            String latStr = cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_LAT));
+            pe.setLat(Double.parseDouble(latStr));
+
+            String lonStr = cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_LON));
+            pe.setLon(Double.parseDouble(lonStr));
+
+            pe.setTags(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_TAGS)));
+            pe.setCreatedOnMillis(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_CREATED_ON)));
+            pe.setDirty(cursor.getInt(cursor.getColumnIndex(POSITION_COLUMN_DIRTY_FLAG)));
+            pe.setDirtyAction(cursor.getString(cursor.getColumnIndex(POSITION_COLUMN_DIRTY_ACTION)));
+
             cursor.close();
         }
         db.close();
@@ -298,7 +313,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
 
     public void deletePositionsLocally() {
         SQLiteDatabase db = getWritableDatabase();
-        db.delete(POSITION_TABLE_NAME, POSITION_COLUMN_DIRTY_FLAG + " = 0 ", null);
+        db.delete(POSITION_TABLE_NAME, POSITION_COLUMN_DIRTY_FLAG + " = 0", null);
         db.close();
     }
 

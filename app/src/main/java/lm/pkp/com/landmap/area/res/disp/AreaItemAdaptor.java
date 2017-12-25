@@ -14,6 +14,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.List;
 
+import lm.pkp.com.landmap.AreaDashboardActivity;
 import lm.pkp.com.landmap.AreaDetailsActivity;
 import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.area.AreaContext;
@@ -79,9 +80,10 @@ public class AreaItemAdaptor extends ArrayAdapter {
         itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                final Activity activity = (Activity) context;
-                AreaContext.INSTANCE.setAreaElement(areaElement, activity);
+                final AreaDashboardActivity activity = (AreaDashboardActivity) context;
+                activity.unregisterReceiver(activity.broadcastReceiver);
 
+                AreaContext.INSTANCE.setAreaElement(areaElement, activity);
                 UserElement userElement = UserContext.getInstance().getUserElement();
                 userElement.getSelections().setArea(areaElement);
 

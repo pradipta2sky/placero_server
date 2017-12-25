@@ -107,7 +107,10 @@ public class AreaCameraPictureActivity extends Activity implements LocationPosit
                 pictureResource.setContentType("Image");
                 pictureResource.setContainerId(areaContext.getImagesRootDriveResource().getResourceId());
                 pictureResource.setCreatedOnMillis(System.currentTimeMillis() + "");
+                pictureResource.setDirty(1);
+                pictureResource.setDirtyAction("upload");
 
+                ae.getMediaResources().add(pictureResource);
                 areaContext.addResourceToQueue(pictureResource);
 
                 Intent i = new Intent(this, AreaAddResourcesActivity.class);
@@ -140,6 +143,8 @@ public class AreaCameraPictureActivity extends Activity implements LocationPosit
     @Override
     public void receivedLocationPostion(PositionElement pe) {
         pe.setType("Media");
+        pe.setDirty(1);
+        pe.setDirtyAction("insert");
         pictureResource.setPosition(pe);
     }
 

@@ -8,19 +8,23 @@ import android.net.NetworkInfo;
 
 import lm.pkp.com.landmap.connectivity.services.AreaSynchronizationService;
 import lm.pkp.com.landmap.connectivity.services.PositionSynchronizationService;
+import lm.pkp.com.landmap.connectivity.services.ResourceSynchronizationService;
 import lm.pkp.com.landmap.custom.GlobalContext;
 
 public class ConnectivityChangeReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        final boolean connected = isConnected(context);
+        boolean connected = isConnected(context);
+        // For testing
+        connected = false;
         if(!connected){
             context.sendBroadcast(new Intent("INTERNET_LOST"));
         }else {
             context.sendBroadcast(new Intent("INTERNET_AVAILABLE"));
             context.startService(new Intent(context, AreaSynchronizationService.class));
             context.startService(new Intent(context, PositionSynchronizationService.class));
+            context.startService(new Intent(context, ResourceSynchronizationService.class));
         }
         GlobalContext.INSTANCE.put(GlobalContext.INTERNET_AVAILABLE,
                 new Boolean(connected).toString());

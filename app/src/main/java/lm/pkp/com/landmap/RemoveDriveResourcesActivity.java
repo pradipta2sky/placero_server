@@ -222,7 +222,7 @@ public class RemoveDriveResourcesActivity extends Activity implements Permission
                     for (int i = 0; i < resourceArr.length; i++) {
                         String resourceID = resourceArr[i];
                         DriveResource fetchedResource = ddh.getDriveResourceByResourceId(resourceID);
-                        ddh.deleteResourceByResourceId(resourceID);
+                        ddh.deleteResourceByGlobally(fetchedResource);
                         ddh.deleteResourceFromServer(fetchedResource);
                         ae.getMediaResources().remove(fetchedResource);
 

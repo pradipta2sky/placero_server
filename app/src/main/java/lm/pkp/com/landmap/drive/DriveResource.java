@@ -20,8 +20,11 @@ public class DriveResource {
     private String size = "";
     private String contentType = "";
     private String mimeType = "";
-    private PositionElement position = null;
+    private Integer dirty = 0;
+    private String dirtyAction = "";
     private String createdOnMillis = System.currentTimeMillis() + "";
+
+    private PositionElement position = null;
 
     public String getUserId() {
         return this.userId;
@@ -123,6 +126,22 @@ public class DriveResource {
 
     public void setCreatedOnMillis(String createdOnMillis) {
         this.createdOnMillis = createdOnMillis;
+    }
+
+    public Integer isDirty() {
+        return this.dirty;
+    }
+
+    public void setDirty(Integer dirty) {
+        this.dirty = dirty;
+    }
+
+    public String getDirtyAction() {
+        return this.dirtyAction;
+    }
+
+    public void setDirtyAction(String dirtyAction) {
+        this.dirtyAction = dirtyAction;
     }
 
     public PositionElement getPosition() {

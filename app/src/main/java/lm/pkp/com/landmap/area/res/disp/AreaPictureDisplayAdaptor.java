@@ -80,7 +80,7 @@ final class AreaPictureDisplayAdaptor extends BaseAdapter {
         }else {
             if(imageFile.exists()){
                 ThumbnailCreator creator = new ThumbnailCreator(context);
-                creator.createVideoThumbnail(imageFile, areaElement.getUniqueId());
+                creator.createImageThumbnail(imageFile, areaElement.getUniqueId());
                 bMap = BitmapFactory.decodeFile(thumbFile.getAbsolutePath());
             }else {
                 bMap = BitmapFactory.decodeResource(context.getResources(), R.drawable.error);

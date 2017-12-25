@@ -19,6 +19,7 @@ import com.cunoraz.tagview.TagView;
 import java.util.List;
 
 import lm.pkp.com.landmap.R;
+import lm.pkp.com.landmap.TagAssignmentActivity;
 import lm.pkp.com.landmap.custom.FragmentHandler;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.user.UserElement;
@@ -31,9 +32,9 @@ public class TagsAreaFragment extends Fragment implements FragmentHandler {
 
     private Activity mActivity = null;
     private View mView = null;
+    private boolean offline = false;
 
     public TagsAreaFragment(){
-        super();
         setArguments(new Bundle());
     }
 
@@ -55,6 +56,7 @@ public class TagsAreaFragment extends Fragment implements FragmentHandler {
         if(getUserVisibleHint()){
             loadFragment();
         }
+        offline = ((TagAssignmentActivity)mActivity).isOffline();
     }
 
     @Override
@@ -109,15 +111,15 @@ public class TagsAreaFragment extends Fragment implements FragmentHandler {
                 List<Tag> selectedTags = bottomContainer.getTags();
                 UserElement userElement = UserContext.getInstance().getUserElement();
                 UserPersistableSelections preferences = userElement.getSelections();
-                if(selectedTags.size() > 0){
-                    for(Tag selectedTag: selectedTags){
+                if (selectedTags.size() > 0) {
+                    for (Tag selectedTag : selectedTags) {
                         TagElement tagElement = new TagElement(selectedTag.text, "executable", "area");
                         preferences.getTags().add(tagElement);
                     }
                     Integer position = TagsDisplayMetaStore.INSTANCE.getTabPositionByType("user");
                     TabLayout tabLayout = (TabLayout) mActivity.findViewById(R.id.areas_tags_tab_layout);
                     tabLayout.getTabAt(position).select();
-                }else {
+                } else {
                     Toast.makeText(getContext(), "No tags selected. Long click on tag to select", Toast.LENGTH_LONG).show();
                 }
             }
@@ -127,6 +129,11 @@ public class TagsAreaFragment extends Fragment implements FragmentHandler {
     @Override
     public String getFragmentTitle() {
         return "Area";
+    }
+
+    @Override
+    public void setOffline(boolean offline) {
+        this.offline = offline;
     }
 
 }

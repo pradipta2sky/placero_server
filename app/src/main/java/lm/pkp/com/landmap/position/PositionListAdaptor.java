@@ -1,6 +1,5 @@
 package lm.pkp.com.landmap.position;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
@@ -20,7 +19,6 @@ import java.util.ArrayList;
 import lm.pkp.com.landmap.AreaDetailsActivity;
 import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.R.id;
-import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
@@ -65,6 +63,10 @@ public class PositionListAdaptor extends ArrayAdapter<PositionElement> {
 
         TextView descText = (TextView) v.findViewById(R.id.pos_desc);
         descText.setText(StringUtils.capitalize(pe.getDescription()));
+
+        if(pe.getDirty() == 1){
+            v.setBackgroundColor(ColorProvider.BUFF_YELLOW_AREA_DISPLAY);
+        }
 
         final AreaContext areaContext = AreaContext.INSTANCE;
         final AreaElement areaElement = areaContext.getAreaElement();

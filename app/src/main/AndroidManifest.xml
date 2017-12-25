@@ -156,6 +156,7 @@
         <receiver android:name=".connectivity.ConnectivityChangeReceiver" >
             <intent-filter>
                 <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+                <action android:name="lm.pkp.com.APPLICATION_START" />
             </intent-filter>
         </receiver>
 

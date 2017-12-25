@@ -22,10 +22,10 @@ public class AreaDocumentChooserActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) this.findViewById(id.fc_toolbar);
         toolbar.setTitle("Choose Document PDF");
 
-        this.setSupportActionBar(toolbar);
-        this.getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(false);
 
-        FragmentTransaction fragmentTransaction = this.getSupportFragmentManager().beginTransaction();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         fragmentTransaction.add(R.id.fragment_container, new AreaDocumentChooserFragment(),
                 AreaDocumentChooserFragment.class.getSimpleName());
         fragmentTransaction.commit();

@@ -42,6 +42,7 @@ import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.custom.FragmentFilterHandler;
 import lm.pkp.com.landmap.custom.FragmentHandler;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
+import lm.pkp.com.landmap.custom.GlobalContext;
 import lm.pkp.com.landmap.permission.PermissionConstants;
 import lm.pkp.com.landmap.permission.PermissionElement;
 import lm.pkp.com.landmap.permission.PermissionsDBHelper;
@@ -54,6 +55,7 @@ import lm.pkp.com.landmap.util.ColorProvider;
 public class AreaDashboardActivity extends AppCompatActivity {
 
     private boolean offline = false;
+    private boolean online = true;
 
     public boolean isOffline() {
         return this.offline;
@@ -63,6 +65,9 @@ public class AreaDashboardActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
+
+        online = new Boolean(GlobalContext.INSTANCE.get(GlobalContext.INTERNET_AVAILABLE));
+        offline = !online;
 
         setContentView(R.layout.activity_area_dashboard);
         registerReceiver(broadcastReceiver, new IntentFilter("INTERNET_LOST"));
@@ -88,7 +93,7 @@ public class AreaDashboardActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 findViewById(id.splash_panel).setVisibility(View.VISIBLE);
-                AreaDBHelper adh = new AreaDBHelper(getApplicationContext(), new DataInsertServerCallback());
+                AreaDBHelper adh = new AreaDBHelper(getApplicationContext());
                 AreaElement areaElement = adh.insertAreaLocally(offline);
 
                 PermissionElement pe = new PermissionElement();
@@ -102,8 +107,9 @@ public class AreaDashboardActivity extends AppCompatActivity {
 
                 // Resetting the context for new Area
                 AreaContext.INSTANCE.setAreaElement(areaElement, getApplicationContext());
-                if(!offline){
-                    adh.insertAreaToServer(areaElement);
+                adh = new AreaDBHelper(getApplicationContext(), new DataInsertServerCallback(areaElement));
+                if(!adh.insertAreaToServer(areaElement)){
+                    doPostAreaCreate();
                 }
             }
         });
@@ -136,6 +142,7 @@ public class AreaDashboardActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), TagAssignmentActivity.class);
                 startActivity(intent);
+                unregisterReceiver(broadcastReceiver);
                 finish();
             }
         });
@@ -180,7 +187,8 @@ public class AreaDashboardActivity extends AppCompatActivity {
         AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
         if(areaElement != null){
             TabLayout tabLayout = (TabLayout) this.findViewById(id.areas_display_tab_layout);
-            Integer position = AreaDashboardDisplayMetaStore.INSTANCE.getTabPositionByAreaType(areaElement.getType());
+            AreaDashboardDisplayMetaStore store = AreaDashboardDisplayMetaStore.INSTANCE;
+            Integer position = store.getTabPositionByAreaType(areaElement.getType());
             tabLayout.getTabAt(position).select();
         }
     }
@@ -219,7 +227,7 @@ public class AreaDashboardActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        new Builder(this).setIcon(drawable.ic_dialog_alert).setTitle("Exit")
+        new Builder(this).setIcon(drawable.ic_dialog_alert).setTitle("Exit Placero")
                 .setMessage("Are you sure?")
                 .setPositiveButton("yes", new OnClickListener() {
                     @Override
@@ -227,19 +235,37 @@ public class AreaDashboardActivity extends AppCompatActivity {
                         Intent intent = new Intent(Intent.ACTION_MAIN);
                         intent.addCategory(Intent.CATEGORY_HOME);
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+
                         startActivity(intent);
+                        unregisterReceiver(broadcastReceiver);
                         finish();
                     }
                 }).setNegativeButton("no", null).show();
     }
 
     private class DataInsertServerCallback implements AsyncTaskCallback {
+
+        private AreaElement areaElement;
+
+        public DataInsertServerCallback(AreaElement areaElement){
+            this.areaElement = areaElement;
+        }
         @Override
         public void taskCompleted(Object result) {
             Intent intent = new Intent(getApplicationContext(), CreateAreaFoldersActivity.class);
+            intent.putExtra("area_id", areaElement.getUniqueId());
             startActivity(intent);
-            finish();
         }
+    }
+
+    private void doPostAreaCreate() {
+        Intent intent = new Intent(getApplicationContext(), CreateAreaFoldersActivity.class);
+        AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
+        intent.putExtra("area_id", areaElement.getUniqueId());
+
+        startActivity(intent);
+        unregisterReceiver(broadcastReceiver);
+        finish();
     }
 
     private void showMessage(String message, String type) {
@@ -272,16 +298,17 @@ public class AreaDashboardActivity extends AppCompatActivity {
         snackbar.show();
     }
 
-    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+    public BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
             if(action.equalsIgnoreCase("INTERNET_LOST")){
                 offline = true;
+                online = false;
             }else {
                 offline = false;
+                online = true;
             }
-
             // notify fragments
             final ViewPager viewPager = (ViewPager) findViewById(R.id.areas_display_tab_pager);
             DisplayAreasPagerAdapter adapter = (DisplayAreasPagerAdapter) viewPager.getAdapter();

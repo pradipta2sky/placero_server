@@ -22,6 +22,7 @@ import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.area.FileStorageConstants;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
+import lm.pkp.com.landmap.custom.GlobalContext;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
 import lm.pkp.com.landmap.user.UserContext;
@@ -29,10 +30,23 @@ import lm.pkp.com.landmap.user.UserElement;
 
 public class CreateAreaFoldersActivity extends BaseDriveActivity {
 
+    private boolean online = true;
+    private boolean execBackground = false;
+    private String areaId = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.activity_synchronize_folders);
+        setContentView(R.layout.activity_synchronize_folders);
+
+        Bundle extras = getIntent().getExtras();
+        areaId = extras.getString("area_id");
+        String exec = extras.getString("exec_background");
+        if(exec != null){
+            execBackground = new Boolean(exec);
+            moveTaskToBack(execBackground);
+        }
+        online = new Boolean(GlobalContext.INSTANCE.get(GlobalContext.INTERNET_AVAILABLE));
     }
 
     @Override
@@ -44,9 +58,9 @@ public class CreateAreaFoldersActivity extends BaseDriveActivity {
     @Override
     protected void handleConnectionIssues() {
         Intent areaDetailsIntent = new Intent(getApplicationContext(), AreaDetailsActivity.class);
-        areaDetailsIntent.putExtra("action", "Drive Error");
+        areaDetailsIntent.putExtra("action", "Drive Connection Error");
         areaDetailsIntent.putExtra("outcome_type", "error");
-        areaDetailsIntent.putExtra("outcome", "Place folder creation failed.");
+        areaDetailsIntent.putExtra("outcome", "Folder creation failed.");
         startActivity(areaDetailsIntent);
     }
 
@@ -56,7 +70,7 @@ public class CreateAreaFoldersActivity extends BaseDriveActivity {
 
         @Override
         protected Object doInBackground(Object[] params) {
-            this.fetchStatusAndAct();
+            fetchStatusAndAct();
             return null;
         }
 
@@ -70,37 +84,40 @@ public class CreateAreaFoldersActivity extends BaseDriveActivity {
             DriveDBHelper ddh = new DriveDBHelper(getApplicationContext());
             // Check if there are common folders defined in database. //content_type = folder
             Map<String, DriveResource> commonResourceMap = ddh.getCommonResourcesByName();
-            AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
 
             DriveResource imagesFolder = commonResourceMap.get(FileStorageConstants.IMAGE_ROOT_FOLDER_NAME);
-            DriveResource folderResource = createFolderResource(areaElement.getUniqueId(), imagesFolder,
+            DriveResource folderResource = createFolderResource(areaId, imagesFolder,
                     FileStorageConstants.IMAGES_CONTENT_TYPE);
-            this.createStack.push(folderResource);
+            createStack.push(folderResource);
 
             DriveResource videosFolder = commonResourceMap.get(FileStorageConstants.VIDEO_ROOT_FOLDER_NAME);
-            folderResource = createFolderResource(areaElement.getUniqueId(), videosFolder,
+            folderResource = createFolderResource(areaId, videosFolder,
                     FileStorageConstants.VIDEOS_CONTENT_TYPE);
-            this.createStack.push(folderResource);
+            createStack.push(folderResource);
 
             DriveResource docsFolder = commonResourceMap.get(FileStorageConstants.DOCUMENT_ROOT_FOLDER_NAME);
-            folderResource = createFolderResource(areaElement.getUniqueId(), docsFolder,
+            folderResource = createFolderResource(areaId, docsFolder,
                     FileStorageConstants.DOCUMENTS_CONTENT_TYPE);
-            this.createStack.push(folderResource);
+            createStack.push(folderResource);
 
             // Start processing.
-            this.processCreateStack();
+            processCreateStack();
         }
 
         public void processCreateStack() {
-            if (this.createStack.isEmpty()) {
+            DriveDBHelper ddh = new DriveDBHelper(getApplicationContext());
+            if (createStack.isEmpty()) {
                 getGoogleApiClient().disconnect();
                 Intent i = new Intent(getApplicationContext(), AreaDetailsActivity.class);
                 startActivity(i);
             } else {
-                DriveResource resource = this.createStack.pop();
-                Drive.DriveApi.fetchDriveId(getGoogleApiClient(), resource.getContainerId())
-                        .setResultCallback(new DriveIdResultCallback(resource));
-
+                DriveResource resource = createStack.pop();
+                if(online){
+                    Drive.DriveApi.fetchDriveId(getGoogleApiClient(), resource.getContainerId())
+                            .setResultCallback(new DriveIdResultCallback(resource));
+                }else {
+                    ddh.insertResourceLocally(resource);
+                }
             }
         }
 
@@ -116,10 +133,10 @@ public class CreateAreaFoldersActivity extends BaseDriveActivity {
             public void onResult(DriveIdResult driveIdResult) {
                 DriveFolder parentFolder = driveIdResult.getDriveId().asDriveFolder();
                 MetadataChangeSet changeSet
-                        = new Builder().setTitle(this.resource.getName())
-                        .setMimeType(this.resource.getMimeType()).build();
+                        = new Builder().setTitle(resource.getName())
+                        .setMimeType(resource.getMimeType()).build();
                 parentFolder.createFolder(getGoogleApiClient(), changeSet)
-                        .setResultCallback(new CreateFolderCallback(this.resource));
+                        .setResultCallback(new CreateFolderCallback(resource));
             }
         }
 
@@ -136,7 +153,7 @@ public class CreateAreaFoldersActivity extends BaseDriveActivity {
                 DriveFolder driveFolder = folderResult.getDriveFolder();
                 driveFolder.addChangeListener(getGoogleApiClient(), new FolderMetaChangeListener(this.resource));
                 MetadataChangeSet changeSet = new Builder()
-                        .setTitle(this.resource.getName())
+                        .setTitle(resource.getName())
                         .build();
                 driveFolder.updateMetadata(getGoogleApiClient(), changeSet);
             }
@@ -157,12 +174,14 @@ public class CreateAreaFoldersActivity extends BaseDriveActivity {
                 String resourceId = driveId.getResourceId();
                 if (resourceId != null && resource.getResourceId() == null) {
                     eventFolder.removeChangeListener(getGoogleApiClient(), this);
-                    this.resource.setResourceId(resourceId);
+                    resource.setResourceId(resourceId);
 
                     DriveResourceInsertCallback callback = new DriveResourceInsertCallback(this.resource);
                     DriveDBHelper ddh = new DriveDBHelper(getApplicationContext(), callback);
-                    ddh.insertResourceLocally(this.resource);
-                    ddh.insertResourceToServer(this.resource);
+                    // This is to handle offline insertion
+                    ddh.deleteResourceLocally(resource);
+                    ddh.insertResourceLocally(resource);
+                    ddh.insertResourceToServer(resource);
                 }
             }
 
@@ -176,7 +195,7 @@ public class CreateAreaFoldersActivity extends BaseDriveActivity {
 
                 @Override
                 public void taskCompleted(Object result) {
-                    FileProcessingTask.this.processCreateStack();
+                    processCreateStack();
                 }
             }
         }
@@ -199,7 +218,10 @@ public class CreateAreaFoldersActivity extends BaseDriveActivity {
         resource.setContentType(contentType);
         resource.setMimeType("application/vnd.google-apps.folder");
         resource.setResourceId(null);
-
+        if(!online){
+            resource.setDirty(1);
+            resource.setDirtyAction("insert");
+        }
         return resource;
     }
 

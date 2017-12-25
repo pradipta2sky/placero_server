@@ -41,16 +41,17 @@ public class AreaContext {
     public void setAreaElement(AreaElement areaElement, Context context) {
         clearContext();
 
-        this.currentArea = areaElement;
         this.context = context;
-        this.uploadQueue.clear();
+        currentArea = areaElement;
+        uploadQueue.clear();
 
         PositionsDBHelper pdb = new PositionsDBHelper(context);
-        this.currentArea.setPositions(pdb.getPositionsForArea(this.currentArea));
-        this.reCenter(this.currentArea);
+        currentArea.setPositions(pdb.getPositionsForArea(currentArea));
+        reCenter(currentArea);
 
         DriveDBHelper ddh = new DriveDBHelper(context);
-        this.currentArea.setMediaResources(ddh.getDriveResourcesByAreaId(this.currentArea.getUniqueId()));
+        currentArea.setMediaResources(ddh.getDriveResourcesByAreaId(currentArea.getUniqueId()));
+        uploadQueue.addAll(ddh.getUploadableDirtyResources());
 
         PermissionsDBHelper pdh = new PermissionsDBHelper(context);
         currentArea.setUserPermissions(pdh.fetchPermissionsByAreaId(currentArea.getUniqueId()));

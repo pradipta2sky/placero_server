@@ -92,7 +92,7 @@ public class AreaDashboardOwnedFragment extends Fragment
             @Override
             public void onClick(View v) {
                 mActivity.findViewById(id.splash_panel).setVisibility(View.VISIBLE);
-                AreaDBHelper adh = new AreaDBHelper(mActivity, new DataInsertServerCallback());
+                AreaDBHelper adh = new AreaDBHelper(mActivity);
                 AreaElement areaElement = adh.insertAreaLocally(offline);
 
                 PermissionElement pe = new PermissionElement();
@@ -106,9 +106,8 @@ public class AreaDashboardOwnedFragment extends Fragment
 
                 // Resetting the context for new Area
                 AreaContext.INSTANCE.setAreaElement(areaElement, mActivity);
-                if(!offline){
-                    adh.insertAreaToServer(areaElement);
-                }
+                adh = new AreaDBHelper(mActivity, new DataInsertServerCallback(areaElement));
+                adh.insertAreaToServer(areaElement);
             }
         });
 
@@ -226,9 +225,16 @@ public class AreaDashboardOwnedFragment extends Fragment
     }
 
     private class DataInsertServerCallback implements AsyncTaskCallback {
+
+        private AreaElement areaElement;
+
+        public DataInsertServerCallback(AreaElement areaElement){
+            this.areaElement = areaElement;
+        }
         @Override
         public void taskCompleted(Object result) {
             Intent intent = new Intent(mActivity, CreateAreaFoldersActivity.class);
+            intent.putExtra("area_id", areaElement.getUniqueId());
             startActivity(intent);
         }
     }

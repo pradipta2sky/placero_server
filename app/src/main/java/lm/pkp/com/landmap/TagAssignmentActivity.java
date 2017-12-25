@@ -4,7 +4,10 @@ package lm.pkp.com.landmap;
  * Created by USER on 12/13/2017.
  */
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -26,10 +29,17 @@ import lm.pkp.com.landmap.util.ColorProvider;
 
 public class TagAssignmentActivity extends AppCompatActivity{
 
+    private boolean offline = false;
+
+    public boolean isOffline() {
+        return this.offline;
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tag_assignment);
+        registerReceiver(broadcastReceiver, new IntentFilter("INTERNET_LOST"));
 
         // Setup Toolbar
         Toolbar topToolbar = (Toolbar) this.findViewById(R.id.areas_tags_toolbar);
@@ -78,10 +88,33 @@ public class TagAssignmentActivity extends AppCompatActivity{
         }
     }
 
+    BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if(action.equalsIgnoreCase("INTERNET_LOST")){
+                offline = true;
+            }else {
+                offline = false;
+            }
+
+            // notify fragments
+            final ViewPager viewPager = (ViewPager) findViewById(R.id.areas_display_tab_pager);
+            DisplayTagsPagerAdapter adapter = (DisplayTagsPagerAdapter) viewPager.getAdapter();
+            int fragmentCount = adapter.getCount();
+            for (int i = 0; i < fragmentCount; i++) {
+                FragmentHandler item = (FragmentHandler) adapter.getItem(i);
+                item.setOffline(offline);
+            }
+        }
+    };
+
     @Override
     public void onBackPressed() {
         Intent intent = new Intent(getApplicationContext(), AreaDashboardActivity.class);
         startActivity(intent);
+
+        unregisterReceiver(broadcastReceiver);
         finish();
     }
 

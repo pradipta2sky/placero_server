@@ -45,6 +45,7 @@ import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
+import lm.pkp.com.landmap.custom.GlobalContext;
 import lm.pkp.com.landmap.custom.LocationPositionReceiver;
 import lm.pkp.com.landmap.drive.DriveResource;
 import lm.pkp.com.landmap.permission.PermissionConstants;
@@ -64,6 +65,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
 
     private PositionsDBHelper pdb;
     private AreaElement ae;
+    private boolean online = true;
 
     private final ArrayList<PositionElement> positionList = new ArrayList<PositionElement>();
     private PositionListAdaptor adaptor;
@@ -77,6 +79,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
+        online = new Boolean(GlobalContext.INSTANCE.get(GlobalContext.INTERNET_AVAILABLE));
 
         setContentView(R.layout.activity_area_details);
         getSupportActionBar().hide();
@@ -124,8 +127,13 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         areaEditItem.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent areaEditIntent = new Intent(getApplicationContext(), AreaEditActivity.class);
-                startActivity(areaEditIntent);
+                if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.CHANGE_NAME)
+                        && PermissionManager.INSTANCE.hasAccess(PermissionConstants.CHANGE_DESCRIPTION)) {
+                    Intent areaEditIntent = new Intent(getApplicationContext(), AreaEditActivity.class);
+                    startActivity(areaEditIntent);
+                }else {
+                    showMessage("You do not have change rights !!", "error");
+                }
             }
         });
 
@@ -141,8 +149,8 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
             }
         });
 
-
-        OnClickListener markLocationOnClickListener = new OnClickListener() {
+        ImageView markLocationItem = (ImageView) findViewById(R.id.action_mark_location);
+        markLocationItem.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.MARK_POSITION)) {
@@ -154,20 +162,33 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
                     showMessage("You do not have Plotting rights !!", "error");
                 }
             }
-        };
-
-        ImageView markLocationItem = (ImageView) findViewById(R.id.action_mark_location);
-        markLocationItem.setOnClickListener(markLocationOnClickListener);
+        });
 
         ImageView markLocationEmptyItem = (ImageView) findViewById(R.id.action_mark_location_empty);
         if (markLocationEmptyItem != null) {
-            markLocationEmptyItem.setOnClickListener(markLocationOnClickListener);
+            markLocationEmptyItem.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.MARK_POSITION)) {
+                        findViewById(R.id.position_list_empty_img).setVisibility(View.GONE);
+                        findViewById(R.id.positions_view_master).setVisibility(View.GONE);
+                        findViewById(R.id.splash_panel).setVisibility(View.VISIBLE);
+                        new GPSLocationProvider(AreaDetailsActivity.this).getLocation();
+                    } else {
+                        showMessage("You do not have Plotting rights !!", "error");
+                    }
+                }
+            });
         }
 
         ImageView plotItem = (ImageView) findViewById(R.id.action_plot_area);
         plotItem.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(!online){
+                    showMessage("No Internet..", "error");
+                    return;
+                }
                 List<PositionElement> positions = ae.getPositions();
                 if (positions.size() >= 1) {
                     Intent intent = new Intent(getApplicationContext(), AreaMapPlotterActivity.class);
@@ -182,6 +203,10 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         navigateItem.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(!online){
+                    showMessage("No Internet..", "error");
+                    return;
+                }
                 List<PositionElement> positions = ae.getPositions();
                 if (positions.size() > 0) {
                     UserElement userElement = UserContext.getInstance().getUserElement();
@@ -204,6 +229,10 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         shareAreaItem.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(!online){
+                    showMessage("No Internet..", "error");
+                    return;
+                }
                 if (PermissionManager.INSTANCE.hasAccess(PermissionConstants.SHARE_READ_ONLY)) {
                     Intent areaShareIntent = new Intent(getApplicationContext(), AreaShareActivity.class);
                     startActivity(areaShareIntent);
@@ -230,8 +259,14 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         displayResItem.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), DownloadDriveResourcesActivity.class);
-                startActivity(intent);
+                if(online){
+                    Intent intent = new Intent(getApplicationContext(), DownloadDriveResourcesActivity.class);
+                    startActivity(intent);
+                }else {
+                    Intent displayIntent = new Intent(getApplicationContext(), AreaResourceDisplayActivity.class);
+                    startActivity(displayIntent);
+                    finish();
+                }
             }
         });
 
@@ -239,8 +274,13 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         weatherItem.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                WeatherManager weatherManager = new WeatherManager(getApplicationContext(), new WeatherDataCallback());
-                weatherManager.loadWeatherInfoForPosition(ae.getCenterPosition());
+                if(online){
+                    WeatherManager weatherManager = new WeatherManager(getApplicationContext(),
+                            new WeatherDataCallback());
+                    weatherManager.loadWeatherInfoForPosition(ae.getCenterPosition());
+                }else {
+                    showMessage("Internet unavailable", "error");
+                }
             }
         });
 

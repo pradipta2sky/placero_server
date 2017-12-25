@@ -109,7 +109,7 @@ public class PositionElement implements Serializable {
         this.type = type;
     }
 
-    public Integer isDirty() {
+    public Integer getDirty() {
         return this.dirty;
     }
 

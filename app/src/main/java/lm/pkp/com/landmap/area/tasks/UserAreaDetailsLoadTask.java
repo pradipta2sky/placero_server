@@ -95,6 +95,7 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
             for (int i = 0; i < areaResponse.length(); i++) {
                 JSONObject areaResponseObj = (JSONObject) areaResponse.get(i);
                 JSONObject areaObj = (JSONObject) areaResponseObj.get("area");
+
                 AreaElement ae = new AreaElement();
                 ae.setName(areaObj.getString("name"));
                 ae.setCreatedBy(areaObj.getString("created_by"));

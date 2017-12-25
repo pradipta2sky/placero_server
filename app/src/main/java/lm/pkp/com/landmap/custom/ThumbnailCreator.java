@@ -86,10 +86,14 @@ public class ThumbnailCreator {
     }
 
     public void createVideoThumbnail(File resourceFile, String areaId) {
-        Bitmap bMap = ThumbnailUtils.createVideoThumbnail(resourceFile.getAbsolutePath(),
-                Thumbnails.MICRO_KIND);
         FileOutputStream out = null;
         try {
+            String filePath = resourceFile.getAbsolutePath();
+            File resFile = new File(filePath);
+            if(!resFile.exists()){
+                return;
+            }
+            Bitmap bMap = ThumbnailUtils.createVideoThumbnail(filePath,Thumbnails.MICRO_KIND);
             File thumbnailRoot = AreaContext.INSTANCE.getAreaLocalVideoThumbnailRoot(areaId);
             String thumbFilePath = thumbnailRoot.getAbsolutePath()
                     + File.separatorChar + resourceFile.getName();
