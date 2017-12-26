@@ -73,6 +73,7 @@ public class GPSLocationProvider implements LocationListener {
         pe.setName("Position_" + (positions.size() + 1));
         pe.setLon(location.getLongitude());
         pe.setLat(location.getLatitude());
+        pe.setUniqueAreaId(areaElement.getUniqueId());
         pe.setCreatedOnMillis(System.currentTimeMillis() + "");
 
         if (receiver != null) {

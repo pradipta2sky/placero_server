@@ -116,7 +116,20 @@ public class DriveResource {
 
     @Override
     public boolean equals(Object o) {
-        EqualsBuilder builder = new EqualsBuilder().append(getResourceId(), ((DriveResource) o).getResourceId());
+        String sourceResId = getResourceId();
+        DriveResource targetRes = (DriveResource) o;
+        String targetResId = targetRes.getResourceId();
+
+        EqualsBuilder builder = null;
+        if(sourceResId.equals("1") || targetResId.equals("1")
+                || sourceResId.trim().equals("") || targetResId.trim().equals("")){
+            String targetResName = targetRes.getName();
+            String sourceResName = getName();
+            builder = new EqualsBuilder().append(sourceResName, targetResName);
+        }else {
+            builder = new EqualsBuilder().append(sourceResId, targetResId);
+        }
+
         return builder.isEquals();
     }
 

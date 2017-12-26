@@ -17,20 +17,22 @@ public class ConnectivityChangeReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         boolean connected = isConnected(context);
         // For testing
-        connected = false;
+        //connected = false;
         if(!connected){
             context.sendBroadcast(new Intent("INTERNET_LOST"));
         }else {
             context.sendBroadcast(new Intent("INTERNET_AVAILABLE"));
-            context.startService(new Intent(context, AreaSynchronizationService.class));
-            context.startService(new Intent(context, PositionSynchronizationService.class));
-            context.startService(new Intent(context, ResourceSynchronizationService.class));
+            if(new Boolean(GlobalContext.INSTANCE.get(GlobalContext.APPLICATION_STARTED))){
+                context.startService(new Intent(context, AreaSynchronizationService.class));
+                context.startService(new Intent(context, PositionSynchronizationService.class));
+                context.startService(new Intent(context, ResourceSynchronizationService.class));
+            }
         }
         GlobalContext.INSTANCE.put(GlobalContext.INTERNET_AVAILABLE,
                 new Boolean(connected).toString());
     }
 
-    public boolean isConnected(Context context) {
+    public static boolean isConnected(Context context) {
         ConnectivityManager connectivityManager
                 = ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE));
         NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();

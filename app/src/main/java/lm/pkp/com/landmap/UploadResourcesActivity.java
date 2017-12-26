@@ -30,6 +30,7 @@ import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.model.AreaElement;
+import lm.pkp.com.landmap.connectivity.ConnectivityChangeReceiver;
 import lm.pkp.com.landmap.custom.ApiClientAsyncTask;
 import lm.pkp.com.landmap.custom.GlobalContext;
 import lm.pkp.com.landmap.custom.ThumbnailCreator;
@@ -53,7 +54,7 @@ public class UploadResourcesActivity extends BaseDriveActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(layout.activity_upload_area_resources);
-        online = new Boolean(GlobalContext.INSTANCE.get(GlobalContext.INTERNET_AVAILABLE));
+        online = ConnectivityChangeReceiver.isConnected(this);
     }
 
     @Override
@@ -68,11 +69,11 @@ public class UploadResourcesActivity extends BaseDriveActivity {
 
     @Override
     protected void handleConnectionIssues() {
-        Intent areaDetailsIntent = new Intent(getApplicationContext(), AreaDetailsActivity.class);
-        areaDetailsIntent.putExtra("action", "Upload");
-        areaDetailsIntent.putExtra("outcome_type", "error");
-        areaDetailsIntent.putExtra("outcome", "Connection issues.");
-        startActivity(areaDetailsIntent);
+        ArrayList<DriveResource> resources = AreaContext.INSTANCE.getUploadedQueue();
+        for (int i = 0; i < resources.size(); i++) {
+            processStack.push(resources.get(i));
+        }
+        processResources();
     }
 
     private void processResources() {
@@ -98,17 +99,17 @@ public class UploadResourcesActivity extends BaseDriveActivity {
     private void processResource(DriveResource res) {
         DriveDBHelper ddh = new DriveDBHelper(getApplicationContext());
         PositionsDBHelper pdh = new PositionsDBHelper(getApplicationContext());
-        AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
-
         if(online){
             new FileProcessingTask(res).execute();
         }else {
+            ddh.deleteResourceLocally(res);
             ddh.insertResourceLocally(res);
             PositionElement position = res.getPosition();
             if(position != null){
+                pdh.deletePositionLocally(position);
                 pdh.insertPositionLocally(position);
-                areaElement.getPositions().add(position);
             }
+            AreaContext.INSTANCE.getUploadedQueue().remove(res);
             processResources();
         }
     }
@@ -176,6 +177,7 @@ public class UploadResourcesActivity extends BaseDriveActivity {
 
                 ddh.deleteResourceLocally(resource);
                 ddh.insertResourceLocally(resource);
+                ddh.deleteResourceFromServer(resource);
                 ddh.insertResourceToServer(resource);
 
                 PositionsDBHelper pdh = new PositionsDBHelper(getApplicationContext());
@@ -186,8 +188,9 @@ public class UploadResourcesActivity extends BaseDriveActivity {
                     position.setDirty(0);
                     position.setDirtyAction("none");
 
-                    pdh.deletePositionGlobally(position);
+                    pdh.deletePositionLocally(position);
                     pdh.insertPositionLocally(position);
+                    pdh.deletePositionFromServer(position);
                     pdh.insertPositionToServer(position);
                 }
                 driveFile.removeChangeListener(getGoogleApiClient(), this);
@@ -233,10 +236,7 @@ public class UploadResourcesActivity extends BaseDriveActivity {
             AreaElement areaElement = areaContext.getAreaElement();
 
             areaContext.removeResourceFromQueue(resource);
-            PositionElement position = resource.getPosition();
-            if(position != null){
-                areaElement.getPositions().add(position);
-            }
+
             // Create thumbnails of the uploaded files for display.
             String resourcePath = resource.getPath();
             File resourceFile = new File(resourcePath);

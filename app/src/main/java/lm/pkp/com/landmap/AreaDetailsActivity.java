@@ -43,6 +43,7 @@ import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
+import lm.pkp.com.landmap.connectivity.ConnectivityChangeReceiver;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.custom.GlobalContext;
@@ -79,7 +80,7 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
-        online = new Boolean(GlobalContext.INSTANCE.get(GlobalContext.INTERNET_AVAILABLE));
+        online = ConnectivityChangeReceiver.isConnected(this);
 
         setContentView(R.layout.activity_area_details);
         getSupportActionBar().hide();
@@ -101,9 +102,9 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
 
         pdb = new PositionsDBHelper(getApplicationContext());
         ListView posListView = (ListView) findViewById(R.id.positionList);
-        positionList.addAll(ae.getPositions());
+        positionList.addAll(pdb.getPositionsForArea(ae));
 
-        adaptor = new PositionListAdaptor(this, id.positionList, positionList);
+        adaptor = new PositionListAdaptor(this, R.id.positionList, positionList);
         posListView.setAdapter(adaptor);
         adaptor.notifyDataSetChanged();
 
@@ -424,8 +425,13 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
                 .setPositiveButton(string.yes, new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int whichButton) {
                         AreaDBHelper adh = new AreaDBHelper(getApplicationContext(), new DeleteAreaCallback());
-                        adh.deleteArea(ae);
-                        adh.deleteAreaFromServer(ae);
+                        if(!adh.deleteAreaFromServer(ae)){
+                            Intent intent = new Intent(getApplicationContext(), AreaDashboardActivity.class);
+                            startActivity(intent);
+                            finish();
+                        }else {
+                            adh.deleteArea(ae);
+                        }
                     }
                 })
                 .setNegativeButton(string.no, new DialogInterface.OnClickListener() {
@@ -439,9 +445,9 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
     private class DeleteAreaCallback implements AsyncTaskCallback {
         @Override
         public void taskCompleted(Object result) {
-            finish();
             Intent areaDashboardIntent = new Intent(getApplicationContext(), RemoveDriveResourcesActivity.class);
             startActivity(areaDashboardIntent);
+            finish();
         }
     }
 

@@ -26,6 +26,8 @@ public class ColorProvider {
     public static final int DEFAULT_POLYGON_FILL = Color.parseColor("#85C1E9");
     public static final int DEFAULT_POLYGON_MEDIA_LINK = Color.parseColor("#F5EEF8");
 
+    public static final int DEFAULT_DIRTY_ITEM_COLOR = Color.parseColor("#F8F2DF");
+
     public static final int getAreaToolBarColor(AreaElement areaElement) {
         if (areaElement.getType().equalsIgnoreCase("shared")) {
             return BUFF_YELLOW_TOOLBAR;

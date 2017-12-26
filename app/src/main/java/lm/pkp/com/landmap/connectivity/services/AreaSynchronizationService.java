@@ -4,6 +4,8 @@ import android.app.IntentService;
 import android.content.Intent;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 
 import lm.pkp.com.landmap.CreateAreaFoldersActivity;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
@@ -23,18 +25,16 @@ public class AreaSynchronizationService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         AreaDBHelper adh = new AreaDBHelper(getApplicationContext());
         final ArrayList<AreaElement> dirtyAreas = adh.getDirtyAreas();
+        String[] areaIds = new String[dirtyAreas.size()];
+        int ctr = 0;
         for (AreaElement areaElement : dirtyAreas) {
             String dirtyAction = areaElement.getDirtyAction();
             if (dirtyAction.equalsIgnoreCase("insert")) {
                 if (adh.insertAreaToServer(areaElement)) {
                     areaElement.setDirty(0);
                     adh.updateAreaLocally(areaElement);
-
-                    Intent createIntent = new Intent(this, CreateAreaFoldersActivity.class);
-                    createIntent.putExtra("exec_background", "true");
-                    createIntent.putExtra("area_id", areaElement.getUniqueId());
-                    createIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    startActivity(createIntent);
+                    areaIds[ctr] = areaElement.getUniqueId();
+                    ctr++;
                 }
             } else if (dirtyAction.equalsIgnoreCase("update")) {
                 if (adh.updateAreaOnServer(areaElement)) {
@@ -44,6 +44,14 @@ public class AreaSynchronizationService extends IntentService {
             } else if (dirtyAction.equalsIgnoreCase("delete")) {
                 adh.deleteAreaFromServer(areaElement);
             }
+        }
+
+        if(areaIds.length > 0){
+            Intent createIntent = new Intent(this, CreateAreaFoldersActivity.class);
+            createIntent.putStringArrayListExtra("area_id_list", new ArrayList<>(Arrays.asList(areaIds)));
+            createIntent.putExtra("synchronizing", "true");
+            createIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            startActivity(createIntent);
         }
     }
 

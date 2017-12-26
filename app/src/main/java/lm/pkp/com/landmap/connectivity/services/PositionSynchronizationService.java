@@ -35,7 +35,7 @@ public class PositionSynchronizationService extends IntentService {
                     pdh.updatePositionLocally(position);
                 }
             } else if (dirtyAction.equalsIgnoreCase("delete")) {
-                pdh.deletePositionGlobally(position);
+                pdh.deletePositionLocally(position);
             }
         }
     }

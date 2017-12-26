@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import lm.pkp.com.landmap.R.layout;
+import lm.pkp.com.landmap.connectivity.ConnectivityChangeReceiver;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.custom.GlobalContext;
@@ -18,7 +19,6 @@ import lm.pkp.com.landmap.sync.LocalFolderStructureManager;
 public class SplashActivity extends Activity {
 
     private boolean userExists = false;
-    private boolean offline = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,8 +30,7 @@ public class SplashActivity extends Activity {
         if(extras != null){
             userExists = new Boolean(extras.getString("user_exists"));
         }
-        offline = new Boolean(GlobalContext.INSTANCE.get(GlobalContext.INTERNET_AVAILABLE));
-        if(offline){
+        if(ConnectivityChangeReceiver.isConnected(this)){
             new LocalDataRefresher(getApplicationContext(), new DataReloadCallback()).refreshLocalData();
         }else {
             Intent dashboardIntent = new Intent(this, AreaDashboardActivity.class);

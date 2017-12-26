@@ -17,6 +17,7 @@ import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
 import lm.pkp.com.landmap.position.PositionElement;
+import lm.pkp.com.landmap.util.ColorProvider;
 
 /**
  * Created by USER on 10/16/2017.
@@ -26,8 +27,8 @@ public class AreaAddResourceAdaptor extends ArrayAdapter<DriveResource> {
     private final ArrayList<DriveResource> items;
     private final Context context;
 
-    public AreaAddResourceAdaptor(Context context, int textViewResourceId, ArrayList<DriveResource> items) {
-        super(context, textViewResourceId, items);
+    public AreaAddResourceAdaptor(Context context, ArrayList<DriveResource> items) {
+        super(context, R.layout.upload_element_row, items);
         this.context = context;
         this.items = items;
     }
@@ -55,15 +56,18 @@ public class AreaAddResourceAdaptor extends ArrayAdapter<DriveResource> {
             filePathText.setText(resource.getSize() + " bytes");
         }
 
+        v.setBackgroundColor(ColorProvider.DEFAULT_DIRTY_ITEM_COLOR);
+
         Button removeButton = (Button) v.findViewById(id.remove_upload_resource);
         removeButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 areaContext.getUploadedQueue().remove(resource);
-                DriveDBHelper ddh = new DriveDBHelper(getContext());
-                ddh.deleteResourceLocally(resource);
                 items.remove(resource);
                 notifyDataSetChanged();
+
+                DriveDBHelper ddh = new DriveDBHelper(getContext());
+                ddh.deleteResourceLocally(resource);
             }
         });
         return v;

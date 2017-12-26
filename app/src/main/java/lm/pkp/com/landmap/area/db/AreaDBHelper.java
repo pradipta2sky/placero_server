@@ -11,14 +11,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Map;
 import java.util.UUID;
 
 import lm.pkp.com.landmap.area.model.AreaAddress;
 import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.area.model.AreaMeasure;
+import lm.pkp.com.landmap.connectivity.ConnectivityChangeReceiver;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
-import lm.pkp.com.landmap.custom.GlobalContext;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.google.geo.CommonGeoHelper;
 import lm.pkp.com.landmap.permission.PermissionsDBHelper;
@@ -32,7 +31,7 @@ import lm.pkp.com.landmap.util.AndroidSystemUtil;
 public class AreaDBHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "landmap.db";
-    private Context localContext;
+    private Context context;
 
     private static final String AREA_TABLE_NAME = "area_master";
     private static final String AREA_COLUMN_NAME = "name";
@@ -51,12 +50,12 @@ public class AreaDBHelper extends SQLiteOpenHelper {
 
     public AreaDBHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
-        this.localContext = context;
+        this.context = context;
     }
 
     public AreaDBHelper(Context context, AsyncTaskCallback callback) {
         super(context, DATABASE_NAME, null, 1);
-        this.localContext = context;
+        this.context = context;
         this.callback = callback;
     }
 
@@ -140,8 +139,8 @@ public class AreaDBHelper extends SQLiteOpenHelper {
     }
 
     public boolean insertAreaToServer(AreaElement ae) {
-        boolean networkAvailable = new Boolean(GlobalContext.INSTANCE.get(GlobalContext.INTERNET_AVAILABLE));
-        if(!networkAvailable) {
+        boolean networkAvailable = ConnectivityChangeReceiver.isConnected(context);
+        if(networkAvailable) {
             new LMSRestAsyncTask(callback).execute(preparePostParams("insert", ae));
         }else {
             ae.setDirty(1);
@@ -198,7 +197,7 @@ public class AreaDBHelper extends SQLiteOpenHelper {
             contentValues.put(AREA_COLUMN_ADDRESS, address.getStorableAddress());
         } else {
             CommonGeoHelper geoHelper = CommonGeoHelper.INSTANCE;
-            AreaAddress areaAddress = geoHelper.getAddressByGeoLocation(localContext,
+            AreaAddress areaAddress = geoHelper.getAddressByGeoLocation(context,
                     centerPosition.getLat(), centerPosition.getLon());
             contentValues.put(AREA_COLUMN_ADDRESS, areaAddress.getStorableAddress());
             ae.setAddress(areaAddress);
@@ -211,7 +210,7 @@ public class AreaDBHelper extends SQLiteOpenHelper {
     }
 
     public boolean updateAreaOnServer(AreaElement ae) {
-        boolean networkAvailable = new Boolean(GlobalContext.INSTANCE.get(GlobalContext.INTERNET_AVAILABLE));
+        boolean networkAvailable = ConnectivityChangeReceiver.isConnected(context);
         if(networkAvailable) {
             new LMSRestAsyncTask(callback).execute(preparePostParams("update", ae));
         }else {
@@ -227,12 +226,12 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         db.delete(AREA_TABLE_NAME, AREA_COLUMN_UNIQUE_ID + " = ? ", new String[]{ae.getUniqueId()});
         db.close();
 
-        PositionsDBHelper pdb = new PositionsDBHelper(localContext);
+        PositionsDBHelper pdb = new PositionsDBHelper(context);
         pdb.deletePositionByAreaId(ae.getUniqueId());
     }
 
     public boolean deleteAreaFromServer(AreaElement ae) {
-        boolean networkAvailable = new Boolean(GlobalContext.INSTANCE.get(GlobalContext.INTERNET_AVAILABLE));
+        boolean networkAvailable = ConnectivityChangeReceiver.isConnected(context);
         if(networkAvailable) {
             new LMSRestAsyncTask(callback).execute(preparePostParams("delete", ae));
         }else {
@@ -247,8 +246,8 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         ArrayList<AreaElement> areas = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
 
-        DriveDBHelper ddh = new DriveDBHelper(localContext);
-        PermissionsDBHelper pdh = new PermissionsDBHelper(localContext);
+        DriveDBHelper ddh = new DriveDBHelper(context);
+        PermissionsDBHelper pdh = new PermissionsDBHelper(context);
 
         Cursor cursor = null;
         try {
@@ -297,16 +296,13 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         ArrayList<AreaElement> allAreas = new ArrayList<AreaElement>();
         SQLiteDatabase db = getReadableDatabase();
 
-        DriveDBHelper ddh = new DriveDBHelper(localContext);
-        PermissionsDBHelper pdh = new PermissionsDBHelper(localContext);
+        DriveDBHelper ddh = new DriveDBHelper(context);
+        PermissionsDBHelper pdh = new PermissionsDBHelper(context);
         Cursor cursor = null;
         try {
             cursor = db.rawQuery("select * from " + AREA_TABLE_NAME
                             + " WHERE " + AREA_COLUMN_DIRTY_FLAG + "=1", null);
-            if (cursor == null) {
-                return allAreas;
-            }
-            if (cursor.getCount() > 0) {
+            if ((cursor != null) && (cursor.getCount() > 0)) {
                 cursor.moveToFirst();
                 while (cursor.isAfterLast() == false) {
                     AreaElement ae = new AreaElement();
@@ -324,6 +320,8 @@ public class AreaDBHelper extends SQLiteOpenHelper {
                     String addressText = cursor.getString(cursor.getColumnIndex(AREA_COLUMN_ADDRESS));
                     ae.setAddress(AreaAddress.fromStoredAddress(addressText));
                     ae.setType(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_TYPE)));
+                    ae.setDirty(cursor.getInt(cursor.getColumnIndex(AREA_COLUMN_DIRTY_FLAG)));
+                    ae.setDirtyAction(cursor.getString(cursor.getColumnIndex(AREA_COLUMN_DIRTY_ACTION)));
 
                     ae.getMediaResources().addAll(ddh.getDriveResourcesByAreaId(ae.getUniqueId()));
                     allAreas.add(ae);
@@ -375,9 +373,9 @@ public class AreaDBHelper extends SQLiteOpenHelper {
     public void deletePublicAreas() {
         ArrayList<AreaElement> publicAreas = getAreas("public");
 
-        PositionsDBHelper pdh = new PositionsDBHelper(localContext);
-        DriveDBHelper ddh = new DriveDBHelper(localContext);
-        PermissionsDBHelper pmh = new PermissionsDBHelper(localContext);
+        PositionsDBHelper pdh = new PositionsDBHelper(context);
+        DriveDBHelper ddh = new DriveDBHelper(context);
+        PermissionsDBHelper pmh = new PermissionsDBHelper(context);
 
         SQLiteDatabase db = getWritableDatabase();
         for (int i = 0; i < publicAreas.size(); i++) {
@@ -397,7 +395,7 @@ public class AreaDBHelper extends SQLiteOpenHelper {
     }
 
     public void insertAreaAddressTagsLocally(AreaElement ae) {
-        TagsDBHelper tagsDBHelper = new TagsDBHelper(localContext);
+        TagsDBHelper tagsDBHelper = new TagsDBHelper(context);
         AreaAddress address = ae.getAddress();
         if(address != null){
             tagsDBHelper.insertTagsLocally(address.getTags(), "area", ae.getUniqueId());
@@ -405,7 +403,7 @@ public class AreaDBHelper extends SQLiteOpenHelper {
     }
 
     public void insertAreaAddressTagsOnServer(AreaElement ae) {
-        TagsDBHelper tagsDBHelper = new TagsDBHelper(localContext);
+        TagsDBHelper tagsDBHelper = new TagsDBHelper(context);
         AreaAddress address = ae.getAddress();
         if(address != null) {
             tagsDBHelper.insertTagsToServer(address.getTags(), "area", ae.getUniqueId());

@@ -76,7 +76,7 @@ public class AreaDashboardOwnedFragment extends Fragment
         super.setUserVisibleHint(visible);
         if (visible && (mView != null) && (mActivity != null)) {
             AreaDashboardDisplayMetaStore.INSTANCE.setActiveTab(AreaDashboardDisplayMetaStore.TAB_OWNED_SEQ);
-            this.loadFragment();
+            loadFragment();
         }
     }
 
@@ -170,6 +170,9 @@ public class AreaDashboardOwnedFragment extends Fragment
     public void doFilter(List<String> filterables, List<String> executables) {
         ListView areaListView = (ListView) mView.findViewById(id.area_display_list);
         AreaItemAdaptor adapter = (AreaItemAdaptor) areaListView.getAdapter();
+        if(adapter.getCount() > 0){
+            return;
+        }
         EditText inputSearch = (EditText) mActivity.findViewById(id.dashboard_search_box);
         Editable inputSearchText = inputSearch.getText();
         adapter.getFilterChain(filterables, executables).filter(inputSearchText.toString());

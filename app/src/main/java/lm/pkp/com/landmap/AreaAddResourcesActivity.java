@@ -38,25 +38,22 @@ public class AreaAddResourcesActivity extends AppCompatActivity {
 
         setContentView(R.layout.activity_area_resource_main);
 
+        AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
         ActionBar ab = getSupportActionBar();
         ab.setHomeButtonEnabled(false);
         ab.setDisplayHomeAsUpEnabled(false);
-
-        AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
         ab.setBackgroundDrawable(new ColorDrawable(ColorProvider.getAreaToolBarColor(areaElement)));
         ab.show();
 
         View includedView = findViewById(R.id.selected_area_include);
         AreaPopulationUtil.INSTANCE.populateAreaElement(includedView);
 
-        ListView resourceFileList = (ListView) findViewById(R.id.file_display_list);
-        adaptor = new AreaAddResourceAdaptor(getApplicationContext(), R.id.file_display_list,
-                resourceList);
-        resourceFileList.setAdapter(adaptor);
-
         ArrayList<DriveResource> driveResources = AreaContext.INSTANCE.getUploadedQueue();
-        resourceList.clear();
         resourceList.addAll(driveResources);
+
+        ListView resListView = (ListView) findViewById(R.id.file_display_list);
+        adaptor = new AreaAddResourceAdaptor(getApplicationContext(),resourceList);
+        resListView.setAdapter(adaptor);
         adaptor.notifyDataSetChanged();
 
         Button takeSnapButton = (Button) findViewById(R.id.take_snap_button);

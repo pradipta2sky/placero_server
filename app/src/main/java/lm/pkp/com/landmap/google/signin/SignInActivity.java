@@ -31,6 +31,10 @@ import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.R.string;
 import lm.pkp.com.landmap.SplashActivity;
+import lm.pkp.com.landmap.connectivity.ConnectivityChangeReceiver;
+import lm.pkp.com.landmap.connectivity.services.AreaSynchronizationService;
+import lm.pkp.com.landmap.connectivity.services.PositionSynchronizationService;
+import lm.pkp.com.landmap.connectivity.services.ResourceSynchronizationService;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.custom.GlobalContext;
 import lm.pkp.com.landmap.tags.TagElement;
@@ -61,8 +65,14 @@ public class SignInActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Intent intent = new Intent("lm.pkp.com.APPLICATION_START");
-        sendBroadcast(intent);
+        // Create the database.
+        new UserDBHelper(getApplicationContext()).dryRun();
+        GlobalContext.INSTANCE.put(GlobalContext.APPLICATION_STARTED, "true");
+        if(ConnectivityChangeReceiver.isConnected(getApplicationContext())){
+            startService(new Intent(this, AreaSynchronizationService.class));
+            startService(new Intent(this, PositionSynchronizationService.class));
+            startService(new Intent(this, ResourceSynchronizationService.class));
+        }
 
         setContentView(R.layout.activity_google_signin_main);
         getSupportActionBar().hide();
@@ -131,9 +141,6 @@ public class SignInActivity extends AppCompatActivity implements
             signedUser = UserMappingUtil.convertGoogleAccountToLocalAccount(acct);
             // Set the user context.
             UserContext.getInstance().setUserElement(signedUser);
-            // Create the database.
-            UserDBHelper udh = new UserDBHelper(getApplicationContext());
-            udh.dryRun();
 
             SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
             SharedPreferences.Editor editor = preferences.edit();
@@ -145,7 +152,8 @@ public class SignInActivity extends AppCompatActivity implements
             searchOnRemoteAndUpdate(signedUser);
             mGoogleApiClient.disconnect();
         } else {
-            offline = new Boolean(GlobalContext.INSTANCE.get(GlobalContext.INTERNET_AVAILABLE));
+            boolean online = ConnectivityChangeReceiver.isConnected(this);
+            offline = !online;
             if(!offline){
                 UserElement user = buildUserFromPreferences();
                 if(user == null){

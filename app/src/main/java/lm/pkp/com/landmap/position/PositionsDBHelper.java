@@ -13,7 +13,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 
 import lm.pkp.com.landmap.area.model.AreaElement;
-import lm.pkp.com.landmap.custom.GlobalContext;
+import lm.pkp.com.landmap.connectivity.ConnectivityChangeReceiver;
 import lm.pkp.com.landmap.sync.LMSRestAsyncTask;
 import lm.pkp.com.landmap.util.AndroidSystemUtil;
 
@@ -34,8 +34,10 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
     private static final String POSITION_COLUMN_DIRTY_ACTION = "d_action";
     private static final String POSITION_COLUMN_CREATED_ON = "created_on";
 
+    private Context context = null;
     public PositionsDBHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
+        this.context = context;
     }
 
     @Override
@@ -97,8 +99,8 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         contentValues.put(POSITION_COLUMN_DIRTY_ACTION, pe.getDirtyAction());
         contentValues.put(POSITION_COLUMN_CREATED_ON, pe.getCreatedOnMillis());
 
-        db.update(POSITION_TABLE_NAME, contentValues, POSITION_COLUMN_UNIQUE_ID + "='"
-                + pe.getUniqueId() + "'", null);
+        db.update(POSITION_TABLE_NAME, contentValues, POSITION_COLUMN_UNIQUE_ID + "=?",
+                new String[]{pe.getUniqueId()});
         db.close();
         return pe;
     }
@@ -126,7 +128,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
     }
 
     public boolean insertPositionToServer(PositionElement pe) {
-        boolean networkAvailable = new Boolean(GlobalContext.INSTANCE.get(GlobalContext.INTERNET_AVAILABLE));
+        boolean networkAvailable = ConnectivityChangeReceiver.isConnected(context);
         if (networkAvailable) {
             new LMSRestAsyncTask().execute(preparePostParams("insert", pe));
         } else {
@@ -138,7 +140,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
     }
 
     public boolean updatePositionToServer(PositionElement pe) {
-        boolean networkAvailable = new Boolean(GlobalContext.INSTANCE.get(GlobalContext.INTERNET_AVAILABLE));
+        boolean networkAvailable = ConnectivityChangeReceiver.isConnected(context);
         if (networkAvailable) {
             new LMSRestAsyncTask().execute(preparePostParams("update", pe));
         } else {
@@ -149,11 +151,15 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         return networkAvailable;
     }
 
-    public boolean deletePositionGlobally(PositionElement pe) {
+    public void deletePositionLocally(PositionElement pe) {
         SQLiteDatabase db = getWritableDatabase();
-        db.delete(POSITION_TABLE_NAME, POSITION_COLUMN_UNIQUE_ID + " = ? ", new String[]{pe.getUniqueId()});
+        db.delete(POSITION_TABLE_NAME, POSITION_COLUMN_UNIQUE_ID + "=?", new String[]{pe.getUniqueId()});
+        db.close();
+        return;
+    }
 
-        boolean networkAvailable = new Boolean(GlobalContext.INSTANCE.get(GlobalContext.INTERNET_AVAILABLE));
+    public boolean deletePositionFromServer(PositionElement pe) {
+        boolean networkAvailable = ConnectivityChangeReceiver.isConnected(context);
         if (networkAvailable) {
             new LMSRestAsyncTask().execute(preparePostParams("delete", pe));
         } else {
@@ -161,7 +167,6 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
             pe.setDirtyAction("delete");
             updatePositionLocally(pe);
         }
-        db.close();
         return networkAvailable;
     }
 

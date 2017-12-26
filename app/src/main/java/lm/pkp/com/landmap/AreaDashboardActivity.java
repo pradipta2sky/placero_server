@@ -38,6 +38,7 @@ import lm.pkp.com.landmap.area.dashboard.AreaDashboardSharedFragment;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.reporting.AreaReportingService;
 import lm.pkp.com.landmap.area.reporting.ReportingContext;
+import lm.pkp.com.landmap.connectivity.ConnectivityChangeReceiver;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.custom.FragmentFilterHandler;
 import lm.pkp.com.landmap.custom.FragmentHandler;
@@ -54,20 +55,17 @@ import lm.pkp.com.landmap.util.ColorProvider;
 
 public class AreaDashboardActivity extends AppCompatActivity {
 
-    private boolean offline = false;
     private boolean online = true;
 
-    public boolean isOffline() {
-        return this.offline;
+    public boolean isOffline(){
+        return !online;
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
-
-        online = new Boolean(GlobalContext.INSTANCE.get(GlobalContext.INTERNET_AVAILABLE));
-        offline = !online;
+        online = ConnectivityChangeReceiver.isConnected(this);
 
         setContentView(R.layout.activity_area_dashboard);
         registerReceiver(broadcastReceiver, new IntentFilter("INTERNET_LOST"));
@@ -94,7 +92,7 @@ public class AreaDashboardActivity extends AppCompatActivity {
             public void onClick(View v) {
                 findViewById(id.splash_panel).setVisibility(View.VISIBLE);
                 AreaDBHelper adh = new AreaDBHelper(getApplicationContext());
-                AreaElement areaElement = adh.insertAreaLocally(offline);
+                AreaElement areaElement = adh.insertAreaLocally(online);
 
                 PermissionElement pe = new PermissionElement();
                 pe.setUserId(UserContext.getInstance().getUserElement().getEmail());
@@ -109,7 +107,8 @@ public class AreaDashboardActivity extends AppCompatActivity {
                 AreaContext.INSTANCE.setAreaElement(areaElement, getApplicationContext());
                 adh = new AreaDBHelper(getApplicationContext(), new DataInsertServerCallback(areaElement));
                 if(!adh.insertAreaToServer(areaElement)){
-                    doPostAreaCreate();
+                    Intent intent = new Intent(getApplicationContext(), AreaDetailsActivity.class);
+                    startActivity(intent);
                 }
             }
         });
@@ -191,6 +190,17 @@ public class AreaDashboardActivity extends AppCompatActivity {
             Integer position = store.getTabPositionByAreaType(areaElement.getType());
             tabLayout.getTabAt(position).select();
         }
+        showErrorsIfAny();
+    }
+
+    private void showErrorsIfAny() {
+        Bundle intentBundle = getIntent().getExtras();
+        if (intentBundle != null) {
+            String action = intentBundle.getString("action");
+            String outcome = intentBundle.getString("outcome");
+            String outcomeType = intentBundle.getString("outcome_type");
+            showMessage(action + " " + outcomeType + ". " + outcome, outcomeType);
+        }
     }
 
 
@@ -258,16 +268,6 @@ public class AreaDashboardActivity extends AppCompatActivity {
         }
     }
 
-    private void doPostAreaCreate() {
-        Intent intent = new Intent(getApplicationContext(), CreateAreaFoldersActivity.class);
-        AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
-        intent.putExtra("area_id", areaElement.getUniqueId());
-
-        startActivity(intent);
-        unregisterReceiver(broadcastReceiver);
-        finish();
-    }
-
     private void showMessage(String message, String type) {
         final Snackbar snackbar = Snackbar.make(getWindow().getDecorView(),
                 message + ".", Snackbar.LENGTH_INDEFINITE);
@@ -302,20 +302,14 @@ public class AreaDashboardActivity extends AppCompatActivity {
         @Override
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if(action.equalsIgnoreCase("INTERNET_LOST")){
-                offline = true;
-                online = false;
-            }else {
-                offline = false;
-                online = true;
-            }
+            online = !action.equalsIgnoreCase("INTERNET_LOST");
             // notify fragments
             final ViewPager viewPager = (ViewPager) findViewById(R.id.areas_display_tab_pager);
             DisplayAreasPagerAdapter adapter = (DisplayAreasPagerAdapter) viewPager.getAdapter();
             int fragmentCount = adapter.getCount();
             for (int i = 0; i < fragmentCount; i++) {
                 FragmentHandler item = (FragmentHandler) adapter.getItem(i);
-                item.setOffline(offline);
+                item.setOffline(online);
             }
         }
     };

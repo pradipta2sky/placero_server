@@ -72,7 +72,7 @@ public class AreaPopulationUtil {
         measureText.setText(Html.fromHtml(content));
 
         if(ae.getDirty() == 1){
-            view.setBackgroundColor(ColorProvider.BUFF_YELLOW_AREA_DISPLAY);
+            view.setBackgroundColor(ColorProvider.DEFAULT_DIRTY_ITEM_COLOR);
         }
         DriveDBHelper ddh = new DriveDBHelper(view.getContext());
         ImageView areaImgView = (ImageView) view.findViewById(id.area_default_img);

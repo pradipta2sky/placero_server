@@ -14,7 +14,8 @@ public class GlobalContext {
 
     public static final GlobalContext INSTANCE = new GlobalContext();
 
-    public static final String INTERNET_AVAILABLE = "internet_available";
+    public static final String INTERNET_AVAILABLE = "lm.pkp.com.INTERNET_AVAILABLE";
+    public static final String APPLICATION_STARTED = "lm.pkp.com.APPLICATION_START";
 
     private GlobalContext(){
     }

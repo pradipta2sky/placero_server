@@ -14,13 +14,13 @@ import com.google.android.gms.drive.MetadataChangeSet.Builder;
 import com.google.android.gms.drive.events.ChangeEvent;
 import com.google.android.gms.drive.events.ChangeListener;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Stack;
 import java.util.UUID;
 
-import lm.pkp.com.landmap.area.AreaContext;
-import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.area.FileStorageConstants;
+import lm.pkp.com.landmap.connectivity.ConnectivityChangeReceiver;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.custom.GlobalContext;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
@@ -31,8 +31,9 @@ import lm.pkp.com.landmap.user.UserElement;
 public class CreateAreaFoldersActivity extends BaseDriveActivity {
 
     private boolean online = true;
-    private boolean execBackground = false;
+    private boolean synchronizing = false;
     private String areaId = null;
+    private ArrayList<String> areaIdList = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,12 +42,13 @@ public class CreateAreaFoldersActivity extends BaseDriveActivity {
 
         Bundle extras = getIntent().getExtras();
         areaId = extras.getString("area_id");
-        String exec = extras.getString("exec_background");
-        if(exec != null){
-            execBackground = new Boolean(exec);
-            moveTaskToBack(execBackground);
+        areaIdList = extras.getStringArrayList("area_id_list");
+
+        String synchronizing = extras.getString("synchronizing");
+        if(synchronizing != null){
+            this.synchronizing = new Boolean(synchronizing);
         }
-        online = new Boolean(GlobalContext.INSTANCE.get(GlobalContext.INTERNET_AVAILABLE));
+        online = ConnectivityChangeReceiver.isConnected(this);
     }
 
     @Override
@@ -57,11 +59,11 @@ public class CreateAreaFoldersActivity extends BaseDriveActivity {
 
     @Override
     protected void handleConnectionIssues() {
-        Intent areaDetailsIntent = new Intent(getApplicationContext(), AreaDetailsActivity.class);
-        areaDetailsIntent.putExtra("action", "Drive Connection Error");
-        areaDetailsIntent.putExtra("outcome_type", "error");
-        areaDetailsIntent.putExtra("outcome", "Folder creation failed.");
-        startActivity(areaDetailsIntent);
+        Intent intent = new Intent(getApplicationContext(), AreaDashboardActivity.class);
+        intent.putExtra("action", "Drive Connection Error");
+        intent.putExtra("outcome_type", "error");
+        intent.putExtra("outcome", "Folder creation failed.");
+        startActivity(intent);
     }
 
     private class FileProcessingTask extends AsyncTask {
@@ -70,7 +72,15 @@ public class CreateAreaFoldersActivity extends BaseDriveActivity {
 
         @Override
         protected Object doInBackground(Object[] params) {
-            fetchStatusAndAct();
+            if(areaId != null){
+                buildResourcesForArea(areaId);
+            }else {
+                for (int i = 0; i < areaIdList.size(); i++) {
+                    String fetchedAreaId = areaIdList.get(i);
+                    buildResourcesForArea(fetchedAreaId);
+                }
+            }
+            processCreateStack();
             return null;
         }
 
@@ -80,7 +90,7 @@ public class CreateAreaFoldersActivity extends BaseDriveActivity {
         }
 
 
-        private void fetchStatusAndAct() {
+        private void buildResourcesForArea(String areaId) {
             DriveDBHelper ddh = new DriveDBHelper(getApplicationContext());
             // Check if there are common folders defined in database. //content_type = folder
             Map<String, DriveResource> commonResourceMap = ddh.getCommonResourcesByName();
@@ -99,17 +109,22 @@ public class CreateAreaFoldersActivity extends BaseDriveActivity {
             folderResource = createFolderResource(areaId, docsFolder,
                     FileStorageConstants.DOCUMENTS_CONTENT_TYPE);
             createStack.push(folderResource);
-
-            // Start processing.
-            processCreateStack();
         }
 
         public void processCreateStack() {
             DriveDBHelper ddh = new DriveDBHelper(getApplicationContext());
             if (createStack.isEmpty()) {
                 getGoogleApiClient().disconnect();
-                Intent i = new Intent(getApplicationContext(), AreaDetailsActivity.class);
-                startActivity(i);
+                Intent intent = null;
+                if(synchronizing){
+                    intent = new Intent(getApplicationContext(), AreaDashboardActivity.class);
+                    intent.putExtra("action", "Synchronizing Offline");
+                    intent.putExtra("outcome_type", "info");
+                    intent.putExtra("outcome", "Complete.");
+                }else {
+                    intent = new Intent(getApplicationContext(), AreaDetailsActivity.class);
+                }
+                startActivity(intent);
             } else {
                 DriveResource resource = createStack.pop();
                 if(online){
@@ -202,26 +217,19 @@ public class CreateAreaFoldersActivity extends BaseDriveActivity {
 
     }
 
-    private DriveResource createFolderResource(String folderName, DriveResource parent, String contentType) {
+    private DriveResource createFolderResource(String areaId, DriveResource parent, String contentType) {
         DriveResource resource = new DriveResource();
-
-        AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
         UserElement userElement = UserContext.getInstance().getUserElement();
-
         resource.setUniqueId(UUID.randomUUID().toString());
-        resource.setName(folderName);
+        resource.setName(areaId);
         resource.setType("folder");
         resource.setUserId(userElement.getEmail());
         resource.setSize("0");
-        resource.setAreaId(areaElement.getUniqueId());
+        resource.setAreaId(areaId);
         resource.setContainerId(parent.getResourceId());
         resource.setContentType(contentType);
         resource.setMimeType("application/vnd.google-apps.folder");
         resource.setResourceId(null);
-        if(!online){
-            resource.setDirty(1);
-            resource.setDirtyAction("insert");
-        }
         return resource;
     }
 

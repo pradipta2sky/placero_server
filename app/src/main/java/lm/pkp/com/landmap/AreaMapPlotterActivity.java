@@ -327,7 +327,9 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                     if(PermissionManager.INSTANCE.hasAccess(PermissionConstants.UPDATE_AREA)){
                         PositionsDBHelper pdh = new PositionsDBHelper(getApplicationContext());
                         PositionElement markedPosition = positionMarkers.get(marker);
-                        pdh.deletePositionGlobally(markedPosition);
+                        pdh.deletePositionLocally(markedPosition);
+                        pdh.deletePositionFromServer(markedPosition);
+
                         ae.getPositions().remove(markedPosition);
                         ac.reCenter(ae);
 
@@ -490,7 +492,6 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                         }
                     }
                 }
-
 
                 DriveResource imagesRootResource = ac.getImagesRootDriveResource();
 

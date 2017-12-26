@@ -19,8 +19,10 @@ import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.model.AreaAddress;
 import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
+import lm.pkp.com.landmap.connectivity.ConnectivityChangeReceiver;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
+import lm.pkp.com.landmap.custom.GlobalContext;
 import lm.pkp.com.landmap.permission.PermissionConstants;
 import lm.pkp.com.landmap.permission.PermissionManager;
 import lm.pkp.com.landmap.permission.PermissionsDBHelper;
@@ -29,24 +31,26 @@ import lm.pkp.com.landmap.util.ColorProvider;
 
 public class AreaEditActivity extends AppCompatActivity {
 
+    private boolean online = true;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
-
-        this.setContentView(R.layout.activity_area_edit);
+        online = ConnectivityChangeReceiver.isConnected(this);
+        setContentView(R.layout.activity_area_edit);
 
         final AreaElement ae = AreaContext.INSTANCE.getAreaElement();
-        ActionBar ab = this.getSupportActionBar();
+        ActionBar ab = getSupportActionBar();
         ab.setHomeButtonEnabled(false);
         ab.setDisplayHomeAsUpEnabled(false);
         ab.setBackgroundDrawable(new ColorDrawable(ColorProvider.getAreaToolBarColor(ae)));
         ab.show();
 
-        View includedView = this.findViewById(R.id.selected_area_include);
+        View includedView = findViewById(R.id.selected_area_include);
         AreaPopulationUtil.INSTANCE.populateAreaElement(includedView);
 
-        final TextView nameText = (TextView) this.findViewById(R.id.area_name_edit);
+        final TextView nameText = (TextView) findViewById(R.id.area_name_edit);
         String areaName = ae.getName();
         if (areaName.length() > 20) {
             areaName = areaName.substring(0, 19).concat("...");
@@ -56,21 +60,27 @@ public class AreaEditActivity extends AppCompatActivity {
             nameText.setEnabled(false);
         }
 
-        final TextView descText = (TextView) this.findViewById(R.id.area_desc_edit);
+        final TextView descText = (TextView) findViewById(R.id.area_desc_edit);
         descText.setText(ae.getDescription());
         if (!PermissionManager.INSTANCE.hasAccess(PermissionConstants.CHANGE_DESCRIPTION)) {
             descText.setEnabled(false);
         }
 
-        final TextView addressText = (TextView) this.findViewById(R.id.area_address_edit);
+        final TextView addressText = (TextView) findViewById(R.id.area_address_edit);
         AreaAddress address = ae.getAddress();
         if(address != null){
             addressText.setText(address.getDisplaybleAddress());
         }else {
             addressText.setText("");
         }
+        addressText.setEnabled(false);
 
-        Button saveButton = (Button) this.findViewById(R.id.area_edit_save_btn);
+        CheckBox makePublicCheckBox = (CheckBox) findViewById(R.id.make_area_public);
+        if(!online){
+            makePublicCheckBox.setEnabled(false);
+        }
+
+        Button saveButton = (Button) findViewById(R.id.area_edit_save_btn);
         saveButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -87,7 +97,11 @@ public class AreaEditActivity extends AppCompatActivity {
 
                 AreaDBHelper adh = new AreaDBHelper(getApplicationContext(), new UpdateAreaToServerCallback());
                 adh.updateAreaLocally(ae);
-                adh.updateAreaOnServer(ae);
+                if(!adh.updateAreaOnServer(ae)){
+                    if(makeAreaPublic()){
+                        navigateToDetailsView();
+                    }
+                }
             }
         });
     }
@@ -103,28 +117,40 @@ public class AreaEditActivity extends AppCompatActivity {
 
         @Override
         public void taskCompleted(Object result) {
-            // Work on the make public option.
-            CheckBox makePublicCheckBox = (CheckBox) findViewById(R.id.make_area_public);
-            if (makePublicCheckBox.isChecked()) {
-                PermissionsDBHelper pdh = new PermissionsDBHelper(getApplicationContext(), new MakeAreaPublicCallback());
-                pdh.insertPermissionsToServer("any", "view_only");
-            } else {
-                findViewById(R.id.splash_panel).setVisibility(View.INVISIBLE);
-                Intent areaDetailsIntent = new Intent(getApplicationContext(), AreaDetailsActivity.class);
-                startActivity(areaDetailsIntent);
-                finish();
-            }
+            makeAreaPublic();
         }
+    }
+
+    private boolean makeAreaPublic() {
+        CheckBox makePublicCheckBox = (CheckBox) findViewById(R.id.make_area_public);
+        if (makePublicCheckBox.isChecked()) {
+            PermissionsDBHelper pdh = new PermissionsDBHelper(getApplicationContext(),
+                    new MakeAreaPublicCallback());
+            pdh.insertPermissionsToServer("any", "view_only");
+            return true;
+        } else {
+            navigateToDetailsView();
+            return false;
+        }
+    }
+
+    private void navigateToDetailsView() {
+        findViewById(R.id.splash_panel).setVisibility(View.INVISIBLE);
+        Intent areaDetailsIntent = new Intent(getApplicationContext(), AreaDetailsActivity.class);
+        startActivity(areaDetailsIntent);
+        finish();
     }
 
     private class MakeAreaPublicCallback implements AsyncTaskCallback {
 
         @Override
         public void taskCompleted(Object result) {
-            Intent areaDetailsIntent = new Intent(AreaEditActivity.this, ShareDriveResourcesActivity.class);
-            areaDetailsIntent.putExtra("share_to_user", "äny");
-            startActivity(areaDetailsIntent);
-            finish();
+            if(online){
+                Intent areaDetailsIntent = new Intent(AreaEditActivity.this, ShareDriveResourcesActivity.class);
+                areaDetailsIntent.putExtra("share_to_user", "any");
+                startActivity(areaDetailsIntent);
+                finish();
+            }
         }
     }
 

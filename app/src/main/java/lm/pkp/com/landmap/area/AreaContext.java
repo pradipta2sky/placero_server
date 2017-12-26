@@ -29,10 +29,8 @@ public class AreaContext {
     private AreaElement currentArea;
     private Context context;
     private Bitmap displayBMap;
-    private Boolean generatingReport;
     private List<Bitmap> viewBitmaps = new ArrayList<>();
     private final ArrayList<DriveResource> uploadQueue = new ArrayList<>();
-    private PositionElement selectedPosition = null;
 
     public AreaElement getAreaElement() {
         return this.currentArea;
@@ -51,7 +49,7 @@ public class AreaContext {
 
         DriveDBHelper ddh = new DriveDBHelper(context);
         currentArea.setMediaResources(ddh.getDriveResourcesByAreaId(currentArea.getUniqueId()));
-        uploadQueue.addAll(ddh.getUploadableDirtyResources());
+        uploadQueue.addAll(ddh.getUploadableDirtyResources(currentArea.getUniqueId()));
 
         PermissionsDBHelper pdh = new PermissionsDBHelper(context);
         currentArea.setUserPermissions(pdh.fetchPermissionsByAreaId(currentArea.getUniqueId()));
@@ -251,21 +249,5 @@ public class AreaContext {
 
     public List<Bitmap> getViewBitmaps() {
         return this.viewBitmaps;
-    }
-
-    public Boolean getGeneratingReport() {
-        return this.generatingReport;
-    }
-
-    public void setGeneratingReport(Boolean generatingReport) {
-        this.generatingReport = generatingReport;
-    }
-
-    public PositionElement getSelectedPosition() {
-        return this.selectedPosition;
-    }
-
-    public void setSelectedPosition(PositionElement selectedPosition) {
-        this.selectedPosition = selectedPosition;
     }
 }

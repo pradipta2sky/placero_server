@@ -65,7 +65,7 @@ public class PositionListAdaptor extends ArrayAdapter<PositionElement> {
         descText.setText(StringUtils.capitalize(pe.getDescription()));
 
         if(pe.getDirty() == 1){
-            v.setBackgroundColor(ColorProvider.BUFF_YELLOW_AREA_DISPLAY);
+            v.setBackgroundColor(ColorProvider.DEFAULT_DIRTY_ITEM_COLOR);
         }
 
         final AreaContext areaContext = AreaContext.INSTANCE;
@@ -114,8 +114,9 @@ public class PositionListAdaptor extends ArrayAdapter<PositionElement> {
             public void onClick(View v) {
                 if(PermissionManager.INSTANCE.hasAccess(PermissionConstants.UPDATE_AREA)){
                     items.remove(position);
-                    pdh.deletePositionGlobally(pe);
-
+                    areaElement.getPositions().remove(pe);
+                    pdh.deletePositionLocally(pe);
+                    pdh.deletePositionFromServer(pe);
                     if(pe.getType().equalsIgnoreCase("Media")){
                         DriveResource resource = ddh.getDriveResourceByPositionId(pe.getUniqueId());
                         resource.setPosition(null);
@@ -124,8 +125,6 @@ public class PositionListAdaptor extends ArrayAdapter<PositionElement> {
                         areaElement.getMediaResources().remove(resource);
                         areaElement.getMediaResources().add(resource);
                     }
-
-                    areaElement.getPositions().remove(pe);
                     notifyDataSetChanged();
                 }
             }

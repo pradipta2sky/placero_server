@@ -124,12 +124,4 @@ public class PositionElement implements Serializable {
     public void setDirtyAction(String dirtyAction) {
         this.dirtyAction = dirtyAction;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        EqualsBuilder builder = new EqualsBuilder();
-        builder.append(lat, ((PositionElement) o).lat);
-        builder.append(lon, ((PositionElement) o).lon);
-        return builder.isEquals();
-    }
 }

@@ -139,6 +139,9 @@ public class AreaDashboardSharedFragment extends Fragment
     public void doFilter(List<String> filterables, List<String> executables) {
         ListView areaListView = (ListView) mView.findViewById(id.area_display_list);
         AreaItemAdaptor adapter = (AreaItemAdaptor) areaListView.getAdapter();
+        if(adapter.getCount() > 0){
+            return;
+        }
         EditText inputSearch = (EditText) mActivity.findViewById(id.dashboard_search_box);
         Editable inputSearchText = inputSearch.getText();
         adapter.getFilterChain(filterables, executables).filter(inputSearchText.toString());

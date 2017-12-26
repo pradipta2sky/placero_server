@@ -16,6 +16,7 @@ import java.util.Map;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
+import lm.pkp.com.landmap.custom.GlobalContext;
 import lm.pkp.com.landmap.sync.LMSRestAsyncTask;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.user.UserElement;
@@ -27,6 +28,9 @@ public class PermissionsDBHelper extends SQLiteOpenHelper {
     public static final String ACCESS_COLUMN_AREA_ID = "area_id";
     public static final String ACCESS_COLUMN_USER_ID = "user_id";
     public static final String ACCESS_COLUMN_FUNCTION_CODE = "function_code";
+    private static final String ACCESS_COLUMN_DIRTY_FLAG = "dirty";
+    private static final String ACCESS_COLUMN_DIRTY_ACTION = "d_action";
+
     private AsyncTaskCallback callback;
 
     public PermissionsDBHelper(Context context, AsyncTaskCallback callback) {
@@ -45,6 +49,8 @@ public class PermissionsDBHelper extends SQLiteOpenHelper {
                         ACCESS_TABLE_NAME + "(" +
                         ACCESS_COLUMN_AREA_ID + " text," +
                         ACCESS_COLUMN_USER_ID + " text, " +
+                        ACCESS_COLUMN_DIRTY_FLAG + " integer DEFAULT 0," +
+                        ACCESS_COLUMN_DIRTY_ACTION + " text," +
                         ACCESS_COLUMN_FUNCTION_CODE + " text)"
         );
     }
@@ -62,15 +68,21 @@ public class PermissionsDBHelper extends SQLiteOpenHelper {
         contentValues.put(ACCESS_COLUMN_AREA_ID, pe.getAreaId());
         contentValues.put(ACCESS_COLUMN_FUNCTION_CODE, pe.getFunctionCode());
         contentValues.put(ACCESS_COLUMN_USER_ID, pe.getUserId());
+        contentValues.put(ACCESS_COLUMN_DIRTY_ACTION, pe.getDirtyAction());
+        contentValues.put(ACCESS_COLUMN_DIRTY_ACTION, pe.getDirtyAction());
 
         db.insert(ACCESS_TABLE_NAME, null, contentValues);
         db.close();
         return pe;
     }
 
-    public void insertPermissionsToServer(String targetUser, String functionCodes) {
-        LMSRestAsyncTask task = new LMSRestAsyncTask(this.callback);
-        task.execute(this.preparePostParams("insert", targetUser, functionCodes));
+    public boolean insertPermissionsToServer(String targetUser, String functionCodes) {
+        boolean networkAvailable = new Boolean(GlobalContext.INSTANCE.get(GlobalContext.INTERNET_AVAILABLE));
+        if (networkAvailable) {
+            new LMSRestAsyncTask(callback)
+                    .execute(preparePostParams("insert", targetUser, functionCodes));
+        }
+        return networkAvailable;
     }
 
     private JSONObject preparePostParams(String queryType, String targetUser, String functionCodes) {
