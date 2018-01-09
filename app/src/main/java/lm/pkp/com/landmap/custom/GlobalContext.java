@@ -16,6 +16,7 @@ public class GlobalContext {
 
     public static final String INTERNET_AVAILABLE = "lm.pkp.com.INTERNET_AVAILABLE";
     public static final String APPLICATION_STARTED = "lm.pkp.com.APPLICATION_START";
+    public static final String SYNCHRONIZING_OFFLINE = "lm.pkp.com.SYNCHRONIZING_OFFLINE";
 
     private GlobalContext(){
     }

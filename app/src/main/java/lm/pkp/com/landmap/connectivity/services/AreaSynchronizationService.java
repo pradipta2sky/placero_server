@@ -8,8 +8,12 @@ import java.util.Arrays;
 import java.util.Collections;
 
 import lm.pkp.com.landmap.CreateAreaFoldersActivity;
+import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.model.AreaElement;
+import lm.pkp.com.landmap.custom.GlobalContext;
+import lm.pkp.com.landmap.drive.DriveDBHelper;
+import lm.pkp.com.landmap.position.PositionsDBHelper;
 
 public class AreaSynchronizationService extends IntentService {
 
@@ -53,6 +57,15 @@ public class AreaSynchronizationService extends IntentService {
             createIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(createIntent);
         }
+
+        PositionsDBHelper pdh = new PositionsDBHelper(getApplicationContext());
+        DriveDBHelper ddh = new DriveDBHelper(getApplicationContext());
+        if(adh.getDirtyAreas().size() == 0
+                && pdh.getDirtyPositions().size() == 0
+                && ddh.getDirtyResources().size() == 0){
+            GlobalContext.INSTANCE.put(GlobalContext.SYNCHRONIZING_OFFLINE, new Boolean(false).toString());
+        }
+
     }
 
 }

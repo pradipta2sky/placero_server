@@ -68,11 +68,6 @@ public class SignInActivity extends AppCompatActivity implements
         // Create the database.
         new UserDBHelper(getApplicationContext()).dryRun();
         GlobalContext.INSTANCE.put(GlobalContext.APPLICATION_STARTED, "true");
-        if(ConnectivityChangeReceiver.isConnected(getApplicationContext())){
-            startService(new Intent(this, AreaSynchronizationService.class));
-            startService(new Intent(this, PositionSynchronizationService.class));
-            startService(new Intent(this, ResourceSynchronizationService.class));
-        }
 
         setContentView(R.layout.activity_google_signin_main);
         getSupportActionBar().hide();

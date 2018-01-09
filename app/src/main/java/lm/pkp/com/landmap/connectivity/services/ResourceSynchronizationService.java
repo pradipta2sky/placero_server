@@ -6,6 +6,8 @@ import android.content.Intent;
 import java.util.ArrayList;
 
 import lm.pkp.com.landmap.CreateAreaFoldersActivity;
+import lm.pkp.com.landmap.area.db.AreaDBHelper;
+import lm.pkp.com.landmap.custom.GlobalContext;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
 import lm.pkp.com.landmap.position.PositionElement;
@@ -41,6 +43,15 @@ public class ResourceSynchronizationService extends IntentService {
                 ddh.deleteResourceByGlobally(resource);
             }
         }
+
+        AreaDBHelper adh = new AreaDBHelper(getApplicationContext());
+        PositionsDBHelper pdh = new PositionsDBHelper(getApplicationContext());
+        if(adh.getDirtyAreas().size() == 0
+                && pdh.getDirtyPositions().size() == 0
+                && ddh.getDirtyResources().size() == 0){
+            GlobalContext.INSTANCE.put(GlobalContext.SYNCHRONIZING_OFFLINE, new Boolean(false).toString());
+        }
+
     }
 
 }

@@ -39,14 +39,21 @@ import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.reporting.AreaReportingService;
 import lm.pkp.com.landmap.area.reporting.ReportingContext;
 import lm.pkp.com.landmap.connectivity.ConnectivityChangeReceiver;
+import lm.pkp.com.landmap.connectivity.services.AreaSynchronizationService;
+import lm.pkp.com.landmap.connectivity.services.PositionSynchronizationService;
+import lm.pkp.com.landmap.connectivity.services.ResourceSynchronizationService;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.custom.FragmentFilterHandler;
 import lm.pkp.com.landmap.custom.FragmentHandler;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
 import lm.pkp.com.landmap.custom.GlobalContext;
+import lm.pkp.com.landmap.drive.DriveDBHelper;
+import lm.pkp.com.landmap.drive.DriveResource;
 import lm.pkp.com.landmap.permission.PermissionConstants;
 import lm.pkp.com.landmap.permission.PermissionElement;
 import lm.pkp.com.landmap.permission.PermissionsDBHelper;
+import lm.pkp.com.landmap.position.PositionElement;
+import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.tags.TagElement;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.user.UserElement;
@@ -106,7 +113,7 @@ public class AreaDashboardActivity extends AppCompatActivity {
                 // Resetting the context for new Area
                 AreaContext.INSTANCE.setAreaElement(areaElement, getApplicationContext());
                 adh = new AreaDBHelper(getApplicationContext(), new DataInsertServerCallback(areaElement));
-                if(!adh.insertAreaToServer(areaElement)){
+                if (!adh.insertAreaToServer(areaElement)) {
                     Intent intent = new Intent(getApplicationContext(), AreaDetailsActivity.class);
                     startActivity(intent);
                 }
@@ -119,7 +126,7 @@ public class AreaDashboardActivity extends AppCompatActivity {
             public void onClick(View v) {
                 UserPersistableSelections selections = UserContext.getInstance().getUserElement().getSelections();
                 AreaElement selectedArea = selections.getArea();
-                if(selectedArea == null){
+                if (selectedArea == null) {
                     showMessage("You need to select a Place first", "error");
                     return;
                 }
@@ -176,6 +183,35 @@ public class AreaDashboardActivity extends AppCompatActivity {
                 }
             }
         });
+
+        ImageView saveOfflineView = (ImageView) findViewById(id.action_save_offline);
+        final ArrayList<AreaElement> dirtyAreas = new AreaDBHelper(getApplicationContext()).getDirtyAreas();
+        final ArrayList<PositionElement> dirtyPositions = new PositionsDBHelper(getApplicationContext()).getDirtyPositions();
+        final ArrayList<DriveResource> dirtyResources = new DriveDBHelper(getApplicationContext()).getDirtyResources();
+
+        saveOfflineView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Boolean offlineSync = new Boolean(GlobalContext.INSTANCE.get(GlobalContext.SYNCHRONIZING_OFFLINE));
+                if(!offlineSync){
+                    if(dirtyAreas.size() == 0 && dirtyPositions.size() == 0 && dirtyResources.size() == 0){
+                        showMessage("All caught up !!", "info");
+                        return;
+                    }
+                    GlobalContext.INSTANCE.put(GlobalContext.SYNCHRONIZING_OFFLINE, new Boolean(true).toString());
+                    startService(new Intent(getApplicationContext(), PositionSynchronizationService.class));
+                    startService(new Intent(getApplicationContext(), ResourceSynchronizationService.class));
+                    startService(new Intent(getApplicationContext(), AreaSynchronizationService.class));
+                }else {
+                    showMessage("Offline sync in progress..", "error");
+                }
+            }
+        });
+
+        if(dirtyAreas.size() > 0 || dirtyPositions.size() > 0 || dirtyResources.size() > 0){
+            saveOfflineView.setBackgroundResource(R.drawable.rounded_corner);
+        }
+
     }
 
 
