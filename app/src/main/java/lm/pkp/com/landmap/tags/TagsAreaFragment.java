@@ -136,4 +136,9 @@ public class TagsAreaFragment extends Fragment implements FragmentHandler {
         this.offline = offline;
     }
 
+    @Override
+    public Object getViewAdaptor() {
+        return null;
+    }
+
 }

@@ -65,6 +65,11 @@
             android:configChanges="orientation"
             android:screenOrientation="portrait"></activity>
         <activity
+            android:name=".CombinedAreasPlotterActivity"
+            android:label="@string/title_activity_land_plotter"
+            android:configChanges="orientation"
+            android:screenOrientation="portrait"></activity>
+        <activity
             android:name=".AreaEditActivity"
             android:label="@string/title_activity_area_edit"
             android:configChanges="orientation"

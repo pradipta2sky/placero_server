@@ -124,4 +124,9 @@ public class TagsUserFragment extends Fragment implements FragmentHandler {
         this.offline = offline;
     }
 
+    @Override
+    public Object getViewAdaptor() {
+        return null;
+    }
+
 }

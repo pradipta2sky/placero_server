@@ -1,9 +1,14 @@
 package lm.pkp.com.landmap.area.model;
 
 
+import android.widget.TextView;
+
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Method;
+import java.text.DecimalFormat;
+
+import lm.pkp.com.landmap.R;
 
 /**
  * Created by USER on 12/15/2017.
@@ -61,5 +66,13 @@ public class AreaMeasure {
             e.printStackTrace();
         }
         return 0.0;
+    }
+
+    @Override
+    public String toString() {
+        DecimalFormat df = new DecimalFormat("###.##");
+        String content = df.format(sqFeet) + " Sqft, " + df.format(acre)
+                + " Acre, " + df.format(decimals) + " Decimals.";
+        return content;
     }
 }

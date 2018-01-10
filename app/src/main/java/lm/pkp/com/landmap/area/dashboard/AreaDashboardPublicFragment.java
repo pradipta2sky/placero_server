@@ -44,6 +44,7 @@ public class AreaDashboardPublicFragment extends Fragment
     private Activity mActivity = null;
     private View mView = null;
     private boolean offline = false;
+    private AreaItemAdaptor viewAdapter = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -127,6 +128,9 @@ public class AreaDashboardPublicFragment extends Fragment
     public void resetFilter() {
         ListView areaListView = (ListView) mView.findViewById(id.area_display_list);
         AreaItemAdaptor adapter = (AreaItemAdaptor) areaListView.getAdapter();
+        if(adapter == null){
+            return;
+        }
         adapter.resetFilter().filter(null);
     }
 
@@ -155,14 +159,15 @@ public class AreaDashboardPublicFragment extends Fragment
                 mView.findViewById(id.public_area_empty_layout).setVisibility(View.VISIBLE);
             }
 
-            AreaItemAdaptor adaptor = new AreaItemAdaptor(mView.getContext(), layout.area_element_row, publicAreas);
+            viewAdapter = new AreaItemAdaptor(mView.getContext(), layout.area_element_row, publicAreas);
             ListView areaListView = (ListView) mView.findViewById(id.area_display_list);
-            areaListView.setAdapter(adaptor);
+            areaListView.setAdapter(viewAdapter);
 
             if(!filterStr.equalsIgnoreCase("")){
-                adaptor.getFilter().filter(filterStr);
+                viewAdapter.getFilter().filter(filterStr);
             }
-            adaptor.notifyDataSetChanged();
+            viewAdapter.notifyDataSetChanged();
+
             areaListView.setDescendantFocusability(ListView.FOCUS_BLOCK_DESCENDANTS);
             mView.findViewById(id.splash_panel).setVisibility(View.INVISIBLE);
 
@@ -216,4 +221,10 @@ public class AreaDashboardPublicFragment extends Fragment
     public void setOffline(boolean offline) {
         this.offline = offline;
     }
+
+    @Override
+    public Object getViewAdaptor() {
+        return viewAdapter;
+    }
+
 }

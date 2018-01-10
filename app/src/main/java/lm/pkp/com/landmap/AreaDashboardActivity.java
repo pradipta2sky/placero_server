@@ -38,6 +38,7 @@ import lm.pkp.com.landmap.area.dashboard.AreaDashboardSharedFragment;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.reporting.AreaReportingService;
 import lm.pkp.com.landmap.area.reporting.ReportingContext;
+import lm.pkp.com.landmap.area.res.disp.AreaItemAdaptor;
 import lm.pkp.com.landmap.connectivity.ConnectivityChangeReceiver;
 import lm.pkp.com.landmap.connectivity.services.AreaSynchronizationService;
 import lm.pkp.com.landmap.connectivity.services.PositionSynchronizationService;
@@ -184,7 +185,7 @@ public class AreaDashboardActivity extends AppCompatActivity {
             }
         });
 
-        ImageView saveOfflineView = (ImageView) findViewById(id.action_save_offline);
+        ImageView saveOfflineView = (ImageView) findViewById(R.id.action_save_offline);
         final ArrayList<AreaElement> dirtyAreas = new AreaDBHelper(getApplicationContext()).getDirtyAreas();
         final ArrayList<PositionElement> dirtyPositions = new PositionsDBHelper(getApplicationContext()).getDirtyPositions();
         final ArrayList<DriveResource> dirtyResources = new DriveDBHelper(getApplicationContext()).getDirtyResources();
@@ -212,6 +213,28 @@ public class AreaDashboardActivity extends AppCompatActivity {
             saveOfflineView.setBackgroundResource(R.drawable.rounded_corner);
         }
 
+        ImageView plotAreasAction = (ImageView) findViewById(R.id.action_plot_areas);
+        plotAreasAction.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DisplayAreasPagerAdapter adapter = (DisplayAreasPagerAdapter) viewPager.getAdapter();
+                FragmentHandler fragment
+                        = (FragmentHandler) adapter.getItem(AreaDashboardDisplayMetaStore.INSTANCE.getActiveTab());
+                AreaItemAdaptor viewAdaptor = (AreaItemAdaptor) fragment.getViewAdaptor();
+                List<String> areaIds = new ArrayList<>();
+                ArrayList<AreaElement> adaptorItems = viewAdaptor.getItems();
+                if((adaptorItems == null) || (adaptorItems.size() == 0)){
+                    showMessage("Nothing to plot..", "error");
+                    return;
+                }
+                for (AreaElement eachItem: adaptorItems) {
+                    areaIds.add(eachItem.getUniqueId());
+                }
+                Intent intent = new Intent(getApplicationContext(), CombinedAreasPlotterActivity.class);
+                intent.putExtra("area_ids", areaIds.toArray());
+                startActivity(intent);
+            }
+        });
     }
 
 
@@ -221,7 +244,7 @@ public class AreaDashboardActivity extends AppCompatActivity {
         super.onPostCreate(savedInstanceState);
         AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
         if(areaElement != null){
-            TabLayout tabLayout = (TabLayout) this.findViewById(id.areas_display_tab_layout);
+            TabLayout tabLayout = (TabLayout) findViewById(id.areas_display_tab_layout);
             AreaDashboardDisplayMetaStore store = AreaDashboardDisplayMetaStore.INSTANCE;
             Integer position = store.getTabPositionByAreaType(areaElement.getType());
             tabLayout.getTabAt(position).select();

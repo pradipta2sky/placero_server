@@ -45,7 +45,7 @@ public class AreaContext {
 
         PositionsDBHelper pdb = new PositionsDBHelper(context);
         currentArea.setPositions(pdb.getPositionsForArea(currentArea));
-        reCenter(currentArea);
+        centerize(currentArea);
 
         DriveDBHelper ddh = new DriveDBHelper(context);
         currentArea.setMediaResources(ddh.getDriveResourcesByAreaId(currentArea.getUniqueId()));
@@ -81,7 +81,7 @@ public class AreaContext {
         }
     }
 
-    public void reCenter(AreaElement areaElement) {
+    public AreaElement centerize(AreaElement areaElement) {
         double latSum = 0.0;
         double longSum = 0.0;
         String positionId = null;
@@ -91,23 +91,35 @@ public class AreaContext {
 
         List<PositionElement> positions = areaElement.getPositions();
         int noOfPositions = positions.size();
+        int boundaryCtr = 0;
         if (noOfPositions != 0) {
             for (int i = 0; i < noOfPositions; i++) {
                 PositionElement pe = positions.get(i);
-                if (positionId == null) {
-                    positionId = pe.getUniqueId();
+                if(!pe.getType().equalsIgnoreCase("boundary")){
+                    continue;
+                }else {
+                    boundaryCtr ++;
+                    if (positionId == null) {
+                        positionId = pe.getUniqueId();
+                    }
                 }
                 latSum += pe.getLat();
                 longSum += pe.getLon();
             }
-            latAvg = latSum / noOfPositions;
-            lonAvg = longSum / noOfPositions;
+            if(boundaryCtr > 0){
+                latAvg = latSum / boundaryCtr;
+                lonAvg = longSum / boundaryCtr;
+
+                PositionElement centerPosition = new PositionElement();
+            }
         }
 
         PositionElement centerPosition = areaElement.getCenterPosition();
         centerPosition.setLat(latAvg);
         centerPosition.setLon(lonAvg);
         centerPosition.setUniqueId(positionId);
+
+        return areaElement;
     }
 
     // Drive specific resources.

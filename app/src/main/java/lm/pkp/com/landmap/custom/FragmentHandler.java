@@ -8,4 +8,6 @@ public interface FragmentHandler {
     public String getFragmentTitle();
 
     public void setOffline(boolean offline);
+
+    public Object getViewAdaptor();
 }

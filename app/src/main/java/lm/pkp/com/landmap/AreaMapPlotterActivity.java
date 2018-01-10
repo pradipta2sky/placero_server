@@ -302,7 +302,6 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
     private void initializeMapEventPropagation() {
         mapWrapperLayout = (MapWrapperLayout) findViewById(R.id.map_relative_layout);
         mapWrapperLayout.init(googleMap, getPixelsFromDp(getApplicationContext(), 35));
-        mapWrapperLayout.setPolygonMarkers(polygonMarkers);
 
         infoWindow = (ViewGroup) getLayoutInflater().inflate(layout.info_window, null);
         infoTitle = (TextView) infoWindow.findViewById(id.title);
@@ -331,7 +330,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                         pdh.deletePositionFromServer(markedPosition);
 
                         ae.getPositions().remove(markedPosition);
-                        ac.reCenter(ae);
+                        ac.centerize(ae);
 
                         polygon.remove();
                         plotPolygonUsingPositions();
@@ -391,7 +390,7 @@ public class AreaMapPlotterActivity extends FragmentActivity implements OnMapRea
                     pdh.updatePositionToServer(newPosition);
 
                     ae.setPositions(pdh.getPositionsForArea(ae));
-                    ac.reCenter(ae);
+                    ac.centerize(ae);
 
                     polygon.remove();
                     plotPolygonUsingPositions();

@@ -12,8 +12,17 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="right|center"
-        android:layout_marginRight="15dp"
+        android:layout_marginRight="10dp"
         android:src="@drawable/create"
+        />
+
+    <ImageView
+        android:id="@+id/action_plot_areas"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right|center"
+        android:src="@drawable/plot"
+        android:layout_marginRight="10dp"
         />
 
     <ImageView
@@ -21,7 +30,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="right|center"
-        android:layout_marginRight="15dp"
+        android:layout_marginRight="10dp"
         android:src="@drawable/report"
         />
 
@@ -30,7 +39,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="right|center"
-        android:layout_marginRight="15dp"
+        android:layout_marginRight="10dp"
         android:src="@drawable/tag"
         />
 
@@ -39,7 +48,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="right|center"
-        android:layout_marginRight="15dp"
+        android:layout_marginRight="10dp"
         android:src="@drawable/filter"
         />
 
@@ -48,7 +57,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="right|center"
-        android:layout_marginRight="15dp"
+        android:layout_marginRight="10dp"
         android:src="@drawable/save"
         />
 

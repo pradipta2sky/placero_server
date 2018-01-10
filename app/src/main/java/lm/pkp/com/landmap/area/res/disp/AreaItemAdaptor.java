@@ -258,4 +258,8 @@ public class AreaItemAdaptor extends ArrayAdapter {
         };
     }
 
+    public ArrayList<AreaElement> getItems() {
+        return this.items;
+    }
+
 }

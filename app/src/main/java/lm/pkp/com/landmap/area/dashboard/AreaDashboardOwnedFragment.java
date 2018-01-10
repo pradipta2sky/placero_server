@@ -49,6 +49,7 @@ public class AreaDashboardOwnedFragment extends Fragment
     private Activity mActivity = null;
     private View mView = null;
     private boolean offline = false;
+    private AreaItemAdaptor viewAdapter = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -115,8 +116,8 @@ public class AreaDashboardOwnedFragment extends Fragment
             mView.findViewById(R.id.owned_area_empty_layout).setVisibility(View.GONE);
             areaListView.setVisibility(View.VISIBLE);
 
-            AreaItemAdaptor adaptor = new AreaItemAdaptor(mActivity, layout.area_element_row, areas);
-            areaListView.setAdapter(adaptor);
+            viewAdapter = new AreaItemAdaptor(mActivity, layout.area_element_row, areas);
+            areaListView.setAdapter(viewAdapter);
             areaListView.setDescendantFocusability(ListView.FOCUS_BLOCK_DESCENDANTS);
         } else {
             areaListView.setVisibility(View.GONE);
@@ -182,6 +183,9 @@ public class AreaDashboardOwnedFragment extends Fragment
     public void resetFilter() {
         ListView areaListView = (ListView) mView.findViewById(id.area_display_list);
         AreaItemAdaptor adapter = (AreaItemAdaptor) areaListView.getAdapter();
+        if(adapter == null){
+            return;
+        }
         adapter.resetFilter().filter(null);
     }
 
@@ -244,5 +248,10 @@ public class AreaDashboardOwnedFragment extends Fragment
 
     public void setOffline(boolean offline) {
         this.offline = offline;
+    }
+
+    @Override
+    public Object getViewAdaptor() {
+        return viewAdapter;
     }
 }

@@ -43,6 +43,7 @@ public class AreaDashboardSharedFragment extends Fragment
     private Activity mActivity = null;
     private View mView = null;
     private boolean offline = false;
+    private AreaItemAdaptor viewAdapter = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -95,13 +96,13 @@ public class AreaDashboardSharedFragment extends Fragment
         AreaDBHelper adh = new AreaDBHelper(mView.getContext());
         ListView areaListView = (ListView) mView.findViewById(id.area_display_list);
         ArrayList<AreaElement> sharedAreas = adh.getAreas("shared");
-        AreaItemAdaptor adaptor = new AreaItemAdaptor(mView.getContext(), layout.area_element_row, sharedAreas);
+        viewAdapter = new AreaItemAdaptor(mView.getContext(), layout.area_element_row, sharedAreas);
 
         if (sharedAreas.size() > 0) {
             mView.findViewById(id.shared_area_empty_layout).setVisibility(View.GONE);
             areaListView.setVisibility(View.VISIBLE);
 
-            areaListView.setAdapter(adaptor);
+            areaListView.setAdapter(viewAdapter);
             areaListView.setDescendantFocusability(ListView.FOCUS_BLOCK_DESCENDANTS);
         } else {
             areaListView.setVisibility(View.GONE);
@@ -151,6 +152,9 @@ public class AreaDashboardSharedFragment extends Fragment
     public void resetFilter() {
         ListView areaListView = (ListView) mView.findViewById(id.area_display_list);
         AreaItemAdaptor adapter = (AreaItemAdaptor) areaListView.getAdapter();
+        if(adapter == null){
+            return;
+        }
         adapter.resetFilter().filter(null);
     }
 
@@ -186,4 +190,10 @@ public class AreaDashboardSharedFragment extends Fragment
     public void setOffline(boolean offline) {
         this.offline = offline;
     }
+
+    @Override
+    public Object getViewAdaptor() {
+        return viewAdapter;
+    }
+
 }

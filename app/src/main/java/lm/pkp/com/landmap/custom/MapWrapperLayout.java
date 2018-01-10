@@ -36,8 +36,6 @@ public class MapWrapperLayout extends RelativeLayout {
      * A currently selected marker
      */
     private Marker marker;
-    private LinkedHashMap<Polygon, Marker> polygonMarkers;
-
 
     /**
      * Our custom view which is returned from either the InfoWindowAdapter.getInfoContents
@@ -95,9 +93,5 @@ public class MapWrapperLayout extends RelativeLayout {
         // If the infoWindow consumed the touch event, then just return true.
         // Otherwise pass this event to the super class and return it's result
         return ret || super.dispatchTouchEvent(ev);
-    }
-
-    public void setPolygonMarkers(LinkedHashMap<Polygon, Marker> polygonMarkers) {
-        this.polygonMarkers = polygonMarkers;
     }
 }

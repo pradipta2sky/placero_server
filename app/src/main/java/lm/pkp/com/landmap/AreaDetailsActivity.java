@@ -64,17 +64,11 @@ import lm.pkp.com.landmap.weather.model.WeatherElement;
 
 public class AreaDetailsActivity extends AppCompatActivity implements LocationPositionReceiver {
 
-    private PositionsDBHelper pdb;
     private AreaElement ae;
     private boolean online = true;
 
     private final ArrayList<PositionElement> positionList = new ArrayList<PositionElement>();
     private PositionListAdaptor adaptor;
-
-    @Override
-    public void showLockTaskEscapeMessage() {
-        super.showLockTaskEscapeMessage();
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,9 +94,8 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
             finish();
         }
 
-        pdb = new PositionsDBHelper(getApplicationContext());
         ListView posListView = (ListView) findViewById(R.id.positionList);
-        positionList.addAll(pdb.getPositionsForArea(ae));
+        positionList.addAll(ae.getPositions());
 
         adaptor = new PositionListAdaptor(this, R.id.positionList, positionList);
         posListView.setAdapter(adaptor);
@@ -308,6 +301,8 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
         if(!positions.contains(pe)){
             pe.setName("Position_" + positions.size());
             positions.add(pe);
+
+            PositionsDBHelper pdb = new PositionsDBHelper(getApplicationContext());
             pdb.insertPositionLocally(pe);
             pdb.insertPositionToServer(pe);
 
