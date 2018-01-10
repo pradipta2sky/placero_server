@@ -24,7 +24,7 @@
         android:layout_height="fill_parent"
         android:gravity="center"
         android:visibility="gone"
-        android:layout_weight="0.8"
+        android:layout_weight="0.9"
         android:orientation="vertical">
         <ProgressBar
             android:layout_width="60dp"
@@ -38,7 +38,7 @@
         android:layout_height="fill_parent"
         android:gravity="center"
         android:visibility="gone"
-        android:layout_weight="0.8"
+        android:layout_weight="0.9"
         android:orientation="vertical"
         android:id="@+id/positions_view_master"
         android:weightSum="2">
@@ -74,7 +74,7 @@
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:orientation="vertical"
-        android:layout_weight="0.8"
+        android:layout_weight="0.9"
         android:id="@+id/position_list_empty_img"
         android:background="@color/white"
         android:visibility="visible">

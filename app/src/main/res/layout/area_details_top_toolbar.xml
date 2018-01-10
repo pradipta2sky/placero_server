@@ -8,7 +8,7 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_weight="0.9"
+        android:layout_weight="1"
         android:orientation="horizontal"
         android:layout_gravity="left|center_vertical"
         android:weightSum="1">
@@ -26,34 +26,85 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_weight="1.1"
+        android:layout_weight="1"
         android:orientation="horizontal"
         android:weightSum="3"
         android:gravity="right">
 
-        <ImageView
-            android:id="@+id/action_area_weather"
-            android:layout_width="50dp"
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/weather"
-            android:padding="5dp"
-            />
+            android:orientation="vertical"
+            android:gravity="top"
+            android:layout_marginLeft="5dp"
+            >
+            <ImageView
+                android:id="@+id/action_area_weather"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/weather"
+                android:layout_gravity="top"
+                />
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="Weather"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:textSize="11sp"
+                android:layout_gravity="center"
+                />
+        </LinearLayout>
 
-        <ImageView
-            android:id="@+id/action_area_edit"
-            android:layout_width="50dp"
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/edit_area"
-            android:padding="5dp"
-            />
+            android:orientation="vertical"
+            android:gravity="top"
+            android:layout_marginLeft="5dp"
+            >
+            <ImageView
+                android:id="@+id/action_area_edit"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/edit_area"
+                android:layout_gravity="top"
+                />
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="Edit"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:textSize="11sp"
+                android:layout_gravity="center"
+                />
+        </LinearLayout>
 
-        <ImageView
-            android:id="@+id/action_delete_area"
-            android:layout_width="50dp"
+        <LinearLayout
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/dump"
-            android:padding="5dp"
-            />
+            android:orientation="vertical"
+            android:gravity="top"
+            android:layout_marginLeft="5dp"
+            >
+            <ImageView
+                android:id="@+id/action_delete_area"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:src="@drawable/dump"
+                android:layout_gravity="top"
+                />
+            <TextView
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:text="Delete"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:textSize="11sp"
+                android:layout_gravity="center"
+                />
+        </LinearLayout>
 
     </LinearLayout>
 
