@@ -440,8 +440,8 @@ public class AreaDetailsActivity extends AppCompatActivity implements LocationPo
     private class DeleteAreaCallback implements AsyncTaskCallback {
         @Override
         public void taskCompleted(Object result) {
-            Intent areaDashboardIntent = new Intent(getApplicationContext(), RemoveDriveResourcesActivity.class);
-            startActivity(areaDashboardIntent);
+            Intent removeIntent = new Intent(getApplicationContext(), RemoveDriveResourcesActivity.class);
+            startActivity(removeIntent);
             finish();
         }
     }

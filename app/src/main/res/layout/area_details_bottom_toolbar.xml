@@ -10,11 +10,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginRight="5dp">
+        android:layout_marginRight="6dp">
         <ImageView
             android:id="@+id/action_mark_location"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+            android:layout_width="43dp"
+            android:layout_height="43dp"
             android:layout_gravity="right|center"
             android:layout_marginRight="10dp"
             android:layout_marginTop="2dp"
@@ -36,12 +36,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginRight="5dp">
+        android:layout_marginRight="6dp">
         <ImageView
             android:layout_marginBottom="2dp"
             android:id="@+id/action_plot_area"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+            android:layout_width="43dp"
+            android:layout_height="43dp"
             android:layout_gravity="right|center"
             android:layout_marginRight="10dp"
             android:layout_marginTop="2dp"
@@ -63,12 +63,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginRight="5dp">
+        android:layout_marginRight="6dp">
         <ImageView
             android:layout_marginBottom="2dp"
             android:id="@+id/action_navigate_area"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+            android:layout_width="43dp"
+            android:layout_height="43dp"
             android:layout_gravity="right|center"
             android:layout_marginRight="10dp"
             android:layout_marginTop="2dp"
@@ -90,12 +90,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginRight="5dp">
+        android:layout_marginRight="6dp">
         <ImageView
             android:layout_marginBottom="2dp"
             android:id="@+id/action_share_area"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+            android:layout_width="43dp"
+            android:layout_height="43dp"
             android:layout_gravity="right|center"
             android:layout_marginRight="10dp"
             android:layout_marginTop="2dp"
@@ -117,12 +117,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginRight="5dp">
+        android:layout_marginRight="6dp">
         <ImageView
             android:layout_marginBottom="2dp"
             android:id="@+id/action_drive_area"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+            android:layout_width="43dp"
+            android:layout_height="43dp"
             android:layout_gravity="right|center"
             android:layout_marginRight="10dp"
             android:layout_marginTop="2dp"
@@ -144,12 +144,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_marginRight="5dp">
+        android:layout_marginRight="3dp">
         <ImageView
             android:layout_marginBottom="2dp"
             android:id="@+id/action_display_res"
-            android:layout_width="45dp"
-            android:layout_height="45dp"
+            android:layout_width="43dp"
+            android:layout_height="43dp"
             android:layout_gravity="right|center"
             android:layout_marginRight="5dp"
             android:layout_marginTop="2dp"

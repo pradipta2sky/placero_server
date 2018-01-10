@@ -83,7 +83,7 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         this.onCreate(db);
     }
 
-    public AreaElement insertAreaLocally(boolean offline) {
+    public AreaElement insertAreaLocally(boolean online) {
         SQLiteDatabase db = getWritableDatabase();
 
         AreaElement ae = new AreaElement();
@@ -121,7 +121,7 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         contentValues.put(AREA_COLUMN_TYPE, "self");
         ae.setType("self");
 
-        if (offline) {
+        if (!online) {
             contentValues.put(AREA_COLUMN_DIRTY_FLAG, "1");
             ae.setDirty(1);
 

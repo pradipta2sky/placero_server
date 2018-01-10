@@ -3,15 +3,15 @@
     android:layout_height="fill_parent"
     android:layout_gravity="center_vertical"
     android:orientation="horizontal"
-    android:weightSum="2">
+    android:weightSum="5">
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_weight="1"
+        android:layout_weight="2.0"
         android:orientation="horizontal"
         android:layout_gravity="left|center_vertical"
-        android:weightSum="1">
+        >
         <TextView
             android:id="@+id/area_name_text"
             android:layout_width="wrap_content"
@@ -26,17 +26,17 @@
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
-        android:layout_weight="1"
+        android:layout_weight="3.0"
         android:orientation="horizontal"
-        android:weightSum="3"
-        android:gravity="right">
-
+        android:gravity="right"
+        >
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:gravity="top"
             android:layout_marginLeft="5dp"
+            android:layout_weight="1"
             >
             <ImageView
                 android:id="@+id/action_area_weather"
@@ -62,6 +62,7 @@
             android:orientation="vertical"
             android:gravity="top"
             android:layout_marginLeft="5dp"
+            android:layout_weight="1"
             >
             <ImageView
                 android:id="@+id/action_area_edit"
@@ -87,6 +88,7 @@
             android:orientation="vertical"
             android:gravity="top"
             android:layout_marginLeft="5dp"
+            android:layout_weight="1"
             >
             <ImageView
                 android:id="@+id/action_delete_area"

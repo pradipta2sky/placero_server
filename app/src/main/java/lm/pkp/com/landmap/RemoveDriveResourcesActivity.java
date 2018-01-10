@@ -64,35 +64,35 @@ public class RemoveDriveResourcesActivity extends Activity implements Permission
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
 
-        this.setContentView(layout.activity_remove_resources);
+        setContentView(layout.activity_remove_resources);
 
-        this.mProgress = new ProgressDialog(this);
-        this.mProgress.setMessage("Removing area files ...");
-        this.mCredential = GoogleAccountCredential.usingOAuth2(this.getApplicationContext(),
+        mProgress = new ProgressDialog(this);
+        mProgress.setMessage("Removing area files ...");
+        mCredential = GoogleAccountCredential.usingOAuth2(getApplicationContext(),
                 Arrays.asList(SCOPES)).setBackOff(new ExponentialBackOff());
 
-        Bundle extras = this.getIntent().getExtras();
+        Bundle extras = getIntent().getExtras();
         if (extras == null) {
-            this.removeResources(this.resourceIds);
+            removeResources(resourceIds);
         } else {
             String resourceIds = extras.getString("resource_ids");
             if (resourceIds != null) {
                 this.resourceIds = resourceIds;
             }
-            this.removeResources(resourceIds);
+            removeResources(resourceIds);
         }
     }
 
     private void removeResources(String resourceIds) {
-        if (!this.isGooglePlayServicesAvailable()) {
-            this.acquireGooglePlayServices();
-        } else if (this.mCredential.getSelectedAccountName() == null) {
-            this.chooseAccount();
+        if (!isGooglePlayServicesAvailable()) {
+            acquireGooglePlayServices();
+        } else if (mCredential.getSelectedAccountName() == null) {
+            chooseAccount();
         } else {
             if (resourceIds == null) {
-                new RemoveRequestTask(this.mCredential).execute();
+                new RemoveRequestTask(mCredential).execute();
             } else {
-                new RemoveRequestTask(this.mCredential, resourceIds).execute();
+                new RemoveRequestTask(mCredential, resourceIds).execute();
             }
         }
     }
@@ -101,14 +101,14 @@ public class RemoveDriveResourcesActivity extends Activity implements Permission
     private void chooseAccount() {
         if (EasyPermissions.hasPermissions(
                 this, permission.GET_ACCOUNTS)) {
-            String accountName = this.getPreferences(Context.MODE_PRIVATE)
+            String accountName = getPreferences(Context.MODE_PRIVATE)
                     .getString(PREF_ACCOUNT_NAME, null);
             if (accountName != null) {
-                this.mCredential.setSelectedAccountName(accountName);
-                this.removeResources(this.resourceIds);
+                mCredential.setSelectedAccountName(accountName);
+                removeResources(resourceIds);
             } else {
                 // Start a dialog from which the user can choose an account
-                this.startActivityForResult(this.mCredential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
+                startActivityForResult(this.mCredential.newChooseAccountIntent(), REQUEST_ACCOUNT_PICKER);
             }
         } else {
             // Request the GET_ACCOUNTS permission via a user dialog
@@ -127,7 +127,7 @@ public class RemoveDriveResourcesActivity extends Activity implements Permission
         switch (requestCode) {
             case REQUEST_GOOGLE_PLAY_SERVICES:
                 if (resultCode == Activity.RESULT_OK) {
-                    this.removeResources(null);
+                    removeResources(null);
                 } else {
                     // TODO Share the error with the user
                 }
@@ -140,21 +140,22 @@ public class RemoveDriveResourcesActivity extends Activity implements Permission
                         Editor editor = settings.edit();
                         editor.putString(PREF_ACCOUNT_NAME, accountName);
                         editor.apply();
-                        this.mCredential.setSelectedAccountName(accountName);
-                        this.removeResources(this.resourceIds);
+                        mCredential.setSelectedAccountName(accountName);
+                        removeResources(resourceIds);
                     }
                 }
                 break;
             case REQUEST_AUTHORIZATION:
                 if (resultCode == Activity.RESULT_OK) {
-                    this.removeResources(this.resourceIds);
+                    removeResources(resourceIds);
                 }
                 break;
         }
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }
@@ -179,7 +180,7 @@ public class RemoveDriveResourcesActivity extends Activity implements Permission
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
         int connectionStatusCode = apiAvailability.isGooglePlayServicesAvailable(this);
         if (apiAvailability.isUserResolvableError(connectionStatusCode)) {
-            this.showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode);
+            showGooglePlayServicesAvailabilityErrorDialog(connectionStatusCode);
         }
     }
 
@@ -199,14 +200,14 @@ public class RemoveDriveResourcesActivity extends Activity implements Permission
         private RemoveRequestTask(GoogleAccountCredential credential) {
             HttpTransport transport = AndroidHttp.newCompatibleTransport();
             JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-            this.mService = new Builder(transport, jsonFactory, credential)
+            mService = new Builder(transport, jsonFactory, credential)
                     .setApplicationName("LMS").build();
         }
 
         private RemoveRequestTask(GoogleAccountCredential credential, String resourceIds) {
             HttpTransport transport = AndroidHttp.newCompatibleTransport();
             JsonFactory jsonFactory = JacksonFactory.getDefaultInstance();
-            this.mService = new Builder(transport, jsonFactory, credential)
+            mService = new Builder(transport, jsonFactory, credential)
                     .setApplicationName("LMS").build();
             this.resourceIds = resourceIds;
         }
@@ -280,8 +281,8 @@ public class RemoveDriveResourcesActivity extends Activity implements Permission
 
                 }
             } catch (Exception e) {
-                this.mLastError = e;
-                this.cancel(true);
+                mLastError = e;
+                cancel(true);
                 return null;
             }
             return false;
@@ -291,7 +292,7 @@ public class RemoveDriveResourcesActivity extends Activity implements Permission
         protected void onPostExecute(Boolean aBoolean) {
             super.onPostExecute(aBoolean);
             Intent displayIntent = null;
-            if (this.resourceIds != null) {
+            if (resourceIds != null) {
                 displayIntent = new Intent(getApplicationContext(), AreaResourceDisplayActivity.class);
                 displayIntent.putExtras(getIntent().getExtras());
             } else {
