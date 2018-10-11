@@ -28,6 +28,7 @@ import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.tags.TagsDBHelper;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.user.UserElement;
+import lm.pkp.com.landmap.util.GeneralUtil;
 
 public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String> {
 
@@ -54,7 +55,7 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
 
     protected String doInBackground(JSONObject... postDataParams) {
         try {
-            String urlString = "http://35.202.7.223/lm/AreaSearch.php?us=";
+            String urlString = "http://"+ GeneralUtil.dbHost+"/lm/AreaSearch.php?us=";
             JSONObject postDataParam = postDataParams[0];
             String searchKey = postDataParam.getString("us");
             URL url = new URL(urlString + URLEncoder.encode(searchKey, "utf-8"));
@@ -118,7 +119,7 @@ public class UserAreaDetailsLoadTask extends AsyncTask<JSONObject, Void, String>
 
                 adh.insertAreaFromServer(ae);
 
-                JSONArray positionsArr = (JSONArray) areaResponseObj.get("positions");
+                    JSONArray positionsArr = (JSONArray) areaResponseObj.get("positions");
                 for (int p = 0; p < positionsArr.length(); p++) {
                     JSONObject positionObj = (JSONObject) positionsArr.get(p);
                     PositionElement pe = new PositionElement();

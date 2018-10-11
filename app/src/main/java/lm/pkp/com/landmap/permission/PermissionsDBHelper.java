@@ -71,7 +71,7 @@ public class PermissionsDBHelper extends SQLiteOpenHelper {
         contentValues.put(ACCESS_COLUMN_DIRTY_ACTION, pe.getDirtyAction());
         contentValues.put(ACCESS_COLUMN_DIRTY_ACTION, pe.getDirtyAction());
 
-        db.insert(ACCESS_TABLE_NAME, null, contentValues);
+        db.insertOrThrow(ACCESS_TABLE_NAME, null, contentValues);
         db.close();
         return pe;
     }

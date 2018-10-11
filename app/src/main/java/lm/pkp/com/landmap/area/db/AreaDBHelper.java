@@ -390,7 +390,7 @@ public class AreaDBHelper extends SQLiteOpenHelper {
         try {
             postParams.put("requestType", "AreaMaster");
             postParams.put("queryType", queryType);
-            postParams.put("deviceID", AndroidSystemUtil.getDeviceId());
+            postParams.put("deviceID", AndroidSystemUtil.getDeviceId(context));
             postParams.put("center_lon", ae.getCenterPosition().getLon());
             postParams.put("center_lat", ae.getCenterPosition().getLat());
             postParams.put("desc", ae.getDescription());

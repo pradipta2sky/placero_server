@@ -89,6 +89,31 @@ public class SignInActivity extends AppCompatActivity implements
         signInButton.setSize(SignInButton.SIZE_STANDARD);
     }
 
+    @Override
+    public void taskCompleted(Object result) {
+        try {
+            String userDetails = result.toString();
+            UserDBHelper udh = new UserDBHelper(getApplicationContext());
+            Intent spashIntent = new Intent(this, SplashActivity.class);
+            if (userDetails.trim().equalsIgnoreCase("[]")) {
+                udh.insertUserToServer(signedUser);
+                spashIntent.putExtra("user_exists", "false");
+            }else {
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putString("user_details", userDetails);
+                editor.commit();
+
+                buildUserSelectionsFromDetails(userDetails);
+                spashIntent.putExtra("user_exists", "true");
+            }
+            startActivity(spashIntent);
+            finish();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @Override
     public void onStart() {
@@ -199,31 +224,6 @@ public class SignInActivity extends AppCompatActivity implements
             e.printStackTrace();
         }
         searchUserTask.setCompletionCallback(this);
-    }
-
-    @Override
-    public void taskCompleted(Object result) {
-        try {
-            String userDetails = result.toString();
-            UserDBHelper udh = new UserDBHelper(getApplicationContext());
-            Intent spashIntent = new Intent(this, SplashActivity.class);
-            if (userDetails.trim().equalsIgnoreCase("[]")) {
-                udh.insertUserToServer(signedUser);
-                spashIntent.putExtra("user_exists", "false");
-            }else {
-                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-                SharedPreferences.Editor editor = preferences.edit();
-                editor.putString("user_details", userDetails);
-                editor.commit();
-
-                buildUserSelectionsFromDetails(userDetails);
-                spashIntent.putExtra("user_exists", "true");
-            }
-            startActivity(spashIntent);
-            finish();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 
     private void buildUserSelectionsFromDetails(String userDetails) {

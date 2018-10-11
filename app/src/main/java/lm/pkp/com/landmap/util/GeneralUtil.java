@@ -18,4 +18,6 @@ public class GeneralUtil {
             return Patterns.EMAIL_ADDRESS.matcher(target).matches();
         }
     }
+
+    public static final String dbHost = "35.200.243.66";
 }

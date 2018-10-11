@@ -18,6 +18,7 @@ import lm.pkp.com.landmap.sync.LMSRestAsyncTask;
 import lm.pkp.com.landmap.tags.TagsDBHelper;
 import lm.pkp.com.landmap.util.AndroidSystemUtil;
 import lm.pkp.com.landmap.weather.db.WeatherDBHelper;
+import android.provider.Settings.Secure;
 
 public class UserDBHelper extends SQLiteOpenHelper {
 
@@ -76,8 +77,9 @@ public class UserDBHelper extends SQLiteOpenHelper {
     private JSONObject preparePostParams(String queryType, UserElement user) {
         JSONObject postParams = new JSONObject();
         try {
+
             postParams.put("queryType", queryType);
-            postParams.put("deviceID", AndroidSystemUtil.getDeviceId());
+            postParams.put("deviceID", AndroidSystemUtil.getDeviceId(localContext));
             postParams.put("requestType", "UserMaster");
             postParams.put(USER_COLUMN_DISPLAY_NAME, user.getDisplayName());
             postParams.put(USER_COLUMN_FAMILY_NAME, user.getFamilyName());

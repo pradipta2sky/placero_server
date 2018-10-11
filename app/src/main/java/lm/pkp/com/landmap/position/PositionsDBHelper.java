@@ -300,7 +300,7 @@ public class PositionsDBHelper extends SQLiteOpenHelper {
         try {
             postParams.put("requestType", "PositionMaster");
             postParams.put("queryType", queryType);
-            postParams.put("deviceID", AndroidSystemUtil.getDeviceId());
+            postParams.put("deviceID", AndroidSystemUtil.getDeviceId(context));
             postParams.put("lon", pe.getLon() + "");
             postParams.put("lat", pe.getLat() + "");
             postParams.put("desc", pe.getDescription());

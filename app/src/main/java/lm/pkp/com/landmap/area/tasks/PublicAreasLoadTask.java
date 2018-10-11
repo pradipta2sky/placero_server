@@ -27,6 +27,7 @@ import lm.pkp.com.landmap.permission.PermissionsDBHelper;
 import lm.pkp.com.landmap.position.PositionElement;
 import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.tags.TagsDBHelper;
+import lm.pkp.com.landmap.util.GeneralUtil;
 
 /**
  * Created by Rinky on 21-10-2017.
@@ -57,7 +58,7 @@ public class PublicAreasLoadTask extends AsyncTask<JSONObject, Void, String> {
 
     protected String doInBackground(JSONObject... postDataParams) {
         try {
-            String urlString = "http://35.202.7.223/lm/AreaPublicSearch.php";
+            String urlString = "http://"+ GeneralUtil.dbHost+"/lm/AreaPublicSearch.php";
             URL url = null;
             if (postDataParams.length > 0) {
                 JSONObject postDataParam = postDataParams[0];

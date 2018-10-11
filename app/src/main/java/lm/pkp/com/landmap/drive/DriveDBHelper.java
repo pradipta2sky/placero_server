@@ -567,7 +567,7 @@ public class DriveDBHelper extends SQLiteOpenHelper {
         try {
             postParams.put("requestType", "DriveMaster");
             postParams.put("query_type", queryType);
-            postParams.put("device_id", AndroidSystemUtil.getDeviceId());
+            postParams.put("device_id", AndroidSystemUtil.getDeviceId(context));
             postParams.put(DRIVE_COLUMN_AREA_ID, dr.getAreaId());
             postParams.put(DRIVE_COLUMN_USER_ID, dr.getUserId());
             postParams.put(DRIVE_COLUMN_UNIQUE_ID, dr.getUniqueId());
