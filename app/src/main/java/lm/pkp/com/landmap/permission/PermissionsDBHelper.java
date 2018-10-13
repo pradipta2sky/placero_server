@@ -134,7 +134,7 @@ public class PermissionsDBHelper extends SQLiteOpenHelper {
 
     public void deletePermissionsLocally() {
         SQLiteDatabase db = getWritableDatabase();
-        db.delete(ACCESS_TABLE_NAME, "1", null);
+        db.delete(ACCESS_TABLE_NAME, ACCESS_COLUMN_DIRTY_FLAG + " = 0 ", null);
         db.close();
     }
 

@@ -125,12 +125,13 @@ public class AreaDBHelper extends SQLiteOpenHelper {
             contentValues.put(AREA_COLUMN_DIRTY_FLAG, "1");
             ae.setDirty(1);
 
-            contentValues.put(AREA_COLUMN_DIRTY_ACTION, "insert");
-            ae.setDirtyAction("insert");
         } else {
-            contentValues.put(AREA_COLUMN_DIRTY_FLAG, "1");
-            ae.setDirty(1);
+            contentValues.put(AREA_COLUMN_DIRTY_FLAG, "0");
+            ae.setDirty(0);
         }
+
+        contentValues.put(AREA_COLUMN_DIRTY_ACTION, "insert");
+        ae.setDirtyAction("insert");
 
         db.insert(AREA_TABLE_NAME, null, contentValues);
         db.close();
