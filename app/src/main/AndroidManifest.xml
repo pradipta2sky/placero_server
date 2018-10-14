@@ -31,7 +31,7 @@
             android:value="@integer/google_play_services_version" />
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAGQItIMMsVu8kjvrU1KCR-zm1Xfdcxgnw" />
+            android:value="AIzaSyCLE-Ia_CzHSmBQ90Z6jQNWewcR0pSbLTo" />
 
         <activity
             android:name=".google.signin.SignInActivity"
