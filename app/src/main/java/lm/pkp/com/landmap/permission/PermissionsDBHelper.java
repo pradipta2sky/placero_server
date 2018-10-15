@@ -15,6 +15,7 @@ import java.util.Map;
 
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.model.AreaElement;
+import lm.pkp.com.landmap.connectivity.ConnectivityChangeReceiver;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.custom.GlobalContext;
 import lm.pkp.com.landmap.sync.LMSRestAsyncTask;
@@ -32,14 +33,16 @@ public class PermissionsDBHelper extends SQLiteOpenHelper {
     private static final String ACCESS_COLUMN_DIRTY_ACTION = "d_action";
 
     private AsyncTaskCallback callback;
-
+    private Context localContext;
     public PermissionsDBHelper(Context context, AsyncTaskCallback callback) {
         super(context, DATABASE_NAME, null, 1);
         this.callback = callback;
+        this.localContext = context;
     }
 
     public PermissionsDBHelper(Context context) {
         super(context, DATABASE_NAME, null, 1);
+        this.localContext = context;
     }
 
     @Override
@@ -77,7 +80,8 @@ public class PermissionsDBHelper extends SQLiteOpenHelper {
     }
 
     public boolean insertPermissionsToServer(String targetUser, String functionCodes) {
-        boolean networkAvailable = new Boolean(GlobalContext.INSTANCE.get(GlobalContext.INTERNET_AVAILABLE));
+        boolean networkAvailable = (new Boolean(GlobalContext.INSTANCE.get(GlobalContext.INTERNET_AVAILABLE))
+                || ConnectivityChangeReceiver.isConnected(localContext) );
         if (networkAvailable) {
             new LMSRestAsyncTask(callback)
                     .execute(preparePostParams("insert", targetUser, functionCodes));

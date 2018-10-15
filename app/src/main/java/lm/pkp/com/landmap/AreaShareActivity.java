@@ -80,7 +80,7 @@ public class AreaShareActivity extends AppCompatActivity {
                 JSONObject searchParams = new JSONObject();
                 try {
                     searchParams.put("ss", s.toString());
-                    searchParams.put("sf", "name");
+                    searchParams.put("sf", "email");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
