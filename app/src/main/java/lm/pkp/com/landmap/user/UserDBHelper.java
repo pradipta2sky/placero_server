@@ -18,6 +18,7 @@ import lm.pkp.com.landmap.sync.LMSRestAsyncTask;
 import lm.pkp.com.landmap.tags.TagsDBHelper;
 import lm.pkp.com.landmap.util.AndroidSystemUtil;
 import lm.pkp.com.landmap.weather.db.WeatherDBHelper;
+import android.provider.Settings.Secure;
 
 public class UserDBHelper extends SQLiteOpenHelper {
 
@@ -49,11 +50,11 @@ public class UserDBHelper extends SQLiteOpenHelper {
                         USER_COLUMN_AUTH_SYS_ID + " text )"
         );
 
-        new AreaDBHelper(this.localContext).onCreate(db);
-        new PositionsDBHelper(this.localContext).onCreate(db);
-        new DriveDBHelper(this.localContext).onCreate(db);
-        new PermissionsDBHelper(this.localContext).onCreate(db);
-        new WeatherDBHelper(this.localContext).onCreate(db);
+        new AreaDBHelper(localContext).onCreate(db);
+        new PositionsDBHelper(localContext).onCreate(db);
+        new DriveDBHelper(localContext).onCreate(db);
+        new PermissionsDBHelper(localContext).onCreate(db);
+        new WeatherDBHelper(localContext).onCreate(db);
         new TagsDBHelper(localContext).onCreate(db);
     }
 
@@ -63,18 +64,8 @@ public class UserDBHelper extends SQLiteOpenHelper {
         this.onCreate(db);
     }
 
-    public void insertUserLocally(UserElement user) {
-        SQLiteDatabase db = getWritableDatabase();
-
-        ContentValues contentValues = new ContentValues();
-        contentValues.put(USER_COLUMN_DISPLAY_NAME, user.getDisplayName());
-        contentValues.put(USER_COLUMN_EMAIL, user.getEmail());
-        contentValues.put(USER_COLUMN_FAMILY_NAME, user.getFamilyName());
-        contentValues.put(USER_COLUMN_GIVEN_NAME, user.getGivenName());
-        contentValues.put(USER_COLUMN_PHOTO_URL, user.getPhotoUrl());
-        contentValues.put(USER_COLUMN_AUTH_SYS_ID, user.getAuthSystemId());
-
-        db.insert(USER_TABLE_NAME, null, contentValues);
+    public void dryRun(){
+        SQLiteDatabase db = getReadableDatabase();
         db.close();
     }
 
@@ -86,8 +77,9 @@ public class UserDBHelper extends SQLiteOpenHelper {
     private JSONObject preparePostParams(String queryType, UserElement user) {
         JSONObject postParams = new JSONObject();
         try {
+
             postParams.put("queryType", queryType);
-            postParams.put("deviceID", AndroidSystemUtil.getDeviceId());
+            postParams.put("deviceID", AndroidSystemUtil.getDeviceId(localContext));
             postParams.put("requestType", "UserMaster");
             postParams.put(USER_COLUMN_DISPLAY_NAME, user.getDisplayName());
             postParams.put(USER_COLUMN_FAMILY_NAME, user.getFamilyName());
@@ -101,34 +93,4 @@ public class UserDBHelper extends SQLiteOpenHelper {
         }
         return postParams;
     }
-
-    public UserElement getUserByEmail(String email) {
-        Cursor cursor = null;
-        UserElement ue = null;
-        SQLiteDatabase db = getReadableDatabase();
-        try {
-            cursor = db.rawQuery("SELECT * FROM " + USER_TABLE_NAME + " WHERE " + USER_COLUMN_EMAIL + "=?",
-                    new String[]{email});
-            if (cursor == null) {
-                return ue;
-            }
-            if (cursor.getCount() > 0) {
-                ue = new UserElement();
-                cursor.moveToFirst();
-                ue.setDisplayName(cursor.getString(cursor.getColumnIndex(USER_COLUMN_DISPLAY_NAME)));
-                ue.setPhotoUrl(cursor.getString(cursor.getColumnIndex(USER_COLUMN_PHOTO_URL)));
-                ue.setGivenName(cursor.getString(cursor.getColumnIndex(USER_COLUMN_GIVEN_NAME)));
-                ue.setFamilyName(cursor.getString(cursor.getColumnIndex(USER_COLUMN_FAMILY_NAME)));
-                ue.setAuthSystemId(cursor.getString(cursor.getColumnIndex(USER_COLUMN_AUTH_SYS_ID)));
-                ue.setEmail(email);
-            }
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-        db.close();
-        return ue;
-    }
-
 }

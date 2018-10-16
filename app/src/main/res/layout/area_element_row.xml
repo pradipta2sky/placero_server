@@ -1,29 +1,28 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="15dp"
+    android:layout_margin="10dp"
     android:orientation="horizontal"
-    android:elevation="5dp"
+    android:elevation="10dp"
     android:weightSum="1"
-    android:background="@drawable/rounded_corner"
+    android:background="@drawable/rounded_area_list_view"
     android:baselineAligned="false"
-    android:minHeight="100dp"
-    android:paddingTop="10dp"
-    android:paddingBottom="10dp">
+    android:minHeight="100dp">
 
     <LinearLayout
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:layout_weight="0.80"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:layout_margin="10dp">
 
         <ImageView
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
             android:id="@+id/area_default_img"
-            android:src="@drawable/app_icon1"
-            android:layout_gravity="center_vertical"
-            android:padding="5dp"/>
+            android:src="@drawable/ic_launcher"
+            android:layout_gravity="center_vertical" />
+
     </LinearLayout>
 
 
@@ -31,7 +30,8 @@
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:layout_weight="0.20">
+        android:layout_weight="0.20"
+        android:layout_margin="10dp">
 
         <TextView
             android:id="@+id/area_name_text"

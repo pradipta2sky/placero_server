@@ -1,0 +1,75 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="lm.pkp.com.landmap.tags.TagsAddressFragment">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="#f0f0f0"
+        android:weightSum="1">
+
+        <ScrollView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight=".3"
+            android:layout_margin="10dp">
+            <com.cunoraz.tagview.TagView
+                xmlns:tagview="http://schemas.android.com/apk/res-auto"
+                android:id="@+id/tag_group"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_margin="10dp"
+                tagview:lineMargin="5dp"
+                tagview:tagMargin="5dp"
+                tagview:textPaddingLeft="8dp"
+                tagview:textPaddingTop="5dp"
+                tagview:textPaddingRight="8dp"
+                tagview:textPaddingBottom="5dp" />
+        </ScrollView>
+
+        <LinearLayout
+            android:id="@+id/bottom_container"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_weight=".7"
+            android:weightSum="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:background="@drawable/rounded_corner"
+            android:visibility="visible">
+
+            <ScrollView
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+                <com.cunoraz.tagview.TagView
+                    xmlns:tagview="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/tag_selection_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    tagview:lineMargin="5dp"
+                    tagview:tagMargin="5dp"
+                    tagview:textPaddingLeft="8dp"
+                    tagview:textPaddingTop="5dp"
+                    tagview:textPaddingRight="8dp"
+                    tagview:textPaddingBottom="5dp" />
+            </ScrollView>
+
+        </LinearLayout>
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="60dp"
+            android:text="Add as filter"
+            android:id="@+id/add_tags_user_action"
+            android:layout_margin="20dp"
+            android:padding="10dp"
+            android:backgroundTint="@color/blue_grey_500"/>
+
+    </LinearLayout>
+
+</FrameLayout>

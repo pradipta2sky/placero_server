@@ -12,6 +12,8 @@ public class UserElement {
     private String photoUrl;
     private String authSystemId;
 
+    private UserPersistableSelections selections = new UserPersistableSelections();
+
     public String getDisplayName() {
         return this.displayName;
     }
@@ -59,5 +61,10 @@ public class UserElement {
     public void setAuthSystemId(String authSystemId) {
         this.authSystemId = authSystemId;
     }
+
+    public UserPersistableSelections getSelections() {
+        return this.selections;
+    }
+
 
 }

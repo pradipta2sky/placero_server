@@ -14,7 +14,6 @@ import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
-import android.widget.ImageView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -24,11 +23,12 @@ import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.RemoveDriveResourcesActivity;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.model.AreaElement;
+import lm.pkp.com.landmap.custom.ThumbnailCreator;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
 import lm.pkp.com.landmap.util.FileUtil;
 
-import static android.widget.ImageView.ScaleType.CENTER_CROP;
+import static android.widget.ImageView.ScaleType.FIT_XY;
 
 final class AreaVideoDisplayAdaptor extends BaseAdapter {
 
@@ -45,11 +45,11 @@ final class AreaVideoDisplayAdaptor extends BaseAdapter {
     }
 
     @Override
-    public View getView(final int position, View convertView, ViewGroup parent) {
+    public View getView(final int position, View convertView, final ViewGroup parent) {
         SquaredImageView view = (SquaredImageView) convertView;
         if (view == null) {
             view = new SquaredImageView(this.context);
-            view.setScaleType(CENTER_CROP);
+            view.setScaleType(FIT_XY);
         } else {
             return view;
         }
@@ -69,10 +69,17 @@ final class AreaVideoDisplayAdaptor extends BaseAdapter {
         final File videoFile = dataSet.get(position).getVideoFile();
 
         Bitmap bMap = null;
+        final AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
         if (thumbFile.exists()) {
             bMap = BitmapFactory.decodeFile(thumbFile.getAbsolutePath());
         }else {
-            bMap = BitmapFactory.decodeResource(context.getResources(), R.drawable.error);
+            if(videoFile.exists()){
+                ThumbnailCreator creator = new ThumbnailCreator(context);
+                creator.createVideoThumbnail(videoFile, areaElement.getUniqueId());
+                bMap = BitmapFactory.decodeFile(thumbFile.getAbsolutePath());
+            }else {
+                bMap = BitmapFactory.decodeResource(context.getResources(), R.drawable.error);
+            }
         }
         view.setImageBitmap(bMap);
 
@@ -83,7 +90,7 @@ final class AreaVideoDisplayAdaptor extends BaseAdapter {
             public void onClick(View v) {
                 Intent intent = new Intent();
                 intent.setAction(Intent.ACTION_VIEW);
-                intent.setDataAndType(Uri.fromFile(videoFile), "video/*");
+                intent.setDataAndType(Uri.fromFile(videoFile), "video/mp4");
                 referredView.getContext().startActivity(intent);
             }
         });
@@ -91,9 +98,12 @@ final class AreaVideoDisplayAdaptor extends BaseAdapter {
         view.setOnLongClickListener(new OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                ImageView clickedImage = (ImageView) referredView;
-                clickedImage.setBackgroundResource(R.drawable.image_border);
-
+                int siblingCount = parent.getChildCount();
+                for (int i = 0; i < siblingCount; i++) {
+                    View child = parent.getChildAt(i);
+                    child.setPadding(0,0,0,0);
+                }
+                referredView.setPadding(20,20,20,20);
                 fragment.getView().findViewById(id.res_action_layout).setVisibility(View.VISIBLE);
 
                 final VideoDisplayElement videoDisplayElement = dataSet.get(position);
@@ -109,7 +119,7 @@ final class AreaVideoDisplayAdaptor extends BaseAdapter {
                         DriveDBHelper ddh = new DriveDBHelper(fragment.getContext());
                         DriveResource driveResource = ddh.getDriveResourceByResourceId(resourceId);
 
-                        AreaContext.INSTANCE.getAreaElement().getMediaResources().remove(driveResource);
+                        areaElement.getMediaResources().remove(driveResource);
                         ddh.deleteResourceLocally(driveResource);
                         ddh.deleteResourceFromServer(driveResource);
 
@@ -124,11 +134,9 @@ final class AreaVideoDisplayAdaptor extends BaseAdapter {
                     @Override
                     public void onClick(View v) {
                         File videoFile = videoDisplayElement.getVideoFile();
-
-                        AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
                         Intent intent = new Intent(Intent.ACTION_SEND);
                         intent.putExtra(Intent.EXTRA_SUBJECT, "Video shared using [Placero LMS] for place - " + areaElement.getName());
-                        intent.putExtra(Intent.EXTRA_TEXT, "Hi, \nCheck out video for " + areaElement.getName());
+                        intent.putExtra(Intent.EXTRA_TEXT, "Hi, \nCheck out video_map for " + areaElement.getName());
                         intent.setType(FileUtil.getMimeType(videoFile));
                         Uri uri = Uri.fromFile(videoFile);
                         intent.putExtra(Intent.EXTRA_STREAM, uri);

@@ -7,7 +7,8 @@
         android:id="@+id/selected_area_include"
         layout="@layout/area_element_row"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"/>
 
     <LinearLayout
         android:id="@+id/action_buttons_section"

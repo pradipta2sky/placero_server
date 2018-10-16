@@ -24,8 +24,6 @@ public abstract class BaseDriveActivity extends Activity implements ConnectionCa
     protected static final int REQUEST_CODE_RESOLUTION = 1;
     private GoogleApiClient mGoogleApiClient;
 
-    protected TextView statusText;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

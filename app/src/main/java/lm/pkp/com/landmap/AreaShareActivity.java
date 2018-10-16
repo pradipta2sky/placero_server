@@ -53,7 +53,7 @@ public class AreaShareActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         new GenericActivityExceptionHandler(this);
 
-        this.setContentView(layout.activity_area_share);
+        this.setContentView(R.layout.activity_area_share);
 
         AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
         ActionBar ab = this.getSupportActionBar();
@@ -80,7 +80,7 @@ public class AreaShareActivity extends AppCompatActivity {
                 JSONObject searchParams = new JSONObject();
                 try {
                     searchParams.put("ss", s.toString());
-                    searchParams.put("sf", "name");
+                    searchParams.put("sf", "email");
                 } catch (Exception e) {
                     e.printStackTrace();
                 }

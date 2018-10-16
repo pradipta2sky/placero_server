@@ -21,22 +21,17 @@ public class AreaElement implements Serializable {
     private String description;
     private String createdBy;
     private String type;
-    private double measureSqFt;
     private String uniqueId;
+    private Integer dirty = 0;
+    private String dirtyAction = "";
+
     private AreaAddress address;
+    private AreaMeasure measure;
 
     private PositionElement centerPosition = new PositionElement();
     private List<PositionElement> positions = new ArrayList<>();
     private List<DriveResource> mediaResources = new ArrayList<>();
     private Map<String, PermissionElement> userPermissions = new HashMap<>();
-
-    public double getMeasureSqFt() {
-        return this.measureSqFt;
-    }
-
-    public void setMeasureSqFt(double measureSqFt) {
-        this.measureSqFt = measureSqFt;
-    }
 
     public String getCreatedBy() {
         return this.createdBy;
@@ -58,6 +53,22 @@ public class AreaElement implements Serializable {
         return this.description;
     }
 
+    public Integer getDirty() {
+        return this.dirty;
+    }
+
+    public void setDirty(Integer dirty) {
+        this.dirty = dirty;
+    }
+
+    public String getDirtyAction() {
+        return this.dirtyAction;
+    }
+
+    public void setDirtyAction(String dirtyAction) {
+        this.dirtyAction = dirtyAction;
+    }
+
     public void setDescription(String description) {
         this.description = description;
     }
@@ -65,7 +76,11 @@ public class AreaElement implements Serializable {
     public List<PositionElement> getPositions() {
         int size = positions.size();
         for (int i = 0; i < size; i++) {
-            positions.get(i).setDisplayName("Position_" + (i + 1));
+            PositionElement position = positions.get(i);
+            String posName = position.getName();
+            if(posName.startsWith("P_")){
+                position.setName("Position_" + (i + 1));
+            }
         }
         return this.positions;
     }
@@ -80,10 +95,6 @@ public class AreaElement implements Serializable {
 
     public void setUniqueId(String uniqueId) {
         this.uniqueId = uniqueId;
-    }
-
-    public AreaElement copy() {
-        return SerializationUtils.clone(this);
     }
 
     public List<DriveResource> getMediaResources() {
@@ -120,5 +131,13 @@ public class AreaElement implements Serializable {
 
     public void setAddress(AreaAddress address) {
         this.address = address;
+    }
+
+    public AreaMeasure getMeasure() {
+        return this.measure;
+    }
+
+    public void setMeasure(AreaMeasure measure) {
+        this.measure = measure;
     }
 }

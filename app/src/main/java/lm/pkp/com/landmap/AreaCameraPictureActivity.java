@@ -14,6 +14,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.UUID;
 
@@ -37,7 +38,7 @@ public class AreaCameraPictureActivity extends Activity implements LocationPosit
     // Camera activity request codes
     private static final int CAMERA_CAPTURE_IMAGE_REQUEST_CODE = 100;
 
-    private Uri fileUri; // file url to store image/video
+    private Uri fileUri; // file url to store image/video_map
     private final DriveResource pictureResource = new DriveResource();
 
     @Override
@@ -107,7 +108,10 @@ public class AreaCameraPictureActivity extends Activity implements LocationPosit
                 pictureResource.setContentType("Image");
                 pictureResource.setContainerId(areaContext.getImagesRootDriveResource().getResourceId());
                 pictureResource.setCreatedOnMillis(System.currentTimeMillis() + "");
+                pictureResource.setDirty(1);
+                pictureResource.setDirtyAction("upload");
 
+                ae.getMediaResources().add(pictureResource);
                 areaContext.addResourceToQueue(pictureResource);
 
                 Intent i = new Intent(this, AreaAddResourcesActivity.class);
@@ -128,7 +132,7 @@ public class AreaCameraPictureActivity extends Activity implements LocationPosit
     }
 
     /**
-     * returning image / video
+     * returning image / video_map
      */
     private static File getOutputMediaFile() {
         AreaElement areaElement = AreaContext.INSTANCE.getAreaElement();
@@ -139,8 +143,10 @@ public class AreaCameraPictureActivity extends Activity implements LocationPosit
 
     @Override
     public void receivedLocationPostion(PositionElement pe) {
-        pictureResource.setLatitude(pe.getLat() + "");
-        pictureResource.setLongitude(pe.getLon() + "");
+        pe.setType("Media");
+        pe.setDirty(1);
+        pe.setDirtyAction("insert");
+        pictureResource.setPosition(pe);
     }
 
     @Override

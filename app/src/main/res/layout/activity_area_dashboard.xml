@@ -31,7 +31,7 @@
         android:id="@+id/areas_display_tab_pager"
         android:layout_width="match_parent"
         android:layout_height="fill_parent"
-        android:layout_marginBottom="50dp"
+        android:layout_marginBottom="60dp"
         android:layout_below="@id/areas_display_tab_layout"
         android:clickable="true"/>
 

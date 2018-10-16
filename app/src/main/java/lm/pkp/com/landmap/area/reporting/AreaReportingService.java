@@ -40,6 +40,7 @@ import java.util.regex.Pattern;
 import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.area.model.AreaAddress;
 import lm.pkp.com.landmap.area.model.AreaElement;
+import lm.pkp.com.landmap.area.model.AreaMeasure;
 import lm.pkp.com.landmap.custom.ThumbnailCreator;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
@@ -172,17 +173,13 @@ public class AreaReportingService extends IntentService {
 
         // Area Measurement attributes
         DecimalFormat areaFormat = new DecimalFormat("###.##");
-        double areaMeasureSqFt = areaElement.getMeasureSqFt();
-        double areaMeasureSqMts = areaMeasureSqFt * 0.092903;
-        double areaMeasureAcre = areaMeasureSqFt / 43560;
-        double areaMeasureHec = areaMeasureAcre * 0.404686;
-        double areaMeasureDecimals = areaMeasureSqFt / 436;
+        AreaMeasure measure = areaElement.getMeasure();
 
-        reportContent.put("area_measurement_sq_ft", "Square Feet - " + areaFormat.format(areaMeasureSqFt));
-        reportContent.put("area_measurement_sq_mt", "Square Meters - " + areaFormat.format(areaMeasureSqMts));
-        reportContent.put("area_measurement_dec", "Decimals - " + areaFormat.format(areaMeasureDecimals));
-        reportContent.put("area_measurement_acre", "Acre - " + areaFormat.format(areaMeasureAcre));
-        reportContent.put("area_measurement_hec", "Hectare - " + areaFormat.format(areaMeasureHec));
+        reportContent.put("area_measurement_sq_ft", "Square Feet - " + areaFormat.format(measure.getSqFeet()));
+        reportContent.put("area_measurement_sq_mt", "Square Meters - " + areaFormat.format(measure.getSqMeters()));
+        reportContent.put("area_measurement_dec", "Decimals - " + areaFormat.format(measure.getDecimals()));
+        reportContent.put("area_measurement_acre", "Acre - " + areaFormat.format(measure.getAcre()));
+        reportContent.put("area_measurement_hec", "Hectare - " + areaFormat.format(measure.getHectare()));
 
         // Area Positions
         DecimalFormat locFormat = new DecimalFormat("##.####");
@@ -366,8 +363,7 @@ public class AreaReportingService extends IntentService {
         resource.setMimeType("application/pdf");
         resource.setAreaId(areaElement.getUniqueId());
         resource.setSize(docFile.length() + "");
-        resource.setLatitude("");
-        resource.setLongitude("");
+        resource.setPosition(new PositionElement());
         resource.setCreatedOnMillis(System.currentTimeMillis() + "");
 
         ThumbnailCreator creator = new ThumbnailCreator(reportingContext.getActivityContext());
@@ -386,7 +382,7 @@ public class AreaReportingService extends IntentService {
         Notification notification = new Notification.Builder(this)
                 .setContentTitle("Your report is now available")
                 .setContentText(reportName)
-                .setSmallIcon(R.drawable.pdf_icon)
+                .setSmallIcon(R.drawable.report)
                 .setAutoCancel(false)
                 .setDefaults(Notification.DEFAULT_ALL)
                 .setVisibility(Notification.VISIBILITY_PUBLIC)

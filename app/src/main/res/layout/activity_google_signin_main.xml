@@ -31,13 +31,6 @@
                 android:contentDescription="@string/desc_google_icon"
                 android:src="@drawable/googleg_color" />
 
-            <ImageView
-                android:id="@+id/application_icon"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:contentDescription="@string/desc_google_icon"
-                android:src="@drawable/app_icon1" />
-
         </LinearLayout>
 
         <TextView

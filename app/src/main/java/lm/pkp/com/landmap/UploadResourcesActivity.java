@@ -30,10 +30,14 @@ import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.area.AreaContext;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.model.AreaElement;
+import lm.pkp.com.landmap.connectivity.ConnectivityChangeReceiver;
 import lm.pkp.com.landmap.custom.ApiClientAsyncTask;
+import lm.pkp.com.landmap.custom.GlobalContext;
 import lm.pkp.com.landmap.custom.ThumbnailCreator;
 import lm.pkp.com.landmap.drive.DriveDBHelper;
 import lm.pkp.com.landmap.drive.DriveResource;
+import lm.pkp.com.landmap.position.PositionElement;
+import lm.pkp.com.landmap.position.PositionsDBHelper;
 import lm.pkp.com.landmap.util.FileUtil;
 
 
@@ -42,13 +46,15 @@ import lm.pkp.com.landmap.util.FileUtil;
  */
 public class UploadResourcesActivity extends BaseDriveActivity {
 
+    private boolean online = true;
     private final Stack<DriveResource> processStack = new Stack<>();
     private List<String> uploadedResources = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setContentView(layout.activity_upload_area_resources);
+        setContentView(layout.activity_upload_area_resources);
+        online = ConnectivityChangeReceiver.isConnected(this);
     }
 
     @Override
@@ -56,35 +62,56 @@ public class UploadResourcesActivity extends BaseDriveActivity {
         super.onConnected(connectionHint);
         ArrayList<DriveResource> resources = AreaContext.INSTANCE.getUploadedQueue();
         for (int i = 0; i < resources.size(); i++) {
-            this.processStack.push(resources.get(i));
+            processStack.push(resources.get(i));
         }
-        this.processResources();
+        processResources();
     }
 
     @Override
     protected void handleConnectionIssues() {
-        Intent areaDetailsIntent = new Intent(getApplicationContext(), AreaDetailsActivity.class);
-        areaDetailsIntent.putExtra("action", "Upload");
-        areaDetailsIntent.putExtra("outcome_type", "error");
-        areaDetailsIntent.putExtra("outcome", "Connection issues.");
-        startActivity(areaDetailsIntent);
+        ArrayList<DriveResource> resources = AreaContext.INSTANCE.getUploadedQueue();
+        for (int i = 0; i < resources.size(); i++) {
+            processStack.push(resources.get(i));
+        }
+        processResources();
     }
 
     private void processResources() {
-        if (!this.processStack.isEmpty()) {
-            this.processResource(this.processStack.pop());
+        if (!processStack.isEmpty()) {
+            processResource(processStack.pop());
         } else {
-            Intent addResourcesIntent = new Intent(this, ShareUploadedResourcesActivity.class);
-            addResourcesIntent.putExtra("uploaded_resource_ids", uploadedResources.toArray());
-            getGoogleApiClient().disconnect();
-            startActivity(addResourcesIntent);
-
+            if(online){
+                Intent addResourcesIntent = new Intent(this, ShareUploadedResourcesActivity.class);
+                addResourcesIntent.putExtra("uploaded_resource_ids", uploadedResources.toArray());
+                getGoogleApiClient().disconnect();
+                startActivity(addResourcesIntent);
+            }else {
+                Intent areaDetailsIntent = new Intent(getApplicationContext(), AreaDetailsActivity.class);
+                areaDetailsIntent.putExtra("action", "Upload");
+                areaDetailsIntent.putExtra("outcome_type", "info");
+                areaDetailsIntent.putExtra("outcome", "Completed offline upload");
+                startActivity(areaDetailsIntent);
+            }
             finish();
         }
     }
 
     private void processResource(DriveResource res) {
-        new FileProcessingTask(res).execute();
+        DriveDBHelper ddh = new DriveDBHelper(getApplicationContext());
+        PositionsDBHelper pdh = new PositionsDBHelper(getApplicationContext());
+        if(online){
+            new FileProcessingTask(res).execute();
+        }else {
+            ddh.deleteResourceLocally(res);
+            ddh.insertResourceLocally(res);
+            PositionElement position = res.getPosition();
+            if(position != null){
+                pdh.deletePositionLocally(position);
+                pdh.insertPositionLocally(position);
+            }
+            AreaContext.INSTANCE.getUploadedQueue().remove(res);
+            processResources();
+        }
     }
 
     private class FileProcessingTask extends AsyncTask {
@@ -97,9 +124,8 @@ public class UploadResourcesActivity extends BaseDriveActivity {
 
         @Override
         protected Object doInBackground(Object[] params) {
-
             DriveApi.DriveIdResult idResult
-                    = Drive.DriveApi.fetchDriveId(getGoogleApiClient(), this.resource.getContainerId()).await();
+                    = Drive.DriveApi.fetchDriveId(getGoogleApiClient(), resource.getContainerId()).await();
             DriveId driveId = idResult.getDriveId();
             if(driveId == null){
                 Intent addResourcesIntent = new Intent(getApplicationContext(), AreaAddResourcesActivity.class);
@@ -108,7 +134,6 @@ public class UploadResourcesActivity extends BaseDriveActivity {
                 addResourcesIntent.putExtra("outcome", "Upload location corrupted.");
                 getGoogleApiClient().disconnect();
                 startActivity(addResourcesIntent);
-
                 finish();
             }else {
                 DriveFolder folder = driveId.asDriveFolder();
@@ -116,13 +141,14 @@ public class UploadResourcesActivity extends BaseDriveActivity {
                         = Drive.DriveApi.newDriveContents(getGoogleApiClient()).await();
                 DriveContents contents = contentsResult.getDriveContents();
                 MetadataChangeSet changeSet = new Builder()
-                        .setTitle(this.resource.getName())
-                        .setMimeType(this.resource.getMimeType())
+                        .setTitle(resource.getName())
+                        .setMimeType(resource.getMimeType())
                         .build();
-                DriveFolder.DriveFileResult driveFileResult = folder.createFile(getGoogleApiClient(), changeSet, contents).await();
-
+                DriveFolder.DriveFileResult driveFileResult
+                        = folder.createFile(getGoogleApiClient(), changeSet, contents).await();
                 DriveFile createdFile = driveFileResult.getDriveFile();
-                createdFile.addChangeListener(getGoogleApiClient(), new FileMetaChangeListener(this.resource, createdFile));
+                createdFile.addChangeListener(getGoogleApiClient(),
+                        new FileMetaChangeListener(resource, createdFile));
             }
             return null;
         }
@@ -142,14 +168,33 @@ public class UploadResourcesActivity extends BaseDriveActivity {
         public void onChange(ChangeEvent changeEvent) {
             if (changeEvent.hasMetadataChanged()) {
                 DriveId driveId = changeEvent.getDriveId();
-                this.resource.setResourceId(driveId.getResourceId());
+                resource.setResourceId(driveId.getResourceId());
 
                 DriveDBHelper ddh = new DriveDBHelper(getApplicationContext());
+                // Handling offline insertion
+                resource.setDirty(0);
+                resource.setDirtyAction("none");
+
+                ddh.deleteResourceLocally(resource);
                 ddh.insertResourceLocally(resource);
+                ddh.deleteResourceFromServer(resource);
                 ddh.insertResourceToServer(resource);
 
-                this.driveFile.removeChangeListener(getGoogleApiClient(), this);
-                new CopyContentsAsyncTask(getApplicationContext(), this.resource).execute(this.driveFile);
+                PositionsDBHelper pdh = new PositionsDBHelper(getApplicationContext());
+                PositionElement position = resource.getPosition();
+                if(position != null){
+                    position.setUniqueAreaId(resource.getAreaId());
+                    // Handling offline insertion
+                    position.setDirty(0);
+                    position.setDirtyAction("none");
+
+                    pdh.deletePositionLocally(position);
+                    pdh.insertPositionLocally(position);
+                    pdh.deletePositionFromServer(position);
+                    pdh.insertPositionToServer(position);
+                }
+                driveFile.removeChangeListener(getGoogleApiClient(), this);
+                new CopyContentsAsyncTask(getApplicationContext(), resource).execute(driveFile);
             }
         }
     }
@@ -166,7 +211,7 @@ public class UploadResourcesActivity extends BaseDriveActivity {
         protected Boolean doInBackgroundConnected(DriveFile... args) {
             DriveFile file = args[0];
             DriveApi.DriveContentsResult driveContentsResult = file.open(
-                    this.getGoogleApiClient(), DriveFile.MODE_WRITE_ONLY, null).await();
+                    getGoogleApiClient(), DriveFile.MODE_WRITE_ONLY, null).await();
             if (!driveContentsResult.getStatus().isSuccess()) {
                 return false;
             }
@@ -174,7 +219,7 @@ public class UploadResourcesActivity extends BaseDriveActivity {
             DriveContents driveContents = driveContentsResult.getDriveContents();
             OutputStream outputStream = driveContents.getOutputStream();
             try {
-                File inputFile = new File(this.resource.getPath());
+                File inputFile = new File(resource.getPath());
                 FileInputStream fileInputStream = new FileInputStream(inputFile);
                 IOUtils.copyLarge(fileInputStream, outputStream);
                 IOUtils.closeQuietly(fileInputStream);
@@ -189,11 +234,11 @@ public class UploadResourcesActivity extends BaseDriveActivity {
         protected void onPostExecute(Boolean result) {
             AreaContext areaContext = AreaContext.INSTANCE;
             AreaElement areaElement = areaContext.getAreaElement();
-            areaContext.removeResourceFromQueue(this.resource);
-            areaElement.getMediaResources().add(this.resource);
+
+            areaContext.removeResourceFromQueue(resource);
 
             // Create thumbnails of the uploaded files for display.
-            String resourcePath = this.resource.getPath();
+            String resourcePath = resource.getPath();
             File resourceFile = new File(resourcePath);
 
             ThumbnailCreator tCreator = new ThumbnailCreator(getApplicationContext());

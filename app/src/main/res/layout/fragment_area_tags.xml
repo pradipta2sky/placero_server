@@ -1,0 +1,156 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="lm.pkp.com.landmap.tags.TagsAddressFragment">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#f0f0f0"
+        android:orientation="vertical"
+        android:weightSum="1">
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_gravity="center"
+            android:layout_margin="20dp"
+            android:layout_weight=".3"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="1">
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:gravity="center"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"
+                    android:text="Units"
+                    android:layout_weight="0.7"
+                    />
+                <Spinner
+                    android:id="@+id/measure_spinner"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#E67E22"
+                    android:entries="@array/measure_arrays"
+                    android:popupBackground="#E3BB45"
+                    android:prompt="@string/measure_prompt"
+                    android:gravity="left"
+                    android:layout_weight="0.3"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="1">
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:gravity="center"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"
+                    android:text="Condition"
+                    android:layout_weight="0.7"
+                    />
+                <Spinner
+                    android:id="@+id/compare_spinner"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:background="#E67E22"
+                    android:entries="@array/compare_arrays"
+                    android:popupBackground="#E3BB45"
+                    android:prompt="@string/compare_prompt"
+                    android:gravity="left"
+                    android:layout_weight="0.3"
+                    />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:weightSum="1"
+                android:layout_marginTop="20dp">
+                <TextView
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:gravity="center"
+                    android:textSize="16sp"
+                    android:textColor="@color/black"
+                    android:text="Value"
+                    android:layout_weight="0.7"
+                    />
+                <EditText
+                    android:id="@+id/compare_value"
+                    android:layout_width="fill_parent"
+                    android:layout_height="45dp"
+                    android:layout_gravity="center"
+                    android:numeric="decimal"
+                    android:background="@drawable/edit_box"
+                    android:layout_weight="0.3"
+                    android:paddingStart="10dp"
+                    android:textColor="@color/blue_grey_900"
+                    />
+            </LinearLayout>
+
+            <Button
+                android:id="@+id/add_condition_tag"
+                android:layout_width="100dp"
+                android:layout_height="50dp"
+                android:layout_gravity="center"
+                android:backgroundTint="@color/blue_grey_500"
+                android:padding="5dp"
+                android:text="Add"
+                android:layout_marginTop="20dp"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/bottom_container"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_marginLeft="20dp"
+            android:layout_marginRight="20dp"
+            android:layout_weight=".7"
+            android:background="@drawable/rounded_corner"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:visibility="visible"
+            android:weightSum="1">
+
+            <ScrollView
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent">
+                <com.cunoraz.tagview.TagView xmlns:tagview="http://schemas.android.com/apk/res-auto"
+                    android:id="@+id/tag_selection_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    tagview:lineMargin="5dp"
+                    tagview:tagMargin="10dp"
+                    tagview:textPaddingTop="5dp"
+                    tagview:textPaddingBottom="5dp"/>
+            </ScrollView>
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/add_tags_user_action"
+            android:layout_width="fill_parent"
+            android:layout_height="60dp"
+            android:layout_margin="20dp"
+            android:backgroundTint="@color/blue_grey_500"
+            android:padding="10dp"
+            android:text="Add as filter" />
+
+    </LinearLayout>
+
+</FrameLayout>

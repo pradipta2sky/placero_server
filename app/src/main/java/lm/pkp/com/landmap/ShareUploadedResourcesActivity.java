@@ -115,7 +115,6 @@ public class ShareUploadedResourcesActivity extends Activity implements Permissi
             }catch (Exception e){
                 e.printStackTrace();
             }
-
         }
     }
 
@@ -186,7 +185,8 @@ public class ShareUploadedResourcesActivity extends Activity implements Permissi
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
     }

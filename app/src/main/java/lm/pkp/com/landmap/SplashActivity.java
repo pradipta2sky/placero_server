@@ -9,8 +9,10 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import lm.pkp.com.landmap.R.layout;
+import lm.pkp.com.landmap.connectivity.ConnectivityChangeReceiver;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
 import lm.pkp.com.landmap.custom.GenericActivityExceptionHandler;
+import lm.pkp.com.landmap.custom.GlobalContext;
 import lm.pkp.com.landmap.sync.LocalDataRefresher;
 import lm.pkp.com.landmap.sync.LocalFolderStructureManager;
 
@@ -28,8 +30,13 @@ public class SplashActivity extends Activity {
         if(extras != null){
             userExists = new Boolean(extras.getString("user_exists"));
         }
-
-        new LocalDataRefresher(getApplicationContext(), new DataReloadCallback()).refreshLocalData();
+        if(ConnectivityChangeReceiver.isConnected(this)){
+            new LocalDataRefresher(getApplicationContext(), new DataReloadCallback()).refreshLocalData();
+        }else {
+            Intent dashboardIntent = new Intent(this, AreaDashboardActivity.class);
+            startActivity(dashboardIntent);
+            finish();
+        }
         LocalFolderStructureManager.create();
     }
 

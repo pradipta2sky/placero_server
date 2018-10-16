@@ -13,14 +13,16 @@ import lm.pkp.com.landmap.weather.model.WeatherElement;
 public class PositionElement implements Serializable {
 
     private String name = "";
-    private String displayName = "";
-    private String description = "";
+    private String description = "No Description";
     private double lat;
     private double lon;
     private String tags = "";
     private String uniqueAreaId = "";
     private String uniqueId = "";
     private String createdOnMillis = System.currentTimeMillis() + "";
+    private String type = "boundary";
+    private Integer dirty = 0;
+    private String dirtyAction = "";
     private WeatherElement weather;
 
     public String getName() {
@@ -91,14 +93,6 @@ public class PositionElement implements Serializable {
         this.createdOnMillis = createdOnMillis;
     }
 
-    public String getDisplayName() {
-        return this.displayName;
-    }
-
-    public void setDisplayName(String displayName) {
-        this.displayName = displayName;
-    }
-
     public WeatherElement getWeather() {
         return weather;
     }
@@ -107,11 +101,27 @@ public class PositionElement implements Serializable {
         this.weather = weather;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        EqualsBuilder builder = new EqualsBuilder();
-        builder.append(lat, ((PositionElement) o).lat);
-        builder.append(lon, ((PositionElement) o).lon);
-        return builder.isEquals();
+    public String getType() {
+        return this.type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Integer getDirty() {
+        return this.dirty;
+    }
+
+    public void setDirty(Integer dirty) {
+        this.dirty = dirty;
+    }
+
+    public String getDirtyAction() {
+        return this.dirtyAction;
+    }
+
+    public void setDirtyAction(String dirtyAction) {
+        this.dirtyAction = dirtyAction;
     }
 }

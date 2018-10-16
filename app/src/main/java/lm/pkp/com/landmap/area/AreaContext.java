@@ -29,7 +29,6 @@ public class AreaContext {
     private AreaElement currentArea;
     private Context context;
     private Bitmap displayBMap;
-    private Boolean generatingReport;
     private List<Bitmap> viewBitmaps = new ArrayList<>();
     private final ArrayList<DriveResource> uploadQueue = new ArrayList<>();
 
@@ -40,20 +39,22 @@ public class AreaContext {
     public void setAreaElement(AreaElement areaElement, Context context) {
         clearContext();
 
-        this.currentArea = areaElement;
         this.context = context;
-        this.uploadQueue.clear();
+        currentArea = areaElement;
+        uploadQueue.clear();
 
         PositionsDBHelper pdb = new PositionsDBHelper(context);
-        this.currentArea.setPositions(pdb.getPositionsForArea(this.currentArea));
-        this.reCenter(this.currentArea);
+        currentArea.setPositions(pdb.getPositionsForArea(currentArea));
+        centerize(currentArea);
 
         DriveDBHelper ddh = new DriveDBHelper(context);
-        this.currentArea.setMediaResources(ddh.getDriveResourcesByAreaId(this.currentArea.getUniqueId()));
+        currentArea.setMediaResources(ddh.getDriveResourcesByAreaId(currentArea.getUniqueId()));
+        uploadQueue.addAll(ddh.getUploadableDirtyResources(currentArea.getUniqueId()));
 
         PermissionsDBHelper pdh = new PermissionsDBHelper(context);
         currentArea.setUserPermissions(pdh.fetchPermissionsByAreaId(currentArea.getUniqueId()));
     }
+
 
     public void clearContext(){
         if(currentArea != null){
@@ -80,7 +81,7 @@ public class AreaContext {
         }
     }
 
-    public void reCenter(AreaElement areaElement) {
+    public AreaElement centerize(AreaElement areaElement) {
         double latSum = 0.0;
         double longSum = 0.0;
         String positionId = null;
@@ -90,23 +91,35 @@ public class AreaContext {
 
         List<PositionElement> positions = areaElement.getPositions();
         int noOfPositions = positions.size();
+        int boundaryCtr = 0;
         if (noOfPositions != 0) {
             for (int i = 0; i < noOfPositions; i++) {
                 PositionElement pe = positions.get(i);
-                if (positionId == null) {
-                    positionId = pe.getUniqueId();
+                if(!pe.getType().equalsIgnoreCase("boundary")){
+                    continue;
+                }else {
+                    boundaryCtr ++;
+                    if (positionId == null) {
+                        positionId = pe.getUniqueId();
+                    }
                 }
                 latSum += pe.getLat();
                 longSum += pe.getLon();
             }
-            latAvg = latSum / noOfPositions;
-            lonAvg = longSum / noOfPositions;
+            if(boundaryCtr > 0){
+                latAvg = latSum / boundaryCtr;
+                lonAvg = longSum / boundaryCtr;
+
+                PositionElement centerPosition = new PositionElement();
+            }
         }
 
         PositionElement centerPosition = areaElement.getCenterPosition();
         centerPosition.setLat(latAvg);
         centerPosition.setLon(lonAvg);
         centerPosition.setUniqueId(positionId);
+
+        return areaElement;
     }
 
     // Drive specific resources.
@@ -248,26 +261,5 @@ public class AreaContext {
 
     public List<Bitmap> getViewBitmaps() {
         return this.viewBitmaps;
-    }
-
-    public void setViewBitmaps(List<Bitmap> viewBitmaps) {
-        this.viewBitmaps = viewBitmaps;
-    }
-
-    public Boolean getGeneratingReport() {
-        return this.generatingReport;
-    }
-
-    public void setGeneratingReport(Boolean generatingReport) {
-        this.generatingReport = generatingReport;
-    }
-
-    public Context getActivityContext() {
-        return this.context;
-    }
-
-
-    public void setActivityContext(Context context) {
-        this.context = context;
     }
 }

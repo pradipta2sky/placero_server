@@ -51,16 +51,16 @@ public class AreaDocumentChooserFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
-        if (this.fragmentView == null) {
-            this.fragmentView = inflater.inflate(layout.document_select_layout, container, false);
+        if (fragmentView == null) {
+            fragmentView = inflater.inflate(layout.document_select_layout, container, false);
 
-            this.listAdapter = new DocumentChooserAdaptor(this.getContext(), this.items);
-            TextView emptyView = (TextView) this.fragmentView.findViewById(id.searchEmptyView);
-            this.listView = (ListView) this.fragmentView.findViewById(id.document_list_view);
-            this.listView.setEmptyView(emptyView);
-            this.listView.setAdapter(this.listAdapter);
+            listAdapter = new DocumentChooserAdaptor(getContext(), items);
+            TextView emptyView = (TextView) fragmentView.findViewById(id.searchEmptyView);
+            listView = (ListView) fragmentView.findViewById(id.document_list_view);
+            listView.setEmptyView(emptyView);
+            listView.setAdapter(listAdapter);
 
-            this.listView.setOnItemClickListener(new OnItemClickListener() {
+            listView.setOnItemClickListener(new OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                     FileDisplayElement item = items.get(i);
@@ -96,27 +96,32 @@ public class AreaDocumentChooserFragment extends Fragment {
                     resource.setMimeType(FileUtil.getMimeType(loadFile));
                     resource.setContentType("Document");
                     resource.setContainerId(areaContext.getDocumentRootDriveResource().getResourceId());
+                    resource.setDirty(1);
+                    resource.setDirtyAction("upload");
+
+                    ae.getMediaResources().add(resource);
                     areaContext.addResourceToQueue(resource);
 
-                    Intent intent = new Intent(getActivity(), AreaAddResourcesActivity.class);
+                    Intent intent = new Intent(getContext(), AreaAddResourcesActivity.class);
                     startActivity(intent);
+
                     getActivity().finish();
                 }
             });
 
             PermittedFileArrayList<FileDisplayElement> files = new PermittedFileArrayList<>();
-            files.addAll(this.findFiles(this.getContext(), "external", "application/pdf"));
-            files.addAll(this.findFiles(this.getContext(), "internal", "application/pdf"));
+            files.addAll(findFiles(getContext(), "external", "application/pdf"));
+            files.addAll(findFiles(getContext(), "internal", "application/pdf"));
 
-            this.items.addAll(files);
-            this.listAdapter.notifyDataSetChanged();
+            items.addAll(files);
+            listAdapter.notifyDataSetChanged();
         } else {
-            ViewGroup parent = (ViewGroup) this.fragmentView.getParent();
+            ViewGroup parent = (ViewGroup) fragmentView.getParent();
             if (parent != null) {
-                parent.removeView(this.fragmentView);
+                parent.removeView(fragmentView);
             }
         }
-        return this.fragmentView;
+        return fragmentView;
     }
 
     private PermittedFileArrayList<FileDisplayElement> findFiles(Context context, String location, String mimeType) {
@@ -140,7 +145,7 @@ public class AreaDocumentChooserFragment extends Fragment {
                 String fileCreated = cursor.getString(cursor.getColumnIndex(MediaStore.Files.FileColumns.DATE_ADDED));
 
                 FileDisplayElement fileDisplayItem = new FileDisplayElement();
-                fileDisplayItem.setIcon(drawable.pdf_icon);
+                fileDisplayItem.setIcon(drawable.report);
                 fileDisplayItem.setName(fileTitle);
                 fileDisplayItem.setDesc(this.createDescriptionText(fileSize, fileLastModifed));
                 fileDisplayItem.setMimeType(fileMime);

@@ -18,6 +18,7 @@ import java.util.Iterator;
 import javax.net.ssl.HttpsURLConnection;
 
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
+import lm.pkp.com.landmap.util.GeneralUtil;
 
 /**
  * Created by Rinky on 21-10-2017.
@@ -39,7 +40,7 @@ public class TagInsertAsyncTask extends AsyncTask<JSONObject, Void, String> {
 
     protected String doInBackground(JSONObject... postDataParams) {
         try {
-            String urlString = "http://35.202.7.223/lm/";
+            String urlString = "http://"+ GeneralUtil.dbHost+"/lm/";
             JSONObject postDataParam = postDataParams[0];
             URL url = new URL(urlString + "TagMaster.php");
 

@@ -17,8 +17,10 @@ import android.widget.ImageView;
 import android.widget.ListView;
 
 import java.util.ArrayList;
+import java.util.List;
 
-import lm.pkp.com.landmap.CreateAreaFolderStructureActivity;
+import lm.pkp.com.landmap.AreaDashboardActivity;
+import lm.pkp.com.landmap.CreateAreaFoldersActivity;
 import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.R.id;
 import lm.pkp.com.landmap.R.layout;
@@ -28,21 +30,26 @@ import lm.pkp.com.landmap.area.model.AreaElement;
 import lm.pkp.com.landmap.area.db.AreaDBHelper;
 import lm.pkp.com.landmap.area.res.disp.AreaItemAdaptor;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
-import lm.pkp.com.landmap.custom.FragmentIdentificationHandler;
+import lm.pkp.com.landmap.custom.FragmentFilterHandler;
+import lm.pkp.com.landmap.custom.FragmentHandler;
 import lm.pkp.com.landmap.permission.PermissionConstants;
 import lm.pkp.com.landmap.permission.PermissionElement;
 import lm.pkp.com.landmap.permission.PermissionsDBHelper;
-import lm.pkp.com.landmap.sync.LocalDataRefresher;
+import lm.pkp.com.landmap.tags.TagElement;
 import lm.pkp.com.landmap.user.UserContext;
+import lm.pkp.com.landmap.user.UserElement;
+import lm.pkp.com.landmap.user.UserPersistableSelections;
 
 /**
  * Created by USER on 11/4/2017.
  */
-public class AreaDashboardOwnedFragment extends Fragment implements FragmentIdentificationHandler{
+public class AreaDashboardOwnedFragment extends Fragment
+        implements FragmentHandler, FragmentFilterHandler{
 
     private Activity mActivity = null;
     private View mView = null;
-
+    private boolean offline = false;
+    private AreaItemAdaptor viewAdapter = null;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -62,6 +69,7 @@ public class AreaDashboardOwnedFragment extends Fragment implements FragmentIden
         if(getUserVisibleHint()){
             loadFragment();
         }
+        offline = ((AreaDashboardActivity)mActivity).isOffline();
     }
 
     @Override
@@ -69,10 +77,9 @@ public class AreaDashboardOwnedFragment extends Fragment implements FragmentIden
         super.setUserVisibleHint(visible);
         if (visible && (mView != null) && (mActivity != null)) {
             AreaDashboardDisplayMetaStore.INSTANCE.setActiveTab(AreaDashboardDisplayMetaStore.TAB_OWNED_SEQ);
-            this.loadFragment();
+            loadFragment();
         }
     }
-
 
     private void loadFragment() {
         AreaContext.INSTANCE.clearContext();
@@ -86,8 +93,8 @@ public class AreaDashboardOwnedFragment extends Fragment implements FragmentIden
             @Override
             public void onClick(View v) {
                 mActivity.findViewById(id.splash_panel).setVisibility(View.VISIBLE);
-                AreaDBHelper adh = new AreaDBHelper(mActivity, new DataInsertServerCallback());
-                AreaElement areaElement = adh.insertAreaLocally();
+                AreaDBHelper adh = new AreaDBHelper(mActivity);
+                AreaElement areaElement = adh.insertAreaLocally(offline);
 
                 PermissionElement pe = new PermissionElement();
                 pe.setUserId(UserContext.getInstance().getUserElement().getEmail());
@@ -100,6 +107,7 @@ public class AreaDashboardOwnedFragment extends Fragment implements FragmentIden
 
                 // Resetting the context for new Area
                 AreaContext.INSTANCE.setAreaElement(areaElement, mActivity);
+                adh = new AreaDBHelper(mActivity, new DataInsertServerCallback(areaElement));
                 adh.insertAreaToServer(areaElement);
             }
         });
@@ -108,8 +116,8 @@ public class AreaDashboardOwnedFragment extends Fragment implements FragmentIden
             mView.findViewById(R.id.owned_area_empty_layout).setVisibility(View.GONE);
             areaListView.setVisibility(View.VISIBLE);
 
-            AreaItemAdaptor adaptor = new AreaItemAdaptor(mActivity, layout.area_element_row, areas);
-            areaListView.setAdapter(adaptor);
+            viewAdapter = new AreaItemAdaptor(mActivity, layout.area_element_row, areas);
+            areaListView.setAdapter(viewAdapter);
             areaListView.setDescendantFocusability(ListView.FOCUS_BLOCK_DESCENDANTS);
         } else {
             areaListView.setVisibility(View.GONE);
@@ -131,19 +139,27 @@ public class AreaDashboardOwnedFragment extends Fragment implements FragmentIden
                     }
                 });
         }
-
-        ImageView refreshAreaView = (ImageView) mActivity.findViewById(id.action_area_refresh);
-        if(AreaDashboardDisplayMetaStore.INSTANCE.getActiveTab() == AreaDashboardDisplayMetaStore.TAB_OWNED_SEQ){
-            refreshAreaView.setOnClickListener(new OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mActivity.findViewById(id.splash_panel).setVisibility(View.VISIBLE);
-                    new LocalDataRefresher(mActivity, new DataReloadCallback()).refreshLocalData();
-                }
-            });
-        }
         mView.findViewById(id.splash_panel).setVisibility(View.GONE);
 
+        final ImageView filterUTView = (ImageView) mActivity.findViewById(id.action_filter_ut);
+        UserElement userElement = UserContext.getInstance().getUserElement();
+        UserPersistableSelections userPersistableSelections = userElement.getSelections();
+        if(userPersistableSelections.isFilter()){
+            filterUTView.setBackground(getResources().getDrawable(R.drawable.rounded_corner));
+            List<TagElement> tags = userPersistableSelections.getTags();
+            List<String> filterables = new ArrayList<>();
+            List<String> executables = new ArrayList<>();
+            for(TagElement tag: tags){
+                if(tag.getType().equals("filterable")){
+                    filterables.add(tag.getName());
+                }else {
+                    executables.add(tag.getName());
+                }
+            }
+            doFilter(filterables, executables);
+        }else {
+            filterUTView.setBackground(null);
+        }
     }
 
     @Override
@@ -151,32 +167,26 @@ public class AreaDashboardOwnedFragment extends Fragment implements FragmentIden
         return "Owned";
     }
 
-    private class DataReloadCallback implements AsyncTaskCallback {
-
-        @Override
-        public void taskCompleted(Object result) {
-            ArrayList<AreaElement> areas = new AreaDBHelper(mActivity).getAreas("self");
-            ListView areaListView = (ListView) mView.findViewById(id.area_display_list);
-
-            if (areas.size() > 0) {
-                mView.findViewById(id.owned_area_empty_layout).setVisibility(View.GONE);
-                areaListView.setVisibility(View.VISIBLE);
-
-                AreaItemAdaptor adaptor = new AreaItemAdaptor(mActivity, layout.area_element_row, areas);
-                areaListView.setAdapter(adaptor);
-                areaListView.setDescendantFocusability(ListView.FOCUS_BLOCK_DESCENDANTS);
-
-                EditText inputSearch = (EditText) mActivity.findViewById(id.dashboard_search_box);
-                String filterStr = inputSearch.getText().toString().trim();
-                if (!filterStr.equalsIgnoreCase("")) {
-                    adaptor.getFilter().filter(filterStr);
-                }
-            } else {
-                areaListView.setVisibility(View.GONE);
-                mView.findViewById(id.owned_area_empty_layout).setVisibility(View.VISIBLE);
-            }
-            mView.findViewById(id.splash_panel).setVisibility(View.INVISIBLE);
+    @Override
+    public void doFilter(List<String> filterables, List<String> executables) {
+        ListView areaListView = (ListView) mView.findViewById(id.area_display_list);
+        AreaItemAdaptor adapter = (AreaItemAdaptor) areaListView.getAdapter();
+        if(adapter.getCount() == 0){
+            return;
         }
+        EditText inputSearch = (EditText) mActivity.findViewById(id.dashboard_search_box);
+        Editable inputSearchText = inputSearch.getText();
+        adapter.getFilterChain(filterables, executables).filter(inputSearchText.toString());
+    }
+
+    @Override
+    public void resetFilter() {
+        ListView areaListView = (ListView) mView.findViewById(id.area_display_list);
+        AreaItemAdaptor adapter = (AreaItemAdaptor) areaListView.getAdapter();
+        if(adapter == null){
+            return;
+        }
+        adapter.resetFilter().filter(null);
     }
 
     private class UserInputWatcher implements TextWatcher {
@@ -198,8 +208,23 @@ public class AreaDashboardOwnedFragment extends Fragment implements FragmentIden
 
                     ListView areaListView = (ListView) mView.findViewById(id.area_display_list);
                     ArrayAdapter<AreaElement> adapter = (ArrayAdapter<AreaElement>) areaListView.getAdapter();
-                    adapter.getFilter().filter(editable.toString());
-
+                    final ImageView filterUTView = (ImageView) mActivity.findViewById(id.action_filter_ut);
+                    UserElement userElement = UserContext.getInstance().getUserElement();
+                    if(filterUTView.getBackground() != null){
+                        List<TagElement> tags = userElement.getSelections().getTags();
+                        List<String> filterables = new ArrayList<>();
+                        List<String> executables = new ArrayList<>();
+                        for(TagElement tag: tags){
+                            if(tag.getType().equals("filterable")){
+                                filterables.add(tag.getName());
+                            }else {
+                                executables.add(tag.getName());
+                            }
+                        }
+                        doFilter(filterables, executables);
+                    }else {
+                        adapter.getFilter().filter(editable.toString());
+                    }
                     mView.findViewById(id.splash_panel).setVisibility(View.GONE);
                 }
             }
@@ -207,10 +232,26 @@ public class AreaDashboardOwnedFragment extends Fragment implements FragmentIden
     }
 
     private class DataInsertServerCallback implements AsyncTaskCallback {
+
+        private AreaElement areaElement;
+
+        public DataInsertServerCallback(AreaElement areaElement){
+            this.areaElement = areaElement;
+        }
         @Override
         public void taskCompleted(Object result) {
-            Intent intent = new Intent(mActivity, CreateAreaFolderStructureActivity.class);
+            Intent intent = new Intent(mActivity, CreateAreaFoldersActivity.class);
+            intent.putExtra("area_id", areaElement.getUniqueId());
             startActivity(intent);
         }
+    }
+
+    public void setOffline(boolean offline) {
+        this.offline = offline;
+    }
+
+    @Override
+    public Object getViewAdaptor() {
+        return viewAdapter;
     }
 }

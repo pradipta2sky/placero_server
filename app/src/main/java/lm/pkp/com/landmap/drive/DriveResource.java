@@ -2,6 +2,8 @@ package lm.pkp.com.landmap.drive;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
+import lm.pkp.com.landmap.position.PositionElement;
+
 /**
  * Created by USER on 10/31/2017.
  */
@@ -18,9 +20,11 @@ public class DriveResource {
     private String size = "";
     private String contentType = "";
     private String mimeType = "";
-    private String latitude = "";
-    private String longitude = "";
+    private Integer dirty = 0;
+    private String dirtyAction = "";
     private String createdOnMillis = System.currentTimeMillis() + "";
+
+    private PositionElement position = null;
 
     public String getUserId() {
         return this.userId;
@@ -110,25 +114,22 @@ public class DriveResource {
         this.containerId = containerId;
     }
 
-    public String getLatitude() {
-        return latitude;
-    }
-
-    public void setLatitude(String latitude) {
-        this.latitude = latitude;
-    }
-
-    public String getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(String longitude) {
-        this.longitude = longitude;
-    }
-
     @Override
     public boolean equals(Object o) {
-        EqualsBuilder builder = new EqualsBuilder().append(getResourceId(), ((DriveResource) o).getResourceId());
+        String sourceResId = getResourceId();
+        DriveResource targetRes = (DriveResource) o;
+        String targetResId = targetRes.getResourceId();
+
+        EqualsBuilder builder = null;
+        if(sourceResId.equals("1") || targetResId.equals("1")
+                || sourceResId.trim().equals("") || targetResId.trim().equals("")){
+            String targetResName = targetRes.getName();
+            String sourceResName = getName();
+            builder = new EqualsBuilder().append(sourceResName, targetResName);
+        }else {
+            builder = new EqualsBuilder().append(sourceResId, targetResId);
+        }
+
         return builder.isEquals();
     }
 
@@ -138,5 +139,29 @@ public class DriveResource {
 
     public void setCreatedOnMillis(String createdOnMillis) {
         this.createdOnMillis = createdOnMillis;
+    }
+
+    public Integer isDirty() {
+        return this.dirty;
+    }
+
+    public void setDirty(Integer dirty) {
+        this.dirty = dirty;
+    }
+
+    public String getDirtyAction() {
+        return this.dirtyAction;
+    }
+
+    public void setDirtyAction(String dirtyAction) {
+        this.dirtyAction = dirtyAction;
+    }
+
+    public PositionElement getPosition() {
+        return this.position;
+    }
+
+    public void setPosition(PositionElement position) {
+        this.position = position;
     }
 }

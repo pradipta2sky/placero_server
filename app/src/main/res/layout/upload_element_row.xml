@@ -1,0 +1,65 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:weightSum="3"
+    android:layout_margin="10dp"
+    android:background="@drawable/rounded_corner">
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_weight="2.8"
+        android:gravity="center_vertical"
+        android:orientation="vertical"
+        android:layout_margin="10dp"
+        >
+
+        <TextView
+            android:id="@+id/ar_file_name"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif-medium"
+            android:textColor="#000000"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            />
+
+        <TextView
+            android:id="@+id/ar_file_path"
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:fontFamily="sans-serif-medium"
+            android:lines="1"
+            android:textColor="#000000"
+            android:textSize="13sp"
+            android:gravity="center"
+            />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="5dp"
+        android:layout_weight="0.2"
+        android:layout_gravity="center"
+        android:orientation="vertical">
+
+    <Button
+        android:id="@+id/remove_upload_resource"
+        style="@style/Base.Widget.AppCompat.Button.Small"
+        android:layout_width="wrap_content"
+        android:layout_height="45dp"
+        android:text="X"
+        android:gravity="center"
+        android:layout_margin="10dp"/>
+
+    </LinearLayout>
+
+</LinearLayout>
+
+

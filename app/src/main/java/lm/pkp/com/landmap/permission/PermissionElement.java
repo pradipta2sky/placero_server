@@ -8,6 +8,8 @@ public class PermissionElement {
     private String areaId;
     private String userId;
     private String functionCode;
+    private Integer dirty = 0;
+    private String dirtyAction = "";
 
     public String getAreaId() {
         return areaId;
@@ -31,5 +33,21 @@ public class PermissionElement {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public Integer getDirty() {
+        return this.dirty;
+    }
+
+    public void setDirty(Integer dirty) {
+        this.dirty = dirty;
+    }
+
+    public String getDirtyAction() {
+        return this.dirtyAction;
+    }
+
+    public void setDirtyAction(String dirtyAction) {
+        this.dirtyAction = dirtyAction;
     }
 }

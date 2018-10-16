@@ -22,27 +22,33 @@ public class ColorProvider {
     public static final int BUFF_BLUE_AREA_DISPLAY = Color.parseColor("#C5D2F7");
     public static final int BUFF_ORANGE_AREA_DISPLAY = Color.parseColor("#F7C7AC");
 
+    public static final int DEFAULT_POLYGON_BOUNDARY = Color.parseColor("#5DADE2");
+    public static final int DEFAULT_POLYGON_FILL = Color.parseColor("#85C1E9");
+    public static final int DEFAULT_POLYGON_MEDIA_LINK = Color.parseColor("#F5EEF8");
+
+    public static final int DEFAULT_DIRTY_ITEM_COLOR = Color.parseColor("#F8F2DF");
+
     public static final int getAreaToolBarColor(AreaElement areaElement) {
         if (areaElement.getType().equalsIgnoreCase("shared")) {
-            return ColorProvider.BUFF_YELLOW_TOOLBAR;
+            return BUFF_YELLOW_TOOLBAR;
         } else if (areaElement.getType().equalsIgnoreCase("public")) {
-            return ColorProvider.BUFF_ORANGE_TOOLBAR;
+            return BUFF_ORANGE_TOOLBAR;
         } else {
-            return ColorProvider.BUFF_BLUE_TOOLBAR;
+            return BUFF_BLUE_TOOLBAR;
         }
     }
 
     public static final int getAreaDetailsColor(AreaElement areaElement) {
         if (areaElement.getType().equalsIgnoreCase("shared")) {
-            return ColorProvider.BUFF_YELLOW_AREA_DISPLAY;
+            return BUFF_YELLOW_AREA_DISPLAY;
         } else if (areaElement.getType().equalsIgnoreCase("public")) {
-            return ColorProvider.BUFF_ORANGE_AREA_DISPLAY;
+            return BUFF_ORANGE_AREA_DISPLAY;
         } else {
-            return ColorProvider.BUFF_BLUE_AREA_DISPLAY;
+            return BUFF_BLUE_AREA_DISPLAY;
         }
     }
 
     public static int getDefaultToolBarColor() {
-        return ColorProvider.DEFAULT_TOOLBAR_COLOR;
+        return DEFAULT_TOOLBAR_COLOR;
     }
 }

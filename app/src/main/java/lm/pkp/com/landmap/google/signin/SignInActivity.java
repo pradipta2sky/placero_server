@@ -2,7 +2,9 @@ package lm.pkp.com.landmap.google.signin;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -22,18 +24,20 @@ import com.google.android.gms.common.api.OptionalPendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
-
-import java.util.Calendar;
-import java.util.Date;
-import java.util.TimeZone;
 
 import lm.pkp.com.landmap.R;
 import lm.pkp.com.landmap.R.id;
-import lm.pkp.com.landmap.R.layout;
 import lm.pkp.com.landmap.R.string;
 import lm.pkp.com.landmap.SplashActivity;
+import lm.pkp.com.landmap.connectivity.ConnectivityChangeReceiver;
+import lm.pkp.com.landmap.connectivity.services.AreaSynchronizationService;
+import lm.pkp.com.landmap.connectivity.services.PositionSynchronizationService;
+import lm.pkp.com.landmap.connectivity.services.ResourceSynchronizationService;
 import lm.pkp.com.landmap.custom.AsyncTaskCallback;
+import lm.pkp.com.landmap.custom.GlobalContext;
+import lm.pkp.com.landmap.tags.TagElement;
 import lm.pkp.com.landmap.user.UserContext;
 import lm.pkp.com.landmap.user.UserDBHelper;
 import lm.pkp.com.landmap.user.UserElement;
@@ -55,21 +59,17 @@ public class SignInActivity extends AppCompatActivity implements
     private TextView mStatusTextView;
     private ProgressDialog mProgressDialog;
     private UserElement signedUser;
+    private boolean offline = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        Intent intent = getIntent();
-        Bundle extras = intent.getExtras();
-        if(extras != null){
-            String cause = extras.getString("cause");
-            if(cause != null && cause.equalsIgnoreCase("crash")){
-                // TODO something for crash recovery
-            }
-        }
+        // Create the database.
+        new UserDBHelper(getApplicationContext()).dryRun();
+        GlobalContext.INSTANCE.put(GlobalContext.APPLICATION_STARTED, "true");
 
-        setContentView(layout.activity_google_signin_main);
+        setContentView(R.layout.activity_google_signin_main);
         getSupportActionBar().hide();
 
         mStatusTextView = (TextView) findViewById(id.status);
@@ -90,12 +90,36 @@ public class SignInActivity extends AppCompatActivity implements
     }
 
     @Override
+    public void taskCompleted(Object result) {
+        try {
+            String userDetails = result.toString();
+            UserDBHelper udh = new UserDBHelper(getApplicationContext());
+            Intent spashIntent = new Intent(this, SplashActivity.class);
+            if (userDetails.trim().equalsIgnoreCase("[]")) {
+                udh.insertUserToServer(signedUser);
+                spashIntent.putExtra("user_exists", "false");
+            }else {
+                SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+                SharedPreferences.Editor editor = preferences.edit();
+                editor.putString("user_details", userDetails);
+                editor.commit();
+
+                buildUserSelectionsFromDetails(userDetails);
+                spashIntent.putExtra("user_exists", "true");
+            }
+            startActivity(spashIntent);
+            finish();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @Override
     public void onStart() {
         super.onStart();
-
         OptionalPendingResult<GoogleSignInResult> opr = Auth.GoogleSignInApi.silentSignIn(mGoogleApiClient);
         if (opr.isDone()) {
-            Log.d(TAG, "Got cached sign-in");
             GoogleSignInResult result = opr.get();
             handleSignInResult(result);
         } else {
@@ -131,23 +155,62 @@ public class SignInActivity extends AppCompatActivity implements
     }
 
     private void handleSignInResult(GoogleSignInResult result) {
-        Log.d(TAG, "handleSignInResult:" + result.isSuccess());
         if (result.isSuccess()) {
             GoogleSignInAccount acct = result.getSignInAccount();
+            // Convert google specific user account to app specific
             signedUser = UserMappingUtil.convertGoogleAccountToLocalAccount(acct);
-
-            UserDBHelper udh = new UserDBHelper(getApplicationContext());
-            UserElement localUser = udh.getUserByEmail(signedUser.getEmail());
-            if (localUser == null) {
-                udh.insertUserLocally(signedUser);
-            }
+            // Set the user context.
             UserContext.getInstance().setUserElement(signedUser);
-            searchOnRemoteAndUpdate(signedUser);
 
+            SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+            SharedPreferences.Editor editor = preferences.edit();
+            editor.putString("user_email", signedUser.getEmail());
+            editor.putString("user_display_name", signedUser.getDisplayName());
+            editor.putString("user_photo_url", signedUser.getPhotoUrl());
+            editor.commit();
+
+            searchOnRemoteAndUpdate(signedUser);
             mGoogleApiClient.disconnect();
         } else {
-            updateUI(false);
+            boolean online = ConnectivityChangeReceiver.isConnected(this);
+            offline = !online;
+            if(!offline){
+                UserElement user = buildUserFromPreferences();
+                if(user == null){
+                    updateUI(false);
+                }else {
+                    Intent spashIntent = new Intent(this, SplashActivity.class);
+                    spashIntent.putExtra("user_exists", "true");
+                    startActivity(spashIntent);
+                    finish();
+                }
+            }else {
+                updateUI(false);
+            }
         }
+    }
+
+    private UserElement buildUserFromPreferences() {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        String email = preferences.getString("user_email", null);
+        if(email == null){
+            return null;
+        }
+        UserElement user = new UserElement();
+        user.setEmail(email);
+
+        String displayName = preferences.getString("user_display_name", null);
+        user.setDisplayName(displayName);
+
+        String photoUrl = preferences.getString("user_photo_url", null);
+        user.setPhotoUrl(photoUrl);
+
+        UserContext.getInstance().setUserElement(user);
+        String userDetails = preferences.getString("user_details", null);
+        if(userDetails != null){
+            buildUserSelectionsFromDetails(userDetails);
+        }
+        return user;
     }
 
     private void searchOnRemoteAndUpdate(UserElement ue) {
@@ -163,22 +226,22 @@ public class SignInActivity extends AppCompatActivity implements
         searchUserTask.setCompletionCallback(this);
     }
 
-    @Override
-    public void taskCompleted(Object result) {
+    private void buildUserSelectionsFromDetails(String userDetails) {
         try {
-            String userDetails = result.toString();
-            UserDBHelper udh = new UserDBHelper(getApplicationContext());
-            Intent spashIntent = new Intent(this, SplashActivity.class);
-            if (userDetails.trim().equalsIgnoreCase("[]")) {
-                udh.insertUserToServer(signedUser);
-                spashIntent.putExtra("user_exists", "false");
-            }else {
-                spashIntent.putExtra("user_exists", "true");
+            JSONArray userArr = new JSONArray(userDetails);
+            JSONObject userObj = (JSONObject) userArr.get(0);
+            String tagsStr = userObj.getString("tags");
+            String[] tagsArr = tagsStr.split(",");
+
+            String tagTypes = userObj.getString("tag_types");
+            String[] tagTypesArr = tagTypes.split(",");
+
+            UserElement userElement = UserContext.getInstance().getUserElement();
+            for (int i = 0; i < tagsArr.length; i++) {
+                TagElement tagElement = new TagElement(tagsArr[i], tagTypesArr[i], "user");
+                userElement.getSelections().getTags().add(tagElement);
             }
-            startActivity(spashIntent);
-            finish();
-        } catch (Exception e) {
-            e.printStackTrace();
+        }catch (Exception e){
         }
     }
 

@@ -179,7 +179,8 @@ public class DownloadDriveResourcesActivity extends Activity implements Permissi
     void showGooglePlayServicesAvailabilityErrorDialog(
             int connectionStatusCode) {
         GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
-        Dialog dialog = apiAvailability.getErrorDialog(this, connectionStatusCode, REQUEST_GOOGLE_PLAY_SERVICES);
+        Dialog dialog = apiAvailability.getErrorDialog(this, connectionStatusCode,
+                REQUEST_GOOGLE_PLAY_SERVICES);
         dialog.show();
     }
 

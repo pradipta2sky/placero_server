@@ -1,39 +1,39 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="15dp"
-    android:background="@drawable/rounded_corner"
+    android:layout_margin="10dp"
+    android:background="@drawable/rounded_pos_list_view"
     android:baselineAligned="false"
     android:elevation="5dp"
-    android:minHeight="80dp"
+    android:minHeight="75dp"
     android:orientation="horizontal"
-    android:paddingBottom="10dp"
-    android:paddingTop="10dp">
+    >
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="fill_parent"
         android:orientation="vertical"
-        android:layout_weight="0.05"
         android:layout_gravity="top">
 
         <ImageView
             android:id="@+id/position_default_img"
             android:layout_width="40dp"
-            android:layout_height="40dp"
+            android:layout_height="fill_parent"
             android:layout_gravity="center_vertical"
             android:layout_marginLeft="10dp"
-            android:src="@drawable/marker_image" />
+            android:src="@drawable/position"
+            android:layout_marginRight="15dp"
+            />
     </LinearLayout>
 
 
     <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="fill_parent"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
         android:orientation="vertical"
         android:layout_gravity="center_vertical"
         android:weightSum="1"
-        android:layout_weight="0.75">
+        android:layout_weight="0.80">
 
         <TextView
             android:id="@+id/pos_name"
@@ -43,24 +43,42 @@
             android:paddingLeft="10dp"
             android:textColor="#000000"
             android:textSize="15sp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:layout_marginTop="10dp"/>
 
         <TextView
             android:id="@+id/pos_latlng"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingLeft="10dp"
+            android:textColor="#000000"
+            android:textSize="13sp"
+            />
+
+        <TextView
+            android:id="@+id/pos_desc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_marginBottom="2dp"
             android:paddingLeft="10dp"
             android:textColor="#000000"
-            android:textSize="13sp" />
-
+            android:textSize="13sp"
+            android:text="No Description"/>
 
     </LinearLayout>
 
     <ImageView
+        android:id="@+id/edit_row"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:gravity="right|center_vertical"
+        android:src="@drawable/edit_position" />
+
+    <ImageView
         android:id="@+id/del_row"
-        android:layout_width="30dp"
-        android:layout_height="30dp"
+        android:layout_width="40dp"
+        android:layout_height="wrap_content"
         android:layout_marginTop="5dp"
         android:layout_marginRight="10dp"
         android:gravity="right|center_vertical"
